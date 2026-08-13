@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    원격통제장치(RCU) ↔ 중앙통제장치(MCE) DDS Binding.
+
+    원칙
+    - Channel의 topicName/typeName은 CSCI CSV의 DDS 정의를 그대로 사용한다.
+    - usvHeader, commandID, DestinationType 및 의미가 확정되지 않은 공용 struct 내부 값은 BindingOnly로 두고 CDM을 부여하지 않는다.
+    - commandID는 원통 CSV 규칙(비주기 메시지 생성마다 +1, 0~65535)에 따라 런타임/Adapter가 생성한다. HMI 입력이 아니다.
+    - CommandStatusReportType은 비주기 명령 처리상태 ACK이며 물리 동작 완료/성공을 의미하지 않는다.
+    - PBIT/IBIT는 CommandStatusReport ACK와 별개로 전용 결과 Reply를 가진다.
+
+    주요 TBD
+    - DestinationType의 중앙통제 대상 3-byte 식별값 생성 규칙
+    - AuthorityControl.destination 의미
+    - 일반 DDS struct 중첩 필드 접근 표기(dotted path 사용 여부)
+    - WirelessCommsPreset Bit 7~6 packing 규칙
+    - VHF rxChannel 범위/단위
+    - PBIT 1 Hz 표기 및 PBIT/IBIT 결과 commandID 부재에 따른 상관관계
+    상세는 CentralControl_OpenIssues.md 참조.
+-->
+<PayloadBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+    <Monitors semantic_id="monitor">
+        <MonitorBindingDDS semantic_id="usvOperationalStatus">
+            <Channel topicName="RUSV::SO::MCE::USVHeartBeatReportType" typeName="USVHeartBeatReportType"/>
+            <Field name="usvHeader"/>
+            <!-- operationalStateUSV의 2~7 의미는 CSV에 정의되어 있지 않다. -->
+            <Field name="operationalStateUSV" cdm="Platform.OperationalState"/>
+            <Field name="operationalModeUSV" cdm="Platform.OperationMode"/>
+            <Field name="latitude" cdm="Navigation.Position.Latitude"/>
+            <Field name="longitude" cdm="Navigation.Position.Longitude"/>
+            <Field name="course" cdm="Navigation.Course"/>
+            <Field name="groundSpeed" cdm="Motion.GroundSpeed"/>
+            <Field name="roll" cdm="Attitude.Roll"/>
+            <Field name="pitch" cdm="Attitude.Pitch"/>
+            <Field name="missionModeAC" cdm="Autonomy.Mission.Mode"/>
+            <Field name="operationalModeEOIR" cdm="Sensor.EOIR.OperationMode"/>
+            <Field name="operationalModeTSA" cdm="Sensor.TowedSonar.OperationMode"/>
+            <Field name="operationalModeRCWS" cdm="Weapon.RCWS.OperationMode"/>
+        </MonitorBindingDDS>
+
+        <MonitorBindingDDS semantic_id="centralControlHealth">
+            <Channel topicName="RUSV::SO::MCE::MCECBITReportType" typeName="MCECBITReportType"/>
+            <Field name="usvHeader"/>
+            <Field name="operationalStatus" cdm="Health.OperationalStatus"/>
+        </MonitorBindingDDS>
+
+        <MonitorBindingDDS semantic_id="controlAuthorityStatus">
+            <Channel topicName="RUSV::C2::MCE::ControlCommandReportType" typeName="ControlCommandReportType"/>
+            <Field name="usvHeader"/>
+            <!-- 중앙통제 CSV 원문에 이 행 주변 #REF! 셀이 있으나 controlCommand 필드/의미는 식별 가능하다. -->
+            <Field name="controlCommand" cdm="Control.Authority.Owner"/>
+        </MonitorBindingDDS>
+    </Monitors>
+
+    <Controls semantic_id="control">
+        <ControlBindingDDS semantic_id="startIntegration">
+            <Channel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
+            <Field name="usvHeader"/>
+            <!-- 중앙통제 대상 DestinationType은 운용자 입력이 아니라 시스템이 채운다. 정확한 3-byte 식별값은 식별자 규칙과 Adapter 규칙 확인 전까지 BindingOnly로 둔다. -->
+            <Field name="destination"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="startIntegrationCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="restartSystem">
+            <Channel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
+            <Field name="usvHeader"/>
+            <!-- 중앙통제 대상 DestinationType은 운용자 입력이 아니라 시스템이 채운다. 정확한 3-byte 식별값은 식별자 규칙과 Adapter 규칙 확인 전까지 BindingOnly로 둔다. -->
+            <Field name="destination"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="restartSystemCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="requestPbit">
+            <Channel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
+            <Field name="usvHeader"/>
+            <!-- 중앙통제 대상 DestinationType은 시스템이 채운다. 정확한 octet 조합은 TBD. -->
+            <Field name="destination"/>
+            <Field name="commandID"/>
+
+            <!-- 원통 CSV의 ACK=O에 대응하는 명령 처리상태. Semantic의 논리 PBIT 결과와는 별도 보조 Reply이다. -->
+            <Reply semantic_id="requestPbitCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+
+            <!--
+                중앙통제 CSCI에는 MCEPBITReportType 주기가 1 Hz로 적혀 있으나,
+                원통 PBIT 요청과 타 장비 PBIT 응답 패턴을 근거로 PBIT 결과 Reply로 잠정 해석한다.
+                이 결과 Telegram에는 commandID가 없어 요청-결과 상관관계 방식은 TBD이다.
+            -->
+            <Reply semantic_id="requestPbitResultReply" required="true">
+                <Channel topicName="RUSV::SO::MCE::MCEPBITReportType" typeName="MCEPBITReportType"/>
+                <Field name="usvHeader"/>
+                <Field name="operationalStatus" cdm="Health.OperationalStatus"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="requestIbit">
+            <Channel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
+            <Field name="usvHeader"/>
+            <!-- 중앙통제 대상 DestinationType은 시스템이 채운다. 정확한 octet 조합은 TBD. -->
+            <Field name="destination"/>
+            <Field name="commandID"/>
+
+            <!-- 원통 CSV의 ACK=O에 대응하는 명령 처리상태. Semantic의 논리 IBIT 결과와는 별도 보조 Reply이다. -->
+            <Reply semantic_id="requestIbitCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+
+            <!-- MCEIBITReportType에는 commandID가 없어 요청-결과 상관관계 방식은 TBD이다. -->
+            <Reply semantic_id="requestIbitResultReply" required="true">
+                <Channel topicName="RUSV::SO::MCE::MCEIBITReportType" typeName="MCEIBITReportType"/>
+                <Field name="usvHeader"/>
+                <!-- 원본 CSV 필드명이 operationalStaus로 표기되어 있어 오타 여부 확인 전까지 그대로 보존한다. -->
+                <Field name="operationalStaus" cdm="Health.OperationalStatus"/>
+                <!-- ProcessorIBIT 16-byte 공용 구조체의 세부 필드 의미는 본 CSV에 없으므로 raw BindingOnly로 보존한다. -->
+                <Field name="mceProcessorIBIT"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="configureWirelessPreset">
+            <Channel topicName="RUSV::C2::RCU::WirelessCommsPresetControlType" typeName="WirelessCommsPresetControlType"/>
+            <Field name="usvHeader"/>
+            <!-- topology/mission은 각각 octet이지만 원문이 둘 다 "Bit 7~6"이라고 표기한다. 실제 shift/packing converter는 TBD이다. -->
+            <Field name="topology" cdm="Communication.WirelessPreset.TopologyMode"/>
+            <Field name="mission" cdm="Communication.WirelessPreset.MissionMode"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="configureWirelessPresetCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="emergencyStop">
+            <Channel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
+            <Field name="usvHeader"/>
+            <!--
+                OperationModeControl은 1-byte 공용 구조체이다.
+                TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.
+                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.
+                원통의 이 Topic은 중앙통제와 선체제어가 함께 수신한다. 본 Binding은 원통↔중통 경계만 의미한다.
+            -->
+            <FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="0"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="emergencyStopCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="emergencyReturn">
+            <Channel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
+            <Field name="usvHeader"/>
+            <!--
+                OperationModeControl은 1-byte 공용 구조체이다.
+                TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.
+                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.
+                원통의 이 Topic은 중앙통제와 선체제어가 함께 수신한다. 본 Binding은 원통↔중통 경계만 의미한다.
+            -->
+            <FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="1"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="emergencyReturnCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="enterRemoteManualMode">
+            <Channel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
+            <Field name="usvHeader"/>
+            <!--
+                OperationModeControl은 1-byte 공용 구조체이다.
+                TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.
+                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.
+                원통의 이 Topic은 중앙통제와 선체제어가 함께 수신한다. 본 Binding은 원통↔중통 경계만 의미한다.
+            -->
+            <FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="2"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="enterRemoteManualModeCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="enterLocalManualMode">
+            <Channel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
+            <Field name="usvHeader"/>
+            <!--
+                OperationModeControl은 1-byte 공용 구조체이다.
+                TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.
+                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.
+                원통의 이 Topic은 중앙통제와 선체제어가 함께 수신한다. 본 Binding은 원통↔중통 경계만 의미한다.
+            -->
+            <FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="3"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="enterLocalManualModeCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="enterAutonomousMode">
+            <Channel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
+            <Field name="usvHeader"/>
+            <!--
+                OperationModeControl은 1-byte 공용 구조체이다.
+                TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.
+                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.
+                원통의 이 Topic은 중앙통제와 선체제어가 함께 수신한다. 본 Binding은 원통↔중통 경계만 의미한다.
+            -->
+            <FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="4"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="enterAutonomousModeCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="enterCommandStandby">
+            <Channel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
+            <Field name="usvHeader"/>
+            <!--
+                OperationModeControl은 1-byte 공용 구조체이다.
+                TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.
+                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.
+                원통의 이 Topic은 중앙통제와 선체제어가 함께 수신한다. 본 Binding은 원통↔중통 경계만 의미한다.
+            -->
+            <FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="5"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="enterCommandStandbyCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="enterMaintenanceMode">
+            <Channel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
+            <Field name="usvHeader"/>
+            <!--
+                OperationModeControl은 1-byte 공용 구조체이다.
+                TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.
+                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.
+                원통의 이 Topic은 중앙통제와 선체제어가 함께 수신한다. 본 Binding은 원통↔중통 경계만 의미한다.
+            -->
+            <FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="6"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="enterMaintenanceModeCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="executeEmergencyAction">
+            <Channel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
+            <Field name="usvHeader"/>
+            <!--
+                OperationModeControl은 1-byte 공용 구조체이다.
+                TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.
+                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.
+                원통의 이 Topic은 중앙통제와 선체제어가 함께 수신한다. 본 Binding은 원통↔중통 경계만 의미한다.
+            -->
+            <FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="7"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="executeEmergencyActionCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="prepareAuthorityTransfer">
+            <Channel topicName="RUSV::C2::RCU::AuthorityControlType" typeName="AuthorityControlType"/>
+            <Field name="usvHeader"/>
+            <!-- AuthorityControl 일반 struct 중첩 경로는 dotted path를 잠정 사용한다. Adapter 중첩 접근 규칙 확인 필요. -->
+            <FixedField name="authorityControlStatus.command" value="0"/>
+            <!-- command=0일 때 commandTarget: 0 고정형, 1 이동형, 2 출입항보조, 255 기타. -->
+            <Field name="authorityControlStatus.commandTarget" cdm="Control.Authority.TargetControlStation"/>
+            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않아 HMI 입력/CDM으로 승격하지 않는다. -->
+            <Field name="authorityControlStatus.destination"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="prepareAuthorityTransferCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="requestControlAuthority">
+            <Channel topicName="RUSV::C2::RCU::AuthorityControlType" typeName="AuthorityControlType"/>
+            <Field name="usvHeader"/>
+            <!-- AuthorityControl 일반 struct 중첩 경로는 dotted path를 잠정 사용한다. Adapter 중첩 접근 규칙 확인 필요. -->
+            <FixedField name="authorityControlStatus.command" value="1"/>
+            <!-- 공용 구조체 설명상 commandTarget은 command=0에서 사용한다. 이 명령에서의 초기화 규칙은 미정이므로 raw 필드를 유지하고 HMI 입력으로 노출하지 않는다. -->
+            <Field name="authorityControlStatus.commandTarget"/>
+            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않았다. -->
+            <Field name="authorityControlStatus.destination"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="requestControlAuthorityCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="approveControlAuthorityRequest">
+            <Channel topicName="RUSV::C2::RCU::AuthorityControlType" typeName="AuthorityControlType"/>
+            <Field name="usvHeader"/>
+            <!-- AuthorityControl 일반 struct 중첩 경로는 dotted path를 잠정 사용한다. Adapter 중첩 접근 규칙 확인 필요. -->
+            <FixedField name="authorityControlStatus.command" value="2"/>
+            <!-- 공용 구조체 설명상 commandTarget은 command=0에서 사용한다. 이 명령에서의 초기화 규칙은 미정이므로 raw 필드를 유지하고 HMI 입력으로 노출하지 않는다. -->
+            <Field name="authorityControlStatus.commandTarget"/>
+            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않았다. -->
+            <Field name="authorityControlStatus.destination"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="approveControlAuthorityRequestCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="rejectControlAuthorityRequest">
+            <Channel topicName="RUSV::C2::RCU::AuthorityControlType" typeName="AuthorityControlType"/>
+            <Field name="usvHeader"/>
+            <!-- AuthorityControl 일반 struct 중첩 경로는 dotted path를 잠정 사용한다. Adapter 중첩 접근 규칙 확인 필요. -->
+            <FixedField name="authorityControlStatus.command" value="3"/>
+            <!-- 공용 구조체 설명상 commandTarget은 command=0에서 사용한다. 이 명령에서의 초기화 규칙은 미정이므로 raw 필드를 유지하고 HMI 입력으로 노출하지 않는다. -->
+            <Field name="authorityControlStatus.commandTarget"/>
+            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않았다. -->
+            <Field name="authorityControlStatus.destination"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="rejectControlAuthorityRequestCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="reclaimControlAuthority">
+            <Channel topicName="RUSV::C2::RCU::AuthorityControlType" typeName="AuthorityControlType"/>
+            <Field name="usvHeader"/>
+            <!-- AuthorityControl 일반 struct 중첩 경로는 dotted path를 잠정 사용한다. Adapter 중첩 접근 규칙 확인 필요. -->
+            <FixedField name="authorityControlStatus.command" value="4"/>
+            <!-- 공용 구조체 설명상 commandTarget은 command=0에서 사용한다. 이 명령에서의 초기화 규칙은 미정이므로 raw 필드를 유지하고 HMI 입력으로 노출하지 않는다. -->
+            <Field name="authorityControlStatus.commandTarget"/>
+            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않았다. -->
+            <Field name="authorityControlStatus.destination"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="reclaimControlAuthorityCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="controlVhf">
+            <Channel topicName="RUSV::C2::RCU::VHFChannelCommandType" typeName="VHFChannelCommandType"/>
+            <Field name="usvHeader"/>
+            <!-- CSV 원문 필드명 VHFchannelCommendType을 그대로 사용한다. 0=중지, 1=송신. -->
+            <Field name="VHFchannelCommendType" cdm="Communication.VHF.TransmitCommand"/>
+            <!-- rxChannel은 '채널 및 주파수'로만 설명되어 허용 범위/단위/채널표가 TBD이다. -->
+            <Field name="rxChannel" cdm="Communication.VHF.Channel"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="controlVhfCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="setVoiceVolume">
+            <Channel topicName="RUSV::C2::RCU::VolumeSquelchCommandType" typeName="VolumeSquelchCommandType"/>
+            <Field name="usvHeader"/>
+            <FixedField name="volumeSquelchControl" value="1"/>
+            <Field name="volumeSquelchState" cdm="Communication.Voice.Volume.Percent"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="setVoiceVolumeCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="setVhfSquelch">
+            <Channel topicName="RUSV::C2::RCU::VolumeSquelchCommandType" typeName="VolumeSquelchCommandType"/>
+            <Field name="usvHeader"/>
+            <FixedField name="volumeSquelchControl" value="2"/>
+            <Field name="volumeSquelchState" cdm="Communication.VHF.Squelch.Percent"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="setVhfSquelchCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="configureVoiceCommunication">
+            <Channel topicName="RUSV::C2::RCU::VoiceRxTxControlType" typeName="VoiceRxTxControlType"/>
+            <Field name="usvHeader"/>
+            <Field name="alarmTxControl" cdm="Communication.Voice.AlarmTransmit"/>
+            <Field name="voiceTxControl" cdm="Communication.Voice.Transmit"/>
+            <!-- 필드 설명은 음성수신명령이나 CSV 비고가 1='송신'으로 되어 있어 용어 오기 여부가 TBD이다. -->
+            <Field name="voiceRxControl" cdm="Communication.Voice.Receive"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="configureVoiceCommunicationCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+
+        <ControlBindingDDS semantic_id="selectVideoDistribution">
+            <Channel topicName="RUSV::C2::RCU::VideoOutCommandType" typeName="VideoOutCommandType"/>
+            <Field name="usvHeader"/>
+            <!-- 0=중지, 1~4=감시#1~#4 -->
+            <Field name="videoTransmitType" cdm="Video.Distribution.Selection"/>
+            <Field name="commandID"/>
+            <Reply semantic_id="selectVideoDistributionCommandStatusReply" required="true">
+                <Channel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+                <Field name="usvHeader"/>
+                <!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다. -->
+                <!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다. -->
+                <Field name="commandStatusReport"/>
+                <Field name="commandID"/>
+            </Reply>
+        </ControlBindingDDS>
+    </Controls>
+</PayloadBinding>

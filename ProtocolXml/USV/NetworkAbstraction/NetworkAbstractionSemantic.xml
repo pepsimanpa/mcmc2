@@ -1,0 +1,1002 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<CommSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+  <!--네트워크추상화장치 Semantic: 네트워크추상화장치 CSCI + 원격통제장치 CSCI + 공용 구조체/식별자 규칙 기반-->
+  <!--범위는 원격통제장치 CSCI ↔ 네트워크추상화장치 CSCI 직접 연동에 한정한다. 원격통제장치로 직접 전달되지 않는 USV L-Band 링크상태/Aux 링크상태 등은 제외한다.-->
+  <!--BIT 세부 bit-packed 필드는 기존 XSD를 확장하지 않고 raw 값으로 유지한다. 단, L-Band OverallBIT.operation은 결정사항에 따라 Bit7~6을 0/1/2 운용상태로 정규화한다.-->
+  <ConstantSpecs id="constant">
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+      <Value>NetworkAbstractionUnit</Value>
+    </TextConstantSpec>
+    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+      <Value>체계망 이중화, 사이버 위협, 통신링크 상태 및 통신장비 BIT/제어를 중계·추상화하는 통신장비 인터페이스</Value>
+    </TextConstantSpec>
+  </ConstantSpecs>
+  <MonitorSpecs id="monitor">
+    <ValueSetSpec id="intraNetworkStatus" name="체계망 활성 경로" cdm="Communication.Network.Redundancy.ActivePath">
+      <Values>
+        <Value cdm="Communication.Network.Path.Emergency">0</Value>
+        <Value cdm="Communication.Network.Path.Primary">1</Value>
+      </Values>
+    </ValueSetSpec>
+    <!--IntraNetworkStatusType의 commandID는 원본 설명상 생성 주체와 Source가 불일치하므로 Semantic 운용값에는 노출하지 않고 Binding 물리 필드로만 유지한다.-->
+    <GroupSpec id="cyberThreat" name="사이버 위협 탐지 정보" cdm="Cyber.Threat">
+      <!--threatCode 원문은 Bit1~0을 사용하며 00/01/10만 정의한다. 11(3)은 미정의이므로 ValueSet에서 제외한다.-->
+      <ValueSetSpec id="threatType" name="위협 종류" cdm="Cyber.Threat.Type">
+        <Values>
+          <Value cdm="Cyber.Threat.Type.UnauthorizedDeviceAccess">0</Value>
+          <Value cdm="Cyber.Threat.Type.UnauthorizedPortServiceAccess">1</Value>
+          <Value cdm="Cyber.Threat.Type.SuspectedDoS">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <TextSpec id="sourceIp" name="공격자 IP" cdm="Cyber.Threat.SourceIP">
+        <MaxLength>256</MaxLength>
+      </TextSpec>
+      <QuantitySpec id="targetPort" name="공격 대상 포트" cdm="Cyber.Threat.TargetPort"/>
+      <!--targetPort는 원본 CSCI에서 octet(1 byte)로 정의되어 있으며 전체 TCP/UDP 포트 범위 지원 여부는 명시되지 않았다. Range를 임의 지정하지 않는다.-->
+    </GroupSpec>
+    <GroupSpec id="networkIntegrationCbitStatus" name="네트워크추상화장치 CBIT 상태" cdm="Health.NetworkAbstraction.CBIT">
+      <ValueSetSpec id="overallStatus" name="종합 상태" cdm="Health.NetworkAbstraction.Overall.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="mccStatus" name="주제어카드 상태" cdm="Health.NetworkAbstraction.MCC.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="ddcStatus" name="DDS회로카드 상태" cdm="Health.NetworkAbstraction.DDC.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="nmcStatus" name="상태감시/안티탬퍼링유닛 상태" cdm="Health.NetworkAbstraction.NMC.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="lBandControlStationCommsStatus" name="무선 통신 링크 상태(통제소)" cdm="Communication.LBand.ControlStation.NetworkStatus">
+      <!--한 DDS 샘플에 통제국 1, 단말기 2, 중계기 5 상태가 함께 전달되므로 하나의 Monitor로 유지한다.-->
+      <!--원본이 bit-packed octet으로 정의되어 있어 raw 값으로 유지하며 bit 의미는 Binding 주석에 보존한다.-->
+      <QuantitySpec id="baseNetworkId" name="통제국 통신망 ID" cdm="Communication.LBand.BaseStation.NetworkID"/>
+      <QuantitySpec id="baseNetSetRaw" name="통제국 네트워크 구성 노드(raw)" cdm="Communication.LBand.BaseStation.NetworkSet.Raw"/>
+      <QuantitySpec id="baseGpsOnePpsRaw" name="통제국 GPS/1PPS 상태(raw)" cdm="Communication.LBand.BaseStation.GPS1PPS.Raw"/>
+      <QuantitySpec id="baseLatitude" name="통제국 위도" cdm="Communication.LBand.BaseStation.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="baseLongitude" name="통제국 경도" cdm="Communication.LBand.BaseStation.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="baseAltitude" name="통제국 고도" cdm="Communication.LBand.BaseStation.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+      <QuantitySpec id="baseHandoverModeRaw" name="통제국 Handover 모드(raw)" cdm="Communication.LBand.BaseStation.HandoverMode.Raw"/>
+      <QuantitySpec id="baseOutputRaw" name="통제국 출력 설정(raw)" cdm="Communication.LBand.BaseStation.Output.Raw"/>
+      <QuantitySpec id="baseComFaRaw" name="통제국 주파수 설정(raw)" cdm="Communication.LBand.BaseStation.Frequency.Raw"/>
+      <QuantitySpec id="baseTopologyRaw" name="통제국 토폴로지(raw)" cdm="Communication.LBand.BaseStation.Topology.Raw"/>
+      <QuantitySpec id="baseResourceRaw" name="통제국 자원할당(raw)" cdm="Communication.LBand.BaseStation.Resource.Raw"/>
+      <QuantitySpec id="terminal1NetworkId" name="단말기1 통신망 ID" cdm="Communication.LBand.Terminal1.NetworkID"/>
+      <QuantitySpec id="terminal1GpsOnePpsRaw" name="단말기1 GPS/1PPS 상태(raw)" cdm="Communication.LBand.Terminal1.GPS1PPS.Raw"/>
+      <QuantitySpec id="terminal1Latitude" name="단말기1 위도" cdm="Communication.LBand.Terminal1.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="terminal1Longitude" name="단말기1 경도" cdm="Communication.LBand.Terminal1.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="terminal1Altitude" name="단말기1 고도" cdm="Communication.LBand.Terminal1.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+      <QuantitySpec id="terminal1HandoverModeRaw" name="단말기1 Handover 모드(raw)" cdm="Communication.LBand.Terminal1.HandoverMode.Raw"/>
+      <QuantitySpec id="terminal1OutputRaw" name="단말기1 출력 설정(raw)" cdm="Communication.LBand.Terminal1.Output.Raw"/>
+      <QuantitySpec id="terminal1Modem1ConnectRaw" name="단말기1 모뎀1 망 가입 상태(raw)" cdm="Communication.LBand.Terminal1.Modem1.Connect.Raw"/>
+      <QuantitySpec id="terminal1Modem1FaRaw" name="단말기1 모뎀1 주파수(raw)" cdm="Communication.LBand.Terminal1.Modem1.Frequency.Raw"/>
+      <QuantitySpec id="terminal1Modem1TopologyRaw" name="단말기1 모뎀1 부모노드(raw)" cdm="Communication.LBand.Terminal1.Modem1.Topology.Raw"/>
+      <QuantitySpec id="terminal1Modem1AmcRaw" name="단말기1 모뎀1 AMC(raw)" cdm="Communication.LBand.Terminal1.Modem1.AMC.Raw"/>
+      <QuantitySpec id="terminal1Modem1LinkStatusRaw" name="단말기1 모뎀1 링크 상태(raw)" cdm="Communication.LBand.Terminal1.Modem1.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="terminal1Modem1Throughput" name="단말기1 모뎀1 UL 전송속도" cdm="Communication.LBand.Terminal1.Modem1.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="terminal1Modem2ConnectRaw" name="단말기1 모뎀2 망 가입 상태(raw)" cdm="Communication.LBand.Terminal1.Modem2.Connect.Raw"/>
+      <QuantitySpec id="terminal1Modem2FaRaw" name="단말기1 모뎀2 주파수(raw)" cdm="Communication.LBand.Terminal1.Modem2.Frequency.Raw"/>
+      <QuantitySpec id="terminal1Modem2TopologyRaw" name="단말기1 모뎀2 부모노드(raw)" cdm="Communication.LBand.Terminal1.Modem2.Topology.Raw"/>
+      <QuantitySpec id="terminal1Modem2AmcRaw" name="단말기1 모뎀2 AMC(raw)" cdm="Communication.LBand.Terminal1.Modem2.AMC.Raw"/>
+      <QuantitySpec id="terminal1Modem2LinkStatusRaw" name="단말기1 모뎀2 링크 상태(raw)" cdm="Communication.LBand.Terminal1.Modem2.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="terminal1Modem2Throughput" name="단말기1 모뎀2 UL 전송속도" cdm="Communication.LBand.Terminal1.Modem2.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="terminal2NetworkId" name="단말기2 통신망 ID" cdm="Communication.LBand.Terminal2.NetworkID"/>
+      <QuantitySpec id="terminal2GpsOnePpsRaw" name="단말기2 GPS/1PPS 상태(raw)" cdm="Communication.LBand.Terminal2.GPS1PPS.Raw"/>
+      <QuantitySpec id="terminal2Latitude" name="단말기2 위도" cdm="Communication.LBand.Terminal2.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="terminal2Longitude" name="단말기2 경도" cdm="Communication.LBand.Terminal2.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="terminal2Altitude" name="단말기2 고도" cdm="Communication.LBand.Terminal2.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+      <QuantitySpec id="terminal2HandoverModeRaw" name="단말기2 Handover 모드(raw)" cdm="Communication.LBand.Terminal2.HandoverMode.Raw"/>
+      <QuantitySpec id="terminal2OutputRaw" name="단말기2 출력 설정(raw)" cdm="Communication.LBand.Terminal2.Output.Raw"/>
+      <QuantitySpec id="terminal2Modem1ConnectRaw" name="단말기2 모뎀1 망 가입 상태(raw)" cdm="Communication.LBand.Terminal2.Modem1.Connect.Raw"/>
+      <QuantitySpec id="terminal2Modem1FaRaw" name="단말기2 모뎀1 주파수(raw)" cdm="Communication.LBand.Terminal2.Modem1.Frequency.Raw"/>
+      <QuantitySpec id="terminal2Modem1TopologyRaw" name="단말기2 모뎀1 부모노드(raw)" cdm="Communication.LBand.Terminal2.Modem1.Topology.Raw"/>
+      <QuantitySpec id="terminal2Modem1AmcRaw" name="단말기2 모뎀1 AMC(raw)" cdm="Communication.LBand.Terminal2.Modem1.AMC.Raw"/>
+      <QuantitySpec id="terminal2Modem1LinkStatusRaw" name="단말기2 모뎀1 링크 상태(raw)" cdm="Communication.LBand.Terminal2.Modem1.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="terminal2Modem1Throughput" name="단말기2 모뎀1 UL 전송속도" cdm="Communication.LBand.Terminal2.Modem1.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="terminal2Modem2ConnectRaw" name="단말기2 모뎀2 망 가입 상태(raw)" cdm="Communication.LBand.Terminal2.Modem2.Connect.Raw"/>
+      <QuantitySpec id="terminal2Modem2FaRaw" name="단말기2 모뎀2 주파수(raw)" cdm="Communication.LBand.Terminal2.Modem2.Frequency.Raw"/>
+      <QuantitySpec id="terminal2Modem2TopologyRaw" name="단말기2 모뎀2 부모노드(raw)" cdm="Communication.LBand.Terminal2.Modem2.Topology.Raw"/>
+      <QuantitySpec id="terminal2Modem2AmcRaw" name="단말기2 모뎀2 AMC(raw)" cdm="Communication.LBand.Terminal2.Modem2.AMC.Raw"/>
+      <QuantitySpec id="terminal2Modem2LinkStatusRaw" name="단말기2 모뎀2 링크 상태(raw)" cdm="Communication.LBand.Terminal2.Modem2.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="terminal2Modem2Throughput" name="단말기2 모뎀2 UL 전송속도" cdm="Communication.LBand.Terminal2.Modem2.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater1NetworkId" name="중계기1 통신망 ID" cdm="Communication.LBand.Repeater1.NetworkID"/>
+      <QuantitySpec id="repeater1GpsOnePpsRaw" name="중계기1 GPS/1PPS 상태(raw)" cdm="Communication.LBand.Repeater1.GPS1PPS.Raw"/>
+      <QuantitySpec id="repeater1Latitude" name="중계기1 위도" cdm="Communication.LBand.Repeater1.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater1Longitude" name="중계기1 경도" cdm="Communication.LBand.Repeater1.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater1Altitude" name="중계기1 고도" cdm="Communication.LBand.Repeater1.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater1HandoverModeRaw" name="중계기1 Handover 모드(raw)" cdm="Communication.LBand.Repeater1.HandoverMode.Raw"/>
+      <QuantitySpec id="repeater1OutputRaw" name="중계기1 출력 설정(raw)" cdm="Communication.LBand.Repeater1.Output.Raw"/>
+      <QuantitySpec id="repeater1Modem1ConnectRaw" name="중계기1 모뎀1 망 가입 상태(raw)" cdm="Communication.LBand.Repeater1.Modem1.Connect.Raw"/>
+      <QuantitySpec id="repeater1Modem1FaRaw" name="중계기1 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater1.Modem1.Frequency.Raw"/>
+      <QuantitySpec id="repeater1Modem1TopologyRaw" name="중계기1 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater1.Modem1.Topology.Raw"/>
+      <QuantitySpec id="repeater1Modem1AmcRaw" name="중계기1 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater1.Modem1.AMC.Raw"/>
+      <QuantitySpec id="repeater1Modem1LinkStatusRaw" name="중계기1 모뎀1 링크 상태(raw)" cdm="Communication.LBand.Repeater1.Modem1.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater1Modem1Throughput" name="중계기1 모뎀1 UL 전송속도" cdm="Communication.LBand.Repeater1.Modem1.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater1Modem2ConnectRaw" name="중계기1 모뎀2 망 가입 상태(raw)" cdm="Communication.LBand.Repeater1.Modem2.Connect.Raw"/>
+      <QuantitySpec id="repeater1Modem2FaRaw" name="중계기1 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater1.Modem2.Frequency.Raw"/>
+      <QuantitySpec id="repeater1Modem2TopologyRaw" name="중계기1 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater1.Modem2.Topology.Raw"/>
+      <QuantitySpec id="repeater1Modem2AmcRaw" name="중계기1 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater1.Modem2.AMC.Raw"/>
+      <QuantitySpec id="repeater1Modem2LinkStatusRaw" name="중계기1 모뎀2 링크 상태(raw)" cdm="Communication.LBand.Repeater1.Modem2.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater1Modem2Throughput" name="중계기1 모뎀2 UL 전송속도" cdm="Communication.LBand.Repeater1.Modem2.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater2NetworkId" name="중계기2 통신망 ID" cdm="Communication.LBand.Repeater2.NetworkID"/>
+      <QuantitySpec id="repeater2GpsOnePpsRaw" name="중계기2 GPS/1PPS 상태(raw)" cdm="Communication.LBand.Repeater2.GPS1PPS.Raw"/>
+      <QuantitySpec id="repeater2Latitude" name="중계기2 위도" cdm="Communication.LBand.Repeater2.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater2Longitude" name="중계기2 경도" cdm="Communication.LBand.Repeater2.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater2Altitude" name="중계기2 고도" cdm="Communication.LBand.Repeater2.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater2HandoverModeRaw" name="중계기2 Handover 모드(raw)" cdm="Communication.LBand.Repeater2.HandoverMode.Raw"/>
+      <QuantitySpec id="repeater2OutputRaw" name="중계기2 출력 설정(raw)" cdm="Communication.LBand.Repeater2.Output.Raw"/>
+      <QuantitySpec id="repeater2Modem1ConnectRaw" name="중계기2 모뎀1 망 가입 상태(raw)" cdm="Communication.LBand.Repeater2.Modem1.Connect.Raw"/>
+      <QuantitySpec id="repeater2Modem1FaRaw" name="중계기2 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater2.Modem1.Frequency.Raw"/>
+      <QuantitySpec id="repeater2Modem1TopologyRaw" name="중계기2 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater2.Modem1.Topology.Raw"/>
+      <QuantitySpec id="repeater2Modem1AmcRaw" name="중계기2 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater2.Modem1.AMC.Raw"/>
+      <QuantitySpec id="repeater2Modem1LinkStatusRaw" name="중계기2 모뎀1 링크 상태(raw)" cdm="Communication.LBand.Repeater2.Modem1.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater2Modem1Throughput" name="중계기2 모뎀1 UL 전송속도" cdm="Communication.LBand.Repeater2.Modem1.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater2Modem2ConnectRaw" name="중계기2 모뎀2 망 가입 상태(raw)" cdm="Communication.LBand.Repeater2.Modem2.Connect.Raw"/>
+      <QuantitySpec id="repeater2Modem2FaRaw" name="중계기2 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater2.Modem2.Frequency.Raw"/>
+      <QuantitySpec id="repeater2Modem2TopologyRaw" name="중계기2 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater2.Modem2.Topology.Raw"/>
+      <QuantitySpec id="repeater2Modem2AmcRaw" name="중계기2 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater2.Modem2.AMC.Raw"/>
+      <QuantitySpec id="repeater2Modem2LinkStatusRaw" name="중계기2 모뎀2 링크 상태(raw)" cdm="Communication.LBand.Repeater2.Modem2.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater2Modem2Throughput" name="중계기2 모뎀2 UL 전송속도" cdm="Communication.LBand.Repeater2.Modem2.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater3NetworkId" name="중계기3 통신망 ID" cdm="Communication.LBand.Repeater3.NetworkID"/>
+      <QuantitySpec id="repeater3GpsOnePpsRaw" name="중계기3 GPS/1PPS 상태(raw)" cdm="Communication.LBand.Repeater3.GPS1PPS.Raw"/>
+      <QuantitySpec id="repeater3Latitude" name="중계기3 위도" cdm="Communication.LBand.Repeater3.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater3Longitude" name="중계기3 경도" cdm="Communication.LBand.Repeater3.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater3Altitude" name="중계기3 고도" cdm="Communication.LBand.Repeater3.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater3HandoverModeRaw" name="중계기3 Handover 모드(raw)" cdm="Communication.LBand.Repeater3.HandoverMode.Raw"/>
+      <QuantitySpec id="repeater3OutputRaw" name="중계기3 출력 설정(raw)" cdm="Communication.LBand.Repeater3.Output.Raw"/>
+      <QuantitySpec id="repeater3Modem1ConnectRaw" name="중계기3 모뎀1 망 가입 상태(raw)" cdm="Communication.LBand.Repeater3.Modem1.Connect.Raw"/>
+      <QuantitySpec id="repeater3Modem1FaRaw" name="중계기3 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater3.Modem1.Frequency.Raw"/>
+      <QuantitySpec id="repeater3Modem1TopologyRaw" name="중계기3 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater3.Modem1.Topology.Raw"/>
+      <QuantitySpec id="repeater3Modem1AmcRaw" name="중계기3 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater3.Modem1.AMC.Raw"/>
+      <QuantitySpec id="repeater3Modem1LinkStatusRaw" name="중계기3 모뎀1 링크 상태(raw)" cdm="Communication.LBand.Repeater3.Modem1.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater3Modem1Throughput" name="중계기3 모뎀1 UL 전송속도" cdm="Communication.LBand.Repeater3.Modem1.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater3Modem2ConnectRaw" name="중계기3 모뎀2 망 가입 상태(raw)" cdm="Communication.LBand.Repeater3.Modem2.Connect.Raw"/>
+      <QuantitySpec id="repeater3Modem2FaRaw" name="중계기3 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater3.Modem2.Frequency.Raw"/>
+      <QuantitySpec id="repeater3Modem2TopologyRaw" name="중계기3 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater3.Modem2.Topology.Raw"/>
+      <QuantitySpec id="repeater3Modem2AmcRaw" name="중계기3 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater3.Modem2.AMC.Raw"/>
+      <QuantitySpec id="repeater3Modem2LinkStatusRaw" name="중계기3 모뎀2 링크 상태(raw)" cdm="Communication.LBand.Repeater3.Modem2.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater3Modem2Throughput" name="중계기3 모뎀2 UL 전송속도" cdm="Communication.LBand.Repeater3.Modem2.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater4NetworkId" name="중계기4 통신망 ID" cdm="Communication.LBand.Repeater4.NetworkID"/>
+      <QuantitySpec id="repeater4GpsOnePpsRaw" name="중계기4 GPS/1PPS 상태(raw)" cdm="Communication.LBand.Repeater4.GPS1PPS.Raw"/>
+      <QuantitySpec id="repeater4Latitude" name="중계기4 위도" cdm="Communication.LBand.Repeater4.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater4Longitude" name="중계기4 경도" cdm="Communication.LBand.Repeater4.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater4Altitude" name="중계기4 고도" cdm="Communication.LBand.Repeater4.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater4HandoverModeRaw" name="중계기4 Handover 모드(raw)" cdm="Communication.LBand.Repeater4.HandoverMode.Raw"/>
+      <QuantitySpec id="repeater4OutputRaw" name="중계기4 출력 설정(raw)" cdm="Communication.LBand.Repeater4.Output.Raw"/>
+      <QuantitySpec id="repeater4Modem1ConnectRaw" name="중계기4 모뎀1 망 가입 상태(raw)" cdm="Communication.LBand.Repeater4.Modem1.Connect.Raw"/>
+      <QuantitySpec id="repeater4Modem1FaRaw" name="중계기4 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater4.Modem1.Frequency.Raw"/>
+      <QuantitySpec id="repeater4Modem1TopologyRaw" name="중계기4 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater4.Modem1.Topology.Raw"/>
+      <QuantitySpec id="repeater4Modem1AmcRaw" name="중계기4 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater4.Modem1.AMC.Raw"/>
+      <QuantitySpec id="repeater4Modem1LinkStatusRaw" name="중계기4 모뎀1 링크 상태(raw)" cdm="Communication.LBand.Repeater4.Modem1.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater4Modem1Throughput" name="중계기4 모뎀1 UL 전송속도" cdm="Communication.LBand.Repeater4.Modem1.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater4Modem2ConnectRaw" name="중계기4 모뎀2 망 가입 상태(raw)" cdm="Communication.LBand.Repeater4.Modem2.Connect.Raw"/>
+      <QuantitySpec id="repeater4Modem2FaRaw" name="중계기4 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater4.Modem2.Frequency.Raw"/>
+      <QuantitySpec id="repeater4Modem2TopologyRaw" name="중계기4 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater4.Modem2.Topology.Raw"/>
+      <QuantitySpec id="repeater4Modem2AmcRaw" name="중계기4 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater4.Modem2.AMC.Raw"/>
+      <QuantitySpec id="repeater4Modem2LinkStatusRaw" name="중계기4 모뎀2 링크 상태(raw)" cdm="Communication.LBand.Repeater4.Modem2.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater4Modem2Throughput" name="중계기4 모뎀2 UL 전송속도" cdm="Communication.LBand.Repeater4.Modem2.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater5NetworkId" name="중계기5 통신망 ID" cdm="Communication.LBand.Repeater5.NetworkID"/>
+      <QuantitySpec id="repeater5GpsOnePpsRaw" name="중계기5 GPS/1PPS 상태(raw)" cdm="Communication.LBand.Repeater5.GPS1PPS.Raw"/>
+      <QuantitySpec id="repeater5Latitude" name="중계기5 위도" cdm="Communication.LBand.Repeater5.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater5Longitude" name="중계기5 경도" cdm="Communication.LBand.Repeater5.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater5Altitude" name="중계기5 고도" cdm="Communication.LBand.Repeater5.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+      <QuantitySpec id="repeater5HandoverModeRaw" name="중계기5 Handover 모드(raw)" cdm="Communication.LBand.Repeater5.HandoverMode.Raw"/>
+      <QuantitySpec id="repeater5OutputRaw" name="중계기5 출력 설정(raw)" cdm="Communication.LBand.Repeater5.Output.Raw"/>
+      <QuantitySpec id="repeater5Modem1ConnectRaw" name="중계기5 모뎀1 망 가입 상태(raw)" cdm="Communication.LBand.Repeater5.Modem1.Connect.Raw"/>
+      <QuantitySpec id="repeater5Modem1FaRaw" name="중계기5 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater5.Modem1.Frequency.Raw"/>
+      <QuantitySpec id="repeater5Modem1TopologyRaw" name="중계기5 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater5.Modem1.Topology.Raw"/>
+      <QuantitySpec id="repeater5Modem1AmcRaw" name="중계기5 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater5.Modem1.AMC.Raw"/>
+      <QuantitySpec id="repeater5Modem1LinkStatusRaw" name="중계기5 모뎀1 링크 상태(raw)" cdm="Communication.LBand.Repeater5.Modem1.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater5Modem1Throughput" name="중계기5 모뎀1 UL 전송속도" cdm="Communication.LBand.Repeater5.Modem1.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="repeater5Modem2ConnectRaw" name="중계기5 모뎀2 망 가입 상태(raw)" cdm="Communication.LBand.Repeater5.Modem2.Connect.Raw"/>
+      <QuantitySpec id="repeater5Modem2FaRaw" name="중계기5 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater5.Modem2.Frequency.Raw"/>
+      <QuantitySpec id="repeater5Modem2TopologyRaw" name="중계기5 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater5.Modem2.Topology.Raw"/>
+      <QuantitySpec id="repeater5Modem2AmcRaw" name="중계기5 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater5.Modem2.AMC.Raw"/>
+      <QuantitySpec id="repeater5Modem2LinkStatusRaw" name="중계기5 모뎀2 링크 상태(raw)" cdm="Communication.LBand.Repeater5.Modem2.LinkQuality.Status.Raw"/>
+      <QuantitySpec id="repeater5Modem2Throughput" name="중계기5 모뎀2 UL 전송속도" cdm="Communication.LBand.Repeater5.Modem2.LinkQuality.Throughput">
+        <Unit>MBps</Unit>
+        <Range min="0" max="25.5"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="geoSatCommsStatus" name="고궤도 위성 링크 상태" cdm="Communication.GeoSat.LinkStatus">
+      <!--각 Modulator/Demodulator valid가 false이면 해당 하위 데이터는 원본 정의상 신뢰하지 않는다.-->
+      <BooleanSpec id="modulatorValid" name="변조 상태 유효성" cdm="Communication.GeoSat.Modulator.Valid"/>
+      <QuantitySpec id="modulatorOutputLevel" name="현재 송신 파워" cdm="Communication.GeoSat.Modulator.OutputLevel">
+        <Unit>dBm</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="modulatorDataBandwidth" name="대역폭" cdm="Communication.GeoSat.Modulator.DataBandwidth">
+        <Unit>bps</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="modulatorDataRate" name="현재 데이터 속도" cdm="Communication.GeoSat.Modulator.DataRate">
+        <Unit>bps</Unit>
+      </QuantitySpec>
+      <TextSpec id="modulatorStatus" name="현재 TDMA 연결 상태" cdm="Communication.GeoSat.Modulator.StatusText">
+        <MaxLength>21</MaxLength>
+      </TextSpec>
+      <BooleanSpec id="demodulatorValid" name="복조 상태 유효성" cdm="Communication.GeoSat.Demodulator.Valid"/>
+      <QuantitySpec id="demodulatorSignalPower" name="수신 신호 크기" cdm="Communication.GeoSat.Demodulator.SignalPower">
+        <Unit>dBm</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="demodulatorCn" name="반송파 대 잡음비" cdm="Communication.GeoSat.Demodulator.CN">
+        <Unit>dB</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="demodulatorBer" name="비트 에러 비율" cdm="Communication.GeoSat.Demodulator.BER">
+        <Unit>E-7</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="demodulatorBitRate" name="최대 전송 비트 수" cdm="Communication.GeoSat.Demodulator.BitRate">
+        <Unit>bps</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="demodulatorTrafficRate" name="현재 전송 비트 수" cdm="Communication.GeoSat.Demodulator.TrafficRate">
+        <Unit>bps</Unit>
+      </QuantitySpec>
+      <!--원본 Unit 표기는 cn="Db", ber="E-7"이다. cn만 표기 정규화하여 dB로 사용하고 BER 스케일은 원문 E-7을 그대로 보존한다.-->
+    </GroupSpec>
+    <GroupSpec id="lBandTerminalDeviceCbitStatus" name="무선통신장치 CBIT 상태(USV)" cdm="Health.LBand.Terminal.CBIT">
+      <!--operation은 원본 LBandDeviceOverallBIT의 Bit7~6(00 정상/01 제한/10 불가)을 0/1/2로 추출하여 Semantic 운용상태로 정규화한다.-->
+      <ValueSetSpec id="terminalOperation" name="USV 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Terminal.OperationalStatus">
+        <Values>
+          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
+          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
+          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="terminalOverallStatus" name="USV 무선통신장치 종합 상태" cdm="Health.LBand.Terminal.DeviceStatus">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="terminalReferenceControlStatus" name="USV 무선통신장치 기준통제반 상태" cdm="Health.LBand.Terminal.ReferenceControl.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="terminalModem1Status" name="USV 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Terminal.Modem1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="terminalModem2Status" name="USV 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Terminal.Modem2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="terminalRfModule1Status" name="USV 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Terminal.RFModule1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="terminalRfModule2Status" name="USV 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Terminal.RFModule2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="terminalPowerStatus" name="USV 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Terminal.Power.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="lBandControlStationGroupCbitStatus" name="무선통신장치 CBIT 상태(통제소/중계소)" cdm="Health.LBand.ControlStationGroup.CBIT">
+      <!--통제소 1대와 중계소 5대가 하나의 DDS 보고에 포함된다. operation은 각 구조체의 Bit7~6을 0/1/2로 정규화한다.-->
+      <ValueSetSpec id="controlStationOperation" name="통제소 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.ControlStation.OperationalStatus">
+        <Values>
+          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
+          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
+          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="controlStationOverallStatus" name="통제소 무선통신장치 종합 상태" cdm="Health.LBand.ControlStation.DeviceStatus">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="controlStationReferenceControlStatus" name="통제소 무선통신장치 기준통제반 상태" cdm="Health.LBand.ControlStation.ReferenceControl.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="controlStationModem1Status" name="통제소 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.ControlStation.Modem1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="controlStationModem2Status" name="통제소 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.ControlStation.Modem2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="controlStationRfModule1Status" name="통제소 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.ControlStation.RFModule1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="controlStationRfModule2Status" name="통제소 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.ControlStation.RFModule2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="controlStationPowerStatus" name="통제소 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.ControlStation.Power.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater1Operation" name="중계소1 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater1.OperationalStatus">
+        <Values>
+          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
+          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
+          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater1OverallStatus" name="중계소1 무선통신장치 종합 상태" cdm="Health.LBand.Repeater1.DeviceStatus">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater1ReferenceControlStatus" name="중계소1 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater1.ReferenceControl.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater1Modem1Status" name="중계소1 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater1.Modem1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater1Modem2Status" name="중계소1 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater1.Modem2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater1RfModule1Status" name="중계소1 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater1.RFModule1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater1RfModule2Status" name="중계소1 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater1.RFModule2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater1PowerStatus" name="중계소1 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater1.Power.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater2Operation" name="중계소2 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater2.OperationalStatus">
+        <Values>
+          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
+          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
+          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater2OverallStatus" name="중계소2 무선통신장치 종합 상태" cdm="Health.LBand.Repeater2.DeviceStatus">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater2ReferenceControlStatus" name="중계소2 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater2.ReferenceControl.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater2Modem1Status" name="중계소2 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater2.Modem1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater2Modem2Status" name="중계소2 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater2.Modem2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater2RfModule1Status" name="중계소2 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater2.RFModule1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater2RfModule2Status" name="중계소2 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater2.RFModule2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater2PowerStatus" name="중계소2 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater2.Power.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater3Operation" name="중계소3 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater3.OperationalStatus">
+        <Values>
+          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
+          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
+          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater3OverallStatus" name="중계소3 무선통신장치 종합 상태" cdm="Health.LBand.Repeater3.DeviceStatus">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater3ReferenceControlStatus" name="중계소3 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater3.ReferenceControl.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater3Modem1Status" name="중계소3 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater3.Modem1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater3Modem2Status" name="중계소3 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater3.Modem2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater3RfModule1Status" name="중계소3 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater3.RFModule1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater3RfModule2Status" name="중계소3 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater3.RFModule2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater3PowerStatus" name="중계소3 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater3.Power.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater4Operation" name="중계소4 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater4.OperationalStatus">
+        <Values>
+          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
+          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
+          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater4OverallStatus" name="중계소4 무선통신장치 종합 상태" cdm="Health.LBand.Repeater4.DeviceStatus">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater4ReferenceControlStatus" name="중계소4 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater4.ReferenceControl.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater4Modem1Status" name="중계소4 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater4.Modem1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater4Modem2Status" name="중계소4 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater4.Modem2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater4RfModule1Status" name="중계소4 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater4.RFModule1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater4RfModule2Status" name="중계소4 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater4.RFModule2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater4PowerStatus" name="중계소4 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater4.Power.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater5Operation" name="중계소5 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater5.OperationalStatus">
+        <Values>
+          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
+          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
+          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater5OverallStatus" name="중계소5 무선통신장치 종합 상태" cdm="Health.LBand.Repeater5.DeviceStatus">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater5ReferenceControlStatus" name="중계소5 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater5.ReferenceControl.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater5Modem1Status" name="중계소5 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater5.Modem1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater5Modem2Status" name="중계소5 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater5.Modem2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater5RfModule1Status" name="중계소5 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater5.RFModule1.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater5RfModule2Status" name="중계소5 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater5.RFModule2.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="repeater5PowerStatus" name="중계소5 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater5.Power.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.Disconnected">3</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <ValueSetSpec id="auxControlDeviceCbitStatus" name="출입항보조통제장치 송수신기 CBIT 상태" cdm="Health.AuxControl.Transceiver.Status">
+      <Values>
+        <Value cdm="Health.Status.Normal">0</Value>
+        <Value cdm="Health.Status.Unavailable">2</Value>
+        <Value cdm="Health.Status.Disconnected">3</Value>
+      </Values>
+    </ValueSetSpec>
+    <ValueSetSpec id="geoSatDeviceCbitStatus" name="고궤도 위성통신장치 CBIT 상태" cdm="Health.GeoSat.Device.Status">
+      <Values>
+        <Value cdm="Health.Status.Normal">0</Value>
+        <Value cdm="Health.Status.Unavailable">2</Value>
+        <Value cdm="Health.Status.Disconnected">3</Value>
+      </Values>
+    </ValueSetSpec>
+  </MonitorSpecs>
+  <ControlSpecs id="control">
+    <!--IntegrationControlType은 동일 DDS를 사용하되 DestinationType의 dstSubEquipmentID로 통제소 NAE(0x01)와 USV NAE(0x02)를 구분한다. 실제 운용에서 각각 별도로 연동 개시하므로 Semantic Control도 대상별로 분리한다.-->
+    <ControlSpec id="startControlStationIntegration" name="통제소 네트워크추상화장치 연동 개시 명령" cdm="Control.Integration.Start">
+      <Target cdm="Communication.NetworkAbstraction.Identifier.Numeric"/>
+      <Reply bindRef="startControlStationIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="startUsvIntegration" name="USV 네트워크추상화장치 연동 개시 명령" cdm="Control.Integration.Start">
+      <Target cdm="Communication.NetworkAbstraction.Identifier.Numeric"/>
+      <Reply bindRef="startUsvIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="addCommsChannel" name="통신 링크 추가" cdm="Control.Communication.Channel.Add">
+      <!--commsChannelID 원본 Range는 0~2이나 정의된 값은 0=무선, 1=위성뿐이다. 값 2는 미정의이므로 Semantic 유효값에 포함하지 않는다. 추가 명령에는 현재 사용하지 않는 ID를 지정한다.-->
+      <Parameters>
+        <Profile cdm="Communication.Channel.Identifier"/>
+      </Parameters>
+      <Reply bindRef="addCommsChannelAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="deleteCommsChannel" name="통신 링크 삭제" cdm="Control.Communication.Channel.Delete">
+      <!--commsChannelID는 0=무선, 1=위성만 정의하며 원본 Range의 2는 의미 미정의로 제외한다.-->
+      <Parameters>
+        <Profile cdm="Communication.Channel.Identifier"/>
+      </Parameters>
+      <Reply bindRef="deleteCommsChannelAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureLBandComms" name="무선통신장치 네트워크 설정" cdm="Control.Communication.LBand.Configuration">
+      <!--LBandCommsControlType은 통제국/단말기2/중계기5의 전체 설정 스냅샷(66B)을 한 번에 전달하므로 하나의 Control로 유지한다.-->
+      <!--netSet/output/comFA/topology/resource/debug 및 단말/중계기 modem fa/topology/amc는 bit-packed octet 원문을 raw 값으로 유지한다.-->
+      <!--Semantic에서는 Repeater로 표기하되 Binding 물리 필드명은 원본 오기인 reapeterCtrl1~5를 그대로 사용한다.-->
+      <Parameters>
+        <Profile cdm="Communication.LBand.BaseStation.NetworkID"/>
+        <Profile cdm="Communication.LBand.BaseStation.NetworkSet.Raw"/>
+        <Profile cdm="Communication.LBand.BaseStation.HandoverMode.Raw"/>
+        <Profile cdm="Communication.LBand.BaseStation.Output.Raw"/>
+        <Profile cdm="Communication.LBand.BaseStation.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.BaseStation.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.BaseStation.Resource.Raw"/>
+        <Profile cdm="Communication.LBand.BaseStation.Debug.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal1.Modem1.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal1.Modem1.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal1.Modem1.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal1.Modem2.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal1.Modem2.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal1.Modem2.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal2.Modem1.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal2.Modem1.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal2.Modem1.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal2.Modem2.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal2.Modem2.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Terminal2.Modem2.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater1.Modem1.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater1.Modem1.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater1.Modem1.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater1.Modem2.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater1.Modem2.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater1.Modem2.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater2.Modem1.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater2.Modem1.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater2.Modem1.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater2.Modem2.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater2.Modem2.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater2.Modem2.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater3.Modem1.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater3.Modem1.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater3.Modem1.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater3.Modem2.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater3.Modem2.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater3.Modem2.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater4.Modem1.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater4.Modem1.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater4.Modem1.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater4.Modem2.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater4.Modem2.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater4.Modem2.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater5.Modem1.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater5.Modem1.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater5.Modem1.AMC.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater5.Modem2.Frequency.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater5.Modem2.Topology.Raw"/>
+        <Profile cdm="Communication.LBand.Repeater5.Modem2.AMC.Raw"/>
+      </Parameters>
+    </ControlSpec>
+    <ControlSpec id="requestNetworkIntegrationControlStationPbit" name="네트워크추상화장치 PBIT 요청(통제소)" cdm="Request.Health.PBIT.NetworkAbstraction.ControlStation">
+      <!--Result 메시지에는 subEquipmentID/commandID가 없어 0x01/0x02 결과의 명시적 식별 방법은 원본 인터페이스 확인 필요(TBD).-->
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestNetworkIntegrationControlStationPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestNetworkIntegrationControlStationPbitResult" cdm="Request.Health.PBIT.NetworkAbstraction.ControlStation.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestNetworkIntegrationUsvPbit" name="네트워크추상화장치 PBIT 요청(USV)" cdm="Request.Health.PBIT.NetworkAbstraction.USV">
+      <!--추후 USV측 NAE 점검 요청을 고려하여 SubEquipmentID 0x02 Control을 별도 정의한다. Result 대상 식별은 TBD.-->
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestNetworkIntegrationUsvPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestNetworkIntegrationUsvPbitResult" cdm="Request.Health.PBIT.NetworkAbstraction.USV.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestLBandControlStationGroupPbit" name="무선통신장치 PBIT 요청(통제소/중계소)" cdm="Request.Health.PBIT.LBand.ControlStationGroup">
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestLBandControlStationGroupPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestLBandControlStationGroupPbitResult" cdm="Request.Health.PBIT.LBand.ControlStationGroup.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestLBandTerminalPbit" name="무선통신장치 PBIT 요청(USV)" cdm="Request.Health.PBIT.LBand.Terminal">
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestLBandTerminalPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestLBandTerminalPbitResult" cdm="Request.Health.PBIT.LBand.Terminal.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestAuxControlPbit" name="출입항보조통제장치 송수신기 PBIT 요청" cdm="Request.Health.PBIT.AuxControl.Transceiver">
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestAuxControlPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestAuxControlPbitResult" cdm="Request.Health.PBIT.AuxControl.Transceiver.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestGeoSatControlStationPbit" name="고궤도 위성통신장치 PBIT 요청(통제소)" cdm="Request.Health.PBIT.GeoSat.ControlStation">
+      <!--GeoSat PBIT Result에 subEquipmentID/commandID가 없어 0x21/0x22 결과의 명시적 식별 방법은 원본 인터페이스 확인 필요(TBD).-->
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestGeoSatControlStationPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestGeoSatControlStationPbitResult" cdm="Request.Health.PBIT.GeoSat.ControlStation.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestGeoSatUsvPbit" name="고궤도 위성통신장치 PBIT 요청(USV)" cdm="Request.Health.PBIT.GeoSat.USV">
+      <!--통제소/USV 대상별 Control 분리 원칙에 따라 SubEquipmentID 0x22를 별도 정의한다. Result 대상 식별은 TBD.-->
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestGeoSatUsvPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestGeoSatUsvPbitResult" cdm="Request.Health.PBIT.GeoSat.USV.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestNetworkIntegrationControlStationIbit" name="네트워크추상화장치 IBIT 요청(통제소)" cdm="Request.Health.IBIT.NetworkAbstraction.ControlStation">
+      <!--Result 메시지에는 subEquipmentID/commandID가 없어 0x01/0x02 결과의 명시적 식별 방법은 원본 인터페이스 확인 필요(TBD).-->
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestNetworkIntegrationControlStationIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestNetworkIntegrationControlStationIbitResult" cdm="Request.Health.IBIT.NetworkAbstraction.ControlStation.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestNetworkIntegrationUsvIbit" name="네트워크추상화장치 IBIT 요청(USV)" cdm="Request.Health.IBIT.NetworkAbstraction.USV">
+      <!--추후 USV측 NAE 점검 요청을 고려하여 SubEquipmentID 0x02 Control을 별도 정의한다. Result 대상 식별은 TBD.-->
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestNetworkIntegrationUsvIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestNetworkIntegrationUsvIbitResult" cdm="Request.Health.IBIT.NetworkAbstraction.USV.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestLBandControlStationGroupIbit" name="무선통신장치 IBIT 요청(통제소/중계소)" cdm="Request.Health.IBIT.LBand.ControlStationGroup">
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestLBandControlStationGroupIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestLBandControlStationGroupIbitResult" cdm="Request.Health.IBIT.LBand.ControlStationGroup.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestLBandTerminalIbit" name="무선통신장치 IBIT 요청(USV)" cdm="Request.Health.IBIT.LBand.Terminal">
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestLBandTerminalIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestLBandTerminalIbitResult" cdm="Request.Health.IBIT.LBand.Terminal.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestAuxControlIbit" name="출입항보조통제장치 송수신기 IBIT 요청" cdm="Request.Health.IBIT.AuxControl.Transceiver">
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestAuxControlIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestAuxControlIbitResult" cdm="Request.Health.IBIT.AuxControl.Transceiver.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestGeoSatControlStationIbit" name="고궤도 위성통신장치 IBIT 요청(통제소)" cdm="Request.Health.IBIT.GeoSat.ControlStation">
+      <!--GeoSat IBIT Result에 subEquipmentID/commandID가 없어 0x21/0x22 결과의 명시적 식별 방법은 원본 인터페이스 확인 필요(TBD).-->
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestGeoSatControlStationIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestGeoSatControlStationIbitResult" cdm="Request.Health.IBIT.GeoSat.ControlStation.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestGeoSatUsvIbit" name="고궤도 위성통신장치 IBIT 요청(USV)" cdm="Request.Health.IBIT.GeoSat.USV">
+      <!--통제소/USV 대상별 Control 분리 원칙에 따라 SubEquipmentID 0x22를 별도 정의한다. Result 대상 식별은 TBD.-->
+      <Target cdm="Communication.Equipment.Identifier.Numeric"/>
+      <Reply bindRef="requestGeoSatUsvIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestGeoSatUsvIbitResult" cdm="Request.Health.IBIT.GeoSat.USV.Response"/>
+    </ControlSpec>
+  </ControlSpecs>
+</CommSpec>

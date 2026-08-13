@@ -1,0 +1,657 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PlatformSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+  <!--자율운항장치(Autonomous Navigation Unit) Semantic 명세: 원격통제장치 CSCI ↔ 자율운항장치 CSCI 직접 연동 기준.-->
+  <!--설계 결정: missionStateID wire 1~8은 공통 Mission.Type 0~7로 정규화한다. PBIT operationalStatus의 Range 0~1은 비고/CBIT/IBIT와 충돌하므로 0~3 오기로 본다.-->
+  <!--설계 결정: headingAcheived/hoverRadiusAcheived/targetTrackingAcheived는 원문 상세값 미기재이나 0=NotAchieved, 1=Achieved로 잠정 정의한다.-->
+  <!--설계 결정: AutonomousDocking distanceRemaining은 동일 의미의 AutonomousNavigation distanceRemaining을 근거로 m를 적용한다.-->
+  <!--TBD: DP distancePointRemaining/errorYawAngle, TargetTracking distanceTargetRemaining은 원문에 단위 근거가 없어 Unit을 비워 둔다. Fuel fuelQuantityRemain과 시간 인코딩도 원문 확인 전 임의 단위를 부여하지 않는다.-->
+  <!--중요: RecordCommand 계열은 RCU/ANU 메시지의 Size 열과 공용 구조체 내용이 불일치한다. 동일 타입명을 참조하므로 공용 구조체 정의를 기준으로 Semantic/Binding을 작성하고 Size 불일치는 TBD로 남긴다.-->
+  <ConstantSpecs id="constant">
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+      <Value>AutonomousNavigation</Value>
+    </TextConstantSpec>
+    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+      <Value>자율운항장치 임무계획, 임무수행 상태, BIT 및 원격 제어 인터페이스</Value>
+    </TextConstantSpec>
+  </ConstantSpecs>
+  <MonitorSpecs id="monitor">
+    <GroupSpec id="missionExecutionStatus" name="자율운항 임무 수행 상태" cdm="Autonomy.Mission.Execution">
+      <ValueSetSpec id="operationMode" name="무인수상정 운용 모드" cdm="Autonomy.OperationMode">
+        <Values>
+          <Value cdm="Platform.OperationMode.LocalManual">0</Value>
+          <Value cdm="Platform.OperationMode.RemoteManual">1</Value>
+          <Value cdm="Platform.OperationMode.Autonomous">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="missionType" name="자율운항 임무 종류" cdm="Autonomy.Mission.Type">
+        <Values>
+          <Value cdm="Autonomy.Mission.Type.Waypoint">0</Value>
+          <Value cdm="Autonomy.Mission.Type.GlobalHover">1</Value>
+          <Value cdm="Autonomy.Mission.Type.TargetTracking">2</Value>
+          <Value cdm="Autonomy.Mission.Type.PointAndGo">3</Value>
+          <Value cdm="Autonomy.Mission.Type.AutonomousNavigation">4</Value>
+          <Value cdm="Autonomy.Mission.Type.SurfaceReconnaissance">5</Value>
+          <Value cdm="Autonomy.Mission.Type.UnderwaterReconnaissance">6</Value>
+          <Value cdm="Autonomy.Mission.Type.AutonomousDocking">7</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="missionState" name="임무 진행 상태" cdm="Autonomy.Mission.Execution.State">
+        <Values>
+          <Value cdm="Mission.Execution.Executing">0</Value>
+          <Value cdm="Mission.Execution.Ended">1</Value>
+          <Value cdm="Mission.Execution.Standby">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="missionPossible" name="임무 수행 가능 여부" cdm="Autonomy.Mission.Execution.Possible">
+        <Values>
+          <Value cdm="Mission.Availability.Possible">0</Value>
+          <Value cdm="Mission.Availability.Impossible">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="waypointRepeatNumber" name="구간 내 정찰 횟수" cdm="Autonomy.Waypoint.RepeatNumber">
+        <Range min="0" max="255"/>
+      </QuantitySpec>
+      <QuantitySpec id="waypointMissionID" name="미션 ID" cdm="Autonomy.Waypoint.MissionID"/>
+      <QuantitySpec id="totalWaypoint" name="전체 경로점 개수" cdm="Autonomy.Waypoint.TotalCount"/>
+      <QuantitySpec id="waypointID" name="현재 추종 경로점 ID" cdm="Autonomy.Waypoint.CurrentID"/>
+      <QuantitySpec id="waypointRemaining" name="남은 경로점 개수" cdm="Autonomy.Waypoint.RemainingCount"/>
+      <QuantitySpec id="waypointLatitude" name="현재 경로점 위도" cdm="Autonomy.Waypoint.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="waypointLongitude" name="현재 경로점 경도" cdm="Autonomy.Waypoint.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="waypointArrivalTime" name="마지막 경로점 도착시간" cdm="Autonomy.Waypoint.ArrivalTime"/>
+      <QuantitySpec id="crossTrackError" name="경로 오차 거리" cdm="Autonomy.Waypoint.CrossTrackError">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="cumulativeDistance" name="축적 거리" cdm="Autonomy.Waypoint.CumulativeDistance">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="waypointDistanceRemaining" name="전체 남은 거리" cdm="Autonomy.Waypoint.DistanceRemaining">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="distanceToWaypoint" name="현재 경로점 남은 거리" cdm="Autonomy.Waypoint.DistanceToCurrent">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <ValueSetSpec id="positionAchieved" name="경로 오차 만족 여부" cdm="Autonomy.Waypoint.PositionAchieved">
+        <Values>
+          <Value cdm="Condition.NotAchieved">0</Value>
+          <Value cdm="Condition.Achieved">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="speedAchieved" name="목표 속도 오차 만족 여부" cdm="Autonomy.Waypoint.SpeedAchieved">
+        <Values>
+          <Value cdm="Condition.NotAchieved">0</Value>
+          <Value cdm="Condition.Achieved">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <!--WaypointTrackingExecutionStatus.arrivalTime은 unsigned long long이지만 원문에 시간 인코딩/기준이 없어 Unit/Converter를 정의하지 않는다.-->
+    </GroupSpec>
+    <GroupSpec id="globalHoverExecutionStatus" name="목표해점위치고정 수행 상태" cdm="Autonomy.GlobalHover.Execution">
+      <ValueSetSpec id="globalHoverState" name="DP 상태" cdm="Autonomy.GlobalHover.State">
+        <Values>
+          <Value cdm="Autonomy.GlobalHover.State.Preparing">0</Value>
+          <Value cdm="Autonomy.GlobalHover.State.Started">1</Value>
+          <Value cdm="Autonomy.GlobalHover.State.Completed">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="firstAchievedTime" name="첫 도달시간" cdm="Autonomy.GlobalHover.FirstAchievedTime"/>
+      <QuantitySpec id="expectedCompletionTime" name="예상 완료시간" cdm="Autonomy.GlobalHover.ExpectedCompletionTime"/>
+      <ValueSetSpec id="headingAchieved" name="선수각 만족 여부" cdm="Autonomy.GlobalHover.HeadingAchieved">
+        <Values>
+          <Value cdm="Condition.NotAchieved">0</Value>
+          <Value cdm="Condition.Achieved">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="hoverRadiusAchieved" name="반경 만족 여부" cdm="Autonomy.GlobalHover.RadiusAchieved">
+        <Values>
+          <Value cdm="Condition.NotAchieved">0</Value>
+          <Value cdm="Condition.Achieved">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="distancePointRemaining" name="목표해점과의 떨어진 거리" cdm="Autonomy.GlobalHover.DistanceToPoint"/>
+      <QuantitySpec id="errorYawAngle" name="목표 선수각과의 오차" cdm="Autonomy.GlobalHover.YawError"/>
+      <ValueSetSpec id="possible" name="임무 수행 가능 여부" cdm="Autonomy.GlobalHover.Possible">
+        <Values>
+          <Value cdm="Mission.Availability.Possible">0</Value>
+          <Value cdm="Mission.Availability.Impossible">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="missionState" name="임무 진행 상태" cdm="Autonomy.GlobalHover.MissionState">
+        <Values>
+          <Value cdm="Mission.Execution.Executing">0</Value>
+          <Value cdm="Mission.Execution.Ended">1</Value>
+          <Value cdm="Mission.Execution.Standby">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <!--timeHoverCompleted는 설명의 "유지 시간"과 비고의 "완료될 것으로 추정되는 절대 시간"이 충돌한다. 본 Semantic에서는 expectedCompletionTime 의미로 두되 인코딩/단위는 확정하지 않는다.-->
+      <!--distancePointRemaining 및 errorYawAngle은 원문 Unit 미기재. m/deg/rad를 추정하지 않고 Unit 미지정으로 유지한다.-->
+      <!--headingAchieved/hoverRadiusAchieved 0/1 의미는 필드 의미에 따라 0=NotAchieved, 1=Achieved로 잠정 정의하며 원작자 확인 시 수정 가능하다.-->
+    </GroupSpec>
+    <GroupSpec id="targetTrackingExecutionStatus" name="표적 추종 수행 상태" cdm="Autonomy.TargetTracking.Execution">
+      <QuantitySpec id="distanceTargetRemaining" name="표적과의 이격 거리" cdm="Autonomy.TargetTracking.DistanceToTarget"/>
+      <ValueSetSpec id="targetTrackingAchieved" name="표적 이격거리 도달 여부" cdm="Autonomy.TargetTracking.Achieved">
+        <Values>
+          <Value cdm="Condition.NotAchieved">0</Value>
+          <Value cdm="Condition.Achieved">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="possible" name="임무 수행 가능 여부" cdm="Autonomy.TargetTracking.Possible">
+        <Values>
+          <Value cdm="Mission.Availability.Possible">0</Value>
+          <Value cdm="Mission.Availability.Impossible">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="missionState" name="임무 진행 상태" cdm="Autonomy.TargetTracking.MissionState">
+        <Values>
+          <Value cdm="Mission.Execution.Executing">0</Value>
+          <Value cdm="Mission.Execution.Ended">1</Value>
+          <Value cdm="Mission.Execution.Standby">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <!--distanceTargetRemaining은 원문 Unit 미기재이므로 Unit을 비워 둔다.-->
+      <!--targetTrackingAchieved 0/1 의미는 0=NotAchieved, 1=Achieved로 잠정 정의한다.-->
+    </GroupSpec>
+    <GroupSpec id="pointAndGoExecutionStatus" name="Point &amp; Go 수행 상태" cdm="Autonomy.PointAndGo.Execution">
+      <ValueSetSpec id="missionState" name="임무 진행 상태" cdm="Autonomy.PointAndGo.MissionState">
+        <Values>
+          <Value cdm="Mission.Execution.Executing">0</Value>
+          <Value cdm="Mission.Execution.Ended">1</Value>
+          <Value cdm="Mission.Execution.Standby">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="possible" name="임무 수행 가능 여부" cdm="Autonomy.PointAndGo.Possible">
+        <Values>
+          <Value cdm="Mission.Availability.Possible">0</Value>
+          <Value cdm="Mission.Availability.Impossible">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="distanceToWaypoint" name="현재 경로점 남은 거리" cdm="Autonomy.PointAndGo.DistanceToWaypoint">
+        <Unit>m</Unit>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="autonomousNavigationExecutionStatus" name="자동운항 수행 상태" cdm="Autonomy.Navigation.Execution">
+      <ValueSetSpec id="missionState" name="임무 진행 상태" cdm="Autonomy.Navigation.MissionState">
+        <Values>
+          <Value cdm="Mission.Execution.Executing">0</Value>
+          <Value cdm="Mission.Execution.Ended">1</Value>
+          <Value cdm="Mission.Execution.Standby">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="possible" name="임무 수행 가능 여부" cdm="Autonomy.Navigation.Possible">
+        <Values>
+          <Value cdm="Mission.Availability.Possible">0</Value>
+          <Value cdm="Mission.Availability.Impossible">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="distanceRemaining" name="전체 남은 거리" cdm="Autonomy.Navigation.DistanceRemaining">
+        <Unit>m</Unit>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="autonomousDockingExecutionStatus" name="자동접안 수행 상태" cdm="Autonomy.Docking.Execution">
+      <ValueSetSpec id="missionState" name="임무 진행 상태" cdm="Autonomy.Docking.MissionState">
+        <Values>
+          <Value cdm="Mission.Execution.Executing">0</Value>
+          <Value cdm="Mission.Execution.Ended">1</Value>
+          <Value cdm="Mission.Execution.Standby">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="possible" name="임무 수행 가능 여부" cdm="Autonomy.Docking.Possible">
+        <Values>
+          <Value cdm="Mission.Availability.Possible">0</Value>
+          <Value cdm="Mission.Availability.Impossible">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="distanceRemaining" name="전체 남은 거리" cdm="Autonomy.Docking.DistanceRemaining">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <!--원문 AutonomousDocking distanceRemaining의 Unit은 미기재이나 동일 필드명/설명/비고의 AutonomousNavigation distanceRemaining이 m로 정의되어 있어 m를 적용한다.-->
+    </GroupSpec>
+    <GroupSpec id="anuCbitStatus" name="자율운항제어카드 CBIT 상태" cdm="Health.CBIT.AutonomousNavigation">
+      <ValueSetSpec id="operationalStatus" name="자율운항제어카드 작동 상태" cdm="Health.CBIT.AutonomousNavigation.Status">
+        <Values>
+          <Value cdm="Health.Status.Normal">0</Value>
+          <Value cdm="Health.Status.Degraded">1</Value>
+          <Value cdm="Health.Status.Unavailable">2</Value>
+          <Value cdm="Health.Status.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="collisionUnavoidable" name="충돌회피 불가 상태" cdm="Autonomy.CollisionAvoidance">
+      <ValueSetSpec id="collisionAvoidanceFail" name="충돌회피 가능 여부" cdm="Autonomy.CollisionAvoidance.Status">
+        <Values>
+          <Value cdm="Autonomy.CollisionAvoidance.Possible">0</Value>
+          <Value cdm="Autonomy.CollisionAvoidance.Impossible">1</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="fuelLowWarning" name="잔여연료 부족 경고" cdm="Platform.Fuel.Warning">
+      <ValueSetSpec id="alertFuel" name="연료 부족 상태" cdm="Platform.Fuel.Alert">
+        <Values>
+          <Value cdm="Platform.Fuel.Alert.Low">0</Value>
+          <Value cdm="Platform.Fuel.Alert.Critical">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="fuelQuantityRemain" name="잔여연료 정량적 수치" cdm="Platform.Fuel.QuantityRemaining"/>
+      <QuantitySpec id="fuelQuantityPercent" name="잔여연료 비율" cdm="Platform.Fuel.PercentRemaining">
+        <Range min="0" max="100"/>
+      </QuantitySpec>
+      <QuantitySpec id="alertTime" name="경고시간" cdm="Platform.Fuel.AlertTime"/>
+      <!--fuelQuantityRemain 및 fuelQuantityPercent는 원문 Unit 미기재. fuelQuantityPercent는 Range 0~100만 반영한다. alertTime은 unsigned long long이며 비고에 년/월/일/시/분/초만 기재되어 인코딩 방식이 불명확하므로 Unit/Converter 미정.-->
+    </GroupSpec>
+    <CollectionSpec id="allMissionWaypointData" name="전체 임무계획 경로점 정보" cdm="Autonomy.Mission.Plan.AllPoints" minOccurs="0" maxOccurs="512">
+      <ElementSpec id="commonMissionData" name="공용 임무 데이터" cdm="Autonomy.Mission.Plan.Point">
+        <QuantitySpec id="missionID" name="미션 ID" cdm="Autonomy.Mission.Plan.MissionID"/>
+        <ValueSetSpec id="missionType" name="임무 종류" cdm="Autonomy.Mission.Type">
+          <Values>
+            <Value cdm="Autonomy.Mission.Type.Waypoint">0</Value>
+            <Value cdm="Autonomy.Mission.Type.GlobalHover">1</Value>
+            <Value cdm="Autonomy.Mission.Type.TargetTracking">2</Value>
+            <Value cdm="Autonomy.Mission.Type.PointAndGo">3</Value>
+            <Value cdm="Autonomy.Mission.Type.AutonomousNavigation">4</Value>
+            <Value cdm="Autonomy.Mission.Type.SurfaceReconnaissance">5</Value>
+            <Value cdm="Autonomy.Mission.Type.UnderwaterReconnaissance">6</Value>
+            <Value cdm="Autonomy.Mission.Type.AutonomousDocking">7</Value>
+          </Values>
+        </ValueSetSpec>
+        <QuantitySpec id="latitude" name="경로점 위도" cdm="Autonomy.Mission.Plan.Point.Latitude">
+          <Unit>deg</Unit>
+          <Range min="-90" max="90"/>
+        </QuantitySpec>
+        <QuantitySpec id="longitude" name="경로점 경도" cdm="Autonomy.Mission.Plan.Point.Longitude">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+        </QuantitySpec>
+        <QuantitySpec id="desiredVelocity" name="운용속도" cdm="Autonomy.Mission.Plan.Point.DesiredVelocity">
+          <Unit>m/s</Unit>
+        </QuantitySpec>
+        <QuantitySpec id="goalErrorTolerance" name="목표점 허용오차" cdm="Autonomy.Mission.Plan.Point.GoalErrorTolerance">
+          <Unit>m</Unit>
+        </QuantitySpec>
+        <QuantitySpec id="pointIndex" name="포인트 번호" cdm="Autonomy.Mission.Plan.Point.Index"/>
+        <QuantitySpec id="totalPointNum" name="미션 내 총 포인트 개수" cdm="Autonomy.Mission.Plan.TotalPointCount"/>
+      </ElementSpec>
+    </CollectionSpec>
+  </MonitorSpecs>
+  <ControlSpecs id="control">
+    <ControlSpec id="startIntegration" name="연동 개시" cdm="Control.Autonomy.Integration.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="startIntegrationAck" cdm="Control.Autonomy.Integration.Start.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="restartSystem" name="자율운항장치 시스템 재시작" cdm="Control.Autonomy.System.Restart">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="restartSystemAck" cdm="Control.Autonomy.System.Restart.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="requestPbit" name="자율운항장치 PBIT 요청" cdm="Control.Autonomy.PBIT.Request">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestPbitAck" cdm="Control.Autonomy.PBIT.Request.Response" required="true"/>
+      <Reply bindRef="requestPbitResult" cdm="Control.Autonomy.PBIT.Result"/>
+    </ControlSpec>
+    <ControlSpec id="requestIbit" name="자율운항장치 IBIT 요청" cdm="Control.Autonomy.IBIT.Request">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestIbitAck" cdm="Control.Autonomy.IBIT.Request.Response" required="true"/>
+      <Reply bindRef="requestIbitResult" cdm="Control.Autonomy.IBIT.Result"/>
+    </ControlSpec>
+    <ControlSpec id="recordWaypointMission" name="경로점 레코드 설정" cdm="Control.Autonomy.Mission.Record.Waypoint">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <CollectionProfile cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <ElementProfile cdm="Autonomy.Mission.Record.CommonMissionData">
+            <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
+            <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+              <Unit>deg</Unit>
+              <Range min="-90" max="90"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+              <Unit>deg</Unit>
+              <Range min="-180" max="180"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+              <Unit>m/s</Unit>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+              <Unit>m</Unit>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
+            <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+          </ElementProfile>
+        </CollectionProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EndAction">
+          <Range min="0" max="1"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+          <Unit>m</Unit>
+        </QuantityProfile>
+      </Parameters>
+      <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 0을 Binding에서 설정한다.-->
+      <Reply bindRef="recordWaypointMissionAck" cdm="Control.Autonomy.Mission.Record.Waypoint.CommandStatus" required="true"/>
+      <Reply bindRef="recordWaypointMissionRecordAck" cdm="Control.Autonomy.Mission.Record.Waypoint.RecordEcho" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="recordGlobalHoverMission" name="목표해점위치고정 레코드 설정" cdm="Control.Autonomy.Mission.Record.GlobalHover">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+          <Unit>deg</Unit>
+          <Range min="-90" max="90"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+          <Unit>m/s</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+          <Unit>m</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EndTime"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Heading"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EnableModeRadius">
+          <Unit>m</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EndAction">
+          <Range min="0" max="1"/>
+        </QuantityProfile>
+      </Parameters>
+      <!--GlobalHoverRecordCommand.endTime은 원문상 절대시각/지속시간 의미가 혼재되어 raw unsigned long long 의미로 유지한다. heading Unit도 원문 미기재.-->
+      <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 1을 Binding에서 설정한다.-->
+      <Reply bindRef="recordGlobalHoverMissionAck" cdm="Control.Autonomy.Mission.Record.GlobalHover.CommandStatus" required="true"/>
+      <Reply bindRef="recordGlobalHoverMissionRecordAck" cdm="Control.Autonomy.Mission.Record.GlobalHover.RecordEcho" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="recordTargetTrackingMission" name="표적추종 레코드 설정" cdm="Control.Autonomy.Mission.Record.TargetTracking">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+          <Unit>deg</Unit>
+          <Range min="-90" max="90"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+          <Unit>m/s</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+          <Unit>m</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.TargetTrackingID"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.RangeToTarget">
+          <Unit>m</Unit>
+          <Range min="0" max="2000"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EndAction">
+          <Range min="0" max="1"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.OffsetFromTarget">
+          <Unit>m</Unit>
+          <Range min="-2000" max="2000"/>
+        </QuantityProfile>
+      </Parameters>
+      <!--targetTrackingID 원문 Range 0xX.Y.0001~0xX.Y.FFFE와 0/65535 Not available 설명을 그대로 따른다. X.Y의 의미는 임의 해석하지 않는다.-->
+      <!--rangeToTarget의 Range는 원문대로 0~2000 m. 0=충돌회피만 수행, 50~2000=이격거리 유지이며 1~49의 의미는 원문에 정의되지 않았다.-->
+      <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 2을 Binding에서 설정한다.-->
+      <Reply bindRef="recordTargetTrackingMissionAck" cdm="Control.Autonomy.Mission.Record.TargetTracking.CommandStatus" required="true"/>
+      <Reply bindRef="recordTargetTrackingMissionRecordAck" cdm="Control.Autonomy.Mission.Record.TargetTracking.RecordEcho" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="recordPointAndGoMission" name="Point &amp; Go 레코드 설정" cdm="Control.Autonomy.Mission.Record.PointAndGo">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+          <Unit>deg</Unit>
+          <Range min="-90" max="90"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+          <Unit>m/s</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+          <Unit>m</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EndAction">
+          <Range min="0" max="1"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+          <Unit>m</Unit>
+          <Range min="0" max="100"/>
+        </QuantityProfile>
+      </Parameters>
+      <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 3을 Binding에서 설정한다.-->
+      <Reply bindRef="recordPointAndGoMissionAck" cdm="Control.Autonomy.Mission.Record.PointAndGo.CommandStatus" required="true"/>
+      <Reply bindRef="recordPointAndGoMissionRecordAck" cdm="Control.Autonomy.Mission.Record.PointAndGo.RecordEcho" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="recordAutonomousNavigationMission" name="자동운항 레코드 설정" cdm="Control.Autonomy.Mission.Record.AutonomousNavigation">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+          <Unit>deg</Unit>
+          <Range min="-90" max="90"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+          <Unit>m/s</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+          <Unit>m</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EndAction">
+          <Range min="0" max="1"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+          <Unit>m</Unit>
+          <Range min="0" max="100"/>
+        </QuantityProfile>
+      </Parameters>
+      <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 4을 Binding에서 설정한다.-->
+      <Reply bindRef="recordAutonomousNavigationMissionAck" cdm="Control.Autonomy.Mission.Record.AutonomousNavigation.CommandStatus" required="true"/>
+      <Reply bindRef="recordAutonomousNavigationMissionRecordAck" cdm="Control.Autonomy.Mission.Record.AutonomousNavigation.RecordEcho" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="recordSurfaceReconnaissanceMission" name="수상감시정찰 레코드 설정" cdm="Control.Autonomy.Mission.Record.SurfaceReconnaissance">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <CollectionProfile cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <ElementProfile cdm="Autonomy.Mission.Record.CommonMissionData">
+            <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
+            <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+              <Unit>deg</Unit>
+              <Range min="-90" max="90"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+              <Unit>deg</Unit>
+              <Range min="-180" max="180"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+              <Unit>m/s</Unit>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+              <Unit>m</Unit>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
+            <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+          </ElementProfile>
+        </CollectionProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+          <Unit>m</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EndAction">
+          <Range min="0" max="1"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.RepeatNumber">
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+      </Parameters>
+      <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 5을 Binding에서 설정한다.-->
+      <Reply bindRef="recordSurfaceReconnaissanceMissionAck" cdm="Control.Autonomy.Mission.Record.SurfaceReconnaissance.CommandStatus" required="true"/>
+      <Reply bindRef="recordSurfaceReconnaissanceMissionRecordAck" cdm="Control.Autonomy.Mission.Record.SurfaceReconnaissance.RecordEcho" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="recordUnderwaterReconnaissanceMission" name="수중감시정찰 레코드 설정" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <CollectionProfile cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <ElementProfile cdm="Autonomy.Mission.Record.CommonMissionData">
+            <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
+            <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+              <Unit>deg</Unit>
+              <Range min="-90" max="90"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+              <Unit>deg</Unit>
+              <Range min="-180" max="180"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+              <Unit>m/s</Unit>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+              <Unit>m</Unit>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
+            <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+          </ElementProfile>
+        </CollectionProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+          <Unit>m</Unit>
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.SearchingRange">
+          <Unit>m</Unit>
+          <Range min="37.5" max="150"/>
+          <Resolution>0.01</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.EndAction">
+          <Range min="0" max="1"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Mission.Record.TimeLimit">
+          <Unit>s</Unit>
+          <Range min="0" max="14400"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <!--searchingRange wire raw 3750~15000은 Semantic 37.5~150.0 m(0.01 m resolution)로 해석한다. timeLimit은 seconds로 정의한다.-->
+      <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 6을 Binding에서 설정한다.-->
+      <Reply bindRef="recordUnderwaterReconnaissanceMissionAck" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance.CommandStatus" required="true"/>
+      <Reply bindRef="recordUnderwaterReconnaissanceMissionRecordAck" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance.RecordEcho" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="setEmergencyReturnRoute" name="비상복귀점 및 경로 설정" cdm="Control.Autonomy.Return.EmergencyRoute">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Autonomy.Return.DesiredVelocity">
+          <Unit>m/s</Unit>
+        </QuantityProfile>
+        <CollectionProfile cdm="Autonomy.Return.RoutePoints" minOccurs="0" maxOccurs="256">
+          <ElementProfile cdm="Autonomy.Return.RoutePoint">
+            <QuantityProfile cdm="Autonomy.Return.RoutePoint.Latitude">
+              <Unit>deg</Unit>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Return.RoutePoint.Longitude">
+              <Unit>deg</Unit>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.Return.RoutePoint.Index"/>
+          </ElementProfile>
+        </CollectionProfile>
+        <QuantityProfile cdm="Autonomy.Return.LateralErrorTolerance">
+          <Unit>m</Unit>
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Return.GoalError">
+          <Unit>m</Unit>
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Return.EndAction">
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+      </Parameters>
+      <!--action 원문 Range는 0~0x03이나 의미가 정의된 값은 0=정지(표류), 1=함위 유지(default), 2=주기적 경적/등화 신호뿐이다. Semantic 입력 범위는 0~2로 제한한다.-->
+      <Reply bindRef="setEmergencyReturnRouteAck" cdm="Control.Autonomy.Return.EmergencyRoute.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="setReturnToBasePoint" name="기지복귀점 설정" cdm="Control.Autonomy.Return.BasePoint">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Autonomy.Return.BasePoint.Latitude">
+          <Unit>deg</Unit>
+          <Range min="-90" max="90"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Autonomy.Return.BasePoint.Longitude">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="setReturnToBasePointAck" cdm="Control.Autonomy.Return.BasePoint.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="startMission" name="임무 시작" cdm="Control.Autonomy.Mission.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Autonomy.Mission.StartPointIndex">
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+      </Parameters>
+      <!--missionActionCommand=0은 Binding FixedField로 설정한다. 원문 Range "11~93"은 비고의 0/1/2 정의와 충돌하므로 비고 정의를 따른다.-->
+      <Reply bindRef="startMissionAck" cdm="Control.Autonomy.Mission.Action.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="resumeMission" name="임무 재개" cdm="Control.Autonomy.Mission.Resume">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Autonomy.Mission.StartPointIndex">
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+      </Parameters>
+      <!--missionActionCommand=1은 Binding FixedField로 설정한다. 원문 Range "11~93"은 비고의 0/1/2 정의와 충돌하므로 비고 정의를 따른다.-->
+      <Reply bindRef="resumeMissionAck" cdm="Control.Autonomy.Mission.Action.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="abortMission" name="임무 중단" cdm="Control.Autonomy.Mission.Abort">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters/>
+      <!--abortMission은 사용자 결정에 따라 pointIndex=0을 Binding FixedField로 설정한다. CSV의 0 의미는 "기존에 진행하고 있던 경로점 추종"으로 기재되어 있음.-->
+      <!--missionActionCommand=2은 Binding FixedField로 설정한다. 원문 Range "11~93"은 비고의 0/1/2 정의와 충돌하므로 비고 정의를 따른다.-->
+      <Reply bindRef="abortMissionAck" cdm="Control.Autonomy.Mission.Action.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="setRestrictedAreas" name="접근금지구역 설정" cdm="Control.Autonomy.RestrictedArea.Set">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <CollectionProfile cdm="Autonomy.RestrictedArea.List" minOccurs="0" maxOccurs="256">
+          <ElementProfile cdm="Autonomy.RestrictedArea.Item">
+            <QuantityProfile cdm="Autonomy.RestrictedArea.ID"/>
+            <QuantityProfile cdm="Autonomy.RestrictedArea.Point0.Latitude">
+              <Unit>deg</Unit>
+              <Range min="-90" max="90"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.RestrictedArea.Point0.Longitude">
+              <Unit>deg</Unit>
+              <Range min="-180" max="180"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.RestrictedArea.Point1.Latitude">
+              <Unit>deg</Unit>
+              <Range min="-90" max="90"/>
+            </QuantityProfile>
+            <QuantityProfile cdm="Autonomy.RestrictedArea.Point1.Longitude">
+              <Unit>deg</Unit>
+              <Range min="-180" max="180"/>
+            </QuantityProfile>
+          </ElementProfile>
+        </CollectionProfile>
+      </Parameters>
+      <!--RestrictArea는 원문에 두 좌표점만 정의되어 있다. 실제 사각형/다각형 생성 규칙은 명시되지 않아 두 점을 그대로 노출하고 형상 구성 규칙은 TBD로 남긴다.-->
+      <Reply bindRef="setRestrictedAreasAck" cdm="Control.Autonomy.RestrictedArea.Set.Response" required="true"/>
+    </ControlSpec>
+  </ControlSpecs>
+</PlatformSpec>

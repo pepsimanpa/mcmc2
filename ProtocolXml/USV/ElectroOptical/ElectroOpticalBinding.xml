@@ -1,0 +1,426 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+  <!--전자광학장치(EOIR) Binding: 원격통제장치 CSCI ↔ 전자광학장치 CSCI 직접 연동 DDS/RTP 매핑-->
+  <!--USVMessageBase와 commandID는 실행환경에서 동적으로 생성한다. 공통 DestinationType의 전자광학장치 식별자는 equipmentType=0x03, equipmentID=0x05이며, 해당 두 값만으로 장비가 식별되고 별도 세부 장비 ID가 정의되어 있지 않으므로 dstSubEquipmentID는 미사용값 0x00을 적용한다.-->
+  <Monitors semantic_id="monitor">
+    <MonitorBinding semantic_id="trackingStatus">
+      <DDSChannel topicName="RUSV::SA::EOIR::TrackingReportType" typeName="TrackingReportType"/>
+      <!--target1/target2는 공용 EOIRTrackingBboxType 구조체이며 dotted path로 하위 필드를 매핑한다. SWIR trackingSensor 값은 원본 CSCI에 없음(TBD).-->
+      <Field name="usvHeader"/>
+      <Field name="trackingStatus1" cdm="EOIR.Tracking.Target1.Status"/>
+      <Field name="trackingStatus2" cdm="EOIR.Tracking.Target2.Status"/>
+      <Field name="trackingSensor" cdm="EOIR.Tracking.Sensor"/>
+      <Field name="target1.targetNumber" cdm="EOIR.Tracking.Target1.Number"/>
+      <Field name="target1.centerX" cdm="EOIR.Tracking.Target1.CenterX"/>
+      <Field name="target1.centerY" cdm="EOIR.Tracking.Target1.CenterY"/>
+      <Field name="target1.width" cdm="EOIR.Tracking.Target1.Width"/>
+      <Field name="target1.height" cdm="EOIR.Tracking.Target1.Height"/>
+      <Field name="target2.targetNumber" cdm="EOIR.Tracking.Target2.Number"/>
+      <Field name="target2.centerX" cdm="EOIR.Tracking.Target2.CenterX"/>
+      <Field name="target2.centerY" cdm="EOIR.Tracking.Target2.CenterY"/>
+      <Field name="target2.width" cdm="EOIR.Tracking.Target2.Width"/>
+      <Field name="target2.height" cdm="EOIR.Tracking.Target2.Height"/>
+    </MonitorBinding>
+    <MonitorBinding semantic_id="lrfMeasurement">
+      <DDSChannel topicName="RUSV::SA::EOIR::LRFReportType" typeName="LRFReportType"/>
+      <!--statusDistance: 1~50000은 m 거리, 0=Unknown, 65535=Fail. Semantic Range는 유효 거리만 표현하며 특수값은 구현에서 상태 처리한다.-->
+      <Field name="usvHeader"/>
+      <Field name="statusDistance" cdm="EOIR.LRF.Distance"/>
+    </MonitorBinding>
+    <MonitorBinding semantic_id="eoirStatus">
+      <DDSChannel topicName="RUSV::SO::EOIR::EOIRHeartBeatReportType" typeName="EOIRHeartBeatReportType"/>
+      <!--statusLrfLife는 CSCI 명시 규칙에 따라 raw/100으로 % 변환한다. statusMwirUsedTime의 시간 단위는 원본에 없음(TBD).-->
+      <Field name="usvHeader"/>
+      <Field name="eoirMode" cdm="EOIR.Mode"/>
+      <Field name="statusPanLocation" cdm="EOIR.Position.Pan"/>
+      <Field name="statusTiltLocation" cdm="EOIR.Position.Tilt"/>
+      <Field name="statusEoZoom" cdm="EOIR.EO.Zoom.Step"/>
+      <Field name="statusIrZoom" cdm="EOIR.IR.Zoom.Step"/>
+      <Field name="statusHFOV" cdm="EOIR.FOV.Horizontal"/>
+      <Field name="statusVFOV" cdm="EOIR.FOV.Vertical"/>
+      <Field name="statusEoirLock" cdm="EOIR.Tracking.Lock"/>
+      <Field name="statusBrightness" cdm="EOIR.Illuminator.Brightness"/>
+      <Field name="statusBeamAngle" cdm="EOIR.Illuminator.BeamRange"/>
+      <Field name="statusLrfLife" cdm="EOIR.LRF.LifePercent" converter="DivideBy100"/>
+      <Field name="statusMwirUsedTime" cdm="EOIR.MWIR.UsageTime"/>
+    </MonitorBinding>
+    <MonitorBinding semantic_id="eoirCbitStatus">
+      <DDSChannel topicName="RUSV::SO::EOIR::EOIRCBITReportType" typeName="EOIRCBITReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="statusEoir" cdm="Health.EOIR.Overall"/>
+      <Field name="statusCameraAssembly" cdm="Health.EOIR.CameraAssembly"/>
+      <Field name="statusMainBodyAssembly" cdm="Health.EOIR.MainBodyAssembly"/>
+    </MonitorBinding>
+  </Monitors>
+  <Controls semantic_id="control">
+    <ControlBinding semantic_id="startIntegration">
+      <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
+      <!--전자광학장치는 equipmentType=0x03, equipmentID=0x05만으로 식별되며 별도 세부 장비 ID가 정의되어 있지 않아 dstSubEquipmentID는 미사용값 0x00을 적용한다.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x03"/>
+      <FixedField name="destination.dstEquipmentID" value="0x05"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="startIntegrationAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="restartSystem">
+      <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
+      <!--전자광학장치는 equipmentType=0x03, equipmentID=0x05만으로 식별되며 별도 세부 장비 ID가 정의되어 있지 않아 dstSubEquipmentID는 미사용값 0x00을 적용한다.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x03"/>
+      <FixedField name="destination.dstEquipmentID" value="0x05"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="restartSystemAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="requestIbit">
+      <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
+      <!--전자광학장치는 equipmentType=0x03, equipmentID=0x05만으로 식별되며 별도 세부 장비 ID가 정의되어 있지 않아 dstSubEquipmentID는 미사용값 0x00을 적용한다.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x03"/>
+      <FixedField name="destination.dstEquipmentID" value="0x05"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="requestIbitAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="requestIbitResult">
+        <DDSChannel topicName="RUSV::SO::EOIR::EOIRIBITReportType" typeName="EOIRIBITReportType"/>
+        <!--statusInternalGimbal/statusSensorAssembly1/statusSensorAssembly2/statusExternalGimbal/statusStabilizationControlBoard는 원본 octet bit field를 raw 단위로 유지한다. Range의 0~N(bit)은 값 범위가 아니라 사용 비트 위치이며 BitField XSD 확장은 이번 설계에서 하지 않는다.-->
+        <Field name="usvHeader"/>
+        <Field name="statusEoir" cdm="Health.EOIR.IBIT.Overall"/>
+        <Field name="statusCameraAssembly" cdm="Health.EOIR.IBIT.CameraAssembly"/>
+        <Field name="statusInternalGimbal" cdm="Health.EOIR.IBIT.InternalGimbal.Raw"/>
+        <Field name="statusSensorAssembly1" cdm="Health.EOIR.IBIT.SensorAssembly1.Raw"/>
+        <Field name="statusSensorAssembly2" cdm="Health.EOIR.IBIT.SensorAssembly2.Raw"/>
+        <Field name="statusPowerSwir" cdm="Health.EOIR.IBIT.SWIR.Power"/>
+        <Field name="statusControlSwir" cdm="Health.EOIR.IBIT.SWIR.Control"/>
+        <Field name="statusMainBodyAssembly" cdm="Health.EOIR.IBIT.MainBodyAssembly"/>
+        <Field name="statusExternalGimbal" cdm="Health.EOIR.IBIT.ExternalGimbal.Raw"/>
+        <Field name="statusStabilizationControlBoard" cdm="Health.EOIR.IBIT.StabilizationControlBoard.Raw"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="requestPbit">
+      <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
+      <!--전자광학장치는 equipmentType=0x03, equipmentID=0x05만으로 식별되며 별도 세부 장비 ID가 정의되어 있지 않아 dstSubEquipmentID는 미사용값 0x00을 적용한다.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x03"/>
+      <FixedField name="destination.dstEquipmentID" value="0x05"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="requestPbitAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="requestPbitResult">
+        <DDSChannel topicName="RUSV::SO::EOIR::EOIRPBITReportType" typeName="EOIRPBITReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="statusEoir" cdm="Health.EOIR.PBIT.Overall"/>
+        <Field name="statusCameraAssembly" cdm="Health.EOIR.PBIT.CameraAssembly"/>
+        <Field name="statusMainBodyAssembly" cdm="Health.EOIR.PBIT.MainBodyAssembly"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="setOperationMode">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRModeControlType" typeName="EOIRModeControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="operationMode" cdm="Control.EOIR.Mode.Command"/>
+      <Reply semantic_id="setOperationModeAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="controlByJoystick">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRJoystickControlType" typeName="EOIRJoystickControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="joystickPanResult" cdm="Control.EOIR.Joystick.Pan"/>
+      <Field name="joystickTiltResult" cdm="Control.EOIR.Joystick.Tilt"/>
+      <Reply semantic_id="controlByJoystickAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="pointToPosition">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRManualActuatorControlType" typeName="EOIRManualActuatorControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="referenceModeResult" cdm="Control.EOIR.Position.ReferenceTrueNorth"/>
+      <Field name="panResult" cdm="Control.EOIR.Position.Pan"/>
+      <Field name="tiltResult" cdm="Control.EOIR.Position.Tilt"/>
+      <Reply semantic_id="pointToPositionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="controlTracking">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRTrackingControlType" typeName="EOIRTrackingControlType"/>
+      <!--EOIRTrackingBboxType의 targetNumber는 target1=0, target2=1로 구조상 고정한다. 좌표/크기는 원본 영상 pixel 기준.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="autoTrackingSetting" cdm="Control.EOIR.Tracking.AutoEnabled"/>
+      <Field name="targetSetting" cdm="Control.EOIR.Tracking.TargetSetting"/>
+      <Field name="trackingPriority" cdm="Control.EOIR.Tracking.PriorityChange"/>
+      <Field name="sensorSelection" cdm="Control.EOIR.Tracking.SensorSelection"/>
+      <FixedField name="target1.targetNumber" value="0"/>
+      <Field name="target1.centerX" cdm="Control.EOIR.Tracking.Target1.CenterX"/>
+      <Field name="target1.centerY" cdm="Control.EOIR.Tracking.Target1.CenterY"/>
+      <Field name="target1.width" cdm="Control.EOIR.Tracking.Target1.Width"/>
+      <Field name="target1.height" cdm="Control.EOIR.Tracking.Target1.Height"/>
+      <FixedField name="target2.targetNumber" value="1"/>
+      <Field name="target2.centerX" cdm="Control.EOIR.Tracking.Target2.CenterX"/>
+      <Field name="target2.centerY" cdm="Control.EOIR.Tracking.Target2.CenterY"/>
+      <Field name="target2.width" cdm="Control.EOIR.Tracking.Target2.Width"/>
+      <Field name="target2.height" cdm="Control.EOIR.Tracking.Target2.Height"/>
+      <Reply semantic_id="controlTrackingAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="pointToRadarTarget">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRPointingRadarControlType" typeName="EOIRPointingRadarControlType"/>
+      <!--targetId 0 및 65535(0xFFFF)는 원본 CSCI의 Not available 특수값이다.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="targetId" cdm="Control.EOIR.Pointing.RadarTarget.Identifier"/>
+      <Reply semantic_id="pointToRadarTargetAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureSwing">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRSwingControlType" typeName="EOIRSwingControlType"/>
+      <!--swingSpeedResult의 원본 단위는 deg로 표기되어 있으나 각속도 의미에 따라 Semantic 단위를 deg/s로 해석한다. 물리 필드 자체에는 수치 변환 없이 전달한다.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="swingFlagResult" cdm="Control.EOIR.Swing.Enabled"/>
+      <Field name="swingStartResult" cdm="Control.EOIR.Swing.StartAngle"/>
+      <Field name="swingEndResult" cdm="Control.EOIR.Swing.EndAngle"/>
+      <Field name="swingSpeedResult" cdm="Control.EOIR.Swing.Speed"/>
+      <Reply semantic_id="configureSwingAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="switchIrVideo">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRSwitchingControlType" typeName="EOIRSwitchingControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="irSwitching" cdm="Control.EOIR.Video.IR.UseSWIR"/>
+      <Reply semantic_id="switchIrVideoAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="controlZoom">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRZoomControlType" typeName="EOIRZoomControlType"/>
+      <!--positionZoomControl은 Semantic % 값을 raw 0.5%/bit 값으로 변환하기 위해 x2 한다. zoomControl=0(No change)일 때 원본 특수값 0x5555 처리 규칙은 serializer 구현에서 적용한다.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="eoirFlagResult" cdm="Control.EOIR.Zoom.UseMWIR"/>
+      <Field name="zoomControl" cdm="Control.EOIR.Zoom.Mode"/>
+      <Field name="continuousZoomControl" cdm="Control.EOIR.Zoom.Continuous"/>
+      <Field name="positionZoomControl" cdm="Control.EOIR.Zoom.Position" converter="MultiplyBy2"/>
+      <Reply semantic_id="controlZoomAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="controlFocus">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRFocusControlType" typeName="EOIRFocusControlType"/>
+      <!--positionFocusControl은 Semantic % 값을 raw 0.5%/bit 값으로 변환하기 위해 x2 한다. focusControl=0(No change)일 때 원본 특수값 0x5555 처리 규칙은 serializer 구현에서 적용한다.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="eoirFlagResult" cdm="Control.EOIR.Focus.UseMWIR"/>
+      <Field name="focusControl" cdm="Control.EOIR.Focus.Mode"/>
+      <Field name="continuousFocusControl" cdm="Control.EOIR.Focus.Continuous"/>
+      <Field name="positionFocusControl" cdm="Control.EOIR.Focus.Position" converter="MultiplyBy2"/>
+      <Reply semantic_id="controlFocusAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureEoSensor">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIREOSensorControlType" typeName="EOIREOSensorControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="eoSensorControl" cdm="Control.EOIR.EO.DayNightDehaze"/>
+      <Field name="eoBLCControl" cdm="Control.EOIR.EO.BLC"/>
+      <Field name="eoWDRControl" cdm="Control.EOIR.EO.WDR"/>
+      <Reply semantic_id="configureEoSensorAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureMwirSensor">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRMWIRSensorControlType" typeName="EOIRMWIRSensorControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="mwirNucControl" cdm="Control.EOIR.MWIR.NUC"/>
+      <Field name="mwirAutoGainControl" cdm="Control.EOIR.MWIR.AutoGain"/>
+      <Field name="mwirPaletteControl" cdm="Control.EOIR.MWIR.Palette"/>
+      <Field name="mwirAgcControl" cdm="Control.EOIR.MWIR.AGCLimit"/>
+      <Field name="mwirMideControl" cdm="Control.EOIR.MWIR.MIDE"/>
+      <Reply semantic_id="configureMwirSensorAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureSwirSensor">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRSWIRSensorControlType" typeName="EOIRSWIRSensorControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="swirAutoGainControl" cdm="Control.EOIR.SWIR.AutoGain"/>
+      <Field name="swirPaletteControl" cdm="Control.EOIR.SWIR.Palette"/>
+      <Reply semantic_id="configureSwirSensorAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="controlLrf">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRLRFControlType" typeName="EOIRLRFControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="controlLRFCount" cdm="Control.EOIR.LRF.MeasurementMode"/>
+      <Reply semantic_id="controlLrfAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureIlluminator">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRLaserIlluminatorControlType" typeName="EOIRLaserIlluminatorControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="laserIlluminatorSetting" cdm="Control.EOIR.Illuminator.Disabled"/>
+      <Field name="brightnessControl" cdm="Control.EOIR.Illuminator.Brightness"/>
+      <Field name="beamAngleTele" cdm="Control.EOIR.Illuminator.BeamTeleStep"/>
+      <Field name="beamAngleWide" cdm="Control.EOIR.Illuminator.BeamWideStep"/>
+      <Reply semantic_id="configureIlluminatorAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="controlWiper">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRWiperControlType" typeName="EOIRWiperControlType"/>
+      <!--원본 wiperSetting은 0~9로 표기되지만 본 Semantic은 유효 동작 0~3만 허용한다. 4/5는 삭제 요청, 6~9는 정의 없음.-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="wiperSetting" cdm="Control.EOIR.Wiper.Mode"/>
+      <Reply semantic_id="controlWiperAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="controlPower">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRPowerControlType" typeName="EOIRPowerControlType"/>
+      <!--SWIR 설정/영상전환/IBIT 상태는 존재하지만 EOIRPowerControlType에 swirPower가 없으므로 Binding에 임의 필드를 추가하지 않는다(TBD).-->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="eoPower" cdm="Control.EOIR.Power.EO"/>
+      <Field name="mwirPower" cdm="Control.EOIR.Power.MWIR"/>
+      <Field name="lrfPower" cdm="Control.EOIR.Power.LRF"/>
+      <Field name="laserIlluminatorPower" cdm="Control.EOIR.Power.Illuminator"/>
+      <Reply semantic_id="controlPowerAck" required="true">
+        <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+  </Controls>
+  <SensorProducts semantic_id="sensorProduct">
+    <ProductBinding semantic_id="eoVideo">
+      <!--전자광학장치 CSCI의 원격통제장치 송출용 EO 영상: RTP, 30Hz. IP/Port는 TODO이며 현재 Binding 명세 범위에서 제외한다.-->
+      <RTPChannel/>
+    </ProductBinding>
+    <ProductBinding semantic_id="irVideo">
+      <!--원본 CSCI의 물리 RTP 명칭은 "MWIR 영상"(30Hz)이다. EOIRSwitchingControlType은 MWIR/SWIR 선택을 제공하고 별도 SWIR RTP 인터페이스는 없어 현재는 해당 RTP 채널을 Semantic irVideo(MWIR/SWIR 공용 영상)에 Binding한다. 실제 물리 채널 공유 여부는 TBD.-->
+      <RTPChannel/>
+    </ProductBinding>
+  </SensorProducts>
+</SensorBinding>

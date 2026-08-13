@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    AUV 본체 기능의 수중통신 Binding.
+    원본 물리 메시지는 UCD-1(제어장치→수중통신장치, 16 bytes)과
+    UCD-2(수중통신장치→제어장치, 16 bytes) 두 종류뿐이다.
+    아래 ControlBinding은 새 메시지를 만드는 것이 아니라 같은 UCD-1/UCD-2를
+    COMMAND/ACK 값으로 구분한 논리 뷰이다.
+    COMMAND, ACK와 의미가 확정되지 않은 raw 점검/status bitset은 BindingOnly이므로 cdm을 부여하지 않는다.
+
+    확정 사항
+    - UCD 구간은 RS422로 연동하며 RS422Channel의 messageType은 물리 Telegram 형식을 나타낸다.
+    - UCD Telegram에는 별도 infoCode가 없으므로 RS422Channel에 infoCode를 사용하지 않는다.
+    - checksum은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지를 UInt16LE로 저장한다.
+    - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지 계산한다.
+
+    미확정 사항
+    - UCD-1에는 AUV_ID가 없으므로 Semantic Target이 실제 링크/장치 선택과 어떻게 연결되는지 확인이 필요하다.
+    - UCD-2에는 전용 성공/실패 bit가 없으며 ACK가 요청 COMMAND와 같다는 사실만 정의되어 있다.
+-->
+<PlatformBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+    <Controls semantic_id="control">
+        <!--
+            Binding: requestAuvCheck
+            UCD-1 COMMAND.AUV_CHECK_Req_L(bit0)=0x0001.
+            UCD-2 ACK=0x0001과 AUV_CHECK_RESULT_L 1 byte를 하나의 Reply로 사용한다.
+        -->
+        <ControlBinding semantic_id="requestAuvCheck">
+            <RS422Channel messageType="AuvUcd1Telegram"/>
+            <!-- UCD-1 bytes 0..3: START(2)=0x7E7E, COMMAND(2 LE). -->
+            <FixedField name="startByte" value="0x7E7E"/>
+            <FixedField name="command" value="0x0001"/>
+            <!-- UCD-1 bytes 4..13: RESERVE1, RESERVE2, RETURN_LAT(4), RETURN_LONG(4). 점검 요청 시 유효값 규칙은 미정. -->
+            <FixedField name="reserve1" value="0"/>
+            <FixedField name="reserve2" value="0"/>
+            <FixedField name="returnLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="returnLongitude" value="0" converter="Float32LE"/>
+            <!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CommandThroughInformation" converter="ByteSumModulo65536LE"/>
+
+            <Reply semantic_id="requestAuvCheckReply" required="true">
+                <RS422Channel messageType="AuvUcd2Telegram"/>
+                <!-- UCD-2 bytes 0..3: START(2)=0x7E7E, ACK(2 LE)=요청 COMMAND. -->
+                <FixedField name="startByte" value="0x7E7E"/>
+                <FixedField name="ack" value="0x0001"/>
+                <!--
+                    UCD-2 byte 4: AUV_CHECK_RESULT_L.
+                    bit 그룹은 reserved, MSS_TEST, CCS_TEST, NS_TEST, BS_TEST, PRS_TEST, MCS_TEST, reserved 순서이다.
+                    개별 bit 번호를 새 필드로 재정의하지 않고 원본 1-byte 결과를 보존한다.
+                -->
+                <Field name="auvCheckResult" converter="UInt8BitMask"/>
+                <!-- UCD-2 bytes 5..12: IMU_LAT/IMU_LONG(rad, float32 LE). 이 명령에서의 유효성은 명시되지 않음. -->
+                <Field name="imuLatitude" converter="Float32LE"/>
+                <Field name="imuLongitude" converter="Float32LE"/>
+                <!-- UCD-2 byte 13: EOR bit 그룹(LEAK, DIS, Ceiling Depth, VEL, COM, PCD, GPS, RF/UCD). -->
+                <Field name="eor" converter="UInt8BitMask"/>
+                <!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. -->
+                <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" converter="ByteSumModulo65536LE"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: emergencyReturn
+            UCD-1 COMMAND.EMER_RETURN(bit5)=0x0020.
+            UCD-2에는 비상복귀 성공/완료 전용 bit가 없어 ACK=0x0020을 응답 식별자로 사용한다.
+        -->
+        <ControlBinding semantic_id="emergencyReturn">
+            <RS422Channel messageType="AuvUcd1Telegram"/>
+            <!-- UCD-1 bytes 0..3: START(2), COMMAND(2 LE). -->
+            <FixedField name="startByte" value="0x7E7E"/>
+            <FixedField name="command" value="0x0020"/>
+            <!-- UCD-1 bytes 4..13: RESERVE1/2와 비상복귀 위치(rad, float32 LE). -->
+            <FixedField name="reserve1" value="0"/>
+            <FixedField name="reserve2" value="0"/>
+            <Field name="returnLatitude" cdm="Autonomy.EmergencyReturn.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <Field name="returnLongitude" cdm="Autonomy.EmergencyReturn.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <!-- UCD-1 bytes 14..15: CHECKSUM. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CommandThroughInformation" converter="ByteSumModulo65536LE"/>
+
+            <Reply semantic_id="emergencyReturnReply" required="true">
+                <RS422Channel messageType="AuvUcd2Telegram"/>
+                <!-- UCD-2 bytes 0..3: START(2), ACK(2 LE)=0x0020. -->
+                <FixedField name="startByte" value="0x7E7E"/>
+                <FixedField name="ack" value="0x0020"/>
+                <!-- UCD-2 byte 4: AUV_CHECK_RESULT_L. 비상복귀 응답에서의 유효성은 명시되지 않음. -->
+                <Field name="auvCheckResult" converter="UInt8BitMask"/>
+                <!-- UCD-2 bytes 5..12: 현재 복합항법 위치(rad, float32 LE). -->
+                <Field name="imuLatitude" cdm="Navigation.Integrated.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <Field name="imuLongitude" cdm="Navigation.Integrated.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <!-- UCD-2 byte 13: EOR bit 그룹. 비상복귀 완료/성공을 직접 나타내는 값인지는 확인이 필요하다. -->
+                <Field name="eor" converter="UInt8BitMask"/>
+                <!-- UCD-2 bytes 14..15: CHECKSUM. -->
+                <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" converter="ByteSumModulo65536LE"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: deleteAllRecords
+            UCD-1 COMMAND.Record_Del(bit9)=0x0200.
+            Record_Del은 저장자료 전체 삭제 명령이며 UCD-1에는 별도 삭제 대상/범위 필드가 없다. UCD-2에도 삭제 결과 전용 필드는 없다.
+        -->
+        <ControlBinding semantic_id="deleteAllRecords">
+            <RS422Channel messageType="AuvUcd1Telegram"/>
+            <!-- UCD-1 bytes 0..3: START(2), COMMAND(2 LE). -->
+            <FixedField name="startByte" value="0x7E7E"/>
+            <FixedField name="command" value="0x0200"/>
+            <!-- UCD-1 bytes 4..13: 전체삭제 명령에서는 대상 선택값을 전달하지 않으므로 고정 0으로 채운다. -->
+            <FixedField name="reserve1" value="0"/>
+            <FixedField name="reserve2" value="0"/>
+            <FixedField name="returnLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="returnLongitude" value="0" converter="Float32LE"/>
+            <!-- UCD-1 bytes 14..15: CHECKSUM. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CommandThroughInformation" converter="ByteSumModulo65536LE"/>
+
+            <Reply semantic_id="deleteAllRecordsReply" required="true">
+                <RS422Channel messageType="AuvUcd2Telegram"/>
+                <!-- UCD-2 bytes 0..3: START(2), ACK(2 LE)=0x0200. -->
+                <FixedField name="startByte" value="0x7E7E"/>
+                <FixedField name="ack" value="0x0200"/>
+                <!--
+                    UCD-2 bytes 4..13은 항상 같은 물리 Body(AUV_CHECK_RESULT_L, IMU 위치, EOR)이다.
+                    삭제 요청과의 인과관계/유효성이 명시되지 않아 CDM 결과로 승격하지 않고 raw 필드로 보존한다.
+                -->
+                <Field name="auvCheckResult" converter="UInt8BitMask"/>
+                <Field name="imuLatitude" converter="Float32LE"/>
+                <Field name="imuLongitude" converter="Float32LE"/>
+                <Field name="eor" converter="UInt8BitMask"/>
+                <!-- UCD-2 bytes 14..15: CHECKSUM. -->
+                <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" converter="ByteSumModulo65536LE"/>
+            </Reply>
+        </ControlBinding>
+    </Controls>
+</PlatformBinding>

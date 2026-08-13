@@ -1,0 +1,470 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PayloadBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+  <!--원격사격통제장치 Binding: 원격사격통제장치 CSCI + 원격통제장치 CSCI 직접 연동 기준.-->
+  <!--공용 명령 목적지: equipmentType=0x07(Weapon), equipmentID=0x01(RemoteFireControlSystem), dstSubEquipmentID=0x00.-->
+  <!--CommandStatusReportType은 모든 ACK=O 비주기 명령의 처리 ACK이며, 전용 PBIT/IBIT/지향/거리측정/메뉴 결과와 구분한다.-->
+  <!--중앙통제 기록저장용 EO/IR RTP, 중앙통제/전자광학장치 대상 StatusType, 중앙통제 전용 RCWSHeartBeatReportType은 직접 RCU Binding에서 제외한다.-->
+  <Monitors semantic_id="monitor">
+    <MonitorBinding semantic_id="rcwsCbitStatus">
+      <DDSChannel topicName="RUSV::SO::RCWS::RCWSCBITReportType" typeName="RCWSCBITReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="remoteControlledWeaponSystemCBIT" cdm="Health.RCWS.Overall"/>
+      <Field name="surveillanceAndStrikeCBIT" cdm="Health.RCWS.SurveillanceAndStrike"/>
+      <Field name="drivingCBIT" cdm="Health.RCWS.Driving"/>
+      <Field name="surveillanceCBIT" cdm="Health.RCWS.Surveillance"/>
+      <Field name="strikeCBIT" cdm="Health.RCWS.Strike"/>
+      <Field name="controlCBIT" cdm="Health.RCWS.Control"/>
+    </MonitorBinding>
+    <MonitorBinding semantic_id="weaponDetailStatus">
+      <DDSChannel topicName="RUSV::MM::RCWS::DetailStatusType" typeName="DetailStatusType"/>
+      <Field name="usvHeader"/>
+      <Field name="firingMode" cdm="Weapon.RCWS.FiringMode"/>
+      <Field name="protectedStatus" cdm="Weapon.RCWS.Protected.Enabled"/>
+      <Field name="bulletLoadingMode" cdm="Weapon.RCWS.BulletLoadingMode"/>
+      <Field name="autoDetect" cdm="Weapon.RCWS.AutoDetect.Enabled"/>
+      <Field name="objectTracking" cdm="Weapon.RCWS.ObjectTracking.Enabled"/>
+      <Field name="eoirAiming" cdm="Weapon.RCWS.Aiming.EOIR.Active"/>
+      <Field name="cipeAming" cdm="Weapon.RCWS.Aiming.NavigationRadar.Active"/>
+      <Field name="triggeredMode" cdm="Weapon.RCWS.TriggerMode"/>
+      <Field name="turningAngle" cdm="Weapon.RCWS.Turret.TraverseAngle"/>
+      <Field name="elevationAngle" cdm="Weapon.RCWS.Turret.ElevationAngle"/>
+      <Field name="firingCount" cdm="Weapon.RCWS.Ammunition.FiringCount"/>
+      <Field name="autoReload" cdm="Weapon.RCWS.AutoReload.Event"/>
+      <Field name="manualLeadCompensation" cdm="Weapon.RCWS.ManualLeadCompensation.ToggleEvent"/>
+      <Field name="cameraFOV" cdm="Weapon.RCWS.Camera.MainFOV"/>
+      <!--물리 필드명 cipeAming은 원문 오탈자를 그대로 유지하며 Semantic CDM에서는 NavigationRadar Aiming으로 정규화한다.-->
+    </MonitorBinding>
+    <MonitorBinding semantic_id="firingAlarm">
+      <DDSChannel topicName="RUSV::MM::RCWS::FireWarningReportType" typeName="FireWarningReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="firingAlarm" cdm="Weapon.RCWS.FireWarning.Active"/>
+    </MonitorBinding>
+  </Monitors>
+  <Controls semantic_id="control">
+    <ControlBinding semantic_id="startIntegration">
+      <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x07"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="startIntegrationAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="restartSystem">
+      <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x07"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="restartSystemAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="requestPbit">
+      <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x07"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="requestPbitAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="requestPbitResult">
+        <DDSChannel topicName="RUSV::SO::RCWS::RCWSPBITReportType" typeName="RCWSPBITReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="remoteControlledWeaponSystemPBIT" cdm="Health.RCWS.Overall"/>
+        <Field name="surveillanceAndStrikePBIT" cdm="Health.RCWS.SurveillanceAndStrike"/>
+        <Field name="drivingPBIT" cdm="Health.RCWS.Driving"/>
+        <Field name="surveillancePBIT" cdm="Health.RCWS.Surveillance"/>
+        <Field name="strikePBIT" cdm="Health.RCWS.Strike"/>
+        <Field name="controlPBIT" cdm="Health.RCWS.Control"/>
+      </Reply>
+      <!--PBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하고 RCWSPBITReportType은 실제 점검 결과 Reply로 처리한다. 결과 Report에는 commandID가 없어 추가 상관관계를 임의로 만들지 않는다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="requestIbit">
+      <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x07"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="requestIbitAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="requestIbitResult">
+        <DDSChannel topicName="RUSV::SO::RCWS::RCWSIBITReportType" typeName="RCWSIBITReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="remoteControlledWeaponSystemIBIT" cdm="Health.RCWS.Overall"/>
+        <Field name="surveillanceAndStrikeIBIT" cdm="Health.RCWS.SurveillanceAndStrike"/>
+        <Field name="drivingIBIT" cdm="Health.RCWS.Driving"/>
+        <Field name="drivingIBIT_Detail" cdm="Health.RCWS.Driving.IBIT.Detail.Raw"/>
+        <Field name="surveillanceIBIT" cdm="Health.RCWS.Surveillance"/>
+        <Field name="surveillanceIBIT_Detail" cdm="Health.RCWS.Surveillance.IBIT.Detail.Raw"/>
+        <Field name="strikeIBIT" cdm="Health.RCWS.Strike"/>
+        <Field name="strikeIBIT_Detail" cdm="Health.RCWS.Strike.IBIT.Detail.Raw"/>
+        <Field name="controlIBIT" cdm="Health.RCWS.Control"/>
+        <Field name="controlIBIT_Detail" cdm="Health.RCWS.Control.IBIT.Detail.Raw"/>
+        <!--IBIT Detail raw bit 정의: driving Bit0=선회모터, Bit1=고각모터, Bit2=급탄모터, Bit3=관성센서 통신; surveillance Bit0=주간카메라, Bit1=야간(협각)카메라, Bit2=야간(광각)카메라, Bit3=거리측정기, Bit4=기압, Bit5=감시조립체 온도; strike Bit0=자동장전조립체 통신, Bit1=격발조립체, Bit2=무장제어보드; control Bit0=통합제어기, Bit1=통합제어기전원, Bit2=사격통제보드, Bit3=통신제어보드, Bit4=구동제어보드. 원문은 각 bit의 0/1 정상/이상 극성을 별도로 명시하지 않아 raw octet으로 유지한다.-->
+      </Reply>
+      <!--IBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하고 RCWSIBITReportType은 실제 점검 결과 Reply로 처리한다. 결과 Report에는 commandID가 없다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="configureDriving">
+      <DDSChannel topicName="RUSV::C2::RCU::DrivingConfigType" typeName="DrivingConfigType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="height" cdm="Control.RCWS.Driving.ElevationAngle"/>
+      <Field name="turn" cdm="Control.RCWS.Driving.TraverseAngle"/>
+      <Field name="protectedMode" cdm="Control.RCWS.Driving.ProtectedModeEvent"/>
+      <Field name="autoOrientaion" cdm="Control.RCWS.Driving.AutoOrientationAction"/>
+      <!--물리 필드명 autoOrientaion은 원문 철자를 그대로 유지한다.-->
+      <Reply semantic_id="configureDrivingAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureCamera">
+      <DDSChannel topicName="RUSV::C2::RCU::CameraConfigType" typeName="CameraConfigType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="cameraType" cdm="Control.RCWS.Camera.Type"/>
+      <Field name="zoomIn" cdm="Control.RCWS.Camera.ZoomInEvent"/>
+      <Field name="zoomOut" cdm="Control.RCWS.Camera.ZoomOutEvent"/>
+      <Reply semantic_id="configureCameraAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureContact">
+      <DDSChannel topicName="RUSV::C2::RCU::ContactConfigType" typeName="ContactConfigType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="select" cdm="Control.RCWS.Contact.SelectEvent"/>
+      <Field name="left" cdm="Control.RCWS.Contact.LeftEvent"/>
+      <Field name="right" cdm="Control.RCWS.Contact.RightEvent"/>
+      <Field name="manualLeadCompensation" cdm="Control.RCWS.Contact.ManualLeadCompensationToggleEvent"/>
+      <Field name="leftAndRightManualLeadChange" cdm="Control.RCWS.Contact.ManualLead.HorizontalChange"/>
+      <Field name="upAndDownManualLeadChange" cdm="Control.RCWS.Contact.ManualLead.VerticalChange"/>
+      <Field name="initCrossHair" cdm="Control.RCWS.Contact.CrossHairInitializeEvent"/>
+      <Field name="measurement" cdm="Control.RCWS.Contact.DistanceMeasureEvent"/>
+      <Reply semantic_id="configureContactAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureWeapon">
+      <DDSChannel topicName="RUSV::C2::RCU::WeaponConfigType" typeName="WeaponConfigType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="backStop" cdm="Control.RCWS.Weapon.BackStopEvent"/>
+      <Field name="triggeredMode" cdm="Control.RCWS.Weapon.TriggerMode"/>
+      <Reply semantic_id="configureWeaponAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureControlPanel">
+      <DDSChannel topicName="RUSV::C2::RCU::ControlPanalConfigType" typeName="ControlPanalConfigType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="firingMode" cdm="Control.RCWS.ControlPanel.FiringMode"/>
+      <Field name="bulletLoadingMode" cdm="Control.RCWS.ControlPanel.BulletLoadingMode"/>
+      <Field name="height" cdm="Control.RCWS.ControlPanel.HeightInput.Raw"/>
+      <Field name="turn" cdm="Control.RCWS.ControlPanel.TurnInput.Raw"/>
+      <Field name="autoDetect" cdm="Control.RCWS.ControlPanel.AutoDetectToggleEvent"/>
+      <Field name="objectTracking" cdm="Control.RCWS.ControlPanel.ObjectTrackingToggleEvent"/>
+      <Field name="backStop" cdm="Control.RCWS.ControlPanel.BackStopEvent"/>
+      <Field name="autoReload" cdm="Control.RCWS.ControlPanel.AutoReloadEvent"/>
+      <Field name="emergencyStop" cdm="Control.RCWS.ControlPanel.EmergencyStop"/>
+      <!--ControlPanalConfigType은 원문 타입명 오탈자를 그대로 사용한다. height/turn 0~65535를 raw 입력으로 전달하며 각도 변환을 적용하지 않는다.-->
+      <Reply semantic_id="configureControlPanelAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="fireWeapon">
+      <DDSChannel topicName="RUSV::C2::RCU::FireControlType" typeName="FireControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="fire" cdm="Control.RCWS.Fire.Enabled"/>
+      <Reply semantic_id="fireWeaponAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="aimNavigationRadar">
+      <DDSChannel topicName="RUSV::C2::RCU::CIPEAimConfigType" typeName="CIPEAimConfigType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="contactID" cdm="Control.RCWS.Aim.NavigationRadar.TargetID"/>
+      <Reply semantic_id="aimNavigationRadarAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="aimNavigationRadarResult">
+        <DDSChannel topicName="RUSV::MM::RCWS::CIPEAimStatusType" typeName="CIPEAimStatusType"/>
+        <Field name="usvHeader"/>
+        <Field name="targetID" cdm="Control.RCWS.Aim.NavigationRadar.Result.TargetID"/>
+        <Field name="eoirHeight" cdm="Control.RCWS.Aim.NavigationRadar.Result.ElevationAngle"/>
+        <Field name="eoirTurn" cdm="Control.RCWS.Aim.NavigationRadar.Result.TraverseAngle"/>
+        <!--CIPEAimStatusType의 물리 필드명 eoirHeight/eoirTurn은 원문을 그대로 유지하되 설명은 항해용레이더 지향 결과이므로 CDM에서 NavigationRadar로 정규화한다.-->
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="aimEoir">
+      <DDSChannel topicName="RUSV::C2::RCU::EOIRAimConfigType" typeName="EOIRAimConfigType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" converter="UInt16"/>
+      <!--CSCI 특수 규칙: EOIRAimConfigType.commandID는 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다.-->
+      <Reply semantic_id="aimEoirAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="aimEoirResult">
+        <DDSChannel topicName="RUSV::MM::RCWS::EOIRAimStatusType" typeName="EOIRAimStatusType"/>
+        <Field name="usvHeader"/>
+        <Field name="eoirHeight" cdm="Control.RCWS.Aim.EOIR.Result.ElevationAngle"/>
+        <Field name="eoirTurn" cdm="Control.RCWS.Aim.EOIR.Result.TraverseAngle"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="measureDistance">
+      <DDSChannel topicName="RUSV::C2::RCU::DistanceMeasureControlType" typeName="DistanceMeasureControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="measureDistanceAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="measureDistanceResult">
+        <DDSChannel topicName="RUSV::MM::RCWS::DistanceMeasureReportType" typeName="DistanceMeasureReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="targetDistance" cdm="Control.RCWS.DistanceMeasure.Result.Distance"/>
+        <!--targetDistance 원문: 0=unknown, 1~4000=meter. 물리 타입/range는 unsigned short 0~65535이나 4001~65535 의미는 원문 미정의이므로 임의 해석하지 않는다.-->
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="configureMenu">
+      <DDSChannel topicName="RUSV::C2::RCU::MenuConfigType" typeName="MenuConfigType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Field name="reloadingCount" cdm="Control.RCWS.Menu.ReloadingCount"/>
+      <Field name="intervalFullAuto" cdm="Control.RCWS.Menu.IntervalFullAuto"/>
+      <Field name="intervalSingle" cdm="Control.RCWS.Menu.IntervalSingle"/>
+      <Field name="interval3Burst" cdm="Control.RCWS.Menu.Interval3Burst"/>
+      <Field name="interval5Burst" cdm="Control.RCWS.Menu.Interval5Burst"/>
+      <Field name="interval10Burst" cdm="Control.RCWS.Menu.Interval10Burst"/>
+      <Field name="speedLevel" cdm="Control.RCWS.Menu.SpeedLevel"/>
+      <Field name="displayIRW" cdm="Control.RCWS.Menu.DisplayIRW.Enabled" converter="BooleanToInverted01"/>
+      <Field name="displayIRT" cdm="Control.RCWS.Menu.DisplayIRT.Enabled" converter="BooleanToInverted01"/>
+      <Field name="patrolMode" cdm="Control.RCWS.Menu.PatrolMode.Enabled" converter="BooleanToInverted01"/>
+      <Field name="patrolModeAngle" cdm="Control.RCWS.Menu.PatrolModeAngle"/>
+      <Field name="noDrivingZone1" cdm="Control.RCWS.Menu.NoDrivingZone1.LowerAngle"/>
+      <!--원문 특수값: noDrivingZone1=-30 deg이면 해당 선회각의 구동제한구역 설정 안 함. noDrivingZone2~12 동일 적용 여부는 원문 미정의(TBD).-->
+      <Field name="noDrivingZone2" cdm="Control.RCWS.Menu.NoDrivingZone2.LowerAngle"/>
+      <Field name="noDrivingZone3" cdm="Control.RCWS.Menu.NoDrivingZone3.LowerAngle"/>
+      <Field name="noDrivingZone4" cdm="Control.RCWS.Menu.NoDrivingZone4.LowerAngle"/>
+      <Field name="noDrivingZone5" cdm="Control.RCWS.Menu.NoDrivingZone5.LowerAngle"/>
+      <Field name="noDrivingZone6" cdm="Control.RCWS.Menu.NoDrivingZone6.LowerAngle"/>
+      <Field name="noDrivingZone7" cdm="Control.RCWS.Menu.NoDrivingZone7.LowerAngle"/>
+      <Field name="noDrivingZone8" cdm="Control.RCWS.Menu.NoDrivingZone8.LowerAngle"/>
+      <Field name="noDrivingZone9" cdm="Control.RCWS.Menu.NoDrivingZone9.LowerAngle"/>
+      <Field name="noDrivingZone10" cdm="Control.RCWS.Menu.NoDrivingZone10.LowerAngle"/>
+      <Field name="noDrivingZone11" cdm="Control.RCWS.Menu.NoDrivingZone11.LowerAngle"/>
+      <Field name="noDrivingZone12" cdm="Control.RCWS.Menu.NoDrivingZone12.LowerAngle"/>
+      <Field name="noFiringZone1" cdm="Control.RCWS.Menu.NoFiringZone1.LowerAngle"/>
+      <Field name="noFiringZone2" cdm="Control.RCWS.Menu.NoFiringZone2.LowerAngle"/>
+      <Field name="noFiringZone3" cdm="Control.RCWS.Menu.NoFiringZone3.LowerAngle"/>
+      <Field name="noFiringZone4" cdm="Control.RCWS.Menu.NoFiringZone4.LowerAngle"/>
+      <Field name="noFiringZone5" cdm="Control.RCWS.Menu.NoFiringZone5.LowerAngle"/>
+      <Field name="noFiringZone6" cdm="Control.RCWS.Menu.NoFiringZone6.LowerAngle"/>
+      <Field name="noFiringZone7" cdm="Control.RCWS.Menu.NoFiringZone7.LowerAngle"/>
+      <Field name="noFiringZone8" cdm="Control.RCWS.Menu.NoFiringZone8.LowerAngle"/>
+      <Field name="noFiringZone9" cdm="Control.RCWS.Menu.NoFiringZone9.LowerAngle"/>
+      <Field name="noFiringZone10" cdm="Control.RCWS.Menu.NoFiringZone10.LowerAngle"/>
+      <Field name="noFiringZone11" cdm="Control.RCWS.Menu.NoFiringZone11.LowerAngle"/>
+      <Field name="noFiringZone12" cdm="Control.RCWS.Menu.NoFiringZone12.LowerAngle"/>
+      <Field name="calTrajectory" cdm="Control.RCWS.Menu.TrajectoryCorrection.Enabled" converter="BooleanToInverted01"/>
+      <Field name="stabilization" cdm="Control.RCWS.Menu.StabilizationToggleEvent"/>
+      <Field name="zeroingMode" cdm="Control.RCWS.Menu.ZeroingMode.Enabled"/>
+      <Field name="initZeroing" cdm="Control.RCWS.Menu.InitializeZeroingAction"/>
+      <Field name="overlayLOS" cdm="Control.RCWS.Menu.OverlayLOS.Enabled"/>
+      <Field name="eoLos1X" cdm="Control.RCWS.Menu.EOLos1.X"/>
+      <Field name="eoLos1Y" cdm="Control.RCWS.Menu.EOLos1.Y"/>
+      <Field name="eoLos2X" cdm="Control.RCWS.Menu.EOLos2.X"/>
+      <Field name="eoLos2Y" cdm="Control.RCWS.Menu.EOLos2.Y"/>
+      <Field name="eoLos3X" cdm="Control.RCWS.Menu.EOLos3.X"/>
+      <Field name="eoLos3Y" cdm="Control.RCWS.Menu.EOLos3.Y"/>
+      <Field name="eoLos4X" cdm="Control.RCWS.Menu.EOLos4.X"/>
+      <Field name="eoLos4Y" cdm="Control.RCWS.Menu.EOLos4.Y"/>
+      <Field name="eoLos5X" cdm="Control.RCWS.Menu.EOLos5.X"/>
+      <Field name="eoLos5Y" cdm="Control.RCWS.Menu.EOLos5.Y"/>
+      <Field name="eoLos6X" cdm="Control.RCWS.Menu.EOLos6.X"/>
+      <Field name="eoLos6Y" cdm="Control.RCWS.Menu.EOLos6.Y"/>
+      <Field name="eoLos7X" cdm="Control.RCWS.Menu.EOLos7.X"/>
+      <Field name="eoLos7Y" cdm="Control.RCWS.Menu.EOLos7.Y"/>
+      <Field name="eoLos8X" cdm="Control.RCWS.Menu.EOLos8.X"/>
+      <Field name="eoLos8Y" cdm="Control.RCWS.Menu.EOLos8.Y"/>
+      <Field name="eoLos9X" cdm="Control.RCWS.Menu.EOLos9.X"/>
+      <Field name="eoLos9Y" cdm="Control.RCWS.Menu.EOLos9.Y"/>
+      <Field name="eoLos10X" cdm="Control.RCWS.Menu.EOLos10.X"/>
+      <Field name="eoLos10Y" cdm="Control.RCWS.Menu.EOLos10.Y"/>
+      <Field name="eoLos11X" cdm="Control.RCWS.Menu.EOLos11.X"/>
+      <Field name="eoLos11Y" cdm="Control.RCWS.Menu.EOLos11.Y"/>
+      <Field name="eoLos12X" cdm="Control.RCWS.Menu.EOLos12.X"/>
+      <Field name="eoLos12Y" cdm="Control.RCWS.Menu.EOLos12.Y"/>
+      <Field name="irwLosX" cdm="Control.RCWS.Menu.IRWLos.X"/>
+      <Field name="irwLosY" cdm="Control.RCWS.Menu.IRWLos.Y"/>
+      <Field name="irtLosX" cdm="Control.RCWS.Menu.IRTLos.X"/>
+      <Field name="irtLosY" cdm="Control.RCWS.Menu.IRTLos.Y"/>
+      <Field name="shutdown" cdm="Control.RCWS.Menu.SystemAction"/>
+      <!--displayIRW/displayIRT/patrolMode/calTrajectory는 Semantic enabled Boolean과 물리값이 반대이므로 송신 시 BooleanToInverted01 converter를 사용한다. 0=켜짐/활성, 1=꺼짐/비활성.-->
+      <!--shutdown: 0=비활성화, 1=시스템 종료, 2=시스템 재부팅. 2는 공용 SystemRebootControlType과 기능상 중복되지만 물리 필드를 보존한다.-->
+      <Reply semantic_id="configureMenuAck" required="true">
+        <DDSChannel topicName="RUSV::C2::RCWS::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="configureMenuResult">
+        <DDSChannel topicName="RUSV::MM::RCWS::MenuStatusType" typeName="MenuStatusType"/>
+        <Field name="usvHeader"/>
+        <Field name="reloadingCount" cdm="Weapon.RCWS.Menu.Status.ReloadingCount"/>
+        <Field name="intervalFullAuto" cdm="Weapon.RCWS.Menu.Status.IntervalFullAuto"/>
+        <Field name="intervalSingle" cdm="Weapon.RCWS.Menu.Status.IntervalSingle"/>
+        <Field name="interval3Burst" cdm="Weapon.RCWS.Menu.Status.Interval3Burst"/>
+        <Field name="interval5Burst" cdm="Weapon.RCWS.Menu.Status.Interval5Burst"/>
+        <Field name="interval10Burst" cdm="Weapon.RCWS.Menu.Status.Interval10Burst"/>
+        <Field name="speedLevel" cdm="Weapon.RCWS.Menu.Status.SpeedLevel"/>
+        <Field name="displayIRW" cdm="Weapon.RCWS.Menu.Status.DisplayIRW.Enabled"/>
+        <Field name="displayIRT" cdm="Weapon.RCWS.Menu.Status.DisplayIRT.Enabled"/>
+        <Field name="patrolMode" cdm="Weapon.RCWS.Menu.Status.PatrolMode.Enabled"/>
+        <Field name="patrolModeAngle" cdm="Weapon.RCWS.Menu.Status.PatrolModeAngle"/>
+        <Field name="noDrivingZone1" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone1.LowerAngle"/>
+        <Field name="noDrivingZone2" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone2.LowerAngle"/>
+        <Field name="noDrivingZone3" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone3.LowerAngle"/>
+        <Field name="noDrivingZone4" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone4.LowerAngle"/>
+        <Field name="noDrivingZone5" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone5.LowerAngle"/>
+        <Field name="noDrivingZone6" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone6.LowerAngle"/>
+        <Field name="noDrivingZone7" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone7.LowerAngle"/>
+        <Field name="noDrivingZone8" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone8.LowerAngle"/>
+        <Field name="noDrivingZone9" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone9.LowerAngle"/>
+        <Field name="noDrivingZone10" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone10.LowerAngle"/>
+        <Field name="noDrivingZone11" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone11.LowerAngle"/>
+        <Field name="noDrivingZone12" cdm="Weapon.RCWS.Menu.Status.NoDrivingZone12.LowerAngle"/>
+        <Field name="noFiringZone1" cdm="Weapon.RCWS.Menu.Status.NoFiringZone1.LowerAngle"/>
+        <Field name="noFiringZone2" cdm="Weapon.RCWS.Menu.Status.NoFiringZone2.LowerAngle"/>
+        <Field name="noFiringZone3" cdm="Weapon.RCWS.Menu.Status.NoFiringZone3.LowerAngle"/>
+        <Field name="noFiringZone4" cdm="Weapon.RCWS.Menu.Status.NoFiringZone4.LowerAngle"/>
+        <Field name="noFiringZone5" cdm="Weapon.RCWS.Menu.Status.NoFiringZone5.LowerAngle"/>
+        <Field name="noFiringZone6" cdm="Weapon.RCWS.Menu.Status.NoFiringZone6.LowerAngle"/>
+        <Field name="noFiringZone7" cdm="Weapon.RCWS.Menu.Status.NoFiringZone7.LowerAngle"/>
+        <Field name="noFiringZone8" cdm="Weapon.RCWS.Menu.Status.NoFiringZone8.LowerAngle"/>
+        <Field name="noFiringZone9" cdm="Weapon.RCWS.Menu.Status.NoFiringZone9.LowerAngle"/>
+        <Field name="noFiringZone10" cdm="Weapon.RCWS.Menu.Status.NoFiringZone10.LowerAngle"/>
+        <Field name="noFiringZone11" cdm="Weapon.RCWS.Menu.Status.NoFiringZone11.LowerAngle"/>
+        <Field name="noFiringZone12" cdm="Weapon.RCWS.Menu.Status.NoFiringZone12.LowerAngle"/>
+        <Field name="calTrajectory" cdm="Weapon.RCWS.Menu.Status.TrajectoryCorrection.Enabled"/>
+        <Field name="stabilization" cdm="Weapon.RCWS.Menu.Status.Stabilization.Enabled"/>
+        <Field name="zeroingX" cdm="Weapon.RCWS.Menu.Status.Zeroing.X"/>
+        <Field name="zeroingY" cdm="Weapon.RCWS.Menu.Status.Zeroing.Y"/>
+        <Field name="zeroingMode" cdm="Weapon.RCWS.Menu.Status.ZeroingMode.Enabled"/>
+        <Field name="overlayLOS" cdm="Weapon.RCWS.Menu.Status.OverlayLOS.Enabled"/>
+        <Field name="eoLos1X" cdm="Weapon.RCWS.Menu.Status.EOLos1.X"/>
+        <Field name="eoLos1Y" cdm="Weapon.RCWS.Menu.Status.EOLos1.Y"/>
+        <Field name="eoLos2X" cdm="Weapon.RCWS.Menu.Status.EOLos2.X"/>
+        <Field name="eoLos2Y" cdm="Weapon.RCWS.Menu.Status.EOLos2.Y"/>
+        <Field name="eoLos3X" cdm="Weapon.RCWS.Menu.Status.EOLos3.X"/>
+        <Field name="eoLos3Y" cdm="Weapon.RCWS.Menu.Status.EOLos3.Y"/>
+        <Field name="eoLos4X" cdm="Weapon.RCWS.Menu.Status.EOLos4.X"/>
+        <Field name="eoLos4Y" cdm="Weapon.RCWS.Menu.Status.EOLos4.Y"/>
+        <Field name="eoLos5X" cdm="Weapon.RCWS.Menu.Status.EOLos5.X"/>
+        <Field name="eoLos5Y" cdm="Weapon.RCWS.Menu.Status.EOLos5.Y"/>
+        <Field name="eoLos6X" cdm="Weapon.RCWS.Menu.Status.EOLos6.X"/>
+        <Field name="eoLos6Y" cdm="Weapon.RCWS.Menu.Status.EOLos6.Y"/>
+        <Field name="eoLos7X" cdm="Weapon.RCWS.Menu.Status.EOLos7.X"/>
+        <Field name="eoLos7Y" cdm="Weapon.RCWS.Menu.Status.EOLos7.Y"/>
+        <Field name="eoLos8X" cdm="Weapon.RCWS.Menu.Status.EOLos8.X"/>
+        <Field name="eoLos8Y" cdm="Weapon.RCWS.Menu.Status.EOLos8.Y"/>
+        <Field name="eoLos9X" cdm="Weapon.RCWS.Menu.Status.EOLos9.X"/>
+        <Field name="eoLos9Y" cdm="Weapon.RCWS.Menu.Status.EOLos9.Y"/>
+        <Field name="eoLos10X" cdm="Weapon.RCWS.Menu.Status.EOLos10.X"/>
+        <Field name="eoLos10Y" cdm="Weapon.RCWS.Menu.Status.EOLos10.Y"/>
+        <Field name="eoLos11X" cdm="Weapon.RCWS.Menu.Status.EOLos11.X"/>
+        <Field name="eoLos11Y" cdm="Weapon.RCWS.Menu.Status.EOLos11.Y"/>
+        <Field name="eoLos12X" cdm="Weapon.RCWS.Menu.Status.EOLos12.X"/>
+        <Field name="eoLos12Y" cdm="Weapon.RCWS.Menu.Status.EOLos12.Y"/>
+        <Field name="irwLosX" cdm="Weapon.RCWS.Menu.Status.IRWLos.X"/>
+        <Field name="irwLosY" cdm="Weapon.RCWS.Menu.Status.IRWLos.Y"/>
+        <Field name="irtLosX" cdm="Weapon.RCWS.Menu.Status.IRTLos.X"/>
+        <Field name="irtLosY" cdm="Weapon.RCWS.Menu.Status.IRTLos.Y"/>
+        <!--MenuStatusType의 displayIRW/displayIRT/patrolMode/calTrajectory는 0=비활성화, 1=활성화로 정상 Boolean 의미이므로 송신 MenuConfig와 달리 반전 converter를 적용하지 않는다.-->
+        <!--MenuStatusType에는 zeroingX/zeroingY 상태가 존재하지만 MenuConfigType에는 대응 설정 필드가 없다. 원문을 그대로 상태 결과로만 노출한다.-->
+      </Reply>
+    </ControlBinding>
+  </Controls>
+  <SensorProducts semantic_id="sensorProduct">
+    <ProductBinding semantic_id="remoteControlEoirVideo">
+      <!--원격통제장치로 직접 제공되는 RCWS EO/IR RTP 스트림(평시 2 Mbps, 사격모드 4 Mbps, 10~20 Hz). IP/Port는 CSCI에 미기재되어 RTPChannel 수준에서 스트림만 식별한다.-->
+      <RTPChannel/>
+    </ProductBinding>
+  </SensorProducts>
+</PayloadBinding>

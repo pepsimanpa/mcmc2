@@ -1,0 +1,513 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+  <!--전자광학장치(EOIR) Semantic: 전자광학장치 CSCI + 원격통제장치 CSCI + 공용 구조체/식별자 규칙 기반-->
+  <!--범위는 원격통제장치 CSCI ↔ 전자광학장치 CSCI 직접 연동에 한정하며 전자광학장치 영상처리 CSC 연동은 제외한다.-->
+  <ConstantSpecs id="constant">
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+      <Value>EOIR</Value>
+    </TextConstantSpec>
+    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+      <Value>EO/MWIR/SWIR 영상, 추적, LRF, 상태 감시 및 원격 구동/센서 제어 인터페이스</Value>
+    </TextConstantSpec>
+  </ConstantSpecs>
+  <MonitorSpecs id="monitor">
+    <GroupSpec id="trackingStatus" name="EOIR 접촉물 추적 상태" cdm="EOIR.Tracking.Status">
+      <ValueSetSpec id="trackingStatus1" name="1차 표적 추적 상태" cdm="EOIR.Tracking.Target1.Status">
+        <Values>
+          <Value cdm="Tracking.Command.None">0</Value>
+          <Value cdm="Tracking.Active">1</Value>
+          <Value cdm="Tracking.Stopped">2</Value>
+          <Value cdm="Tracking.Failed">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="trackingStatus2" name="2차 표적 추적 상태" cdm="EOIR.Tracking.Target2.Status">
+        <Values>
+          <Value cdm="Tracking.Command.None">0</Value>
+          <Value cdm="Tracking.Active">1</Value>
+          <Value cdm="Tracking.Stopped">2</Value>
+          <Value cdm="Tracking.Failed">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <!--원본 CSCI의 trackingSensor는 0=undef, 1=EO, 2=MWIR만 정의한다. SWIR 추적 지원 여부는 확인되지 않아 추가하지 않는다(TBD).-->
+      <ValueSetSpec id="trackingSensor" name="추적 영상 채널" cdm="EOIR.Tracking.Sensor">
+        <Values>
+          <Value cdm="EOIR.Tracking.Sensor.Undef">0</Value>
+          <Value cdm="EOIR.Tracking.Sensor.EO">1</Value>
+          <Value cdm="EOIR.Tracking.Sensor.MWIR">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <!--EOIRTrackingBboxType 기준 좌표 최대값은 EO centerX=1919/centerY=1079, IR centerX=639/centerY=479이며, 크기 최대값은 EO 1920x1080, IR 640x480이다. 현재 Semantic Range는 전체 최대 해상도인 EO 기준으로 정의하고 IR 범위는 본 주석으로 보존한다.-->
+      <ValueSetSpec id="target1Number" name="1차 표적 번호" cdm="EOIR.Tracking.Target1.Number">
+        <Values>
+          <Value cdm="EOIR.Tracking.Target.First">0</Value>
+          <Value cdm="EOIR.Tracking.Target.Second">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="target1CenterX" name="1차 표적 중심 X" cdm="EOIR.Tracking.Target1.CenterX">
+        <Unit>pixel</Unit>
+        <Range min="0" max="1919"/>
+      </QuantitySpec>
+      <QuantitySpec id="target1CenterY" name="1차 표적 중심 Y" cdm="EOIR.Tracking.Target1.CenterY">
+        <Unit>pixel</Unit>
+        <Range min="0" max="1079"/>
+      </QuantitySpec>
+      <QuantitySpec id="target1Width" name="1차 표적 수평크기" cdm="EOIR.Tracking.Target1.Width">
+        <Unit>pixel</Unit>
+        <Range min="0" max="1920"/>
+      </QuantitySpec>
+      <QuantitySpec id="target1Height" name="1차 표적 수직크기" cdm="EOIR.Tracking.Target1.Height">
+        <Unit>pixel</Unit>
+        <Range min="0" max="1080"/>
+      </QuantitySpec>
+      <ValueSetSpec id="target2Number" name="2차 표적 번호" cdm="EOIR.Tracking.Target2.Number">
+        <Values>
+          <Value cdm="EOIR.Tracking.Target.First">0</Value>
+          <Value cdm="EOIR.Tracking.Target.Second">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="target2CenterX" name="2차 표적 중심 X" cdm="EOIR.Tracking.Target2.CenterX">
+        <Unit>pixel</Unit>
+        <Range min="0" max="1919"/>
+      </QuantitySpec>
+      <QuantitySpec id="target2CenterY" name="2차 표적 중심 Y" cdm="EOIR.Tracking.Target2.CenterY">
+        <Unit>pixel</Unit>
+        <Range min="0" max="1079"/>
+      </QuantitySpec>
+      <QuantitySpec id="target2Width" name="2차 표적 수평크기" cdm="EOIR.Tracking.Target2.Width">
+        <Unit>pixel</Unit>
+        <Range min="0" max="1920"/>
+      </QuantitySpec>
+      <QuantitySpec id="target2Height" name="2차 표적 수직크기" cdm="EOIR.Tracking.Target2.Height">
+        <Unit>pixel</Unit>
+        <Range min="0" max="1080"/>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="lrfMeasurement" name="LRF 측정 정보" cdm="EOIR.LRF.Measurement">
+      <!--LRFReportType.statusDistance의 유효 거리는 1~50000 m이다. 물리 특수값 0=Unknown, 65535=Fail은 Binding/구현에서 상태값으로 처리한다.-->
+      <QuantitySpec id="distance" name="LRF 측정 거리" cdm="EOIR.LRF.Distance">
+        <Unit>m</Unit>
+        <Range min="1" max="50000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="eoirStatus" name="전자광학장치 상태" cdm="EOIR.Status">
+      <ValueSetSpec id="eoirMode" name="EOIR 운용 모드" cdm="EOIR.Mode">
+        <Values>
+          <Value cdm="EOIR.Mode.Standby">0</Value>
+          <Value cdm="EOIR.Mode.ManualDrive">1</Value>
+          <Value cdm="EOIR.Mode.Tracking">2</Value>
+          <Value cdm="EOIR.Mode.RadarLinked">3</Value>
+          <Value cdm="EOIR.Mode.RCWSLinked">4</Value>
+          <Value cdm="EOIR.Mode.BowPointing">5</Value>
+          <Value cdm="EOIR.Mode.Swing">6</Value>
+          <Value cdm="EOIR.Mode.Stow">7</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="statusPanLocation" name="EOIR PAN 현재 위치" cdm="EOIR.Position.Pan">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="statusTiltLocation" name="EOIR TILT 현재 위치" cdm="EOIR.Position.Tilt">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="statusEoZoom" name="EO 카메라 Zoom 단계" cdm="EOIR.EO.Zoom.Step">
+        <Unit>num</Unit>
+        <Range min="0" max="1000"/>
+      </QuantitySpec>
+      <QuantitySpec id="statusIrZoom" name="IR 카메라 Zoom 단계" cdm="EOIR.IR.Zoom.Step">
+        <Unit>num</Unit>
+        <Range min="0" max="1000"/>
+      </QuantitySpec>
+      <!--원본 CSCI에 statusHFOV/statusVFOV의 최소/최대 범위가 정의되어 있지 않아 Range는 지정하지 않는다.-->
+      <QuantitySpec id="statusHFOV" name="수평 화각(HFOV)" cdm="EOIR.FOV.Horizontal">
+        <Unit>deg</Unit>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="statusVFOV" name="수직 화각(VFOV)" cdm="EOIR.FOV.Vertical">
+        <Unit>deg</Unit>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <BooleanSpec id="statusEoirLock" name="EOIR LOCK 상태" cdm="EOIR.Tracking.Lock"/>
+      <QuantitySpec id="statusBrightness" name="탐조등 밝기" cdm="EOIR.Illuminator.Brightness">
+        <Unit>num</Unit>
+        <Range min="0" max="255"/>
+      </QuantitySpec>
+      <QuantitySpec id="statusBeamAngle" name="탐조등 광원 범위" cdm="EOIR.Illuminator.BeamRange">
+        <Unit>num</Unit>
+        <Range min="0" max="1000"/>
+      </QuantitySpec>
+      <!--statusLrfLife는 원본 CSCI의 0~10000 raw 값을 /100하여 사용하는 것으로 명시되어 있어 Semantic에서는 0.00~100.00%로 표현한다.-->
+      <QuantitySpec id="statusLrfLife" name="LRF 수명 비율" cdm="EOIR.LRF.LifePercent">
+        <Unit>%</Unit>
+        <Range min="0" max="100"/>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <!--statusMwirUsedTime은 MWIR 사용시간(0~65535)으로 정의되어 있으나 sec/min/hour 등의 시간 단위가 명시되어 있지 않아 Unit은 지정하지 않는다(TBD).-->
+      <QuantitySpec id="statusMwirUsedTime" name="MWIR 사용시간" cdm="EOIR.MWIR.UsageTime">
+        <Range min="0" max="65535"/>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="eoirCbitStatus" name="전자광학장치 CBIT 상태" cdm="Health.CBIT.EOIR">
+      <ValueSetSpec id="statusEoir" name="전자광학장치 상태" cdm="Health.EOIR.Overall">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="statusCameraAssembly" name="카메라 조립체 상태" cdm="Health.EOIR.CameraAssembly">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="statusMainBodyAssembly" name="주몸체조립체 상태" cdm="Health.EOIR.MainBodyAssembly">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+  </MonitorSpecs>
+  <ControlSpecs id="control">
+    <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response"/>
+    </ControlSpec>
+    <ControlSpec id="setOperationMode" name="EOIR 운용모드 설정" cdm="Control.EOIR.Mode.Set">
+      <!--operationMode: 0=대기, 1=구동, 2=추적, 3=항해레이더 연동, 4=RCWS 연동, 5=선수지향, 6=SWING, 7=STOW-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.Mode.Command">
+          <Unit>enum</Unit>
+          <Range min="0" max="7"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="setOperationModeAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="controlByJoystick" name="EOIR 조이스틱 구동 제어" cdm="Control.EOIR.Motion.Joystick">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.Joystick.Pan">
+          <Unit>%</Unit>
+          <Range min="-100" max="100"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Joystick.Tilt">
+          <Unit>%</Unit>
+          <Range min="-100" max="100"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="controlByJoystickAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="pointToPosition" name="EOIR 설정값 구동 제어" cdm="Control.EOIR.Motion.Position">
+      <!--referenceModeResult: false(0)=헤딩 기준, true(1)=진북 기준. PAN 허용범위는 헤딩 기준 -180~180 deg, 진북 기준 0~360 deg로 조건부이므로 단일 Range는 지정하지 않는다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.EOIR.Position.ReferenceTrueNorth"/>
+        <QuantityProfile cdm="Control.EOIR.Position.Pan">
+          <Unit>deg</Unit>
+          <Resolution>0.01</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Position.Tilt">
+          <Unit>deg</Unit>
+          <Range min="-90" max="90"/>
+          <Resolution>0.01</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="pointToPositionAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="controlTracking" name="EOIR 접촉물 추적 제어" cdm="Control.EOIR.Tracking">
+      <!--targetSetting: 0=No change, 1=1차 설정, 2=2차 설정, 3=1차 취소, 4=2차 취소. sensorSelection: 0=직전 채널, 1=EO, 2=MWIR. SWIR 추적 값은 원본 CSCI에 없음(TBD).-->
+      <!--target1/target2의 targetNumber는 구조체 의미에 따라 Binding에서 각각 0/1로 고정한다. 좌표/크기는 실 영상 pixel 기준이며, EO는 centerX=0~1919/centerY=0~1079/width=0~1920/height=0~1080, IR은 centerX=0~639/centerY=0~479/width=0~640/height=0~480이다. 현재 Parameter Range는 전체 최대 해상도인 EO 기준으로 정의한다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.EOIR.Tracking.AutoEnabled"/>
+        <QuantityProfile cdm="Control.EOIR.Tracking.TargetSetting">
+          <Unit>enum</Unit>
+          <Range min="0" max="4"/>
+        </QuantityProfile>
+        <BooleanProfile cdm="Control.EOIR.Tracking.PriorityChange"/>
+        <QuantityProfile cdm="Control.EOIR.Tracking.SensorSelection">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Tracking.Target1.CenterX">
+          <Unit>pixel</Unit>
+          <Range min="0" max="1919"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Tracking.Target1.CenterY">
+          <Unit>pixel</Unit>
+          <Range min="0" max="1079"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Tracking.Target1.Width">
+          <Unit>pixel</Unit>
+          <Range min="0" max="1920"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Tracking.Target1.Height">
+          <Unit>pixel</Unit>
+          <Range min="0" max="1080"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Tracking.Target2.CenterX">
+          <Unit>pixel</Unit>
+          <Range min="0" max="1919"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Tracking.Target2.CenterY">
+          <Unit>pixel</Unit>
+          <Range min="0" max="1079"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Tracking.Target2.Width">
+          <Unit>pixel</Unit>
+          <Range min="0" max="1920"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Tracking.Target2.Height">
+          <Unit>pixel</Unit>
+          <Range min="0" max="1080"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="controlTrackingAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="pointToRadarTarget" name="항해레이더 지향 목표 표적 설정" cdm="Control.EOIR.Pointing.RadarTarget">
+      <!--targetId: 1~65534는 탐지물 ID이며 0 및 65535(0xFFFF)는 Not available 특수값이다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.Pointing.RadarTarget.Identifier">
+          <Unit>num</Unit>
+          <Range min="1" max="65534"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="pointToRadarTargetAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureSwing" name="EOIR 스윙 설정" cdm="Control.EOIR.Swing">
+      <!--원본 CSCI의 swingSpeedResult 단위는 deg로 기재되어 있으나 필드 의미가 각속도이므로 본 Semantic에서는 deg/s로 해석한다. 원본 표기 차이는 추적 가능하도록 주석으로 유지한다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.EOIR.Swing.Enabled"/>
+        <QuantityProfile cdm="Control.EOIR.Swing.StartAngle">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+          <Resolution>0.01</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Swing.EndAngle">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+          <Resolution>0.01</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Swing.Speed">
+          <Unit>deg/s</Unit>
+          <Range min="0" max="180"/>
+          <Resolution>0.01</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="configureSwingAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="switchIrVideo" name="IR 영상 전환" cdm="Control.EOIR.Video.IR.Switch">
+      <!--irSwitching: false(0)=MWIR 송신(SWIR 포트 닫음), true(1)=SWIR 송신(MWIR 포트 닫음).-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.EOIR.Video.IR.UseSWIR"/>
+      </Parameters>
+      <Reply bindRef="switchIrVideoAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="controlZoom" name="EOIR Zoom 설정" cdm="Control.EOIR.Zoom">
+      <!--eoirFlagResult: false(0)=EO, true(1)=MWIR. zoomControl: 0=No action/No change, 1=연속제어, 2=위치제어. continuousZoomControl: 0=No action, 1=Zoom In, 2=Zoom Out, 3=Stop.-->
+      <!--positionZoomControl은 raw 0~1000, 0.5%/bit로 해석하여 Semantic 0~500%, Resolution 0.5%로 표현한다. 0x5555는 No change 물리 특수값이며 Binding/구현에서 처리한다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.EOIR.Zoom.UseMWIR"/>
+        <QuantityProfile cdm="Control.EOIR.Zoom.Mode">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Zoom.Continuous">
+          <Unit>enum</Unit>
+          <Range min="0" max="3"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Zoom.Position">
+          <Unit>%</Unit>
+          <Range min="0" max="500"/>
+          <Resolution>0.5</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="controlZoomAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="controlFocus" name="EOIR Focus 설정" cdm="Control.EOIR.Focus">
+      <!--eoirFlagResult: false(0)=EO, true(1)=MWIR. focusControl: 0=No action/No change, 1=연속제어, 2=위치제어. continuousFocusControl: 0=No change, 1=Near, 2=Far, 3=Auto Focus ON, 4=Stop.-->
+      <!--positionFocusControl은 raw 0~1000, 0.5%/bit로 해석하여 Semantic 0~500%, Resolution 0.5%로 표현한다. 원본 비고의 "최대 zoom에 대한 비율" 문구는 Focus 항목과 불일치하므로 원문 오기 가능성을 주석으로 남긴다. 0x5555는 No change 물리 특수값이다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.EOIR.Focus.UseMWIR"/>
+        <QuantityProfile cdm="Control.EOIR.Focus.Mode">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Focus.Continuous">
+          <Unit>enum</Unit>
+          <Range min="0" max="4"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Focus.Position">
+          <Unit>%</Unit>
+          <Range min="0" max="500"/>
+          <Resolution>0.5</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="controlFocusAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureEoSensor" name="EO 카메라 세부 설정" cdm="Control.EOIR.EO.Configure">
+      <!--eoSensorControl: 0=No change, 1=Day, 2=Night, 3=연무제거 On, 4=연무제거 Off. eoBLCControl/eoWDRControl: 0=No change, 1=On, 2=Off.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.EO.DayNightDehaze">
+          <Unit>enum</Unit>
+          <Range min="0" max="4"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.EO.BLC">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.EO.WDR">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="configureEoSensorAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureMwirSensor" name="MWIR 카메라 세부 설정" cdm="Control.EOIR.MWIR.Configure">
+      <!--NUC/AutoGain: 0=No change, 1=On, 2=Off. Palette: 0=No change, 1=Hot/White, 2=Cold/White. AGC Limit: 0=No change, 1~9=Level(default 4). MIDE: 0=No change, 1~15=Level, 16=Off(default).-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.MWIR.NUC">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.MWIR.AutoGain">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.MWIR.Palette">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.MWIR.AGCLimit">
+          <Unit>enum</Unit>
+          <Range min="0" max="9"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.MWIR.MIDE">
+          <Unit>enum</Unit>
+          <Range min="0" max="16"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="configureMwirSensorAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureSwirSensor" name="SWIR 카메라 세부 설정" cdm="Control.EOIR.SWIR.Configure">
+      <!--AutoGain: 0=No change, 1=On, 2=Off. Palette: 0=No change, 1=Hot/White, 2=Cold/White.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.SWIR.AutoGain">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.SWIR.Palette">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="configureSwirSensorAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="controlLrf" name="LRF 측정 설정" cdm="Control.EOIR.LRF.Measurement">
+      <!--controlLRFCount: 0=No change, 1=단발 1회, 2=1Hz 연속, 3=4Hz 연속, 4=연속 정지. 측정 결과는 LRFReportType을 lrfMeasurement Monitor로 수신한다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.LRF.MeasurementMode">
+          <Unit>enum</Unit>
+          <Range min="0" max="4"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="controlLrfAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureIlluminator" name="탐조등 설정" cdm="Control.EOIR.Illuminator">
+      <!--laserIlluminatorSetting: false(0)=탐조등 사용, true(1)=탐조등 미사용. beamAngleTele/Wide 값은 한 번 확대/축소되는 변화 크기이며 0~255 raw 단계값이다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.EOIR.Illuminator.Disabled"/>
+        <QuantityProfile cdm="Control.EOIR.Illuminator.Brightness">
+          <Unit>num</Unit>
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Illuminator.BeamTeleStep">
+          <Unit>num</Unit>
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Illuminator.BeamWideStep">
+          <Unit>num</Unit>
+          <Range min="0" max="255"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="configureIlluminatorAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="controlWiper" name="Wiper 설정" cdm="Control.EOIR.Wiper">
+      <!--원본 CSCI의 wiperSetting 범위는 0~9이나 실제 유효 동작으로 0=No change, 1=1회 동작, 2=연속 동작, 3=Stop만 사용한다. 4/5는 원본에 삭제 요청으로 표기되고 6~9는 정의가 없어 Semantic에서 제외한다.-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.Wiper.Mode">
+          <Unit>enum</Unit>
+          <Range min="0" max="3"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="controlWiperAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="controlPower" name="EOIR 전원 설정" cdm="Control.EOIR.Power">
+      <!--각 전원 필드: 0=No change, 1=On, 2=Off. SWIR는 설정/영상전환/IBIT 상태는 존재하지만 EOIRPowerControlType에 swirPower가 정의되어 있지 않아 임의로 추가하지 않는다(TBD).-->
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.EOIR.Power.EO">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Power.MWIR">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Power.LRF">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.EOIR.Power.Illuminator">
+          <Unit>enum</Unit>
+          <Range min="0" max="2"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="controlPowerAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+  </ControlSpecs>
+  <SensorProductSpecs id="sensorProduct">
+    <ProductStreamSpec id="eoVideo" name="EO 영상 스트림" cdm="ProductStream.Video.EO">
+      <ProductKind cdm="ProductKind.Video"/>
+    </ProductStreamSpec>
+    <!--IR 영상은 EOIRSwitchingControlType으로 MWIR/SWIR가 전환된다. 원본 CSCI에는 원격통제장치 RTP가 "MWIR 영상"으로만 정의되고 별도 SWIR RTP는 없어 Semantic에서는 공용 irVideo로 정의한다. 실제 물리 채널의 공유 여부는 추후 ICD 확인 필요(TBD).-->
+    <ProductStreamSpec id="irVideo" name="IR 영상 스트림(MWIR/SWIR 선택)" cdm="ProductStream.Video.IR">
+      <ProductKind cdm="ProductKind.Video"/>
+    </ProductStreamSpec>
+  </SensorProductSpecs>
+</SensorSpec>

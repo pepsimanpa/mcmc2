@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
+원작자의 Semantic 의도(운용자가 인식하는 기능/상태 중심)와 기존 MDV 실제 TCP Binding을 결합한다.
+
+재정의 원칙
+- missionCtrlCmd, operationMode, emergencyStopType 같은 물리 enum 선택값은 Semantic 기능으로 분리한다.
+- 실제 숫자 선택값은 Binding FixedField에서 결정하고 HMI Parameter로 노출하지 않는다.
+- Monitor는 물리 패킷 단위가 아니라 Navigation/USBL/Target/Link/Health/Mission/Guidance 의미 단위로 구분한다.
+- mdvId는 상태 자체가 아니라 대상 식별/상관관계 정보이므로 Monitor Semantic 항목에서 제외한다.
+- T_HEARTBEAT는 통신 유지용 메시지이나 현 XSD에 Binding-only 통신관리 항목이 없어 기존 Monitor 표현을 임시 유지한다.
+- 복합 임무시작 조건은 현 XSD가 단일 Precondition만 지원하므로 임의로 축약하지 않고 OM 검증 대상으로 유지한다.
+-->
+<PlatformSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+    <ConstantSpecs id="constant">
+        <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+            <Value>MDV Platform Interface</Value>
+        </TextConstantSpec>
+        <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+            <Value>Transport-independent MDV control, mission and monitoring semantic specification</Value>
+        </TextConstantSpec>
+    </ConstantSpecs>
+
+    <MonitorSpecs id="monitor">
+        <GroupSpec id="navigationState" name="MDV 항법 상태" cdm="Navigation.Platform"><QuantitySpec id="mdvDepth" name="MDV 심도" cdm="Navigation.Depth"><Unit>cm</Unit><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="mdvHeading" name="MDV 헤딩" cdm="Navigation.Heading"><Unit>deg</Unit><Range min="0" max="359.9"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="mdvLatitude" name="MDV 위도" cdm="Navigation.Position.Latitude"><Unit>deg</Unit><Range min="-90" max="90"/><Resolution>0.0000001</Resolution></QuantitySpec><QuantitySpec id="mdvLongitude" name="MDV 경도" cdm="Navigation.Position.Longitude"><Unit>deg</Unit><Range min="-180" max="180"/><Resolution>0.0000001</Resolution></QuantitySpec></GroupSpec><GroupSpec id="usblTracking" name="MDV USBL 추적 상태" cdm="Navigation.USBL"><QuantitySpec id="usblTime" name="USBL 시간" cdm="Navigation.USBL.Time"><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="usblAaePosX" name="USBL X축 위치" cdm="Navigation.USBL.AAE.Position.X"><Unit>m</Unit><Range min="0" max="99999.9"/></QuantitySpec><QuantitySpec id="usblAaePosY" name="USBL Y축 위치" cdm="Navigation.USBL.AAE.Position.Y"><Unit>m</Unit><Range min="0" max="99999.9"/></QuantitySpec><QuantitySpec id="usblAaePosZ" name="USBL Z축 위치" cdm="Navigation.USBL.AAE.Position.Z"><Unit>m</Unit><Range min="0" max="99999.9"/></QuantitySpec><QuantitySpec id="usblAaeSlantRange" name="USBL 직선 거리" cdm="Navigation.USBL.AAE.SlantRange"><Range min="0" max="9999.9"/></QuantitySpec><QuantitySpec id="usblAaeTargetBearing" name="USBL 목표물 방위각" cdm="Navigation.USBL.AAE.TargetBearing"><Unit>deg</Unit><Range min="0" max="359.9"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="usblAaeCompass" name="USBL Compass" cdm="Navigation.USBL.AAE.Compass"><Unit>deg</Unit><Range min="0" max="359.9"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="usblAaeRoll" name="USBL Roll" cdm="Navigation.USBL.AAE.Roll"><Unit>deg</Unit><Range min="0" max="359.9"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="usblAaePitch" name="USBL Pitch" cdm="Navigation.USBL.AAE.Pitch"><Unit>deg</Unit><Range min="0" max="359.9"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="usblAaeStatus" name="USBL 상태" cdm="Navigation.USBL.AAE.Status"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec></GroupSpec><GroupSpec id="targetTracking" name="MDV TDS 표적 추적 상태" cdm="Mission.Target.Tracking"><QuantitySpec id="tdsTargetBearing" name="TDS 목표물 방위각" cdm="Mission.Target.Bearing"><Unit>deg</Unit><Range min="0" max="359.9"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="tdsTargetRange" name="TDS 목표물 거리" cdm="Mission.Target.Range"><Unit>m</Unit><Range min="0" max="9999.9"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="tdsTargetDepth" name="TDS 목표물 심도" cdm="Mission.Target.Depth"><Unit>cm</Unit><Resolution>1</Resolution></QuantitySpec></GroupSpec><GroupSpec id="communicationStatus" name="MDV 통신 연동 상태" cdm="Communication.Link"><ValueSetSpec id="consoleLinkStatus" name="MDV 콘솔 연동 상태" cdm="Communication.Link.Console.Status"><Values><Value cdm="Communication.Link.State.Disconnected">0</Value><Value cdm="Communication.Link.State.Connected">1</Value><Value cdm="Communication.Link.State.Unstable">2</Value></Values></ValueSetSpec><ValueSetSpec id="mdvLinkStatus" name="MDV 연동 상태" cdm="Communication.Link.Platform.Status"><Values><Value cdm="Communication.Link.State.Disconnected">0</Value><Value cdm="Communication.Link.State.Connected">1</Value><Value cdm="Communication.Link.State.Unstable">2</Value></Values></ValueSetSpec></GroupSpec><GroupSpec id="healthStatus" name="MDV 건전성 상태" cdm="Health"><ValueSetSpec id="consoleHealthStatus" name="MDV 콘솔 운용 상태" cdm="Health.Console.Status"><Values><Value cdm="Health.State.Normal">0</Value><Value cdm="Health.State.Warning">1</Value><Value cdm="Health.State.Abnormal">2</Value></Values></ValueSetSpec><ValueSetSpec id="mdvHealthStatus" name="MDV 운용 상태" cdm="Health.Platform.Status"><Values><Value cdm="Health.State.Normal">0</Value><Value cdm="Health.State.Warning">1</Value><Value cdm="Health.State.Abnormal">2</Value></Values></ValueSetSpec><QuantitySpec id="statusCode" name="상태 코드" cdm="Platform.Status.ReasonCode"><Range min="0" max="5"/><Resolution>1</Resolution></QuantitySpec></GroupSpec><GroupSpec id="operationModeStatus" name="MDV 현재 운용모드" cdm="Platform.OperationMode"><ValueSetSpec id="operationMode" name="MDV 운용모드" cdm="Platform.OperationMode"><Values><Value cdm="Platform.OperationMode.Legacy">0</Value><Value cdm="Platform.OperationMode.Autonomous">1</Value></Values></ValueSetSpec></GroupSpec><GroupSpec id="missionExecutionStatus" name="MDV 임무 수행 상태" cdm="Mission.Execution"><ValueSetSpec id="missionState" name="임무 수행 상태" cdm="Mission.Execution.State"><Values><Value cdm="Mission.Execution.State.None">0</Value><Value cdm="Mission.Execution.State.PlanReceived">1</Value><Value cdm="Mission.Execution.State.Executing">2</Value><Value cdm="Mission.Execution.State.Paused">3</Value><Value cdm="Mission.Execution.State.Completed">4</Value><Value cdm="Mission.Execution.State.Stopped">5</Value><Value cdm="Mission.Execution.State.Abnormal">6</Value></Values></ValueSetSpec><QuantitySpec id="missionId" name="임무 식별번호" cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="currentWaypointIndex" name="현재 경유점 인덱스" cdm="MissionPlan.CurrentWaypointIndex"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="waypointCount" name="전체 경유점 개수" cdm="MissionPlan.WaypointCount"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec></GroupSpec><GroupSpec id="guidanceStatusInfo" name="MDV 유도 상태" cdm="Autonomy.Guidance"><ValueSetSpec id="guidanceStatus" name="유도 상태" cdm="Autonomy.Guidance.Status"><Values><Value cdm="Autonomy.Guidance.State.Normal">0</Value><Value cdm="Autonomy.Guidance.State.MissionNotStarted">1</Value><Value cdm="Autonomy.Guidance.State.MissionPaused">2</Value><Value cdm="Autonomy.Guidance.State.MissionCompleted">3</Value><Value cdm="Autonomy.Guidance.State.Fault">4</Value></Values></ValueSetSpec><QuantitySpec id="distanceToWaypoint" name="목표 경유점까지 거리" cdm="Autonomy.Guidance.DistanceToWaypoint"><Unit>m</Unit><Range min="0"/></QuantitySpec><QuantitySpec id="targetHeading" name="목표 헤딩" cdm="Autonomy.Guidance.TargetHeading"><Unit>deg</Unit><Range min="0" max="359.9"/></QuantitySpec><QuantitySpec id="targetPitch" name="목표 피치" cdm="Autonomy.Guidance.TargetPitch"><Unit>deg</Unit><Range min="-90" max="90"/></QuantitySpec></GroupSpec><GroupSpec id="transmitHeartbeat" name="MDV 하트비트 송신" cdm="Communication.Heartbeat">
+            <QuantitySpec id="sourceDeviceId" name="송신장비 ID" cdm="Communication.Endpoint.Source.Identifier">
+                <Range min="0" max="65535"/>
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="destinationDeviceId" name="수신장비 ID" cdm="Communication.Endpoint.Destination.Identifier">
+                <Range min="0" max="65535"/>
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="heartbeatCount" name="하트비트 카운트" cdm="Communication.Heartbeat.Sequence">
+                <Range min="0" max="4294967295"/>
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+
+        <GroupSpec id="receiveHeartbeat" name="MDV 하트비트 수신" cdm="Communication.Heartbeat">
+            <QuantitySpec id="sourceDeviceId" name="송신장비 ID" cdm="Communication.Endpoint.Source.Identifier">
+                <Range min="0" max="65535"/>
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="destinationDeviceId" name="수신장비 ID" cdm="Communication.Endpoint.Destination.Identifier">
+                <Range min="0" max="65535"/>
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="heartbeatCount" name="하트비트 카운트" cdm="Communication.Heartbeat.Sequence">
+                <Range min="0" max="4294967295"/>
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+    </MonitorSpecs>
+
+    <ControlSpecs id="control">
+        <ControlSpec id="stopMission" name="MDV 임무 정지" cdm="Control.Mission.Stop"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true"/></ControlSpec><ControlSpec id="startMission" name="MDV 임무 시작" cdm="Control.Mission.Start"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true"/></ControlSpec><ControlSpec id="pauseMission" name="MDV 임무 일시정지" cdm="Control.Mission.Pause"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true"/></ControlSpec><ControlSpec id="resumeMission" name="MDV 임무 재개" cdm="Control.Mission.Resume"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true"/></ControlSpec><ControlSpec id="setLegacyMode" name="MDV 레거시모드 설정" cdm="Control.Platform.OperationMode.Legacy"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Control.Platform.OperationMode.Legacy.Response" bindRef="setLegacyModeReply" required="true"/></ControlSpec><ControlSpec id="setAutonomousMode" name="MDV 자율운항모드 설정" cdm="Control.Platform.OperationMode.Autonomous"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Control.Platform.OperationMode.Autonomous.Response" bindRef="setAutonomousModeReply" required="true"/></ControlSpec><ControlSpec id="transferMissionPlan" name="MDV 임무계획 전송" cdm="Request.MissionPlan.Transfer">
+            <Target cdm="Platform.Identifier.Numeric"/>
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295"/>
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+                <CollectionProfile cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="20">
+                    <ElementProfile cdm="MissionPlan.Waypoint">
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Latitude">
+                            <Unit>deg</Unit>
+                            <Range min="-90" max="90"/>
+                            <Resolution>0.0000001</Resolution>
+                        </QuantityProfile>
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Longitude">
+                            <Unit>deg</Unit>
+                            <Range min="-180" max="180"/>
+                            <Resolution>0.0000001</Resolution>
+                        </QuantityProfile>
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Speed">
+                            <Unit>knot</Unit>
+                            <Range min="0" max="100"/>
+                            <Resolution>0.1</Resolution>
+                        </QuantityProfile>
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Depth">
+                            <Unit>cm</Unit>
+                            <Resolution>1</Resolution>
+                        </QuantityProfile>
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Action">
+                            <Range min="0" max="1"/>
+                            <Resolution>1</Resolution>
+                        </QuantityProfile>
+                    </ElementProfile>
+                </CollectionProfile>
+                <QuantityProfile cdm="Mission.Type">
+                    <Range min="0" max="2"/>
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true"/>
+        </ControlSpec>
+
+        <ControlSpec id="immediateEmergencyStop" name="MDV 즉시 비상정지" cdm="Control.Platform.EmergencyStop.Immediate"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Platform.EmergencyStop.Reason"><Range min="0" max="4"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true"/></ControlSpec><ControlSpec id="emergencyStopAndStandby" name="MDV 임무중지 후 대기" cdm="Control.Platform.EmergencyStop.StopAndStandby"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Platform.EmergencyStop.Reason"><Range min="0" max="4"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true"/></ControlSpec><ControlSpec id="setTargetInformation" name="MDV 표적정보 설정" cdm="Control.Mission.TargetInformation">
+            <Parameters>
+                <QuantityProfile cdm="Navigation.OwnShip.Heading">
+                    <Unit>deg</Unit>
+                    <Range min="0" max="359.9"/>
+                    <Resolution>0.1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Navigation.Relative.Platform.Bearing">
+                    <Unit>deg</Unit>
+                    <Range min="0" max="359.9"/>
+                    <Resolution>0.1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Navigation.Relative.Platform.Range">
+                    <Unit>m</Unit>
+                    <Range min="0" max="1999.9"/>
+                    <Resolution>0.1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Navigation.Depth">
+                    <Unit>cm</Unit>
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Bearing">
+                    <Unit>deg</Unit>
+                    <Range min="0" max="359.9"/>
+                    <Resolution>0.1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Range">
+                    <Unit>m</Unit>
+                    <Range min="0" max="1999.9"/>
+                    <Resolution>0.1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Depth">
+                    <Unit>cm</Unit>
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+        </ControlSpec>
+    </ControlSpecs>
+</PlatformSpec>

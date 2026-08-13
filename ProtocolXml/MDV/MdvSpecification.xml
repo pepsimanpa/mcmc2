@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    MDV 전체 사양 조합 파일.
+    MDV 기능과 rov_common.csv의 양방향 TCP 하트비트는
+    MdvPlatformSemantic.xml과 MdvTcpBinding.xml에 통합하여 정의한다.
+-->
+<VehicleSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./VehicleSpecificationSchema.xsd">
+    <Identification>
+        <ID>MCM-MDV-001</ID>
+        <Name>MDV</Name>
+    </Identification>
+    <Platform>
+        <!--
+            Platform.MDV는 공통 의미 데이터 CDM이 아니라 MDV Profile을 가리키는 잠정 참조 표현이다.
+            현재 XSD에 ProfileRef 전용 직렬화가 없어 AUV Specification과 같은 cdm 속성 형식을 유지한다.
+        -->
+        <PlatformSpecRef id="mdv" name="MDV" cdm="Platform.MDV">
+            <SemanticPath>MdvPlatformSemantic.xml</SemanticPath>
+            <BindingPath>MdvTcpBinding.xml</BindingPath>
+        </PlatformSpecRef>
+    </Platform>
+</VehicleSpec>

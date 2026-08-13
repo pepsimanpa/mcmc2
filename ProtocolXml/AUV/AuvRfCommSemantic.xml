@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    AUV RF 통신장치 자체 기능 Semantic.
+    AUV 몸체 제어와 분리하여 RF_CONFIG, RF_CH_SCAN, RF_STATUS, PLC_Req,
+    RF_GAIN, KEY_CMD를 RF 통신장치의 원격 기능으로 정의한다.
+
+    확정 규칙
+    - 한 요청에는 RF 장치 주 기능 COMMAND bit를 하나만 설정한다.
+    - Binding은 주 기능 bit와 RF_EXEC를 함께 설정한다.
+    - RF-2는 요청에 대한 응답이며, 주기 상태 메시지 근거가 없어 MonitorSpecs를 정의하지 않는다.
+    - KEY_CMD는 새 키를 전송하거나 암호화를 on/off하는 명령이 아니라 이미 주입된 키를 적용하는 명령이다.
+    - RF 기능은 RFCommunication/Security Capability로 분류하고 AUV는 해당 Capability를 선택한 Profile로 본다.
+
+    미확정 사항
+    - RF_GAIN과 KEY_CMD의 INFO 종류는 ICD에 기재되어 있지 않다. RF 장치 명령 문맥상 Binding에서 INFO1로 잠정 매핑한다.
+    - ICD에는 Reply timeout이 없어 timeout 속성을 임의로 넣지 않았다.
+    - RF_CMD_COMPLETE는 RF통신장치가 해당 명령의 처리 완료를 알리는 bit이며 AUV 본체 동작 완료와는 구분한다.
+    - RF-2 ACK, RF_CMD_COMPLETE, 결과 Body가 항상 같은 Telegram에서 동시에 유효한지는 별도 확인이 필요하다.
+    - RF 장치 Target은 독립 장치 식별자가 확인되지 않아 현재 AUV 탑재 endpoint를 뜻하는 Platform.Identifier.Numeric으로 잠정 적용한다.
+-->
+<CommSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+    <ConstantSpecs id="constant">
+        <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+            <Value>AUV RF Communication Device Interface</Value>
+        </TextConstantSpec>
+        <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+            <Value>AUV RF communication-device control and reply semantic specification</Value>
+        </TextConstantSpec>
+    </ConstantSpecs>
+
+    <ControlSpecs id="control">
+        <!--
+            RF 환경 설정.
+            RF-1 INFORMATION1의 RF_CONFIG + RF_EXEC 및 RF_CONF_MODE/RF_CONF_PWR를 사용한다.
+            RF-2 ACK와 RF_CMD_COMPLETE(=RF통신장치 명령 처리 완료), 설정 echo를 하나의 응답으로 해석한다.
+            RF_CONF_MODE bit 정의는 ICD 기준으로 다음과 같이 확정한다.
+            bit 0=1:1, bit 1=1:2, bit 2=본체 Time Slot 2, bit 3=본체 Time Slot 4,
+            bit 4~5=UHF 채널(0 reserved, 1~3 채널), bit 6~7=L-BAND 채널(0 reserved, 1~3 채널).
+            RF_CONF_PWR는 UHF/L-BAND 각각 OFF/LOW/HIGH one-hot bit로 구성한다.
+        -->
+        <ControlSpec id="configureRf" name="RF 통신 환경 설정" cdm="Control.Communication.RF.Configuration">
+            <Target cdm="Platform.Identifier.Numeric"/>
+            <Parameters>
+                <Profile cdm="Communication.RF.Configuration.OperationMode"/>
+                <Profile cdm="Communication.RF.Configuration.TimeSlot"/>
+                <Profile cdm="Communication.RF.Configuration.UHF.Channel"/>
+                <Profile cdm="Communication.RF.Configuration.LBand.Channel"/>
+                <Profile cdm="Communication.RF.Configuration.UHF.Power"/>
+                <Profile cdm="Communication.RF.Configuration.LBand.Power"/>
+            </Parameters>
+            <Reply cdm="Control.Communication.RF.Configuration.Response" bindRef="configureRfReply" required="true"/>
+        </ControlSpec>
+
+        <!--
+            RF 채널 스캔.
+            RF-1 RF_CH_SCAN + RF_EXEC에 대한 RF-2의 CH_SCAN 6 bytes와 PER 2 bytes를 응답으로 사용한다.
+        -->
+        <ControlSpec id="scanRfChannels" name="RF 채널 스캔" cdm="Request.Communication.RF.ChannelScan">
+            <Target cdm="Platform.Identifier.Numeric"/>
+            <Reply cdm="Request.Communication.RF.ChannelScan.Response" bindRef="scanRfChannelsReply" required="true"/>
+        </ControlSpec>
+
+        <!--
+            RF 현재 상태 요청.
+            RF-1 RF_STATUS + RF_EXEC에 대한 RF-2의 설정, 배터리, 스캔, PER, STAT_code를 응답으로 사용한다.
+        -->
+        <ControlSpec id="requestRfStatus" name="RF 상태 요청" cdm="Request.Communication.RF.Status">
+            <Target cdm="Platform.Identifier.Numeric"/>
+            <Reply cdm="Request.Communication.RF.Status.Response" bindRef="requestRfStatusReply" required="true"/>
+        </ControlSpec>
+
+        <!--
+            RF 출항 전 점검 요청.
+            RF-1 PLC_Req + RF_EXEC에 대한 결과는 RF-2 Body의 2-byte Pre_Launch-Check 필드이다.
+            ICD 설명에 등장하는 PLC_Result bit는 실제 RF-2 COMMAND 정의에 존재하지 않으므로 사용하지 않는다.
+        -->
+        <ControlSpec id="requestPreLaunchCheck" name="RF 출항 전 점검 요청" cdm="Request.Health.Check">
+            <Target cdm="Platform.Identifier.Numeric"/>
+            <Reply cdm="Request.Health.Check.Response" bindRef="requestPreLaunchCheckReply" required="true"/>
+        </ControlSpec>
+
+        <!--
+            RF Gain 토글.
+            합의에 따라 장치 내부에 이미 알려진 Gain 적용 상태를 호출할 때마다 반전하는 명령으로 해석한다.
+            현재 상태, 초기 상태, 토글 방향 및 RF_GAIN 전용 결과 필드가 ICD에 없으므로 Parameter를 두지 않는다.
+        -->
+        <ControlSpec id="toggleRfGain" name="RF Gain 토글" cdm="Control.Equipment.RF.GainToggle">
+            <Target cdm="Platform.Identifier.Numeric"/>
+            <!--
+                사용자 합의에 따라 Reply를 정의하지 않는다.
+                실제 RF-2가 ACK 또는 RF_CMD_COMPLETE를 보낼 가능성은 있으나 RF_GAIN과의 관계가 확인되지 않았다.
+            -->
+        </ControlSpec>
+
+        <!--
+            사전 주입 암호 키 적용.
+            RF-1 KEY_CMD + RF_EXEC를 사용하며 키 데이터 자체는 이 ICD에 존재하지 않는다.
+            RF-2 COMMAND의 KEY_COMPLETE=1을 적용 완료로 해석한다.
+            KEY_COMPLETE와 RF_CMD_COMPLETE가 함께 설정되는지, 별도 Telegram으로 오는지는 확인이 필요하다.
+        -->
+        <ControlSpec id="applyRfEncryptionKey" name="사전 주입 RF 암호 키 적용" cdm="Control.Security.PreloadedKey.Apply">
+            <Target cdm="Platform.Identifier.Numeric"/>
+            <Precondition cdm="Security.PreloadedKey.Available"/>
+            <Reply cdm="Control.Security.PreloadedKey.Apply.Response" bindRef="applyRfEncryptionKeyReply" required="true"/>
+        </ControlSpec>
+    </ControlSpecs>
+</CommSpec>

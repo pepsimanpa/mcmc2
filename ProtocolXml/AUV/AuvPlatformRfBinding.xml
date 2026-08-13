@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    AUV 본체 기능의 RF Binding.
+    AUV RF 구간은 TCP로 연동하며 요청은 RF-1 Telegram, 일반 응답은 RF-2 Telegram,
+    데이터 전송 응답은 RF-3 Telegram을 사용한다.
+    ControlBinding은 메시지를 새로 쪼갠 것이 아니라 동일 물리 Telegram을
+    COMMAND/ACK와 INFORMATION 종류로 구분한 논리 뷰이다.
+
+    공통 확정 규칙
+    - little-endian이며 COMMAND 표의 위 행을 bit0으로 해석한다.
+    - 한 번에 AUV 주 기능 bit 하나만 설정하고 RF_SEND(bit30)를 함께 설정한다.
+    - INFO_NUM은 AUV 1에서 INFO1/2/3=1/2/3, AUV 2에서 4/5/6이다.
+    - RF-2 ACK는 RF-1 COMMAND 전체 4-byte word와 동일하다.
+    - RF-3의 'ACK' 필드는 명령 ACK가 아니라 DATA TYPE과 Start/End frame flag이다.
+    - COMMAND, ACK, INFO_NUM, raw bitset과 RF-3 framing은 BindingOnly이므로 cdm을 부여하지 않는다.
+
+    미확정 사항
+    - TCPChannel의 messageType은 RF-1/RF-2/RF-3 물리 Telegram 형식을 나타내며 별도 infoCode는 사용하지 않는다.
+    - INFO_NUM converter와 실제 AUV 대상 선택 방식은 adapter 구현 확인이 필요하다.
+    - RF-1 COUNT와 RF-2/RF-3 COUNT 사이의 상관관계는 정의되어 있지 않다.
+    - RF-2 COMMAND의 RF_CMD_COMPLETE(bit13)=1은 RF통신장치가 휴대용콘솔에서 받은 명령의 처리/전달을 완료했음을 의미한다.
+    - RF_CMD_COMPLETE는 AUV 본체의 실제 동작 완료를 의미하지 않으며, AUV 본체 성공/실패 또는 동작 완료는 별도 상태로 판단해야 한다.
+    - RF-2는 항상 고정 80 bytes지만 명령별로 어느 Body 필드가 유효한지 명시되지 않았다.
+    - checksum은 COUNT부터 INFORMATION 마지막 byte까지의 unsigned byte 합을 65536으로 나눈 나머지이다.
+    - checksum 값은 UInt16 little-endian으로 전송한다.
+-->
+<PlatformBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+    <Controls semantic_id="control">
+        <!--
+            Binding: requestAuvCheck
+            RF-1 COMMAND=AUV_CHECK_Req(bit0)|RF_SEND(bit30)=0x40000001, INFORMATION3.
+            RF-2 ACK=0x40000001과 AUV_CHECK_RESULT 12 bytes를 하나의 Reply로 사용한다.
+        -->
+        <ControlBinding semantic_id="requestAuvCheck">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER: START(4), INFO_NUM(1), COUNT(4), COMMAND(4), reverse ACK(2). -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000001"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!--
+                RF-1 bytes 15..39 INFORMATION3:
+                AUV_ID, RC_SPEED, RC_DIRECTION, DATA TYPE, File_First, File_Final,
+                EMER_LAT, EMER_LONG, BRIGHTNESS, RESERVE(8).
+                점검 요청에서는 AUV_ID 외 필드의 유효값/초기화 규칙이 명시되지 않았다.
+            -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL: CHECKSUM(2), STOP(2)=0x8181. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="requestAuvCheckReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER: START(4), COUNT(4), COMMAND(2), ACK(4). -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <!-- KEY_COMPLETE/RF_CMD_COMPLETE가 들어 있는 RF 장치용 word이며 AUV 완료 판정에는 사용하지 않는다. -->
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000001"/>
+                <!--
+                    RF-2 bytes 14..15 MSPD 2-byte 점검 그룹.
+                    첫 byte: 모듈#1 부팅/저장매체, FLS/SSS 점검·연동, 자율제어컴퓨터/통신부 연동.
+                    둘째 byte: 광학/초음파 카메라 점검·연동과 reserved.
+                -->
+                <Field name="mspdCheck" converter="UInt16LEBitMask"/>
+                <!--
+                    RF-2 bytes 16..17 INB 2-byte 점검 그룹.
+                    두 byte는 메모리 및 IMU/DVL/심도계/GPS/지자기/자율제어컴퓨터 통신 연동 상태를 담는다.
+                    ICD의 MSB/LSB 명칭과 실제 wire byte 대응은 확인이 필요하다.
+                -->
+                <Field name="inbCheck" converter="UInt16LEBitMask"/>
+                <!--
+                    RF-2 bytes 18..19 ACC 2-byte 점검 그룹.
+                    전원제어/누수/점멸등/핑어/ACC 자체점검과 MSPD/INB/RF/UCD/추진제어기 연동 상태를 담는다.
+                -->
+                <Field name="accCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 20..21 PCD 그룹: BMS, 전지팩 전압·온도, 제어/BMS 연동 상태와 reserved. -->
+                <Field name="pcdCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 22..23 MC 그룹: 추진제어기 온도·입력전원·전류센서와 방향타/승강타 구동기 상태. -->
+                <Field name="mcCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 24..25 RCD 그룹: MCU, 모뎀/제어반, UHF/L-Band 송수신반, 전원반, 암호화반과 reserved. -->
+                <Field name="rcdCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 76..79 TAIL: CHECKSUM(2), STOP(2). -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: transferMissionPlan
+            RF-1 COMMAND=MISSION_TRANS(bit1)|RF_SEND=0x40000002, INFORMATION2.
+            RF-2에는 임무계획 수신 성공/실패 전용 결과가 없어 ACK=0x40000002를 응답 식별자로 사용한다.
+        -->
+        <ControlBinding semantic_id="transferMissionPlan">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 2 또는 5. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation2"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000002"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!--
+                RF-1 bytes 15..1031 INFORMATION2:
+                AUV_ID, MODE, Velocity, DEPTH, WAYPOINT count, RETURN 좌표,
+                Waypoint 좌표 영역, RESERVE, ALIGN_INTERVAL, Custom1/2.
+            -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <!-- 현재 유효값: 1=광역탐색모드, 2=정밀탐색모드. 3~8은 추후 결정이므로 송신하지 않는다. -->
+            <Field name="missionMode" cdm="MissionPlan.OperationMode"/>
+            <Field name="velocity" cdm="MissionPlan.Speed"/>
+            <Field name="depth" cdm="MissionPlan.Depth"/>
+            <DerivedField name="waypointCount" cdm="MissionPlan.WaypointCount" sourceField="waypoints" converter="ArrayLengthUInt8"/>
+            <Field name="returnLatitude" cdm="MissionPlan.ReturnPosition.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <Field name="returnLongitude" cdm="MissionPlan.ReturnPosition.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <!--
+                최대 100개라면 위·경도 쌍은 800 bytes이나 ICD는 중간 영역을 '~ 992 bytes'로 표기한다.
+                아래 배열은 의미 모델이며 실제 padding/추가 필드/offset은 반드시 확인해야 한다.
+            -->
+            <ArrayField name="waypoints" cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="100">
+                <Element name="waypoint" cdm="MissionPlan.Waypoint">
+                    <Field name="latitude" cdm="MissionPlan.Waypoint.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                    <Field name="longitude" cdm="MissionPlan.Waypoint.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                </Element>
+            </ArrayField>
+            <FixedField name="reserveInformation2" value="0"/>
+            <Field name="alignInterval" cdm="MissionPlan.AlignmentInterval"/>
+            <FixedField name="custom1" value="0"/>
+            <FixedField name="custom2" value="0"/>
+            <!-- RF-1 bytes 1032..1035 TAIL: CHECKSUM(2), STOP(2). -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="transferMissionPlanReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000002"/>
+                <!-- RF-2 bytes 14..75 고정 Body는 존재하지만 임무계획 전송 결과로 사용할 전용 필드는 정의되지 않았다. -->
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: controlAuvLocally
+            RF-1 COMMAND=RC_MODE(bit2)|RF_SEND=0x40000004, INFORMATION3.
+        -->
+        <ControlBinding semantic_id="controlAuvLocally">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 3 또는 6. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000004"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3. RC_SPEED와 signed RC_DIRECTION(-15~15)을 사용한다. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <Field name="remoteSpeed" cdm="Platform.Motion.Speed"/>
+            <Field name="remoteDirection" cdm="Platform.Motion.Direction" converter="Int8"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="controlAuvLocallyReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. ACK는 요청 식별자이며 실제 조종 동작 완료/성공 필드는 없다. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000004"/>
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: requestAuvStatus
+            RF-1 COMMAND=Status_Chk(bit3)|RF_SEND=0x40000008, INFORMATION3.
+            RF-2 고정 Body의 AUV 항법·파일·EOR·MODE 영역을 하나의 Reply로 사용한다.
+        -->
+        <ControlBinding semantic_id="requestAuvStatus">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000008"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3. 상태 요청에서는 AUV_ID 외 Body 값의 사용 규칙이 명시되지 않음. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="requestAuvStatusReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000008"/>
+                <!-- RF-2 bytes 14..25: AUV_CHECK_RESULT 12 bytes. 상태 요청에서 유효한지 불명확하여 raw 그룹으로 보존. -->
+                <Field name="auvCheckResult"/>
+                <!-- RF-2 bytes 26..45: AUV ID, BATTERY, GPS 위치, WAYPOINT 수, ALIGN_STATUS, IMU 위치. -->
+                <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+                <Field name="batteryPercent" cdm="Platform.Energy.Battery.RemainingPercent"/>
+                <Field name="gpsLatitude" cdm="Navigation.GNSS.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <Field name="gpsLongitude" cdm="Navigation.GNSS.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <Field name="waypointCount" cdm="MissionPlan.WaypointCount"/>
+                <Field name="alignmentStatus" cdm="Navigation.Integrated.Alignment.Status"/>
+                <Field name="imuLatitude" cdm="Navigation.Integrated.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <Field name="imuLongitude" cdm="Navigation.Integrated.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <!-- RF-2 bytes 46..55: AUV/SSS/OC/AC/FLS 파일 개수, 각 UInt16 LE. -->
+                <Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" converter="UInt16LE"/>
+                <Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" converter="UInt16LE"/>
+                <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/>
+                <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/>
+                <Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" converter="UInt16LE"/>
+                <!--
+                    RF-2 bytes 56..57 EOR 2-byte bit 그룹:
+                    LEAK, ROLL, PITCH, VEL, COM, PCD, GPS, RF/UCD,
+                    Ceiling Depth, BT_SOC, BT_TEMP, BT_CO, BT_V, MC, DIS, EOM.
+                -->
+                <Field name="eor" converter="UInt16LEBitMask"/>
+                <!--
+                    RF-2 bytes 58..59 MODE 2-byte bit 그룹:
+                    PLC, MS, RC, ALIGN, MS_ST, EMER, FILE, DATA, MS_STOP, REC_DEL, RF_CONF, EOR와 reserved.
+                -->
+                <Field name="mode" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 60..75: RESERVE_RF 및 RF 장치 결과/상태. AUV 상태 Reply에서는 raw 그룹으로 보존. -->
+                <Field name="rfDeviceStatusBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: startMission
+            RF-1 COMMAND=MISSION_START(bit4)|RF_SEND=0x40000010.
+            원본 COMMAND 표에 따라 INFORMATION2를 사용한다(기존 INFO3 해석을 사용하지 않음).
+        -->
+        <ControlBinding semantic_id="startMission">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 2 또는 5. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation2"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000010"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!--
+                RF-1 bytes 15..1031 INFORMATION2 전체가 물리적으로 존재한다.
+                임무 시작 시 임무계획을 재전송해야 하는지 설명이 없어 AUV_ID 외 필드는 raw로 보존한다.
+            -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="missionMode" value="0"/>
+            <FixedField name="velocity" value="0"/>
+            <FixedField name="depth" value="0"/>
+            <FixedField name="waypointCount" value="0"/>
+            <FixedField name="returnLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="returnLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="waypointArea" value="0"/>
+            <FixedField name="reserveInformation2" value="0"/>
+            <FixedField name="alignInterval" value="0"/>
+            <FixedField name="custom1" value="0"/>
+            <FixedField name="custom2" value="0"/>
+            <!-- RF-1 bytes 1032..1035 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="startMissionReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. RF_CMD_COMPLETE는 RF 장치의 명령 처리/전달 완료이며 AUV 임무 시작 완료/성공 전용 필드는 없다. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000010"/>
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: emergencyReturn
+            RF-1 COMMAND=EMER_RETURN(bit5)|RF_SEND=0x40000020, INFORMATION3.
+        -->
+        <ControlBinding semantic_id="emergencyReturn">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000020"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3. EMER_LAT/EMER_LONG은 rad float32 LE. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <Field name="emergencyLatitude" cdm="Autonomy.EmergencyReturn.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <Field name="emergencyLongitude" cdm="Autonomy.EmergencyReturn.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="emergencyReturnReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. RF_CMD_COMPLETE는 RF 장치의 명령 처리/전달 완료이며 AUV 비상복귀 완료/성공 전용 필드는 없다. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000020"/>
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: requestFileList
+            RF-1 COMMAND=File_List_Req(bit6)|RF_SEND=0x40000040, INFORMATION3.
+            INFORMATION3 DATA_TYPE은 AUV/SSS/OC/FLS/AC 중 정확히 1개만 선택하여 one-hot으로 설정한다.
+        -->
+        <ControlBinding semantic_id="requestFileList">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000040"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!--
+                RF-1 bytes 15..39 INFORMATION3.
+                DATA TYPE byte는 AUV/SSS/OC/AC/FLS 선택 bit와 reserved 3 bits로 구성된다.
+            -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <Field name="dataType" cdm="RecordedData.FileList.DataType" converter="PackSingleFileListDataType"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="requestFileListReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000040"/>
+                <!-- RF-2 bytes 46..55: 데이터 종류별 파일 개수, 각 UInt16 LE. -->
+                <Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" converter="UInt16LE"/>
+                <Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" converter="UInt16LE"/>
+                <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/>
+                <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/>
+                <Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" converter="UInt16LE"/>
+                <!-- 나머지 RF-2 고정 Body의 이 명령 관련 유효성은 명시되지 않았다. -->
+                <Field name="otherInformationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: requestData
+            RF-1 COMMAND=Data_Req(bit7)|RF_SEND=0x40000080, INFORMATION3.
+            RF-3 데이터 프레임은 아래 SensorProducts의 ProductBinding으로 분리한다.
+        -->
+        <ControlBinding semantic_id="requestData">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000080"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3: DATA TYPE과 File_First/File_Final을 요청 조건으로 사용한다. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <DerivedField name="dataType"
+                          sourceField="RecordedData.Selection.Platform,RecordedData.Selection.SideScanSonar,RecordedData.Selection.OpticalCamera,RecordedData.Selection.AcousticCamera,RecordedData.Selection.ForwardLookingSonar"
+                          converter="PackDataTypeBits"/>
+            <Field name="fileFirst" cdm="RecordedData.FileRange.First" converter="UInt16LE"/>
+            <Field name="fileFinal" cdm="RecordedData.FileRange.Final" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+        </ControlBinding>
+
+        <!--
+            Binding: stopMission
+            RF-1 COMMAND=MISSION_STOP(bit8)|RF_SEND=0x40000100, INFORMATION3.
+        -->
+        <ControlBinding semantic_id="stopMission">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000100"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3. AUV_ID 외 필드의 사용 규칙은 명시되지 않음. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="stopMissionReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. RF_CMD_COMPLETE는 RF 장치의 명령 처리/전달 완료이며 AUV 임무 중지 완료/성공 전용 필드는 없다. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000100"/>
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: deleteAllRecords
+            RF-1 COMMAND=Record_Del(bit9)|RF_SEND=0x40000200, INFORMATION3.
+            Record_Del은 저장자료 전체 삭제 명령이며 DATA_TYPE과 File_First/File_Final은 삭제 대상 선택에 사용하지 않는다.
+        -->
+        <ControlBinding semantic_id="deleteAllRecords">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000200"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3. Record_Del은 전체 삭제이므로 대상 선택/파일 범위 필드는 사용하지 않고 0으로 채운다. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="deleteAllRecordsReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. RF_CMD_COMPLETE는 RF 장치의 전체삭제 명령 처리/전달 완료이며 AUV 본체 삭제 성공/실패 전용 필드는 없다. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000200"/>
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: enterMaintenanceMode
+            RF-1 COMMAND=MTE_MODE(bit10)|RF_SEND=0x40000400, INFORMATION3.
+            MTE_MODE bit=1 명령은 자율제어컴퓨터가 정비장비모드를 수행하도록 요청한다. 별도 해제 명령은 정의하지 않는다.
+        -->
+        <ControlBinding semantic_id="enterMaintenanceMode">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40000400"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3. MTE_MODE 자체가 진입 명령 bit이며 별도 설정 파라미터는 없다. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="enterMaintenanceModeReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. RF_CMD_COMPLETE는 RF 장치의 명령 처리/전달 완료이며 AUV 정비모드 진입 완료 상태는 아니다. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40000400"/>
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: setFlashBrightness
+            RF-1 COMMAND=FLASH(bit15)|RF_SEND=0x40008000, INFORMATION3.
+            BRIGHTNESS 1은 최소, 10은 최대 밝기이다.
+        -->
+        <ControlBinding semantic_id="setFlashBrightness">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x40008000"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3. BRIGHTNESS byte만 이 명령의 설정값으로 사용한다. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <Field name="brightness" cdm="Equipment.Light.Brightness"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="setFlashBrightnessReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. RF_CMD_COMPLETE는 RF 장치의 명령 처리/전달 완료이며 AUV 실제 밝기 적용 완료/상태 필드는 없다. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x40008000"/>
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+    </Controls>
+
+    <!--
+        RF-3 저장자료 Sensor Product Binding.
+        다섯 자료 종류는 동일 AuvRf3DataTelegram을 사용하므로 frameFlags의 DATA TYPE bit로 구분한다.
+        Start/End, length, payload 재조립은 RF-3 adapter가 담당하며 ProductBinding에는 중복 정의하지 않는다.
+    -->
+    <SensorProducts semantic_id="sensorProduct">
+        <ProductBinding semantic_id="auvData">
+            <TCPChannel messageType="AuvRf3DataTelegram"/>
+            <MatchField name="frameFlags" mask="0x00000800" value="0x00000800"/>
+        </ProductBinding>
+        <ProductBinding semantic_id="sideScanSonarData">
+            <TCPChannel messageType="AuvRf3DataTelegram"/>
+            <MatchField name="frameFlags" mask="0x00001000" value="0x00001000"/>
+        </ProductBinding>
+        <ProductBinding semantic_id="opticalCameraData">
+            <TCPChannel messageType="AuvRf3DataTelegram"/>
+            <MatchField name="frameFlags" mask="0x00002000" value="0x00002000"/>
+        </ProductBinding>
+        <ProductBinding semantic_id="acousticCameraData">
+            <TCPChannel messageType="AuvRf3DataTelegram"/>
+            <MatchField name="frameFlags" mask="0x00004000" value="0x00004000"/>
+        </ProductBinding>
+        <ProductBinding semantic_id="forwardLookingSonarData">
+            <TCPChannel messageType="AuvRf3DataTelegram"/>
+            <MatchField name="frameFlags" mask="0x00008000" value="0x00008000"/>
+        </ProductBinding>
+    </SensorProducts>
+</PlatformBinding>

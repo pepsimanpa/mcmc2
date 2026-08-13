@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+  <!--센서융합 정보처리장치 Binding: 센서융합 정보처리 CSC 및 원격통제장치 CSCI 직접 연동 기준-->
+  <!--공용 식별자 규칙: SurfaceDetection=0x03, SensorFusionProcessorCard=0x01, 별도 세부 장비 ID 없음 → dstSubEquipmentID 미사용값 0x00 적용.-->
+  <Monitors semantic_id="monitor">
+    <MonitorBinding semantic_id="fusionContacts">
+      <DDSChannel topicName="RUSV::SA::CIPE::FusionContactReportType" typeName="FusionContactReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="contactNum" cdm="Contact.Fusion.Count"/>
+      <ArrayField name="sensorFusionContactTypeList" cdm="Contact.Fusion.List" minOccurs="0" maxOccurs="256">
+        <Element name="contact" cdm="Contact.Fusion.Item">
+          <Field name="sensorFusionContactID" cdm="Contact.Fusion.Identifier"/>
+          <Field name="sensorFusionContactIdentifier" cdm="Contact.Fusion.Classification"/>
+          <Field name="sensorFusionContactAttribute" cdm="Contact.Fusion.MotionAttribute"/>
+          <Field name="latitude" cdm="Contact.Fusion.Position.Latitude"/>
+          <Field name="longitude" cdm="Contact.Fusion.Position.Longitude"/>
+          <Field name="altitudeAmsl" cdm="Contact.Fusion.Position.AltitudeAMSL"/>
+          <Field name="range" cdm="Contact.Fusion.Range"/>
+          <Field name="relativeAzimuth" cdm="Contact.Fusion.Bearing.RelativeAzimuth"/>
+          <Field name="trueAzimuth" cdm="Contact.Fusion.Bearing.TrueAzimuth"/>
+          <Field name="elevationAngle" cdm="Contact.Fusion.Bearing.Elevation"/>
+          <Field name="relativeSpeed" cdm="Contact.Fusion.Motion.RelativeSpeed"/>
+          <Field name="relativeHeading" cdm="Contact.Fusion.Motion.RelativeHeading"/>
+          <Field name="cog" cdm="Contact.Fusion.Motion.COG"/>
+          <Field name="sog" cdm="Contact.Fusion.Motion.SOG"/>
+          <Field name="contactLength" cdm="Contact.Fusion.Dimension.Length"/>
+          <Field name="contactWidth" cdm="Contact.Fusion.Dimension.Width"/>
+          <Field name="contactHeight" cdm="Contact.Fusion.Dimension.Height"/>
+          <Field name="size" cdm="Contact.Fusion.Dimension.Size"/>
+          <Field name="cpa" cdm="Contact.Fusion.CPA"/>
+          <Field name="collisionRisk" cdm="Contact.Fusion.CollisionRisk"/>
+        </Element>
+      </ArrayField>
+    </MonitorBinding>
+
+    <MonitorBinding semantic_id="fusionWaves">
+      <DDSChannel topicName="RUSV::SA::CIPE::FusionWaveReportType" typeName="FusionWaveReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="waveNum" cdm="Wave.Fusion.Count"/>
+      <ArrayField name="waveTypeList" cdm="Wave.Fusion.List" minOccurs="0" maxOccurs="256">
+        <Element name="wave" cdm="Wave.Fusion.Item">
+          <Field name="waveID" cdm="Wave.Fusion.Identifier"/>
+          <Field name="waveRange" cdm="Wave.Fusion.Range"/>
+          <Field name="relativeWaveDirection" cdm="Wave.Fusion.Direction.Relative"/>
+          <Field name="latitude" cdm="Wave.Fusion.Position.Latitude"/>
+          <Field name="longitude" cdm="Wave.Fusion.Position.Longitude"/>
+          <Field name="waveHeight" cdm="Wave.Fusion.Height"/>
+          <Field name="maximumWaveHeight" cdm="Wave.Fusion.Height.Maximum"/>
+          <Field name="waveDirection" cdm="Wave.Fusion.Direction"/>
+          <!--물리 필드명 directionalWaveSpectrum은 원본 의미 '파향분산도'에 따라 Semantic CDM Wave.Fusion.Direction.Spread로 매핑한다.-->
+          <Field name="directionalWaveSpectrum" cdm="Wave.Fusion.Direction.Spread"/>
+          <Field name="wavePeriod" cdm="Wave.Fusion.Period"/>
+          <Field name="meanWavePeriod" cdm="Wave.Fusion.Period.Mean"/>
+          <Field name="waveSpectrum" cdm="Wave.Fusion.Spectrum"/>
+          <Field name="integratedWaveEnergy" cdm="Wave.Fusion.Energy.Integrated"/>
+          <Field name="spectralPeakPeriod" cdm="Wave.Fusion.Period.SpectralPeak"/>
+        </Element>
+      </ArrayField>
+    </MonitorBinding>
+
+    <MonitorBinding semantic_id="cipeCbitStatus">
+      <DDSChannel topicName="RUSV::SO::CIPE::CIPECBITReportType" typeName="CIPECBITReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="cipeCBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
+      <Field name="cipeCBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
+    </MonitorBinding>
+  </Monitors>
+
+  <Controls semantic_id="control">
+    <ControlBinding semantic_id="startIntegration">
+      <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x03"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="startIntegrationAck" required="true">
+        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <!--ACK의 목적지 장비 ID는 원 명령 발행자(FRCU/PRCU)에 따라 달라질 수 있으므로 특정 RemoteControl equipmentID로 고정하지 않는다.-->
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+
+    <ControlBinding semantic_id="restartSystem">
+      <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x03"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="restartSystemAck" required="true">
+        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+
+    <ControlBinding semantic_id="requestIbit">
+      <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x03"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="requestIbitAck" required="true">
+        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="requestIbitResult">
+        <DDSChannel topicName="RUSV::SO::CIPE::CIPEIBITReportType" typeName="CIPEIBITReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
+        <Field name="cipeIBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
+        <!--DDS에는 CPU 상태 enum이 별도로 존재하지 않으며 실제 cpuTemperature 값만 전달된다. 원본 온도 판정 기준(정상 30~85, 성능저하 ~29 또는 86~89, 위험 90~)은 구현/HMI 판단 기준으로 사용한다.-->
+        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature"/>
+        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.CIPE.Processor.CpuLoad"/>
+      </Reply>
+    </ControlBinding>
+
+    <ControlBinding semantic_id="requestPbit">
+      <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x03"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <Reply semantic_id="requestPbitAck" required="true">
+        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="requestPbitResult">
+        <DDSChannel topicName="RUSV::SO::CIPE::CIPEPBITReportType" typeName="CIPEPBITReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
+        <Field name="cipePBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
+      </Reply>
+    </ControlBinding>
+  </Controls>
+</SensorBinding>

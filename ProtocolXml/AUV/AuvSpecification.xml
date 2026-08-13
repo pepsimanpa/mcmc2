@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- 생성일시: 2026-08-04 11:51:54 KST -->
+<VehicleSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./VehicleSpecificationSchema.xsd">
+    <Identification>
+        <ID>MCM-AUV-001</ID>
+        <Name>AUV</Name>
+    </Identification>
+    <Platform>
+        <!--
+            CDM 분류상 Platform.AUV는 의미 데이터 CDM이 아니라 AUV Profile 참조이다.
+            현재 XSD에 ProfileRef 전용 직렬화가 없어 cdm 속성에는 기존 호환 값을 잠정 유지한다.
+        -->
+        <PlatformSpecRef id="auv" name="AUV" cdm="Platform.AUV">
+            <SemanticPath>AuvPlatformSemantic.xml</SemanticPath>
+            <BindingPath>AuvPlatformRfBinding.xml</BindingPath>
+            <BindingPath>AuvPlatformUcdBinding.xml</BindingPath>
+        </PlatformSpecRef>
+    </Platform>
+    <Comms>
+        <!--
+            CDM 분류상 Communication.RF는 RFCommunication Capability 참조이다.
+            ProfileRef 직렬화 방식이 확정될 때까지 기존 cdm 속성 표현을 잠정 유지한다.
+        -->
+        <CommSpecRef id="auvRfCommunication" name="AUV RF 통신장치" cdm="Communication.RF">
+            <SemanticPath>AuvRfCommSemantic.xml</SemanticPath>
+            <BindingPath>AuvRfCommBinding.xml</BindingPath>
+        </CommSpecRef>
+    </Comms>
+</VehicleSpec>

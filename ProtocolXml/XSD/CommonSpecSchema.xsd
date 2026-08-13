@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://lignex1.com/mcmc2/umsSchema"
+    xmlns="http://lignex1.com/mcmc2/umsSchema"
+    elementFormDefault="qualified">
+
+    <!-- Root Elements Below -->
+    <!--
+    ============================================================================================= -->
+    <xs:element name="SensorSpec" type="SensorSpecCompositionType" />
+    <xs:element name="PlatformSpec" type="PlatformSpecCompositionType" />
+    <xs:element name="PayloadSpec" type="PayloadSpecCompositionType" />
+    <xs:element name="CommSpec" type="CommSpecCompositionType" />
+
+    <!-- Attribute Group Below -->
+    <!--
+    ============================================================================================= -->
+    <xs:attributeGroup name="SpecAttrs">
+        <xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="name" type="xs:string" use="optional" />
+		<xs:attribute name="cdm" type="CdmRefType" use="optional" />
+    </xs:attributeGroup>
+
+    <!-- Core Type Below -->
+    <!--
+    ============================================================================================= -->
+    <!-- 
+    Summary:
+        CDM 키 정보를 담는 Element 타입 선언    
+    -->
+    <xs:simpleType name="CdmRefType">
+        <xs:restriction base="xs:string">
+            <!-- <xs:pattern value="" /> CDM 키 정규식 들어갈 자리 -->
+            <xs:minLength value="1" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- 
+    Summary:
+        CDM 키 정보를 담는 Attribute를 갖는 Element 타입 선언    
+    -->
+    <xs:complexType name="CdmRefAttrType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- 
+    Summary:
+        Binding 키 정보를 담는 Element 타입 선언    
+    -->
+    <xs:simpleType name="BindRefType">
+        <xs:restriction base="xs:string">
+            <!-- <xs:pattern value="" /> Binding 키 정규식 들어갈 자리 -->
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- 
+    Summary:
+        Binding 키 정보를 담는 Attribute를 갖는 Element 타입 선언    
+    -->
+    <xs:complexType name="BindRefAttrType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="bindRef" type="BindRefType" use="optional" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- 
+    Summary: 
+        SemanticSpec이 가질 수 있는 기본 항목들을 선언
+    Elements:
+        CdmRef: CDM 매핑 키
+        BindRef: BindindSpec 매핑 키
+    Attributes:
+        SpecAttrs: 
+    -->
+    <xs:complexType name="SemanticSpecBaseType">
+        <xs:attributeGroup ref="SpecAttrs" />
+    </xs:complexType>
+
+    <!-- 
+    Summary: 
+        Sensor가 가질 수 있는 기본 항목들을 선언
+    Elements:
+        ConstantSpecs: 정적 사양 명세
+        MonitorSpecs: 감시 가능한 사양 명세
+        ControlSpecs: 제어 가능한 사양 명세
+    -->
+    <xs:complexType name="SensorSpecCompositionType">
+        <xs:sequence>
+            <xs:element name="ConstantSpecs" type="ConstantSpecSetType" minOccurs="0" />
+            <xs:element name="MonitorSpecs" type="MonitorSpecSetType" minOccurs="0" />
+            <xs:element name="ControlSpecs" type="ControlSpecSetType" minOccurs="0" />
+            <xs:element name="SensorProductSpecs" type="SensorProductSpecType" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- 
+    Summary: 
+        Platform이 가질 수 있는 기본 항목들을 선언
+    Elements:
+        ConstantSpecs: 정적 사양 명세
+        MonitorSpecs: 감시 가능한 사양 명세
+        ControlSpecs: 제어 가능한 사양 명세
+    -->
+    <xs:complexType name="PlatformSpecCompositionType">
+        <xs:sequence>
+            <xs:element name="ConstantSpecs" type="ConstantSpecSetType" minOccurs="0" />
+            <xs:element name="MonitorSpecs" type="MonitorSpecSetType" minOccurs="0" />
+            <xs:element name="ControlSpecs" type="ControlSpecSetType" minOccurs="0" />
+            <xs:element name="SensorProductSpecs" type="SensorProductSpecType" minOccurs="0" />
+        </xs:sequence>
+	</xs:complexType>
+
+    <!-- 
+    Summary: 
+        Payload(임무장비)가 가질 수 있는 기본 항목들을 선언
+    Elements:
+        ConstantSpecs: 정적 사양 명세
+        MonitorSpecs: 감시 가능한 사양 명세
+        ControlSpecs: 제어 가능한 사양 명세
+    -->
+    <xs:complexType name="PayloadSpecCompositionType">
+        <xs:sequence>
+            <xs:element name="ConstantSpecs" type="ConstantSpecSetType" minOccurs="0" />
+            <xs:element name="MonitorSpecs" type="MonitorSpecSetType" minOccurs="0" />
+            <xs:element name="ControlSpecs" type="ControlSpecSetType" minOccurs="0" />
+            <!-- 임무장비도 영상/파일 등 SensorProduct 형식의 산출물을 원격 운용 인터페이스로 제공할 수 있다. RCWS EO/IR RTP 등을 표현하기 위한 확장. -->
+            <xs:element name="SensorProductSpecs" type="SensorProductSpecType" minOccurs="0" />
+        </xs:sequence>
+	</xs:complexType>
+
+    <!-- 
+    Summary: 
+        Comm(통신장비)가 가질 수 있는 기본 항목들을 선언
+    Elements:
+        ConstantSpecs: 정적 사양 명세
+        MonitorSpecs: 감시 가능한 사양 명세
+        ControlSpecs: 제어 가능한 사양 명세
+    -->
+    <xs:complexType name="CommSpecCompositionType">
+        <xs:sequence>
+            <xs:element name="ConstantSpecs" type="ConstantSpecSetType" minOccurs="0" />
+            <xs:element name="MonitorSpecs" type="MonitorSpecSetType" minOccurs="0" />
+            <xs:element name="ControlSpecs" type="ControlSpecSetType" minOccurs="0" />
+        </xs:sequence>
+	</xs:complexType>
+
+    <!-- 
+    Summary: 
+        정적 사양 명세
+    Elements:
+        ~
+    -->
+    <xs:complexType name="ConstantSpecSetType">
+		<xs:complexContent>
+			<xs:extension base="SemanticSpecBaseType">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="QuantityConstantSpec" type="QuantityConstantSpecType" />
+                    <xs:element name="TextConstantSpec" type="TextConstantSpecType" />
+                </xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+    </xs:complexType>
+
+    <!-- 
+    Summary: 
+        감시 가능한 사양 명세
+    Elements:
+        ~
+    -->
+    <xs:complexType name="MonitorSpecSetType">
+		<xs:complexContent>
+			<xs:extension base="SemanticSpecBaseType">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="QuantitySpec" type="QuantitySpecType" />
+					<xs:element name="TextSpec" type="TextSpecType" />
+					<xs:element name="ValueSetSpec" type="ValueSetSpecType" />
+					<xs:element name="QuantityValueSetSpec" type="QuantityValueSetSpecType" />
+					<xs:element name="HealthStatusSetSpec" type="HealthStatusSetSpecType" />
+                    <xs:element name="BooleanSpec" type="BooleanSpecType" />
+                    <xs:element name="CollectionSpec" type="CollectionSpecType" />
+					<xs:element name="GroupSpec" type="GroupSpecType" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+    </xs:complexType>
+
+    <!-- 
+    Summary: 
+        제어 가능한 사양 명세
+    Elements:
+        ~
+    -->
+    <xs:complexType name="ControlSpecSetType">
+		<xs:complexContent>
+			<xs:extension base="SemanticSpecBaseType">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="ControlSpec" type="ControlSpecType" />
+					<xs:element name="SetPointSpec" type="SetPointSpecType" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+    </xs:complexType>
+
+    <!-- 
+    Summary: 
+        센서 산출물 사양 명세
+    Elements:
+        ~
+    -->
+    <xs:complexType name="SensorProductSpecType">
+		<xs:complexContent>
+			<xs:extension base="SemanticSpecBaseType">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="ProductStreamSpec" type="ProductStreamSpecType" />
+					<xs:element name="ProductFileSpec" type="ProductFileSpecType" />
+					<xs:element name="ProductFrameSpec" type="ProductFrameSpecType" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+    </xs:complexType>
+
+    <!-- Spec Type Detail Below-->
+    <!--
+    ============================================================================================= -->
+    <xs:complexType name="NumericValueSpecBaseType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="Unit" type="xs:string" minOccurs="0" />
+                    <xs:element name="Range" minOccurs="0">
+                        <xs:complexType>
+                            <xs:attribute name="min" type="xs:decimal" use="optional" />
+                            <xs:attribute name="max" type="xs:decimal" use="optional" />
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Resolution" type="xs:decimal" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="QuantitySpecType">
+        <xs:complexContent>
+            <xs:extension base="NumericValueSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="Format" type="xs:string" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- 
+    Summary:
+        참/거짓 형식의 사양 명세
+    -->
+    <xs:complexType name="BooleanSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- 
+    Summary:
+        반복되는 데이터 형식의 사양 명세
+    -->
+    <xs:complexType name="CollectionSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="ElementSpec" type="GroupSpecType" />
+                </xs:sequence>
+                <xs:attribute name="minOccurs" type="xs:nonNegativeInteger" use="optional" />
+                <xs:attribute name="maxOccurs" type="xs:positiveInteger" use="optional" />
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="QuantityConstantSpecType">
+        <xs:complexContent>
+            <xs:extension base="NumericValueSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="Value" type="xs:decimal" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="TextSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="MaxLength" type="xs:decimal" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="TextConstantSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="Value" type="xs:string" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ValueSetSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="Values">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="Value" type="CdmRefAttrType" maxOccurs="unbounded" />
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="QuantityValueSetSpecType">
+        <xs:complexContent>
+            <xs:extension base="ValueSetSpecType">
+                <xs:sequence>
+                    <xs:element name="Unit" type="xs:string" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="HealthStatusSetSpecType">
+        <xs:complexContent>
+            <xs:extension base="ValueSetSpecType">
+                <xs:sequence>
+                    <xs:element name="ComponentDomain" type="CdmRefAttrType" />
+                    <xs:element name="ComponentRole" type="CdmRefAttrType" />
+                    <xs:element name="AffectedFunction" type="CdmRefAttrType" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ReplySpecType">
+        <xs:complexContent>
+            <xs:extension base="BindRefAttrType">
+                <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+                <xs:attribute name="required" type="xs:boolean" />
+                <xs:attribute name="timeout" type="xs:decimal" />
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="QuantityProfileType">
+        <xs:sequence>
+            <xs:element name="Unit" type="xs:string" minOccurs="0" />
+            <xs:element name="Range" minOccurs="0">
+                <xs:complexType>
+                    <xs:attribute name="min" type="xs:decimal" use="optional" />
+                    <xs:attribute name="max" type="xs:decimal" use="optional" />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Resolution" type="xs:decimal" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+    </xs:complexType>
+
+    <!-- 
+    Summary:
+        참/거짓 형식의 제어 파라미터 프로파일
+    -->
+    <xs:complexType name="BooleanProfileType">
+        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+        <xs:attribute name="required" type="xs:boolean" use="optional" />
+        <xs:attribute name="default" type="xs:boolean" use="optional" />
+    </xs:complexType>
+
+    <!-- 
+    Summary:
+        반복 데이터의 단일 항목 프로파일
+    -->
+    <xs:complexType name="ElementProfileType">
+        <xs:complexContent>
+            <xs:extension base="ProfileCompositeType">
+                <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- 
+    Summary:
+        반복되는 제어 파라미터 프로파일
+    -->
+    <xs:complexType name="CollectionProfileType">
+        <xs:sequence>
+            <xs:element name="ElementProfile" type="ElementProfileType" />
+        </xs:sequence>
+        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+        <xs:attribute name="minOccurs" type="xs:nonNegativeInteger" use="optional" />
+        <xs:attribute name="maxOccurs" type="xs:positiveInteger" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="ProfileCompositeType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="Profile" type="CdmRefAttrType" />
+            <xs:element name="QuantityProfile" type="QuantityProfileType" />
+            <xs:element name="BooleanProfile" type="BooleanProfileType" />
+            <xs:element name="CollectionProfile" type="CollectionProfileType" />
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="ControlSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="Target" type="CdmRefAttrType" minOccurs="0" />
+                    <xs:element name="Parameters" type="ProfileCompositeType" minOccurs="0" />
+                    <xs:element name="Precondition" type="CdmRefAttrType" minOccurs="0" />
+                    <xs:element name="Reply" type="ReplySpecType" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="SetPointSpecType">
+        <xs:complexContent>
+            <xs:extension base="ControlSpecType">
+                <xs:sequence>
+                    <xs:element name="Unit" type="xs:string" minOccurs="0" />
+                    <xs:element name="Range" minOccurs="0">
+                        <xs:complexType>
+                            <xs:attribute name="min" type="xs:decimal" use="optional" />
+                            <xs:attribute name="max" type="xs:decimal" use="optional" />
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Resolution" type="xs:decimal" minOccurs="0" />
+                    <xs:element name="ControlMethod" minOccurs="0">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="absolute" />
+                                <xs:enumeration value="relative" />
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ProductStreamSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="ProductKind" type="CdmRefAttrType" />
+                    <xs:element name="ProcessingState" type="CdmRefAttrType" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ProductFileSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="ProductKind" type="CdmRefAttrType" />
+                    <xs:element name="ProcessingState" type="CdmRefAttrType" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ProductFrameSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:sequence>
+                    <xs:element name="ProductKind" type="CdmRefAttrType" />
+                    <xs:element name="ProcessingState" type="CdmRefAttrType" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="GroupSpecType">
+        <xs:complexContent>
+            <xs:extension base="SemanticSpecBaseType">
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="QuantitySpec" type="QuantitySpecType" />
+                    <xs:element name="TextSpec" type="TextSpecType" />
+                    <xs:element name="ValueSetSpec" type="ValueSetSpecType" />
+                    <xs:element name="QuantityValueSetSpec" type="QuantityValueSetSpecType" />
+                    <xs:element name="HealthStatusSetSpec" type="HealthStatusSetSpecType" />
+                    <xs:element name="BooleanSpec" type="BooleanSpecType" />
+                    <xs:element name="CollectionSpec" type="CollectionSpecType" />
+                </xs:choice>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

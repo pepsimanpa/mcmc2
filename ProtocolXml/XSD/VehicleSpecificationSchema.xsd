@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://lignex1.com/mcmc2/umsSchema"
+    xmlns="http://lignex1.com/mcmc2/umsSchema"
+    elementFormDefault="qualified">
+    <xs:include schemaLocation="./CommonSpecSchema.xsd" />
+
+    <xs:element name="VehicleSpec" type="VehicleSpecType" />
+    
+    <xs:complexType name="VehicleSpecType">
+        <xs:all>
+            <xs:element name="Identification" type="IdentificationType" minOccurs="1" />
+            <xs:element name="Sensors" type="Sensors" minOccurs="0" maxOccurs="1" />
+            <xs:element name="Platform" type="Platform" minOccurs="0" maxOccurs="1" />
+            <xs:element name="Payloads" type="Payload" minOccurs="0" maxOccurs="1" />
+            <xs:element name="Comms" type="Comms" minOccurs="0" maxOccurs="1" />
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="IdentificationType">
+        <xs:all>
+            <xs:element name="ID" type="xs:string" minOccurs="1" />
+            <xs:element name="Name" type="xs:string" minOccurs="1" />
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="Sensors">
+        <xs:sequence>
+            <xs:element name="SensorSpecRef" type="SensorSpecRefType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Platform">
+        <xs:sequence>
+            <xs:element name="PlatformSpecRef" type="PlatformSpecRefType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Payload">
+        <xs:sequence>
+            <xs:element name="PayloadSpecRef" type="PayloadSpecRefType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Comms">
+        <xs:sequence>
+            <xs:element name="CommSpecRef" type="CommSpecRefType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SensorSpecRefType">
+        <xs:sequence>
+            <xs:element name="SemanticPath" type="xs:string"/>
+            <xs:element name="BindingPath" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="SpecAttrs"/>
+    </xs:complexType>
+
+    <xs:complexType name="PlatformSpecRefType">
+        <xs:sequence>
+            <xs:element name="SemanticPath" type="xs:string"/>
+            <xs:element name="BindingPath" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="SpecAttrs"/>
+    </xs:complexType>
+
+    <xs:complexType name="PayloadSpecRefType">
+        <xs:sequence>
+            <xs:element name="SemanticPath" type="xs:string"/>
+            <xs:element name="BindingPath" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="SpecAttrs"/>
+    </xs:complexType>
+
+    <xs:complexType name="CommSpecRefType">
+        <xs:sequence>
+            <xs:element name="SemanticPath" type="xs:string"/>
+            <xs:element name="BindingPath" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="SpecAttrs"/>
+    </xs:complexType>
+</xs:schema>

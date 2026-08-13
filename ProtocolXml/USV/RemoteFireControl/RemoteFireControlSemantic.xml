@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PayloadSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+  <!--원격사격통제장치(Remote Fire Control System) Semantic 명세: 원격통제장치 CSCI ↔ 원격사격통제장치 CSCI 직접 연동 기준.-->
+  <!--직접 RCU 연동 대상: 원격통제 송출용 EO/IR RTP, RCWS CBIT/상세상태/사격경고, PBIT/IBIT 결과, 지향/거리측정/메뉴 결과, 공통 명령 ACK, 공통 및 RCWS 전용 제어. 중앙통제 기록저장용 RTP, 중앙통제/전자광학장치 대상 StatusType, 중앙통제 전용 HeartBeat는 제외한다.-->
+  <!--공용 식별자: Weapon=0x07, RemoteFireControlSystem=0x01. 세부 장비 ID가 정의되어 있지 않으므로 공통 명령의 dstSubEquipmentID는 0x00으로 사용한다.-->
+  <!--ACK 원칙: CommandStatusReportType은 비주기성 명령의 처리 ACK(required=true)이며, PBIT/IBIT·지향·거리측정·메뉴 응답은 실제 결과 Reply로 별도 처리한다.-->
+  <!--MenuConfigType의 displayIRW/displayIRT/patrolMode/calTrajectory는 송신 0=켬,1=끔이지만 MenuStatusType은 0=비활성화,1=활성화이므로 Semantic은 enabled Boolean으로 정규화하고 Binding에서 송신 방향만 반전한다.-->
+  <!--MenuConfigType.shutdown의 2=재부팅은 공용 restartSystem과 기능상 중복되지만 원문 물리 필드이므로 systemAction(0=None,1=Shutdown,2=Reboot)으로 보존한다.-->
+  <!--ControlPanalConfigType.height/turn은 원문 물리값 0~65535를 조작반 원시 입력으로 보존한다. 비고의 ±20도와 물리값 간 변환식/중심값은 원문 미정의(TBD)이다.-->
+  <ConstantSpecs id="constant">
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+      <Value>RemoteFireControlSystem</Value>
+    </TextConstantSpec>
+    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+      <Value>원격사격통제장치 영상·상태 감시, 원격 자체점검, 포탑/카메라/접촉물/무장/조작반/지향/거리측정/메뉴 제어 인터페이스</Value>
+    </TextConstantSpec>
+  </ConstantSpecs>
+  <MonitorSpecs id="monitor">
+    <GroupSpec id="rcwsCbitStatus" name="원격사격통제장치 CBIT 상태" cdm="Health.CBIT.RCWS">
+      <ValueSetSpec id="remoteControlledWeaponSystemCBIT" name="원격사격통제장치 상태" cdm="Health.RCWS.Overall">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="surveillanceAndStrikeCBIT" name="감시/타격장치 상태" cdm="Health.RCWS.SurveillanceAndStrike">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="drivingCBIT" name="구동조립체 상태" cdm="Health.RCWS.Driving">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="surveillanceCBIT" name="감시조립체 상태" cdm="Health.RCWS.Surveillance">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="strikeCBIT" name="총가조립체 상태" cdm="Health.RCWS.Strike">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="controlCBIT" name="통제장치 상태" cdm="Health.RCWS.Control">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="weaponDetailStatus" name="RCWS 무장 상세 상태" cdm="Weapon.RCWS.DetailStatus">
+      <ValueSetSpec id="firingMode" name="안전/사격 모드" cdm="Weapon.RCWS.FiringMode">
+        <Values>
+          <Value cdm="Weapon.RCWS.FiringMode.Safe">0</Value>
+          <Value cdm="Weapon.RCWS.FiringMode.Fire">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <!--firingMode 원문 Range는 0~3이나 의미가 정의된 값은 0=안전모드, 1=사격모드뿐이며 2~3의 의미는 원문 미정의이다.-->
+      <BooleanSpec id="protectedStatus" name="보호상태 활성화" cdm="Weapon.RCWS.Protected.Enabled"/>
+      <ValueSetSpec id="bulletLoadingMode" name="급탄 운용모드" cdm="Weapon.RCWS.BulletLoadingMode">
+        <Values>
+          <Value cdm="Weapon.RCWS.BulletLoadingMode.RemoteControl">0</Value>
+          <Value cdm="Weapon.RCWS.BulletLoadingMode.Maintenance">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <BooleanSpec id="autoDetect" name="자동탐지 상태" cdm="Weapon.RCWS.AutoDetect.Enabled"/>
+      <BooleanSpec id="objectTracking" name="접촉물 추적 상태" cdm="Weapon.RCWS.ObjectTracking.Enabled"/>
+      <BooleanSpec id="eoirAiming" name="전자광학장치 지향 상태" cdm="Weapon.RCWS.Aiming.EOIR.Active"/>
+      <BooleanSpec id="cipeAiming" name="항해용레이더 지향 상태" cdm="Weapon.RCWS.Aiming.NavigationRadar.Active"/>
+      <ValueSetSpec id="triggeredMode" name="발사 모드" cdm="Weapon.RCWS.TriggerMode">
+        <Values>
+          <Value cdm="Weapon.RCWS.TriggerMode.FullAuto">0</Value>
+          <Value cdm="Weapon.RCWS.TriggerMode.Single">1</Value>
+          <Value cdm="Weapon.RCWS.TriggerMode.ThreeRoundBurst">2</Value>
+          <Value cdm="Weapon.RCWS.TriggerMode.FiveRoundBurst">3</Value>
+          <Value cdm="Weapon.RCWS.TriggerMode.TenRoundBurst">4</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="turningAngle" name="포탑구동 선회각" cdm="Weapon.RCWS.Turret.TraverseAngle">
+        <Unit>deg</Unit>
+        </QuantitySpec>
+      <!--DetailStatusType 원문 turningAngle Range 셀은 "0~360-180~180"로 중첩 표기되어 의미가 모호하다. 동일 장치의 DrivingConfig/Status에는 -180~180 deg가 제시되지만, 본 Semantic에서는 원문 모호성을 보존하기 위해 범위를 강제하지 않는다(TBD).-->
+      <QuantitySpec id="elevationAngle" name="포탑구동 고저각" cdm="Weapon.RCWS.Turret.ElevationAngle">
+        <Unit>deg</Unit>
+        <Range min="-20" max="60"/>
+      </QuantitySpec>
+      <QuantitySpec id="firingCount" name="탄 카운팅 정보" cdm="Weapon.RCWS.Ammunition.FiringCount">
+        <Unit>num</Unit>
+        <Range min="0" max="2000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <BooleanSpec id="autoReload" name="자동장전 이벤트" cdm="Weapon.RCWS.AutoReload.Event"/>
+      <BooleanSpec id="manualLeadCompensation" name="수동 선보상 전환 이벤트" cdm="Weapon.RCWS.ManualLeadCompensation.ToggleEvent"/>
+      <QuantitySpec id="cameraFOV" name="메인 카메라 FOV" cdm="Weapon.RCWS.Camera.MainFOV">
+        <Range min="0" max="60"/>
+      </QuantitySpec>
+      <!--autoReload/manualLeadCompensation는 원문상 이벤트 필드이며 값 1 발생 후 다시 0으로 초기화된다.-->
+    </GroupSpec>
+    <BooleanSpec id="firingAlarm" name="150발 지속사격 경고" cdm="Weapon.RCWS.FireWarning.Active"/>
+  </MonitorSpecs>
+  <ControlSpecs id="control">
+    <ControlSpec id="startIntegration" name="원격사격통제장치 연동 개시" cdm="Control.RCWS.Integration.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="restartSystem" name="원격사격통제장치 시스템 재시작" cdm="Control.RCWS.System.Restart">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="requestPbit" name="원격사격통제장치 PBIT 요청" cdm="Request.Health.PBIT.RCWS">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response.RCWS"/>
+    </ControlSpec>
+    <ControlSpec id="requestIbit" name="원격사격통제장치 IBIT 요청" cdm="Request.Health.IBIT.RCWS">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response.RCWS"/>
+    </ControlSpec>
+    <ControlSpec id="configureDriving" name="RCWS 구동 설정" cdm="Control.RCWS.Driving.Configure">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.RCWS.Driving.ElevationAngle">
+          <Unit>deg</Unit>
+          <Range min="-20" max="60"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Driving.TraverseAngle">
+          <Unit>deg</Unit>
+          <Range min="-180" max="180"/>
+        </QuantityProfile>
+        <BooleanProfile cdm="Control.RCWS.Driving.ProtectedModeEvent"/>
+        <Profile cdm="Control.RCWS.Driving.AutoOrientationAction"/>
+      </Parameters>
+      <!--autoOrientationAction 물리값: 0=초기상태, 1=자동지향, 2=현재 포탑 선회/고저각 저장. protectedMode는 1 발생 후 0으로 초기화되는 이벤트이다.-->
+      <Reply bindRef="configureDrivingAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureCamera" name="RCWS 영상 설정" cdm="Control.RCWS.Camera.Configure">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <Profile cdm="Control.RCWS.Camera.Type"/>
+        <BooleanProfile cdm="Control.RCWS.Camera.ZoomInEvent"/>
+        <BooleanProfile cdm="Control.RCWS.Camera.ZoomOutEvent"/>
+      </Parameters>
+      <!--cameraType 물리값: 0=주간, 1=야간(광각), 2=야간(협각). zoomIn/zoomOut은 1 발생 후 0으로 초기화되는 이벤트이다.-->
+      <Reply bindRef="configureCameraAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureContact" name="RCWS 접촉물 설정" cdm="Control.RCWS.Contact.Configure">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.RCWS.Contact.SelectEvent"/>
+        <BooleanProfile cdm="Control.RCWS.Contact.LeftEvent"/>
+        <BooleanProfile cdm="Control.RCWS.Contact.RightEvent"/>
+        <BooleanProfile cdm="Control.RCWS.Contact.ManualLeadCompensationToggleEvent"/>
+        <Profile cdm="Control.RCWS.Contact.ManualLead.HorizontalChange"/>
+        <Profile cdm="Control.RCWS.Contact.ManualLead.VerticalChange"/>
+        <BooleanProfile cdm="Control.RCWS.Contact.CrossHairInitializeEvent"/>
+        <BooleanProfile cdm="Control.RCWS.Contact.DistanceMeasureEvent"/>
+      </Parameters>
+      <!--접촉물/수동선보상/조준점/거리측정 항목은 원문상 이벤트 입력이며 1 또는 방향값 발생 후 0으로 초기화된다. 좌우조정: 0=초기,1=오른쪽,2=왼쪽; 상하조정: 0=초기,1=위,2=아래.-->
+      <Reply bindRef="configureContactAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureWeapon" name="RCWS 총기 설정" cdm="Control.RCWS.Weapon.Configure">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.RCWS.Weapon.BackStopEvent"/>
+        <Profile cdm="Control.RCWS.Weapon.TriggerMode"/>
+      </Parameters>
+      <!--TriggerMode 물리값: 0=연발, 1=1점사, 2=3점사, 3=5점사, 4=10점사. backStop은 이벤트이다.-->
+      <Reply bindRef="configureWeaponAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="configureControlPanel" name="RCWS 조작반 설정" cdm="Control.RCWS.ControlPanel.Configure">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <Profile cdm="Control.RCWS.ControlPanel.FiringMode"/>
+        <Profile cdm="Control.RCWS.ControlPanel.BulletLoadingMode"/>
+        <QuantityProfile cdm="Control.RCWS.ControlPanel.HeightInput.Raw">
+          <Range min="0" max="65535"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.ControlPanel.TurnInput.Raw">
+          <Range min="0" max="65535"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <BooleanProfile cdm="Control.RCWS.ControlPanel.AutoDetectToggleEvent"/>
+        <BooleanProfile cdm="Control.RCWS.ControlPanel.ObjectTrackingToggleEvent"/>
+        <BooleanProfile cdm="Control.RCWS.ControlPanel.BackStopEvent"/>
+        <BooleanProfile cdm="Control.RCWS.ControlPanel.AutoReloadEvent"/>
+        <BooleanProfile cdm="Control.RCWS.ControlPanel.EmergencyStop"/>
+      </Parameters>
+      <!--height/turn은 조이스틱 원시 입력값 0~65535로 유지한다. 원문 비고에는 조이스틱 가동범위 -20도~+20도가 기재되어 있으나 물리값↔각도 변환관계는 미정의(TBD). firingMode 원문 Range 0~3 중 의미는 0=안전,1=사격만 정의되어 있다.-->
+      <Reply bindRef="configureControlPanelAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="fireWeapon" name="RCWS 사격 제어" cdm="Control.RCWS.Fire">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <BooleanProfile cdm="Control.RCWS.Fire.Enabled"/>
+      </Parameters>
+      <Reply bindRef="fireWeaponAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="aimNavigationRadar" name="RCWS 항해용레이더 지향" cdm="Control.RCWS.Aim.NavigationRadar">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.RCWS.Aim.NavigationRadar.TargetID">
+          <Range min="10000"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="aimNavigationRadarAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="aimNavigationRadarResult" cdm="Control.RCWS.Aim.NavigationRadar.Response"/>
+      <!--CIPEAimStatusType에는 commandID가 없으므로 전용 지향 종료 결과와 요청의 명시적 commandID 상관관계는 원문에서 제공되지 않는다.-->
+    </ControlSpec>
+    <ControlSpec id="aimEoir" name="RCWS 전자광학장치 지향" cdm="Control.RCWS.Aim.EOIR">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="aimEoirAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="aimEoirResult" cdm="Control.RCWS.Aim.EOIR.Response"/>
+      <!--EOIRAimConfigType은 commandID 외 별도 제어 필드가 없다. 원문 commandID 규칙은 수신한 commandID를 그대로 계승하는 특수 규칙이며 Binding에서 반영한다.-->
+    </ControlSpec>
+    <ControlSpec id="measureDistance" name="RCWS 거리 측정" cdm="Control.RCWS.DistanceMeasure">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="measureDistanceAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="measureDistanceResult" cdm="Control.RCWS.DistanceMeasure.Response"/>
+      <!--DistanceMeasureReportType에는 commandID가 없으므로 결과 Reply와 요청의 명시적 commandID 상관관계는 원문에서 제공되지 않는다.-->
+    </ControlSpec>
+    <ControlSpec id="configureMenu" name="RCWS 메뉴 설정" cdm="Control.RCWS.Menu.Configure">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Control.RCWS.Menu.ReloadingCount">
+          <Unit>num</Unit>
+          <Range min="0" max="2000"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.IntervalFullAuto">
+          <Range min="-255" max="255"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.IntervalSingle">
+          <Range min="-255" max="255"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.Interval3Burst">
+          <Range min="-255" max="255"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.Interval5Burst">
+          <Range min="-255" max="255"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.Interval10Burst">
+          <Range min="-255" max="255"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <Profile cdm="Control.RCWS.Menu.SpeedLevel"/>
+        <BooleanProfile cdm="Control.RCWS.Menu.DisplayIRW.Enabled"/>
+        <BooleanProfile cdm="Control.RCWS.Menu.DisplayIRT.Enabled"/>
+        <BooleanProfile cdm="Control.RCWS.Menu.PatrolMode.Enabled"/>
+        <QuantityProfile cdm="Control.RCWS.Menu.PatrolModeAngle">
+          <Unit>deg</Unit>
+          <Range min="0" max="180"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone1.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <!--원문: noDrivingZone1에 -30 deg 설정 시 해당 선회각의 구동제한구역을 설정하지 않는다. 이 특수값 규칙은 noDrivingZone2~12에는 명시되어 있지 않으므로 확대 적용하지 않는다(TBD).-->
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone2.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone3.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone4.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone5.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone6.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone7.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone8.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone9.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone10.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone11.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoDrivingZone12.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone1.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone2.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone3.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone4.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone5.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone6.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone7.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone8.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone9.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone10.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone11.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.NoFiringZone12.LowerAngle">
+          <Unit>deg</Unit>
+          <Range min="-30" max="30"/>
+        </QuantityProfile>
+        <BooleanProfile cdm="Control.RCWS.Menu.TrajectoryCorrection.Enabled"/>
+        <BooleanProfile cdm="Control.RCWS.Menu.StabilizationToggleEvent"/>
+        <BooleanProfile cdm="Control.RCWS.Menu.ZeroingMode.Enabled"/>
+        <BooleanProfile cdm="Control.RCWS.Menu.InitializeZeroingAction"/>
+        <BooleanProfile cdm="Control.RCWS.Menu.OverlayLOS.Enabled"/>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos1.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos1.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos2.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos2.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos3.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos3.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos4.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos4.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos5.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos5.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos6.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos6.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos7.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos7.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos8.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos8.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos9.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos9.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos10.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos10.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos11.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos11.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos12.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.EOLos12.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.IRWLos.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.IRWLos.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.IRTLos.X">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Control.RCWS.Menu.IRTLos.Y">
+          <Range min="-500" max="500"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <Profile cdm="Control.RCWS.Menu.SystemAction"/>
+      </Parameters>
+      <!--displayIRW/displayIRT/patrolMode/calTrajectory의 Semantic enabled=true는 물리 MenuConfig 송신값 0(켬), false는 1(끔)로 반전한다. MenuStatus 수신값은 0=비활성화,1=활성화이므로 반전하지 않는다.-->
+      <!--stabilization은 1 발생 후 0으로 초기화되는 토글 이벤트. zeroingMode/overlayLOS는 유지형 상태. initZeroing 물리값은 0=초기상태, 1=영점 초기화이며 1 이후 0으로 자동 초기화되는지 여부는 원문에 정의되어 있지 않다. systemAction 물리값: 0=None, 1=Shutdown, 2=Reboot이며 2는 공용 restartSystem과 기능상 중복된다.-->
+      <Reply bindRef="configureMenuAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="configureMenuResult" cdm="Control.RCWS.Menu.Response"/>
+      <!--MenuStatusType에는 commandID가 없으므로 메뉴 상태 결과와 요청의 명시적 commandID 상관관계는 원문에서 제공되지 않는다.-->
+    </ControlSpec>
+  </ControlSpecs>
+  <SensorProductSpecs id="sensorProduct">
+    <ProductStreamSpec id="remoteControlEoirVideo" name="원격통제 송출용 EO/IR 영상" cdm="ProductStream.Video.RCWS.EOIR">
+      <ProductKind cdm="ProductKind.Video"/>
+    </ProductStreamSpec>
+  </SensorProductSpecs>
+</PayloadSpec>

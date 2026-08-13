@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    원격통제장치(HMI CSC/운용관리 CSC)에서 접근하는 중앙통제장치 원격 기능 Semantic.
+
+    설계 범위
+    - Semantic은 운용자가 중앙통제장치를 통해 수행/조회하는 기능 의미를 정의한다.
+    - DDS Topic/Type, usvHeader, commandID, DestinationType 같은 물리/시스템 항목은 Binding 책임으로 둔다.
+    - 중앙통제가 USV 내부 장치로 다시 배포하는 DDS는 본 파일의 원통↔중통 경계에서 제외한다.
+    - RCUHeartBeatReportType(원통→중통 5 Hz)은 원격통제장치 생존정보이므로 중앙통제의 HMI 기능으로 노출하지 않는다.
+
+    확정 사항
+    - 운용모드 0~7은 각각 독립 Semantic Control로 노출한다. EA(비상조치)도 독립 Control이다.
+    - 통제권 command 0~4는 각각 독립 Semantic Control로 노출한다.
+    - PBIT/IBIT는 요청-결과 Reply로 표현한다.
+    - USV HeartBeat, 중앙통제 CBIT, 통제권 소유정보는 Monitor로 표현한다.
+    - CommandStatusReport는 실제 장비 동작 완료가 아니라 비주기 명령의 처리 상태로 해석한다.
+
+    미확정 사항은 각 위치의 TBD 주석과 CentralControl_OpenIssues.md를 함께 참조한다.
+-->
+<PayloadSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+    <ConstantSpecs id="constant">
+        <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+            <Value>USV Central Control Interface</Value>
+        </TextConstantSpec>
+        <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+            <Value>원격통제장치와 중앙통제장치 간 원격 제어·감시 Semantic</Value>
+        </TextConstantSpec>
+    </ConstantSpecs>
+
+    <MonitorSpecs id="monitor">
+        <!-- 중앙통제가 5 Hz로 제공하는 USV 종합 운용상태. 개별 장비 Semantic의 상세 상태와 중복될 수 있으나, 본 항목은 중통이 제공하는 플랫폼 종합 뷰이다. -->
+        <GroupSpec id="usvOperationalStatus" name="무인수상정 종합 운용상태" cdm="Platform.OperationalStatus">
+            <!-- CSV Range는 0~7이지만 의미가 명시된 값은 0=정상, 1=비정상 경고뿐이다. 2~7 의미는 정의하지 않는다. -->
+            <ValueSetSpec id="operationalState" name="무인수상정 운용상태" cdm="Platform.OperationalState">
+                <Values>
+                    <Value>Normal</Value>
+                    <Value>Warning</Value>
+                </Values>
+            </ValueSetSpec>
+            <ValueSetSpec id="currentOperationMode" name="무인수상정 운용모드" cdm="Platform.OperationMode">
+                <Values>
+                    <Value>EmergencyStop</Value>
+                    <Value>EmergencyReturn</Value>
+                    <Value>RemoteManual</Value>
+                    <Value>LocalManual</Value>
+                    <Value>Autonomous</Value>
+                    <Value>CommandStandby</Value>
+                    <Value>Maintenance</Value>
+                    <Value>EmergencyAction</Value>
+                </Values>
+            </ValueSetSpec>
+            <QuantitySpec id="latitude" name="무인수상정 위도" cdm="Navigation.Position.Latitude">
+                <Unit>deg</Unit>
+            </QuantitySpec>
+            <QuantitySpec id="longitude" name="무인수상정 경도" cdm="Navigation.Position.Longitude">
+                <Unit>deg</Unit>
+            </QuantitySpec>
+            <QuantitySpec id="course" name="무인수상정 침로" cdm="Navigation.Course">
+                <Unit>rad</Unit>
+            </QuantitySpec>
+            <QuantitySpec id="groundSpeed" name="무인수상정 이동속력" cdm="Motion.GroundSpeed">
+                <Unit>m/s</Unit>
+            </QuantitySpec>
+            <QuantitySpec id="roll" name="무인수상정 Roll" cdm="Attitude.Roll">
+                <Unit>rad</Unit>
+            </QuantitySpec>
+            <QuantitySpec id="pitch" name="무인수상정 Pitch" cdm="Attitude.Pitch">
+                <Unit>rad</Unit>
+            </QuantitySpec>
+            <ValueSetSpec id="autonomousMissionMode" name="자율운항 임무모드" cdm="Autonomy.Mission.Mode">
+                <Values>
+                    <Value>WaypointNavigation</Value>
+                    <Value>TargetPointHold</Value>
+                    <Value>TargetTracking</Value>
+                    <Value>PointAndGo</Value>
+                    <Value>AutomaticNavigation</Value>
+                    <Value>SurfaceISR</Value>
+                    <Value>UnderwaterISR</Value>
+                    <Value>AutomaticDocking</Value>
+                </Values>
+            </ValueSetSpec>
+            <ValueSetSpec id="eoirOperationMode" name="전자광학장치 운용모드" cdm="Sensor.EOIR.OperationMode">
+                <Values>
+                    <Value>Standby</Value>
+                    <Value>ManualTracking</Value>
+                    <Value>AutomaticTracking</Value>
+                    <Value>RadarSlave</Value>
+                    <Value>BowPointing</Value>
+                    <Value>SwingGuard</Value>
+                    <Value>RCWSLinked</Value>
+                    <Value>StowProtect</Value>
+                    <Value>BuiltInTest</Value>
+                </Values>
+            </ValueSetSpec>
+            <ValueSetSpec id="towedSonarOperationMode" name="예인형수중탐색장치 운용모드" cdm="Sensor.TowedSonar.OperationMode">
+                <Values>
+                    <Value>Automatic</Value>
+                    <Value>Standby</Value>
+                    <Value>ManualLaunch</Value>
+                    <Value>ManualRecovery</Value>
+                    <Value>ManualPayOut</Value>
+                    <Value>EmergencyStop</Value>
+                    <Value>CableRelease</Value>
+                </Values>
+            </ValueSetSpec>
+            <ValueSetSpec id="rcwsOperationMode" name="원격사격통제장치 운용모드" cdm="Weapon.RCWS.OperationMode">
+                <Values>
+                    <Value>Safe</Value>
+                    <Value>Fire</Value>
+                    <Value>Feed</Value>
+                    <Value>Protect</Value>
+                </Values>
+            </ValueSetSpec>
+        </GroupSpec>
+
+        <GroupSpec id="centralControlHealth" name="중앙통제장치 CBIT 상태" cdm="Health.CBIT.CentralControl">
+            <ValueSetSpec id="operationalStatus" name="중앙통제장치 운용상태" cdm="Health.OperationalStatus">
+                <Values>
+                    <Value>Normal</Value>
+                    <Value>Degraded</Value>
+                    <Value>Unavailable</Value>
+                    <Value>NoResponse</Value>
+                </Values>
+            </ValueSetSpec>
+        </GroupSpec>
+
+        <GroupSpec id="controlAuthorityStatus" name="현재 통제권 소유정보" cdm="Control.Authority.Status">
+            <ValueSetSpec id="currentController" name="현재 통제권 소유주체" cdm="Control.Authority.Owner">
+                <Values>
+                    <Value>USV</Value>
+                    <Value>FixedRemoteControl</Value>
+                    <Value>MobileRemoteControl</Value>
+                    <Value>PortAssistControl</Value>
+                    <Value>MaintenanceLaptop</Value>
+                </Values>
+            </ValueSetSpec>
+        </GroupSpec>
+    </MonitorSpecs>
+
+    <ControlSpecs id="control">
+        <ControlSpec id="startIntegration" name="연동 개시" cdm="Control.Equipment.Integration.Start">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="startIntegrationCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <ControlSpec id="restartSystem" name="중앙통제장치 재시작" cdm="Control.Equipment.Restart">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="restartSystemCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <!-- PBIT 요청은 원통의 비주기 RCUPBITControlType에 의해 수행된다. 중앙통제 CSCI의 MCEPBITReportType 주기가 1 Hz로 적혀 있으나, 타 장비 PBIT 패턴과 상충하므로 Request/Reply로 해석한다. -->
+        <ControlSpec id="requestPbit" name="중앙통제장치 PBIT 요청" cdm="Request.Health.PBIT">
+            <Reply cdm="Request.Health.PBIT.Response" bindRef="requestPbitResultReply" required="true"/>
+        </ControlSpec>
+
+        <ControlSpec id="requestIbit" name="중앙통제장치 IBIT 요청" cdm="Request.Health.IBIT">
+            <Reply cdm="Request.Health.IBIT.Response" bindRef="requestIbitResultReply" required="true"/>
+        </ControlSpec>
+
+        <!--
+            Preset 의미값은 확정되어 있으나 실제 octet의 Bit 7~6 wire packing 규칙은 미확정이다.
+            topology: 고송신/저송신, mission: 탐지/소나/무장/중계.
+            Semantic에서는 의미 선택만 노출하고 bit packing은 Binding/Adapter에서 해결한다.
+        -->
+        <ControlSpec id="configureWirelessPreset" name="무선통신 Preset 설정" cdm="Control.Communication.WirelessPreset">
+            <Parameters>
+                <Profile cdm="Communication.WirelessPreset.TopologyMode"/>
+                <Profile cdm="Communication.WirelessPreset.MissionMode"/>
+            </Parameters>
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="configureWirelessPresetCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <!-- OperationModeControl.operationMode 0~7을 서로 다른 운용자 동작으로 분리한다. -->
+        <ControlSpec id="emergencyStop" name="무인수상정 비상정지" cdm="Control.Platform.EmergencyStop">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="emergencyStopCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="emergencyReturn" name="무인수상정 비상복귀" cdm="Control.Platform.EmergencyReturn">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="emergencyReturnCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="enterRemoteManualMode" name="원격수동조작 모드 진입" cdm="Control.Platform.OperationMode.RemoteManual">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterRemoteManualModeCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="enterLocalManualMode" name="근거리수동조작 모드 진입" cdm="Control.Platform.OperationMode.LocalManual">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterLocalManualModeCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="enterAutonomousMode" name="자율운항 모드 진입" cdm="Control.Platform.OperationMode.Autonomous">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterAutonomousModeCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="enterCommandStandby" name="명령대기 모드 진입" cdm="Control.Platform.OperationMode.CommandStandby">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterCommandStandbyCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="enterMaintenanceMode" name="정비 모드 진입" cdm="Control.Platform.OperationMode.Maintenance">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterMaintenanceModeCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="executeEmergencyAction" name="비상조치 수행" cdm="Control.Platform.EmergencyAction">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="executeEmergencyActionCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <!--
+            AuthorityControl.command 0~4를 기능별로 분리한다.
+            commandTarget은 command=0(통제권 전환 대기)에서만 의미 있는 운용자 입력으로 노출한다.
+            AuthorityControl.destination의 정확한 업무 의미는 미확정이며 HMI 입력으로 노출하지 않는다.
+        -->
+        <ControlSpec id="prepareAuthorityTransfer" name="통제권 전환 대기" cdm="Control.Authority.Transfer.Prepare">
+            <Parameters>
+                <Profile cdm="Control.Authority.TargetControlStation"/>
+            </Parameters>
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="prepareAuthorityTransferCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="requestControlAuthority" name="통제권 요청" cdm="Request.Control.Authority">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="requestControlAuthorityCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="approveControlAuthorityRequest" name="통제권 요청 승인" cdm="Control.Authority.Request.Approve">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="approveControlAuthorityRequestCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="rejectControlAuthorityRequest" name="통제권 요청 거절" cdm="Control.Authority.Request.Reject">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="rejectControlAuthorityRequestCommandStatusReply" required="true"/>
+        </ControlSpec>
+        <ControlSpec id="reclaimControlAuthority" name="통제권 회수" cdm="Control.Authority.Reclaim">
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="reclaimControlAuthorityCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <!-- rxChannel의 허용 채널/주파수 범위와 단위가 CSV에 없어 Range/Unit을 지정하지 않는다. -->
+        <ControlSpec id="controlVhf" name="음성송수신기 VHF 제어" cdm="Control.Communication.VHF">
+            <Parameters>
+                <Profile cdm="Communication.VHF.TransmitCommand"/>
+                <QuantityProfile cdm="Communication.VHF.Channel">
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="controlVhfCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <ControlSpec id="setVoiceVolume" name="음성송수신기 볼륨 설정" cdm="Control.Communication.Voice.Volume">
+            <Parameters>
+                <QuantityProfile cdm="Communication.Voice.Volume.Percent">
+                    <Unit>percent</Unit>
+                    <Range min="0" max="100"/>
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="setVoiceVolumeCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <ControlSpec id="setVhfSquelch" name="음성송수신기 VHF 스퀄치 설정" cdm="Control.Communication.VHF.Squelch">
+            <Parameters>
+                <QuantityProfile cdm="Communication.VHF.Squelch.Percent">
+                    <Unit>percent</Unit>
+                    <Range min="0" max="100"/>
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="setVhfSquelchCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <!-- voiceRxControl은 필드 설명이 '음성수신명령'이지만 CSV 비고는 1='송신'으로 적혀 있다. Semantic은 수신 활성/중지 의미로만 노출하고 용어 오기는 추후 확인한다. -->
+        <ControlSpec id="configureVoiceCommunication" name="음성 송수신 제어" cdm="Control.Communication.Voice">
+            <Parameters>
+                <Profile cdm="Communication.Voice.AlarmTransmit"/>
+                <Profile cdm="Communication.Voice.Transmit"/>
+                <Profile cdm="Communication.Voice.Receive"/>
+            </Parameters>
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="configureVoiceCommunicationCommandStatusReply" required="true"/>
+        </ControlSpec>
+
+        <!-- videoTransmitType: 0=중지, 1~4=감시#1~#4. -->
+        <ControlSpec id="selectVideoDistribution" name="영상분배 선택" cdm="Control.Video.Distribution">
+            <Parameters>
+                <Profile cdm="Video.Distribution.Selection"/>
+            </Parameters>
+            <Reply cdm="Command.ProcessingStatus.Response" bindRef="selectVideoDistributionCommandStatusReply" required="true"/>
+        </ControlSpec>
+    </ControlSpecs>
+</PayloadSpec>

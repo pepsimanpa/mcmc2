@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+  <!--센서융합 정보처리장치 Semantic: 센서융합 정보처리 CSC + 원격통제장치 CSCI + 공용 구조체/식별자 규칙 기반-->
+  <!--범위는 원격통제장치 CSCI ↔ 센서융합 정보처리 CSC 직접 연동에 한정하며 타 장비 간 연동은 제외한다.-->
+  <ConstantSpecs id="constant">
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+      <Value>SensorFusionProcessor</Value>
+    </TextConstantSpec>
+    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+      <Value>센서융합 접촉물/파도 정보 제공, 상태 감시 및 연동·재시작·BIT 제어 인터페이스</Value>
+    </TextConstantSpec>
+  </ConstantSpecs>
+
+  <MonitorSpecs id="monitor">
+    <GroupSpec id="fusionContacts" name="센서융합 접촉물 정보" cdm="Contact.Fusion">
+      <!--contactNum은 원본 DDS 메시지에 독립 필드로 존재하므로 Collection 길이와 별도로 Semantic에 노출한다. 원본 CSCI에는 contactNum 자체의 Range가 명시되어 있지 않아 Range를 지정하지 않는다.-->
+      <QuantitySpec id="contactCount" name="센서융합 접촉물 개수" cdm="Contact.Fusion.Count">
+        <Unit>num</Unit>
+      </QuantitySpec>
+      <CollectionSpec id="contacts" name="센서융합 접촉물 목록" cdm="Contact.Fusion.List" minOccurs="0" maxOccurs="256">
+        <ElementSpec id="fusionContact" name="센서융합 접촉물" cdm="Contact.Fusion.Item">
+          <QuantitySpec id="sensorFusionContactID" name="센서융합 접촉물 고유 식별번호" cdm="Contact.Fusion.Identifier">
+            <Range min="40000" max="49999"/>
+          </QuantitySpec>
+          <ValueSetSpec id="sensorFusionContactIdentifier" name="센서융합 클래스 식별" cdm="Contact.Fusion.Classification">
+            <Values>
+              <Value cdm="Contact.Fusion.Classification.Unclassified">0</Value>
+              <Value cdm="Contact.Fusion.Classification.Vessel">1</Value>
+            </Values>
+          </ValueSetSpec>
+          <ValueSetSpec id="sensorFusionContactAttribute" name="센서융합 접촉물 속성" cdm="Contact.Fusion.MotionAttribute">
+            <Values>
+              <Value cdm="Contact.Fusion.MotionAttribute.Static">0</Value>
+              <Value cdm="Contact.Fusion.MotionAttribute.Dynamic">1</Value>
+            </Values>
+          </ValueSetSpec>
+          <QuantitySpec id="latitude" name="위도" cdm="Contact.Fusion.Position.Latitude">
+            <Unit>deg</Unit>
+            <Range min="-90" max="90"/>
+          </QuantitySpec>
+          <QuantitySpec id="longitude" name="경도" cdm="Contact.Fusion.Position.Longitude">
+            <Unit>deg</Unit>
+            <Range min="-180" max="180"/>
+          </QuantitySpec>
+          <QuantitySpec id="altitudeAmsl" name="해수면 기준 고도" cdm="Contact.Fusion.Position.AltitudeAMSL">
+            <Unit>m</Unit>
+            <Range min="0" max="10"/>
+          </QuantitySpec>
+          <QuantitySpec id="range" name="거리" cdm="Contact.Fusion.Range">
+            <Unit>m</Unit>
+            <Range min="0" max="12000"/>
+          </QuantitySpec>
+          <!--방위/침로 계열은 원본 공용 구조체의 rad 단위를 그대로 유지한다.-->
+          <QuantitySpec id="relativeAzimuth" name="상대 방위각" cdm="Contact.Fusion.Bearing.RelativeAzimuth">
+            <Unit>rad</Unit>
+            <Range min="-3.141592653589793" max="3.141592653589793"/>
+          </QuantitySpec>
+          <QuantitySpec id="trueAzimuth" name="절대 방위각" cdm="Contact.Fusion.Bearing.TrueAzimuth">
+            <Unit>rad</Unit>
+            <Range min="0" max="6.283185307179586"/>
+          </QuantitySpec>
+          <QuantitySpec id="elevationAngle" name="고각" cdm="Contact.Fusion.Bearing.Elevation">
+            <Unit>rad</Unit>
+            <Range min="-1.570796326794897" max="1.570796326794897"/>
+          </QuantitySpec>
+          <QuantitySpec id="relativeSpeed" name="상대 속력" cdm="Contact.Fusion.Motion.RelativeSpeed">
+            <Unit>m/s</Unit>
+            <Range min="0" max="500"/>
+          </QuantitySpec>
+          <QuantitySpec id="relativeHeading" name="상대 선수각" cdm="Contact.Fusion.Motion.RelativeHeading">
+            <Unit>rad</Unit>
+            <Range min="0" max="6.283185307179586"/>
+          </QuantitySpec>
+          <QuantitySpec id="cog" name="절대 침로(COG)" cdm="Contact.Fusion.Motion.COG">
+            <Unit>rad</Unit>
+            <Range min="0" max="6.283185307179586"/>
+          </QuantitySpec>
+          <QuantitySpec id="sog" name="속력(SOG)" cdm="Contact.Fusion.Motion.SOG">
+            <Unit>m/s</Unit>
+            <Range min="0" max="500"/>
+          </QuantitySpec>
+          <QuantitySpec id="contactLength" name="길이" cdm="Contact.Fusion.Dimension.Length">
+            <Unit>m</Unit>
+            <Range min="0" max="1000"/>
+          </QuantitySpec>
+          <QuantitySpec id="contactWidth" name="폭" cdm="Contact.Fusion.Dimension.Width">
+            <Unit>m</Unit>
+            <Range min="0" max="1000"/>
+          </QuantitySpec>
+          <QuantitySpec id="contactHeight" name="높이" cdm="Contact.Fusion.Dimension.Height">
+            <Unit>m</Unit>
+            <Range min="0" max="500"/>
+          </QuantitySpec>
+          <QuantitySpec id="size" name="유효크기" cdm="Contact.Fusion.Dimension.Size">
+            <Unit>m</Unit>
+            <Range min="0" max="1000"/>
+          </QuantitySpec>
+          <!--공용 구조체에 CPA Range가 정의되어 있지 않아 Unit만 반영한다.-->
+          <QuantitySpec id="cpa" name="CPA" cdm="Contact.Fusion.CPA">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="collisionRisk" name="충돌위험도" cdm="Contact.Fusion.CollisionRisk">
+            <Unit>%</Unit>
+            <Range min="1" max="100"/>
+          </QuantitySpec>
+        </ElementSpec>
+      </CollectionSpec>
+    </GroupSpec>
+
+    <GroupSpec id="fusionWaves" name="센서융합 파도 정보" cdm="Wave.Fusion">
+      <!--waveNum은 원본 DDS 메시지에 독립 필드로 존재하므로 Collection 길이와 별도로 Semantic에 노출한다. 원본 CSCI에는 waveNum 자체의 Range가 명시되어 있지 않아 Range를 지정하지 않는다.-->
+      <QuantitySpec id="waveCount" name="파도 개수" cdm="Wave.Fusion.Count">
+        <Unit>num</Unit>
+      </QuantitySpec>
+      <CollectionSpec id="waves" name="파도 목록" cdm="Wave.Fusion.List" minOccurs="0" maxOccurs="256">
+        <ElementSpec id="wave" name="파도 정보" cdm="Wave.Fusion.Item">
+          <QuantitySpec id="waveID" name="파도 식별번호" cdm="Wave.Fusion.Identifier">
+            <Range min="0" max="10000"/>
+          </QuantitySpec>
+          <QuantitySpec id="waveRange" name="파도 상대 거리" cdm="Wave.Fusion.Range">
+            <Unit>m</Unit>
+            <Range min="0" max="300"/>
+          </QuantitySpec>
+          <QuantitySpec id="relativeWaveDirection" name="파도 상대 파향" cdm="Wave.Fusion.Direction.Relative">
+            <Unit>deg</Unit>
+            <Range min="0" max="359.99"/>
+          </QuantitySpec>
+          <QuantitySpec id="latitude" name="위도" cdm="Wave.Fusion.Position.Latitude">
+            <Unit>deg</Unit>
+            <Range min="-90" max="90"/>
+          </QuantitySpec>
+          <QuantitySpec id="longitude" name="경도" cdm="Wave.Fusion.Position.Longitude">
+            <Unit>deg</Unit>
+            <Range min="-180" max="180"/>
+          </QuantitySpec>
+          <QuantitySpec id="waveHeight" name="파고" cdm="Wave.Fusion.Height">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="maximumWaveHeight" name="최대파고" cdm="Wave.Fusion.Height.Maximum">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <!--원본 공용 구조체는 waveDirection의 기준을 추가로 명시하지 않으므로 TrueDirection 등으로 확대 해석하지 않는다.-->
+          <QuantitySpec id="waveDirection" name="파향" cdm="Wave.Fusion.Direction">
+            <Unit>deg</Unit>
+            <Range min="0" max="359.99"/>
+          </QuantitySpec>
+          <!--물리 필드명은 directionalWaveSpectrum이나 원본 설명은 '파향분산도'이며 단일 float 값이므로 Semantic에서는 Direction.Spread로 정의한다.-->
+          <QuantitySpec id="directionalWaveSpectrum" name="파향분산도" cdm="Wave.Fusion.Direction.Spread">
+            <Unit>deg</Unit>
+            <Range min="0" max="359.99"/>
+          </QuantitySpec>
+          <QuantitySpec id="wavePeriod" name="파주기" cdm="Wave.Fusion.Period">
+            <Unit>s</Unit>
+            <Range min="0" max="30"/>
+          </QuantitySpec>
+          <QuantitySpec id="meanWavePeriod" name="평균파주기" cdm="Wave.Fusion.Period.Mean">
+            <Unit>s</Unit>
+            <Range min="0" max="30"/>
+          </QuantitySpec>
+          <!--원본 공용 구조체에 waveSpectrum의 Unit/Range가 정의되어 있지 않아 임의로 추정하지 않는다.-->
+          <QuantitySpec id="waveSpectrum" name="파 스펙트럼" cdm="Wave.Fusion.Spectrum"/>
+          <!--원본 공용 구조체에 integratedWaveEnergy의 Unit/Range가 정의되어 있지 않아 임의로 추정하지 않는다.-->
+          <QuantitySpec id="integratedWaveEnergy" name="에너지 총합" cdm="Wave.Fusion.Energy.Integrated"/>
+          <QuantitySpec id="spectralPeakPeriod" name="중심 주기" cdm="Wave.Fusion.Period.SpectralPeak">
+            <Unit>s</Unit>
+            <Range min="0" max="30"/>
+          </QuantitySpec>
+        </ElementSpec>
+      </CollectionSpec>
+    </GroupSpec>
+
+    <GroupSpec id="cipeCbitStatus" name="센서융합 처리카드 CBIT 상태" cdm="Health.CBIT.CIPE">
+      <!--공용 CIPECBITReport의 동일 상태 정의를 사용한다. cipeOperationalStatus는 센서 종류와 연동 여부를 하나의 enum 값으로 표현하므로 분리하지 않고 원본 의미를 유지한다.-->
+      <ValueSetSpec id="cipeOperationalStatus" name="센서 연동 상태" cdm="Health.CIPE.EquipmentLink">
+        <Values>
+          <Value cdm="Health.CIPE.Radar.Connected">10</Value>
+          <Value cdm="Health.CIPE.Radar.Disconnected">13</Value>
+          <Value cdm="Health.CIPE.Lidar.Connected">20</Value>
+          <Value cdm="Health.CIPE.Lidar.Disconnected">23</Value>
+          <Value cdm="Health.CIPE.NearContact.Connected">30</Value>
+          <Value cdm="Health.CIPE.NearContact.Disconnected">33</Value>
+          <Value cdm="Health.CIPE.EOIR.Connected">40</Value>
+          <Value cdm="Health.CIPE.EOIR.Disconnected">43</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="operationalStatus" name="처리카드 정상 작동 여부" cdm="Health.CIPE.OperationalStatus">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+  </MonitorSpecs>
+
+  <ControlSpecs id="control">
+    <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response"/>
+    </ControlSpec>
+  </ControlSpecs>
+</SensorSpec>

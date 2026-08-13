@@ -1,0 +1,606 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PlatformBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+  <!--자율운항장치 Binding: 원격통제장치 CSCI ↔ 자율운항장치 CSCI 직접 DDS 연동 기준.-->
+  <!--공용 식별자 규칙: AutonomousControl equipmentType=0x02, AutoNavControlCard equipmentID=0x01, 별도 subEquipmentID 의미가 없어 generic DestinationType은 0x00을 미사용 값으로 설정한다.-->
+  <!--RecordCommand 계열 RCU/ANU Size 열은 공용 구조체 실제 필드와 불일치한다. 동일 공용 타입 정의를 기준으로 중첩 필드/sequence를 Binding하며 크기 불일치는 TBD.-->
+  <!--RecordCommand는 CommandStatusReport(commandID 상관관계)와 전용 RecordCommandAckReport(수신 레코드 echo, commandID 없음)를 각각 Reply로 연결한다.-->
+  <Monitors semantic_id="monitor">
+    <MonitorBinding semantic_id="missionExecutionStatus">
+      <DDSChannel topicName="RUSV::MM::ANU::AutonomyMissionExecutionStatusReportType" typeName="AutonomyMissionExecutionStatusReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="taskID" cdm="Autonomy.OperationMode"/>
+      <Field name="missionStateID" cdm="Autonomy.Mission.Type" converter="Subtract1"/>
+      <Field name="isMissionEnd" cdm="Autonomy.Mission.Execution.State"/>
+      <Field name="isPossible" cdm="Autonomy.Mission.Execution.Possible"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.repeatNumber" cdm="Autonomy.Waypoint.RepeatNumber"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.missionID" cdm="Autonomy.Waypoint.MissionID"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.totalWaypoint" cdm="Autonomy.Waypoint.TotalCount"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.waypointID" cdm="Autonomy.Waypoint.CurrentID"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.waypointRemaining" cdm="Autonomy.Waypoint.RemainingCount"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.latitude" cdm="Autonomy.Waypoint.Position.Latitude"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.longitude" cdm="Autonomy.Waypoint.Position.Longitude"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.arrivalTime" cdm="Autonomy.Waypoint.ArrivalTime"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.crossTrackError" cdm="Autonomy.Waypoint.CrossTrackError"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.cumulativeDistance" cdm="Autonomy.Waypoint.CumulativeDistance"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.distanceRemaining" cdm="Autonomy.Waypoint.DistanceRemaining"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.distanceToWaypoint" cdm="Autonomy.Waypoint.DistanceToCurrent"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.positionAcheived" cdm="Autonomy.Waypoint.PositionAchieved"/>
+      <Field name="infoANUWaypointTrackingExecutionStatus.speedAcheived" cdm="Autonomy.Waypoint.SpeedAchieved"/>
+      <!--missionStateID는 wire 1~8을 Semantic Mission.Type 0~7로 정규화하기 위해 Subtract1 converter를 사용한다. taskID 물리 필드명은 유지하되 Semantic 의미는 Platform.OperationMode로 매핑한다.-->
+    </MonitorBinding>
+    <MonitorBinding semantic_id="globalHoverExecutionStatus">
+      <DDSChannel topicName="RUSV::MM::ANU::GlobalHoverExecutionStatusReportType" typeName="GlobalHoverExecutionStatusReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="globalHoverState" cdm="Autonomy.GlobalHover.State"/>
+      <Field name="timeHoverAcheived" cdm="Autonomy.GlobalHover.FirstAchievedTime"/>
+      <Field name="timeHoverCompleted" cdm="Autonomy.GlobalHover.ExpectedCompletionTime"/>
+      <Field name="headingAcheived" cdm="Autonomy.GlobalHover.HeadingAchieved"/>
+      <Field name="hoverRadiusAcheived" cdm="Autonomy.GlobalHover.RadiusAchieved"/>
+      <Field name="distancePointRemaining" cdm="Autonomy.GlobalHover.DistanceToPoint"/>
+      <Field name="errorYawAngle" cdm="Autonomy.GlobalHover.YawError"/>
+      <Field name="isPossible" cdm="Autonomy.GlobalHover.Possible"/>
+      <Field name="isMissionEnd" cdm="Autonomy.GlobalHover.MissionState"/>
+      <!--distancePointRemaining/errorYawAngle 및 timeHoverAcheived/timeHoverCompleted는 원문에 단위/시간 인코딩 근거가 부족하여 converter를 두지 않는다.-->
+    </MonitorBinding>
+    <MonitorBinding semantic_id="targetTrackingExecutionStatus">
+      <DDSChannel topicName="RUSV::MM::ANU::TargetTrackingRecordExecutionStatusReportType" typeName="TargetTrackingRecordExecutionStatusReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="distanceTargetRemaining" cdm="Autonomy.TargetTracking.DistanceToTarget"/>
+      <Field name="targetTrackingAcheived" cdm="Autonomy.TargetTracking.Achieved"/>
+      <Field name="isPossible" cdm="Autonomy.TargetTracking.Possible"/>
+      <Field name="isMissionEnd" cdm="Autonomy.TargetTracking.MissionState"/>
+      <!--distanceTargetRemaining Unit은 원문 미기재로 converter/unit 변환 없음.-->
+    </MonitorBinding>
+    <MonitorBinding semantic_id="pointAndGoExecutionStatus">
+      <DDSChannel topicName="RUSV::MM::ANU::PointAndGoRecordExecutionStatusReportType" typeName="PointAndGoRecordExecutionStatusReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="isMissionEnd" cdm="Autonomy.PointAndGo.MissionState"/>
+      <Field name="isPossible" cdm="Autonomy.PointAndGo.Possible"/>
+      <Field name="distanceToWaypoint" cdm="Autonomy.PointAndGo.DistanceToWaypoint"/>
+    </MonitorBinding>
+    <MonitorBinding semantic_id="autonomousNavigationExecutionStatus">
+      <DDSChannel topicName="RUSV::MM::ANU::AutonomousNavigationRecordExecutionStatusReportType" typeName="AutonomousNavigationRecordExecutionStatusReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="isMissionEnd" cdm="Autonomy.Navigation.MissionState"/>
+      <Field name="isPossible" cdm="Autonomy.Navigation.Possible"/>
+      <Field name="distanceRemaining" cdm="Autonomy.Navigation.DistanceRemaining"/>
+    </MonitorBinding>
+    <MonitorBinding semantic_id="autonomousDockingExecutionStatus">
+      <DDSChannel topicName="RUSV::MM::ANU::AutonomousDockingRecordExecutionStatusReportType" typeName="AutonomousDockingRecordExecutionStatusReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="isMissionEnd" cdm="Autonomy.Docking.MissionState"/>
+      <Field name="isPossible" cdm="Autonomy.Docking.Possible"/>
+      <Field name="distanceRemaining" cdm="Autonomy.Docking.DistanceRemaining"/>
+      <!--distanceRemaining 원문 Unit은 - 이지만 동일 의미/설명의 AutonomousNavigation 필드가 m로 정의되어 Semantic에서 m 적용.-->
+    </MonitorBinding>
+    <MonitorBinding semantic_id="anuCbitStatus">
+      <DDSChannel topicName="RUSV::SO::ANU::ANUCBITReportType" typeName="ANUCBITReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="operationalCBITStatus" cdm="Health.CBIT.AutonomousNavigation.Status"/>
+    </MonitorBinding>
+    <MonitorBinding semantic_id="collisionUnavoidable">
+      <DDSChannel topicName="RUSV::MM::ANU::CollisionUnavoidableReportType" typeName="CollisionUnavoidableReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="collisionAvoidanceFail" cdm="Autonomy.CollisionAvoidance.Status"/>
+    </MonitorBinding>
+    <MonitorBinding semantic_id="fuelLowWarning">
+      <DDSChannel topicName="RUSV::MM::ANU::FuelLowWarningReportType" typeName="FuelLowWarningReportType"/>
+      <Field name="usvHeader"/>
+      <Field name="alertFuel" cdm="Platform.Fuel.Alert"/>
+      <Field name="fuelQuantityRemain" cdm="Platform.Fuel.QuantityRemaining"/>
+      <Field name="fuelQuantityPercent" cdm="Platform.Fuel.PercentRemaining"/>
+      <Field name="alertTime" cdm="Platform.Fuel.AlertTime"/>
+      <!--fuelQuantityRemain/fuelQuantityPercent Unit 및 alertTime 인코딩 방식은 원문 미기재/불명확하여 converter를 두지 않는다.-->
+    </MonitorBinding>
+    <MonitorBinding semantic_id="allMissionWaypointData">
+      <DDSChannel topicName="RUSV::MM::ANU::AllMissionWaypointDataReportType" typeName="AllMissionWaypointDataReportType"/>
+      <Field name="usvHeader"/>
+      <ArrayField name="commonMissionDataSequence" cdm="Autonomy.Mission.Plan.AllPoints" minOccurs="0" maxOccurs="512">
+        <Element name="commonMissionData" cdm="Autonomy.Mission.Plan.Point">
+          <Field name="missionID" cdm="Autonomy.Mission.Plan.MissionID"/>
+          <Field name="missionType" cdm="Autonomy.Mission.Type"/>
+          <Field name="latitude" cdm="Autonomy.Mission.Plan.Point.Latitude"/>
+          <Field name="longitude" cdm="Autonomy.Mission.Plan.Point.Longitude"/>
+          <Field name="desiredVelocity" cdm="Autonomy.Mission.Plan.Point.DesiredVelocity"/>
+          <Field name="goalErrorTolerance" cdm="Autonomy.Mission.Plan.Point.GoalErrorTolerance"/>
+          <Field name="pointIndex" cdm="Autonomy.Mission.Plan.Point.Index"/>
+          <Field name="totalPointNum" cdm="Autonomy.Mission.Plan.TotalPointCount"/>
+        </Element>
+      </ArrayField>
+    </MonitorBinding>
+  </Monitors>
+  <Controls semantic_id="control">
+    <ControlBinding semantic_id="startIntegration">
+      <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x02" cdm="Control.Target.EquipmentType"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01" cdm="Control.Target.EquipmentID"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00" cdm="Control.Target.SubEquipmentID"/>
+      <Reply semantic_id="startIntegrationAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="restartSystem">
+      <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x02" cdm="Control.Target.EquipmentType"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01" cdm="Control.Target.EquipmentID"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00" cdm="Control.Target.SubEquipmentID"/>
+      <Reply semantic_id="restartSystemAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="requestPbit">
+      <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x02" cdm="Control.Target.EquipmentType"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01" cdm="Control.Target.EquipmentID"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00" cdm="Control.Target.SubEquipmentID"/>
+      <Reply semantic_id="requestPbitAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="requestPbitResult">
+        <DDSChannel topicName="RUSV::SO::ANU::ANUPBITReportType" typeName="ANUPBITReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="operationalStatus" cdm="Health.PBIT.AutonomousNavigation.Status"/>
+        <!--ANUPBITReportType Range 0~1은 비고의 0~3 및 CBIT/IBIT와 충돌하므로 0~3 상태 체계를 적용한다.-->
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="requestIbit">
+      <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <FixedField name="destination.dstEquipmentType" value="0x02" cdm="Control.Target.EquipmentType"/>
+      <FixedField name="destination.dstEquipmentID" value="0x01" cdm="Control.Target.EquipmentID"/>
+      <FixedField name="destination.dstSubEquipmentID" value="0x00" cdm="Control.Target.SubEquipmentID"/>
+      <Reply semantic_id="requestIbitAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="requestIbitResult">
+        <DDSChannel topicName="RUSV::SO::ANU::ANUIBITReportType" typeName="ANUIBITReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="operationalIBITStatus" cdm="Health.IBIT.AutonomousNavigation.Status"/>
+        <Field name="anuProcessorIBIT.cpuTemperature" cdm="Health.IBIT.CPU.Temperature"/>
+        <Field name="anuProcessorIBIT.cpuLoad" cdm="Health.IBIT.CPU.Load"/>
+        <!--ProcessorIBIT의 cpuTemperature/cpuLoad만 의미 필드로 노출하며 임계값은 원문 참고 주석 수준으로 유지한다.-->
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="recordWaypointMission">
+      <DDSChannel topicName="RUSV::C2::RCU::WaypointRecordCommandType" typeName="WaypointRecordCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <ArrayField name="waypointRecordCommandStatus.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+        <Element name="commonMissionData" cdm="Autonomy.Mission.Record.CommonMissionData">
+          <FixedField name="missionType" value="0" cdm="Autonomy.Mission.Type"/>
+          <Field name="missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+          <Field name="latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+          <Field name="longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+          <Field name="desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+          <Field name="goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+          <Field name="pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+          <Field name="totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        </Element>
+      </ArrayField>
+      <Field name="waypointRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+      <Field name="waypointRecordCommandStatus.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="recordWaypointMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="recordWaypointMissionRecordAck" required="true">
+        <DDSChannel topicName="RUSV::MM::ANU::WaypointRecordCommandAckReportType" typeName="WaypointRecordCommandAckReportType"/>
+        <Field name="usvHeader"/>
+        <ArrayField name="responseWaypointRecordCommand.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <Element name="commonMissionData" cdm="Autonomy.Mission.Record.CommonMissionData">
+            <Field name="missionType" cdm="Autonomy.Mission.Type"/>
+            <Field name="missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+            <Field name="latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+            <Field name="longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+            <Field name="desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+            <Field name="goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+            <Field name="pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+            <Field name="totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+          </Element>
+        </ArrayField>
+        <Field name="responseWaypointRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+        <Field name="responseWaypointRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+      </Reply>
+      <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="recordGlobalHoverMission">
+      <DDSChannel topicName="RUSV::C2::RCU::GlobalHoverRecordCommandType" typeName="GlobalHoverRecordCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <FixedField name="globalHoverRecordCommandStatus.commonMissionData.missionType" value="1" cdm="Autonomy.Mission.Type"/>
+      <Field name="globalHoverRecordCommandStatus.commonMissionData.missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+      <Field name="globalHoverRecordCommandStatus.commonMissionData.latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+      <Field name="globalHoverRecordCommandStatus.commonMissionData.longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+      <Field name="globalHoverRecordCommandStatus.commonMissionData.desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+      <Field name="globalHoverRecordCommandStatus.commonMissionData.goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+      <Field name="globalHoverRecordCommandStatus.commonMissionData.pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+      <Field name="globalHoverRecordCommandStatus.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+      <Field name="globalHoverRecordCommandStatus.endTime" cdm="Autonomy.Mission.Record.EndTime"/>
+      <Field name="globalHoverRecordCommandStatus.heading" cdm="Autonomy.Mission.Record.Heading"/>
+      <Field name="globalHoverRecordCommandStatus.enableModeRadius" cdm="Autonomy.Mission.Record.EnableModeRadius"/>
+      <Field name="globalHoverRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="recordGlobalHoverMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="recordGlobalHoverMissionRecordAck" required="true">
+        <DDSChannel topicName="RUSV::MM::ANU::GlobalHoverRecordCommandAckReportType" typeName="GlobalHoverRecordCommandAckReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="responseGlobalHoverCommand.commonMissionData.missionType" cdm="Autonomy.Mission.Type"/>
+        <Field name="responseGlobalHoverCommand.commonMissionData.missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+        <Field name="responseGlobalHoverCommand.commonMissionData.latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+        <Field name="responseGlobalHoverCommand.commonMissionData.longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+        <Field name="responseGlobalHoverCommand.commonMissionData.desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+        <Field name="responseGlobalHoverCommand.commonMissionData.goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+        <Field name="responseGlobalHoverCommand.commonMissionData.pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+        <Field name="responseGlobalHoverCommand.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <Field name="responseGlobalHoverCommand.endTime" cdm="Autonomy.Mission.Record.EndTime"/>
+        <Field name="responseGlobalHoverCommand.heading" cdm="Autonomy.Mission.Record.Heading"/>
+        <Field name="responseGlobalHoverCommand.enableModeRadius" cdm="Autonomy.Mission.Record.EnableModeRadius"/>
+        <Field name="responseGlobalHoverCommand.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+      </Reply>
+      <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="recordTargetTrackingMission">
+      <DDSChannel topicName="RUSV::C2::RCU::TargetTrackingRecordCommandType" typeName="TargetTrackingRecordCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <FixedField name="targetTrackingRecordCommandStatus.commonMissionData.missionType" value="2" cdm="Autonomy.Mission.Type"/>
+      <Field name="targetTrackingRecordCommandStatus.commonMissionData.missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+      <Field name="targetTrackingRecordCommandStatus.commonMissionData.latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+      <Field name="targetTrackingRecordCommandStatus.commonMissionData.longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+      <Field name="targetTrackingRecordCommandStatus.commonMissionData.desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+      <Field name="targetTrackingRecordCommandStatus.commonMissionData.goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+      <Field name="targetTrackingRecordCommandStatus.commonMissionData.pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+      <Field name="targetTrackingRecordCommandStatus.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+      <Field name="targetTrackingRecordCommandStatus.targetTrackingID" cdm="Autonomy.Mission.Record.TargetTrackingID"/>
+      <Field name="targetTrackingRecordCommandStatus.rangeToTarget" cdm="Autonomy.Mission.Record.RangeToTarget"/>
+      <Field name="targetTrackingRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+      <Field name="targetTrackingRecordCommandStatus.offsetFromTarget" cdm="Autonomy.Mission.Record.OffsetFromTarget"/>
+      <!--rangeToTarget wire Range는 0~2000 m 그대로 유지. 0은 충돌회피만 수행, 50~2000은 이격거리 유지, 1~49 의미는 원문 미정의.-->
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="recordTargetTrackingMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="recordTargetTrackingMissionRecordAck" required="true">
+        <DDSChannel topicName="RUSV::MM::ANU::TargetTrackingRecordCommandAckReportType" typeName="TargetTrackingRecordCommandAckReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="responseTargetTrackingRecordCommand.commonMissionData.missionType" cdm="Autonomy.Mission.Type"/>
+        <Field name="responseTargetTrackingRecordCommand.commonMissionData.missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+        <Field name="responseTargetTrackingRecordCommand.commonMissionData.latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+        <Field name="responseTargetTrackingRecordCommand.commonMissionData.longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+        <Field name="responseTargetTrackingRecordCommand.commonMissionData.desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+        <Field name="responseTargetTrackingRecordCommand.commonMissionData.goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+        <Field name="responseTargetTrackingRecordCommand.commonMissionData.pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+        <Field name="responseTargetTrackingRecordCommand.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <Field name="responseTargetTrackingRecordCommand.targetTrackingID" cdm="Autonomy.Mission.Record.TargetTrackingID"/>
+        <Field name="responseTargetTrackingRecordCommand.rangeToTarget" cdm="Autonomy.Mission.Record.RangeToTarget"/>
+        <Field name="responseTargetTrackingRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+        <Field name="responseTargetTrackingRecordCommand.offsetFromTarget" cdm="Autonomy.Mission.Record.OffsetFromTarget"/>
+      </Reply>
+      <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="recordPointAndGoMission">
+      <DDSChannel topicName="RUSV::C2::RCU::PointAndGoRecordCommandType" typeName="PointAndGoRecordCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <FixedField name="pointAndGoRecordCommandStatus.commonMissionData.missionType" value="3" cdm="Autonomy.Mission.Type"/>
+      <Field name="pointAndGoRecordCommandStatus.commonMissionData.missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+      <Field name="pointAndGoRecordCommandStatus.commonMissionData.latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+      <Field name="pointAndGoRecordCommandStatus.commonMissionData.longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+      <Field name="pointAndGoRecordCommandStatus.commonMissionData.desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+      <Field name="pointAndGoRecordCommandStatus.commonMissionData.goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+      <Field name="pointAndGoRecordCommandStatus.commonMissionData.pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+      <Field name="pointAndGoRecordCommandStatus.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+      <Field name="pointAndGoRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+      <Field name="pointAndGoRecordCommandStatus.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="recordPointAndGoMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="recordPointAndGoMissionRecordAck" required="true">
+        <DDSChannel topicName="RUSV::MM::ANU::PointAndGoRecordCommandAckReportType" typeName="PointAndGoRecordCommandAckReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="responsePointAndGoRecordCommand.commonMissionData.missionType" cdm="Autonomy.Mission.Type"/>
+        <Field name="responsePointAndGoRecordCommand.commonMissionData.missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+        <Field name="responsePointAndGoRecordCommand.commonMissionData.latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+        <Field name="responsePointAndGoRecordCommand.commonMissionData.longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+        <Field name="responsePointAndGoRecordCommand.commonMissionData.desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+        <Field name="responsePointAndGoRecordCommand.commonMissionData.goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+        <Field name="responsePointAndGoRecordCommand.commonMissionData.pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+        <Field name="responsePointAndGoRecordCommand.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <Field name="responsePointAndGoRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+        <Field name="responsePointAndGoRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+      </Reply>
+      <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="recordAutonomousNavigationMission">
+      <DDSChannel topicName="RUSV::C2::RCU::AutonomousNavigationRecordCommandType" typeName="AutonomousNavigationRecordCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <FixedField name="autonomousNavigationRecordCommandStatus.commonMissionData.missionType" value="4" cdm="Autonomy.Mission.Type"/>
+      <Field name="autonomousNavigationRecordCommandStatus.commonMissionData.missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+      <Field name="autonomousNavigationRecordCommandStatus.commonMissionData.latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+      <Field name="autonomousNavigationRecordCommandStatus.commonMissionData.longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+      <Field name="autonomousNavigationRecordCommandStatus.commonMissionData.desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+      <Field name="autonomousNavigationRecordCommandStatus.commonMissionData.goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+      <Field name="autonomousNavigationRecordCommandStatus.commonMissionData.pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+      <Field name="autonomousNavigationRecordCommandStatus.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+      <Field name="autonomousNavigationRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+      <Field name="autonomousNavigationRecordCommandStatus.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="recordAutonomousNavigationMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="recordAutonomousNavigationMissionRecordAck" required="true">
+        <DDSChannel topicName="RUSV::MM::ANU::AutonomousNavigationRecordCommandAckReportType" typeName="AutonomousNavigationRecordCommandAckReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.missionType" cdm="Autonomy.Mission.Type"/>
+        <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+        <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+        <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+        <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+        <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+        <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+        <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <Field name="responseAutonomousNavigationRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+        <Field name="responseAutonomousNavigationRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+      </Reply>
+      <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="recordSurfaceReconnaissanceMission">
+      <DDSChannel topicName="RUSV::C2::RCU::SurfaceReconnaissanceRecordCommandType" typeName="SurfaceReconnaissanceRecordCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <ArrayField name="surfaceReconnaissanceRecordCommandStatus.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+        <Element name="commonMissionData" cdm="Autonomy.Mission.Record.CommonMissionData">
+          <FixedField name="missionType" value="5" cdm="Autonomy.Mission.Type"/>
+          <Field name="missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+          <Field name="latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+          <Field name="longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+          <Field name="desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+          <Field name="goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+          <Field name="pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+          <Field name="totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        </Element>
+      </ArrayField>
+      <Field name="surfaceReconnaissanceRecordCommandStatus.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+      <Field name="surfaceReconnaissanceRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+      <Field name="surfaceReconnaissanceRecordCommandStatus.repeatNumber" cdm="Autonomy.Mission.Record.RepeatNumber"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="recordSurfaceReconnaissanceMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="recordSurfaceReconnaissanceMissionRecordAck" required="true">
+        <DDSChannel topicName="RUSV::MM::ANU::SurfaceReconnaissanceRecordCommandAckReportType" typeName="SurfaceReconnaissanceRecordCommandAckReportType"/>
+        <Field name="usvHeader"/>
+        <ArrayField name="responseSurfaceReconnaissanceRecordCommand.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <Element name="commonMissionData" cdm="Autonomy.Mission.Record.CommonMissionData">
+            <Field name="missionType" cdm="Autonomy.Mission.Type"/>
+            <Field name="missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+            <Field name="latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+            <Field name="longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+            <Field name="desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+            <Field name="goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+            <Field name="pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+            <Field name="totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+          </Element>
+        </ArrayField>
+        <Field name="responseSurfaceReconnaissanceRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+        <Field name="responseSurfaceReconnaissanceRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+        <Field name="responseSurfaceReconnaissanceRecordCommand.repeatNumber" cdm="Autonomy.Mission.Record.RepeatNumber"/>
+      </Reply>
+      <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="recordUnderwaterReconnaissanceMission">
+      <DDSChannel topicName="RUSV::C2::RCU::UnderwaterMissionPlanRecordCommandType" typeName="UnderwaterMissionPlanRecordCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <ArrayField name="underwaterMissionPlanRecordCommandStatus.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+        <Element name="commonMissionData" cdm="Autonomy.Mission.Record.CommonMissionData">
+          <FixedField name="missionType" value="6" cdm="Autonomy.Mission.Type"/>
+          <Field name="missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+          <Field name="latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+          <Field name="longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+          <Field name="desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+          <Field name="goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+          <Field name="pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+          <Field name="totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        </Element>
+      </ArrayField>
+      <Field name="underwaterMissionPlanRecordCommandStatus.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+      <Field name="underwaterMissionPlanRecordCommandStatus.searchingRange" cdm="Autonomy.Mission.Record.SearchingRange" converter="Scale0.01"/>
+      <Field name="underwaterMissionPlanRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+      <Field name="underwaterMissionPlanRecordCommandStatus.timeLimit" cdm="Autonomy.Mission.Record.TimeLimit"/>
+      <!--Scale0.01: Semantic[m] = wire raw × 0.01. 송신 인코딩 시 역변환을 적용한다. timeLimit은 wire 값 자체를 seconds로 사용한다.-->
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="recordUnderwaterReconnaissanceMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <Reply semantic_id="recordUnderwaterReconnaissanceMissionRecordAck" required="true">
+        <DDSChannel topicName="RUSV::MM::ANU::UnderwaterMissionPlanRecordCommandAckReportType" typeName="UnderwaterMissionPlanRecordCommandAckReportType"/>
+        <Field name="usvHeader"/>
+        <ArrayField name="responseUnderwaterMissionPlanRecordCommand.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <Element name="commonMissionData" cdm="Autonomy.Mission.Record.CommonMissionData">
+            <Field name="missionType" cdm="Autonomy.Mission.Type"/>
+            <Field name="missionID" cdm="Autonomy.Mission.Record.MissionID"/>
+            <Field name="latitude" cdm="Autonomy.Mission.Record.Latitude"/>
+            <Field name="longitude" cdm="Autonomy.Mission.Record.Longitude"/>
+            <Field name="desiredVelocity" cdm="Autonomy.Mission.Record.DesiredVelocity"/>
+            <Field name="goalErrorTolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance"/>
+            <Field name="pointIndex" cdm="Autonomy.Mission.Record.PointIndex"/>
+            <Field name="totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+          </Element>
+        </ArrayField>
+        <Field name="responseUnderwaterMissionPlanRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance"/>
+        <Field name="responseUnderwaterMissionPlanRecordCommand.searchingRange" cdm="Autonomy.Mission.Record.SearchingRange" converter="Scale0.01"/>
+        <Field name="responseUnderwaterMissionPlanRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction"/>
+        <Field name="responseUnderwaterMissionPlanRecordCommand.timeLimit" cdm="Autonomy.Mission.Record.TimeLimit"/>
+      </Reply>
+      <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="setEmergencyReturnRoute">
+      <DDSChannel topicName="RUSV::C2::RCU::ReturnToEmergencyPointCommandType" typeName="ReturnToEmergencyPointCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <Field name="desiredVelocity" cdm="Autonomy.Return.DesiredVelocity"/>
+      <ArrayField name="returnToBasePointDataSequence" cdm="Autonomy.Return.RoutePoints" minOccurs="0" maxOccurs="256">
+        <Element name="returnPoint" cdm="Autonomy.Return.RoutePoint">
+          <Field name="latitude" cdm="Autonomy.Return.RoutePoint.Latitude"/>
+          <Field name="longitude" cdm="Autonomy.Return.RoutePoint.Longitude"/>
+          <Field name="pointIndex" cdm="Autonomy.Return.RoutePoint.Index"/>
+        </Element>
+      </ArrayField>
+      <Field name="lateralErrorTolerance" cdm="Autonomy.Return.LateralErrorTolerance"/>
+      <Field name="goalError" cdm="Autonomy.Return.GoalError"/>
+      <Field name="action" cdm="Autonomy.Return.EndAction"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="setEmergencyReturnRouteAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <!--action 값 3은 Range에는 포함되지만 의미가 미정의이므로 Semantic 입력에서는 사용하지 않는다.-->
+    </ControlBinding>
+    <ControlBinding semantic_id="setReturnToBasePoint">
+      <DDSChannel topicName="RUSV::C2::RCU::ReturnToBasePointCommandType" typeName="ReturnToBasePointCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <Field name="latitude" cdm="Autonomy.Return.BasePoint.Latitude"/>
+      <Field name="longitude" cdm="Autonomy.Return.BasePoint.Longitude"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="setReturnToBasePointAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="startMission">
+      <DDSChannel topicName="RUSV::C2::RCU::StartMissionCommandType" typeName="StartMissionCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <FixedField name="missionActionCommand" value="0" cdm="Autonomy.Mission.Action"/>
+      <Field name="pointIndex" cdm="Autonomy.Mission.StartPointIndex"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="startMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="resumeMission">
+      <DDSChannel topicName="RUSV::C2::RCU::StartMissionCommandType" typeName="StartMissionCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <FixedField name="missionActionCommand" value="1" cdm="Autonomy.Mission.Action"/>
+      <Field name="pointIndex" cdm="Autonomy.Mission.StartPointIndex"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="resumeMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="abortMission">
+      <DDSChannel topicName="RUSV::C2::RCU::StartMissionCommandType" typeName="StartMissionCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <FixedField name="missionActionCommand" value="2" cdm="Autonomy.Mission.Action"/>
+      <FixedField name="pointIndex" value="0" cdm="Autonomy.Mission.StartPointIndex"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="abortMissionAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="setRestrictedAreas">
+      <DDSChannel topicName="RUSV::C2::RCU::RestrictAreaCommandType" typeName="RestrictAreaCommandType"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <ArrayField name="restrictAreaSequence" cdm="Autonomy.RestrictedArea.List" minOccurs="0" maxOccurs="256">
+        <Element name="restrictedArea" cdm="Autonomy.RestrictedArea.Item">
+          <Field name="restrictedAreaID" cdm="Autonomy.RestrictedArea.ID"/>
+          <Field name="latitude" cdm="Autonomy.RestrictedArea.Point0.Latitude"/>
+          <Field name="longitude" cdm="Autonomy.RestrictedArea.Point0.Longitude"/>
+          <Field name="latitude1" cdm="Autonomy.RestrictedArea.Point1.Latitude"/>
+          <Field name="longitude1" cdm="Autonomy.RestrictedArea.Point1.Longitude"/>
+        </Element>
+      </ArrayField>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <Reply semantic_id="setRestrictedAreasAck" required="true">
+        <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
+        <Field name="usvHeader"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+      </Reply>
+      <!--원문 RestrictArea는 두 좌표점만 제공하며 사각형/다각형 생성 규칙은 정의하지 않는다.-->
+    </ControlBinding>
+  </Controls>
+</PlatformBinding>

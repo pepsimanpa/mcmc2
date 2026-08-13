@@ -1,0 +1,679 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+  <!--SideScanSonar 재정의본: 기능 중심 Semantic + 실제 IDD 기반 Binding/Reply 구조-->
+  <ConstantSpecs id="constant">
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+      <Value>SideScanSonar</Value>
+    </TextConstantSpec>
+    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+      <Value>예인형수중탐색장치 원격 제어·상태·센서 데이터 인터페이스</Value>
+    </TextConstantSpec>
+  </ConstantSpecs>
+  <MonitorSpecs id="monitor">
+    <GroupSpec id="mode" name="예인형수중탐색장치 운용 모드" cdm="Mode">
+      <ValueSetSpec id="operationalMode" name="운용 모드" cdm="Mode.Operation">
+        <Values>
+          <Value cdm="Mode.Auto">0</Value>
+          <Value cdm="Mode.Standby">1</Value>
+          <Value cdm="Mode.ManualLaunch">2</Value>
+          <Value cdm="Mode.ManualRecovery">3</Value>
+          <Value cdm="Mode.ManualDeploy">4</Value>
+          <Value cdm="Mode.EmergencyStop">5</Value>
+          <Value cdm="Mode.CableSeparation">6</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="pingSetting" name="PING 및 송신 설정" cdm="Ping">
+      <QuantityValueSetSpec id="frequency" name="SSS Frequency" cdm="Ping.CarrierFrequency">
+        <Values>
+          <Value>100</Value>
+          <Value>600</Value>
+        </Values>
+        <Unit>kHz</Unit>
+      </QuantityValueSetSpec>
+      <QuantitySpec id="sssPulseWidth" name="SSS Pulse Width" cdm="Ping.SideScanSonar.PulseWidth">
+        <Unit>㎲</Unit>
+        <Range min="0" max="1000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <ValueSetSpec id="sssPulseType" name="SSS Pulse Type" cdm="Ping.SideScanSonar.PulseType">
+        <Values>
+          <Value cdm="Ping.PulseType.ContinuousWave">0</Value>
+          <Value cdm="Ping.PulseType.Chirp">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="gfPulseWidth" name="GapFiller Pulse Width" cdm="Ping.GapFiller.PulseWidth">
+        <Unit>㎲</Unit>
+        <Range min="0" max="1000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <ValueSetSpec id="gfPulseType" name="GapFiller Pulse Type" cdm="Ping.GapFiller.PulseType">
+        <Values>
+          <Value cdm="Ping.PulseType.ContinuousWave">0</Value>
+          <Value cdm="Ping.PulseType.Chirp">1</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="settingValues" name="소나 설정 값" cdm="Setting">
+      <QuantitySpec id="sssRange" name="SSS Range" cdm="Setting.SideScanSonar.DetectionRange">
+        <Unit>m</Unit>
+        <Range min="0" max="400"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="sssGain" name="SSS Gain" cdm="Setting.SideScanSonar.Gain">
+        <Unit>dB</Unit>
+        <Range min="0" max="80"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <ValueSetSpec id="sssTvgMode" name="SSS TVG On/Off" cdm="Setting.SideScanSonar.TVG.Mode">
+        <Values>
+          <Value cdm="Setting.TVG.Off">0</Value>
+          <Value cdm="Setting.TVG.On">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="sssTvgDistCoeff" name="SSS 거리감쇄계수" cdm="Setting.SideScanSonar.TVG.DistanceCoefficient">
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="sssTvgAttenCoeff" name="SSS 흡수손실계수" cdm="Setting.SideScanSonar.TVG.AttenuationCoefficient">
+        <Unit>dB</Unit>
+        <Range min="0" max="200"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="gfRange" name="GapFiller Range" cdm="Setting.GapFiller.DetectionRange">
+        <Unit>m</Unit>
+        <Range min="0" max="400"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="gfGain" name="GapFiller Gain" cdm="Setting.GapFiller.Gain">
+        <Unit>dB</Unit>
+        <Range min="0" max="80"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <ValueSetSpec id="gfTvgMode" name="GapFiller TVG On/Off" cdm="Setting.GapFiller.TVG.Mode">
+        <Values>
+          <Value cdm="Setting.TVG.Off">0</Value>
+          <Value cdm="Setting.TVG.On">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="gfTvgDistCoeff" name="GapFiller 거리감쇄계수" cdm="Setting.GapFiller.TVG.DistanceCoefficient">
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="gfTvgAttenCoeff" name="GapFiller 흡수손실계수" cdm="Setting.GapFiller.TVG.AttenuationCoefficient">
+        <Unit>dB</Unit>
+        <Range min="0" max="200"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="position" name="예인형음탐기 위치 정보" cdm="Position">
+      <QuantitySpec id="towLatitude" name="Latitude" cdm="Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+        <Format>dms</Format>
+      </QuantitySpec>
+      <QuantitySpec id="towLongitude" name="Longitude" cdm="Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+        <Format>dms</Format>
+      </QuantitySpec>
+      <QuantitySpec id="towDepth" name="Depth" cdm="Position.Depth">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="towAltitude" name="Altitude" cdm="Position.Altitude">
+        <Unit>m</Unit>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="attitude" name="예인형음탐기 자세 정보" cdm="Attitude">
+      <QuantitySpec id="towHeading" name="Heading" cdm="Attitude.Heading">
+        <Unit>rad</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="towPitch" name="Pitch" cdm="Attitude.Pitch">
+        <Unit>rad</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="towRoll" name="Roll" cdm="Attitude.Roll">
+        <Unit>rad</Unit>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="launchRecoveryState" name="진회수장치 상태" cdm="LaunchRecovery.Status">
+      <ValueSetSpec id="operationStatus" name="진회수 운용 상태" cdm="LaunchRecovery.Status.Operation">
+        <Values>
+          <Value cdm="LaunchRecovery.State.Standby">0</Value>
+          <Value cdm="LaunchRecovery.State.Launching">1</Value>
+          <Value cdm="LaunchRecovery.State.Launched">2</Value>
+          <Value cdm="LaunchRecovery.State.Operating">3</Value>
+          <Value cdm="LaunchRecovery.State.Recovering">4</Value>
+          <Value cdm="LaunchRecovery.State.Recovered">5</Value>
+          <Value cdm="LaunchRecovery.State.EmergencyStop">6</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="usblMode" name="USBL 모드" cdm="LaunchRecovery.USBL.Mode">
+        <Values>
+          <Value cdm="LaunchRecovery.State.Stop">0</Value>
+          <Value cdm="LaunchRecovery.State.Launch">1</Value>
+          <Value cdm="LaunchRecovery.State.Recovery">2</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="winchMotorBrakeStatus" name="윈치모터 브레이크 상태" cdm="LaunchRecovery.Winch.Brake">
+        <Values>
+          <Value cdm="Brake.Released">0</Value>
+          <Value cdm="Brake.Locked">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="slideMotorBrakeStatus" name="슬라이드 모터 브레이크 상태" cdm="LaunchRecovery.Slide.Brake">
+        <Values>
+          <Value cdm="Brake.Released">0</Value>
+          <Value cdm="Brake.Locked">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="ultraShortBaseLineMotorBrakeStatus" name="USBL 액추에이터 상태" cdm="LaunchRecovery.USBL.Brake">
+        <Values>
+          <Value cdm="Brake.Released">0</Value>
+          <Value cdm="Brake.Locked">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="cableDeployLength" name="케이블 조출 길이" cdm="LaunchRecovery.Cable.Length">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="cableDeploySpeed" name="케이블 조출 속도" cdm="LaunchRecovery.Cable.Speed">
+        <Unit>m/s</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="slidePosition" name="슬라이드 위치" cdm="LaunchRecovery.Slide.Position">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="ultraShortBaseLineVerticalPosition" name="USBL 수직 위치" cdm="LaunchRecovery.USBL.VerticalPosition">
+        <Unit>m</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="winchCurrent" name="윈치 전류" cdm="LaunchRecovery.Winch.Current">
+        <Unit>A</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="recoveryUnitCurrent" name="진회수 전류" cdm="LaunchRecovery.Slide.Current">
+        <Unit>A</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="ultraShortBaseLineVerticalCurrent" name="USBL 수직 전류" cdm="LaunchRecovery.USBL.Current">
+        <Unit>A</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="cableTension" name="케이블 장력" cdm="LaunchRecovery.Cable.Tension">
+        <Unit>kgf</Unit>
+      </QuantitySpec>
+      <ValueSetSpec id="launchLimitSwitchStatus" name="진수 한계스위치" cdm="LaunchRecovery.LimitSwitch.Launch">
+        <Values>
+          <Value cdm="LimitSwitch.NotDetected">0</Value>
+          <Value cdm="LimitSwitch.Detected">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="recoveryLimitSwitchStatus" name="회수 한계스위치" cdm="LaunchRecovery.LimitSwitch.Recovery">
+        <Values>
+          <Value cdm="LimitSwitch.NotDetected">0</Value>
+          <Value cdm="LimitSwitch.Detected">1</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="powerState" name="장비 전원 상태" cdm="ElectricalState.Power">
+      <ValueSetSpec id="towedSonarArrayPowerStatus" name="예인형음탐기 전원 상태" cdm="ElectricalState.Power.TowedSonarArray">
+        <Values>
+          <Value cdm="PowerSupplyState.Off">0</Value>
+          <Value cdm="PowerSupplyState.On">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="ultraShortBaseLinePowerStatus" name="USBL 전원 상태" cdm="ElectricalState.Power.USBL">
+        <Values>
+          <Value cdm="PowerSupplyState.Off">0</Value>
+          <Value cdm="PowerSupplyState.On">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="winchPowerStatus" name="윈치 전원 상태" cdm="ElectricalState.Power.Winch">
+        <Values>
+          <Value cdm="PowerSupplyState.Off">0</Value>
+          <Value cdm="PowerSupplyState.On">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="recoveryUnitPowerStatus" name="진회수장치 전원 상태" cdm="ElectricalState.Power.RecoveryUnit">
+        <Values>
+          <Value cdm="PowerSupplyState.Off">0</Value>
+          <Value cdm="PowerSupplyState.On">1</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cameraPowerStatus" name="카메라 전원 상태" cdm="ElectricalState.Power.Camera">
+        <Values>
+          <Value cdm="PowerSupplyState.Off">0</Value>
+          <Value cdm="PowerSupplyState.On">1</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="subsystemHealthStatus" name="구성품 정상 작동 여부" cdm="CBIT">
+      <HealthStatusSetSpec id="towedSonarAssembly" name="예인형수중탐색장치 정상 작동 여부" cdm="CBIT.TowfishAssembly">
+        <Values>
+          <Value cdm="OperationalState.Normal">0</Value>
+          <Value cdm="OperationalState.Degraded">1</Value>
+          <Value cdm="OperationalState.Unavailable">2</Value>
+          <Value cdm="OperationalState.NoResponse">3</Value>
+        </Values>
+        <ComponentDomain cdm="SensorSubsystem"/>
+        <ComponentRole cdm="TowfishAssembly"/>
+      </HealthStatusSetSpec>
+      <HealthStatusSetSpec id="launchAndRecovery" name="진회수장치 정상 작동 여부" cdm="CBIT.LaunchRecoveryAssembly">
+        <Values>
+          <Value cdm="OperationalState.Normal">0</Value>
+          <Value cdm="OperationalState.Degraded">1</Value>
+          <Value cdm="OperationalState.Unavailable">2</Value>
+          <Value cdm="OperationalState.NoResponse">3</Value>
+        </Values>
+        <ComponentDomain cdm="SensorSubsystem"/>
+        <ComponentRole cdm="LaunchRecoveryAssembly"/>
+      </HealthStatusSetSpec>
+      <HealthStatusSetSpec id="towedSonarArray" name="예인형음탐기 정상 작동 여부" cdm="CBIT.TransducerArray">
+        <Values>
+          <Value cdm="OperationalState.Normal">0</Value>
+          <Value cdm="OperationalState.Degraded">1</Value>
+          <Value cdm="OperationalState.Unavailable">2</Value>
+          <Value cdm="OperationalState.NoResponse">3</Value>
+        </Values>
+        <ComponentDomain cdm="SensorSubsystem"/>
+        <ComponentRole cdm="TransducerArray"/>
+      </HealthStatusSetSpec>
+      <HealthStatusSetSpec id="sonarSignalProcessor" name="음탐기신호처리장치 정상 작동 여부" cdm="CBIT.SignalProcessor">
+        <Values>
+          <Value cdm="OperationalState.Normal">0</Value>
+          <Value cdm="OperationalState.Degraded">1</Value>
+          <Value cdm="OperationalState.Unavailable">2</Value>
+          <Value cdm="OperationalState.NoResponse">3</Value>
+        </Values>
+        <ComponentDomain cdm="SensorSubsystem"/>
+        <ComponentRole cdm="SignalProcessor"/>
+      </HealthStatusSetSpec>
+      <HealthStatusSetSpec id="sonarImageProcessor" name="음탐기영상처리장치 정상 작동 여부" cdm="CBIT.ImageProcessor">
+        <Values>
+          <Value cdm="OperationalState.Normal">0</Value>
+          <Value cdm="OperationalState.Degraded">1</Value>
+          <Value cdm="OperationalState.Unavailable">2</Value>
+          <Value cdm="OperationalState.NoResponse">3</Value>
+        </Values>
+        <ComponentDomain cdm="SensorSubsystem"/>
+        <ComponentRole cdm="ImageProcessor"/>
+      </HealthStatusSetSpec>
+      <HealthStatusSetSpec id="hullMountedSonar" name="선체부착형음탐기 정상 작동 여부" cdm="CBIT.HullMountedSonar">
+        <Values>
+          <Value cdm="OperationalState.Normal">0</Value>
+          <Value cdm="OperationalState.Degraded">1</Value>
+          <Value cdm="OperationalState.Unavailable">2</Value>
+          <Value cdm="OperationalState.NoResponse">3</Value>
+        </Values>
+        <ComponentDomain cdm="SensorSubsystem"/>
+        <ComponentRole cdm="HullMountedSonar"/>
+      </HealthStatusSetSpec>
+    </GroupSpec>
+  </MonitorSpecs>
+  <ControlSpecs id="control">
+    <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.Restart">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response"/>
+    </ControlSpec>
+    <ControlSpec id="stopSlideBackStop" name="슬라이드 후퇴고정 정지 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Stop">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="stopSlideBackStopAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="stopSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response"/>
+    </ControlSpec>
+    <ControlSpec id="engageSlideBackStop" name="슬라이드 후퇴고정 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Engage">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="engageSlideBackStopAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="engageSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response"/>
+    </ControlSpec>
+    <ControlSpec id="returnSlideBackStop" name="슬라이드 후퇴고정 복귀 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Return">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="returnSlideBackStopAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="returnSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response"/>
+    </ControlSpec>
+    <ControlSpec id="setCommunicationLevel" name="음탐통신량 전환 명령" cdm="Control.Communication.Level">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Communication.MCS.Level">
+          <Range min="0" max="7"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="setCommunicationLevelAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="setCommunicationLevelResult" cdm="Control.Communication.Level.Response"/>
+    </ControlSpec>
+    <ControlSpec id="configureOperatingParameters" name="소나 설정 명령" cdm="Control.SetParameters">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="SideScanSonar.SonarType">
+          <Range min="0" max="2"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <Profile cdm="Ping.CarrierFrequency"/>
+        <QuantityProfile cdm="Coverage.Range">
+          <Unit>m</Unit>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.Gain">
+          <Unit>dB</Unit>
+          <Range min="0" max="80"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.TVG.Mode">
+          <Range min="0" max="1"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.TVG.DistanceCoefficient">
+          <Range min="0" max="999"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.TVG.AttenuationCoefficient">
+          <Unit>dB</Unit>
+          <Range min="0" max="999"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Ping.PulseWidth">
+          <Range min="0" max="1000"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="Ping.PulseType">
+          <Range min="0" max="1"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Mode">
+          <Range min="0" max="2"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Auto">
+          <Unit>%</Unit>
+          <Range min="0" max="100"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.TVGA">
+          <Range min="0" max="40"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.TVGB">
+          <Unit>dB/100m</Unit>
+          <Range min="0" max="100"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.TVGC">
+          <Unit>dB</Unit>
+          <Range min="0" max="80"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Raw">
+          <Unit>dB</Unit>
+          <Range min="0" max="80"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.LowPassFilter.Mode">
+          <Range min="0" max="1"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="ReceiveProcessing.LowPassFilter.Level">
+          <Range min="0" max="14"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="configureOperatingParametersAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="start" name="장비 실행 명령" cdm="SideScanSonar.Control.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="SideScanSonar.SonarType">
+          <Range min="0" max="1"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="startAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="stop" name="장비 중지 명령" cdm="Control.ShutDown">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="SideScanSonar.SonarType">
+          <Range min="0" max="1"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="stopAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="powerOnOff" name="장비 전원 제어 명령" cdm="Control.PowerSupplyControl">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="SideScanSonar.Subsystem">
+          <Range min="1" max="5"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+        <QuantityProfile cdm="PowerSupplyState">
+          <Range min="0" max="1"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="powerOnOffAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="setAutoMode" name="자동 모드 변경 명령" cdm="Control.ModeChange">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="setAutoModeAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="setManualMode" name="수동 모드 변경 명령" cdm="Control.ModeChange">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="setManualModeAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="stopTowfish" name="자동모드 진수/회수 정지 명령" cdm="Control.LaunchRecovery.Stop">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Precondition cdm="SideScanSonar.State.Auto"/>
+      <Reply bindRef="stopTowfishAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="stopTowfishResult" cdm="Control.LaunchRecovery.Response"/>
+    </ControlSpec>
+    <ControlSpec id="launchTowfish" name="자동모드 진수 명령" cdm="Control.Launch">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Precondition cdm="SideScanSonar.State.Auto"/>
+      <Reply bindRef="launchTowfishAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="launchTowfishResult" cdm="Control.LaunchRecovery.Response"/>
+    </ControlSpec>
+    <ControlSpec id="recoveryTowfish" name="자동모드 회수 명령" cdm="Control.Recovery">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Precondition cdm="SideScanSonar.State.Auto"/>
+      <Reply bindRef="recoveryTowfishAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="recoveryTowfishResult" cdm="Control.LaunchRecovery.Response"/>
+    </ControlSpec>
+    <ControlSpec id="emergencyStop" name="비상 정지 명령" cdm="Control.EmergencyStop">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="emergencyStopAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="cancelEmergencyStop" name="비상 정지 해제 명령" cdm="Control.EmergencyStop.Cancel">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="cancelEmergencyStopAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <SetPointSpec id="setTowingCableLength" name="조출량 설정 명령" cdm="Control.AdjustTowingCable">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.Cable.TargetLength">
+          <Unit>m</Unit>
+          <Range min="0" max="100"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="setTowingCableLengthAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </SetPointSpec>
+    <SetPointSpec id="setTowfishDepth" name="목표수심 설정 명령" cdm="Control.SetPointTowfishDepth">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="Position.TargetDepth">
+          <Unit>m</Unit>
+          <Range min="0" max="80"/>
+        </QuantityProfile>
+      </Parameters>
+      <Reply bindRef="setTowfishDepthAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </SetPointSpec>
+    <ControlSpec id="changeScreenRealTimeMode" name="실시간 화면 모드 변경 명령" cdm="Control.Display.RealTime">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="changeScreenRealTimeModeAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="changeScreenMergeMode" name="병합 화면 모드 변경 명령" cdm="Control.Display.Merge">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="changeScreenMergeModeAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="stopUsblMotion" name="수동 모드 USBL 구동 정지 명령" cdm="Control.USBL.Stop">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.USBL.MotorSpeed">
+          <Unit>m/s</Unit>
+          <Range min="0" max="0.011"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="stopUsblMotionAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="launchUsbl" name="수동 모드 USBL 진수 명령" cdm="Control.Launch">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.USBL.MotorSpeed">
+          <Unit>m/s</Unit>
+          <Range min="0" max="0.011"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="launchUsblAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="recoveryUsbl" name="수동 모드 USBL 회수 명령" cdm="Control.Recovery">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.USBL.MotorSpeed">
+          <Unit>m/s</Unit>
+          <Range min="0" max="0.011"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="recoveryUsblAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="returnUsblOrigin" name="수동 모드 USBL 원점복귀 명령" cdm="Control.USBL.ReturnOrigin">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.USBL.MotorSpeed">
+          <Unit>m/s</Unit>
+          <Range min="0" max="0.011"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="returnUsblOriginAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="startUsbl" name="수동 모드 USBL 작동 명령" cdm="Control.ExecutionControl.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="startUsblAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="stopUsbl" name="수동 모드 USBL 정지 명령" cdm="Control.ExecutionControl.Stop">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="stopUsblAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="stopSlide" name="수동 모드 슬라이드 정지 명령" cdm="Control.Slide.Stop">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.Slide.Position">
+          <Unit>m</Unit>
+          <Range min="0" max="2.15"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="stopSlideAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="moveSlide" name="수동 모드 슬라이드 작동 명령" cdm="Control.Slide.Move">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.Slide.Position">
+          <Unit>m</Unit>
+          <Range min="0" max="2.15"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="moveSlideAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="returnSlideWithTowfish" name="수동 모드 슬라이드 예인체 장착 원점복귀 명령" cdm="Control.Slide.ReturnOrigin.WithTowfish">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.Slide.Position">
+          <Unit>m</Unit>
+          <Range min="0" max="2.15"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="returnSlideWithTowfishAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="returnSlideWithoutTowfish" name="수동 모드 슬라이드 예인체 미장착 원점복귀 명령" cdm="Control.Slide.ReturnOrigin.WithoutTowfish">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.Slide.Position">
+          <Unit>m</Unit>
+          <Range min="0" max="2.15"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="returnSlideWithoutTowfishAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="stopWinch" name="수동 모드 윈치 정지 명령" cdm="Control.Winch.Stop">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.Winch.CableLength">
+          <Unit>m</Unit>
+          <Range min="0" max="100"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="stopWinchAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="deployWinch" name="수동 모드 윈치 전개 명령" cdm="Control.Launch">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.Winch.CableLength">
+          <Unit>m</Unit>
+          <Range min="0" max="100"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="deployWinchAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="recoveryWinch" name="수동 모드 윈치 회수 명령" cdm="Control.Recovery">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Parameters>
+        <QuantityProfile cdm="LaunchRecovery.Winch.CableLength">
+          <Unit>m</Unit>
+          <Range min="0" max="100"/>
+        </QuantityProfile>
+      </Parameters>
+      <Precondition cdm="SideScanSonar.State.Manual"/>
+      <Reply bindRef="recoveryWinchAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="separateCable" name="케이블 분리 명령" cdm="Control.Cable.Separate">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="separateCableAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="cancelCableSeparation" name="케이블 분리 해제 명령" cdm="Control.Cable.SeparationCancel">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="cancelCableSeparationAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+  </ControlSpecs>
+  <SensorProductSpecs id="sensorProduct">
+    <ProductStreamSpec id="compressedSideScanSignal" name="예인형음탐기 SSS 압축 신호정보" cdm="ProductStream.Signal.SideScanSonar">
+      <ProductKind cdm="ProductKind.Processed"/>
+    </ProductStreamSpec>
+    <ProductStreamSpec id="compressedGapFillerSignal" name="예인형음탐기 GapFiller 압축 신호정보" cdm="ProductStream.Signal.GapFiller">
+      <ProductKind cdm="ProductKind.Processed"/>
+    </ProductStreamSpec>
+    <ProductStreamSpec id="compressedMergedSignal" name="예인형음탐기 병합 압축 신호정보" cdm="ProductStream.Signal.MergedSonar">
+      <ProductKind cdm="ProductKind.Processed"/>
+    </ProductStreamSpec>
+    <ProductStreamSpec id="objectDetection2d" name="예인형음탐기 자동 접촉물 탐지 결과" cdm="ProductStream.Detection.Object2D">
+      <ProductKind cdm="ProductKind.ATR"/>
+    </ProductStreamSpec>
+    <ProductStreamSpec id="recoveryCamera" name="예인형음탐기 진회수장치 카메라" cdm="ProductStream.Video.LaunchRecovery">
+      <ProductKind cdm="ProductKind.Video"/>
+    </ProductStreamSpec>
+  </SensorProductSpecs>
+</SensorSpec>

@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<VehicleSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./VehicleSpecificationSchema.xsd">
+  <!--
+    USV Vehicle Specification은 USV 원격 운용을 위한 기본적인 사양에 대한 설명을 포함하는 명세서이다.
+    USV의 기본적인(필수적인) 운용이 가능한 정도의 사양만을 명세하는 것으로 USV의 모든 정보를 표현하려하지 않는 것이 중요하다.
+    USV에서 가져올 정보, 제어할 정보에 집중해서 작성한다.
+    작성해야될 Spec의 큰 기준 중 하나는 지휘소에서 원격 운용, 접근이 가능한 장치가 기준이 된다.
+    원격 지휘소에서 제어할 수 있는 항목 혹은 원격 지휘소에서 획득해야하는 정보 중심으로 작성하는 것이 중요하다.
+    -->
+  <!--
+    
+    -->
+  <Identification>
+    <ID>MCM-USV-LIG-001</ID>
+    <Name>M-Hunter</Name>
+  </Identification>
+  <!-- 센서 장비 -->
+  <Sensors>
+    <SensorSpecRef id="sideScanSonar" name="예인형수중탐색장치">
+      <SemanticPath>SideScanSonarSemantic.xml</SemanticPath>
+      <BindingPath>SideScanSonarBinding.xml</BindingPath>
+    </SensorSpecRef>
+    <SensorSpecRef id="navigationRadar" name="항해레이더 정보처리장치">
+      <SemanticPath>NavigationRadarSemantic.xml</SemanticPath>
+      <BindingPath>NavigationRadarBinding.xml</BindingPath>
+    </SensorSpecRef>
+    <SensorSpecRef id="integratedNavigation" name="복합항법장치">
+      <SemanticPath>IntegratedNavigationSemantic.xml</SemanticPath>
+      <BindingPath>IntegratedNavigationBinding.xml</BindingPath>
+    </SensorSpecRef>
+    <SensorSpecRef id="lidarProcessor" name="라이다 정보처리장치">
+      <SemanticPath>LidarSemantic.xml</SemanticPath>
+      <BindingPath>LidarBinding.xml</BindingPath>
+    </SensorSpecRef>
+    <SensorSpecRef id="electroOptical" name="전자광학장치">
+      <SemanticPath>ElectroOpticalSemantic.xml</SemanticPath>
+      <BindingPath>ElectroOpticalBinding.xml</BindingPath>
+    </SensorSpecRef>
+    <SensorSpecRef id="sensorFusion" name="센서융합 정보처리장치">
+      <SemanticPath>SensorFusionSemantic.xml</SemanticPath>
+      <BindingPath>SensorFusionBinding.xml</BindingPath>
+    </SensorSpecRef>
+    <!--<SensorSpecRef id="eots" name="전자광학장치" ref="./SensorSpec/ElectronicOpticalCamera.xml" />
+        <SensorSpecRef id="camera" name="항해용카메라" ref="./SensorSpec/VoyageCamera.xml" />
+        <SensorSpecRef id="radar" name="항해용레이더" ref="./SensorSpec/Radar.xml" />-->
+    <SensorSpecRef id="navigationCamera" name="운항용카메라장치">
+      <SemanticPath>NavigationCameraSemantic.xml</SemanticPath>
+      <BindingPath>NavigationCameraBinding.xml</BindingPath>
+    </SensorSpecRef>
+    <SensorSpecRef id="nearContactDetection" name="근거리접촉물탐지장치">
+      <SemanticPath>NearContactDetectionSemantic.xml</SemanticPath>
+      <BindingPath>NearContactDetectionBinding.xml</BindingPath>
+    </SensorSpecRef>
+    <SensorSpecRef id="electroOpticalProcessor" name="전자광학장치 영상처리 CSC">
+      <SemanticPath>ElectroOpticalProcessorSemantic.xml</SemanticPath>
+      <BindingPath>ElectroOpticalProcessorBinding.xml</BindingPath>
+    </SensorSpecRef>
+  </Sensors>
+  <!-- Payload/임무장비 -->
+  <Payloads>
+    <PayloadSpecRef id="centralControl" name="중앙통제장치">
+      <SemanticPath>CentralControlSemantic.xml</SemanticPath>
+      <BindingPath>CentralControlBinding.xml</BindingPath>
+    </PayloadSpecRef>
+    <PayloadSpecRef id="remoteFireControl" name="원격사격통제장치">
+      <SemanticPath>RemoteFireControlSemantic.xml</SemanticPath>
+      <BindingPath>RemoteFireControlBinding.xml</BindingPath>
+    </PayloadSpecRef>
+  </Payloads>
+  <!-- 플랫폼 장비 -->
+  <Platform>
+    <PlatformSpecRef id="platformController" name="선체제어장치">
+      <SemanticPath>PlatformControllerSemantic.xml</SemanticPath>
+      <BindingPath>PlatformControllerBinding.xml</BindingPath>
+    </PlatformSpecRef>
+    <PlatformSpecRef id="autonomousNavigation" name="자율운항장치">
+      <SemanticPath>AutonomousNavigationSemantic.xml</SemanticPath>
+      <BindingPath>AutonomousNavigationBinding.xml</BindingPath>
+    </PlatformSpecRef>
+  </Platform>
+  <!-- 임무 장비 -->
+  <!--
+    <Payloads>
+        <PayloadSpecRef id="missionController" name="임무통제장치" ref="./PayloadSpec/***.xml" />
+        <PayloadSpecRef id="mainController" name="중앙통제장치" ref="./PayloadSpec/***.xml" />
+        <PayloadSpecRef id="navalGun" name="함포" ref="./PayloadSpec/NavalGun.xml" />
+        <PayloadSpecRef id="cis" name="복합감응소해장비" ref="./PayloadSpec/***.xml" />
+        <PayloadSpecRef id="auvLauncher" name="AUV 진수장치" ref="./PayloadSpec/LARS.xml"/>
+        <PayloadSpecRef id="auvRecovery" name="AUV 회수장치" ref="./PayloadSpec/***.xml"/>
+        <PayloadSpecRef id="emdwLauncher" name="EMDW 진수장치" ref="./PayloadSpec/***.xml"/>
+    </Payloads>
+
+    -->
+  <!-- 통신 장비 -->
+  <Comms>
+    <CommSpecRef id="networkAdapterDevice" name="네트워크추상화장치">
+      <SemanticPath>NetworkAbstractionSemantic.xml</SemanticPath>
+      <BindingPath>NetworkAbstractionBinding.xml</BindingPath>
+    </CommSpecRef>
+  </Comms>
+</VehicleSpec>

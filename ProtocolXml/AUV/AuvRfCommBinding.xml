@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    AUV RF 통신장치 자체 기능 Binding.
+    AUV RF 구간은 TCP로 연동하며 모든 요청은 RF-1 Telegram, 모든 정의된 응답은 RF-2 Telegram을 공유한다.
+    ControlBinding별 TCPChannel은 별도 송수신 메시지가 아니라 같은 물리 Telegram의 COMMAND/ACK 논리 뷰이다.
+
+    공통 물리 구조
+    - RF-1/INFO1: 44 bytes = HEADER 15 + INFORMATION1 25 + TAIL 4.
+    - RF-2: 80 bytes = HEADER 14 + 고정 INFORMATION 62 + TAIL 4.
+    - little-endian이며 COMMAND 표의 위 행을 bit0으로 해석한다.
+    - RF 장치 요청은 주 기능 bit 하나와 RF_EXEC(bit31)를 결합한다.
+    - COMMAND, ACK, 완료 bit, INFO_NUM, packed word와 raw 상태 bitset은 BindingOnly이므로 cdm을 부여하지 않는다.
+    - checksum은 COUNT부터 INFORMATION 마지막 byte까지의 unsigned byte 합을 65536으로 나눈 나머지이며 UInt16 little-endian으로 전송한다.
+
+    미확정 사항
+    - TCPChannel의 messageType은 RF-1/RF-2 물리 Telegram 형식을 나타내며 별도 infoCode는 사용하지 않는다.
+    - INFO_NUM은 AUV 1의 INFO1이면 1, AUV 2의 INFO1이면 4이다. converter 구현은 별도 확인이 필요하다.
+    - RF-1 COUNT는 매 통신 증가값일 뿐 RF-2 COUNT와 상관관계가 정의되어 있지 않다.
+    - RF-1의 2-byte ACK는 반대 방향 RF-2 COMMAND 완료 bit의 echo이며 현재 요청 COMMAND와 다른 필드이다.
+    - RF_CMD_COMPLETE(bit13)=1은 RF통신장치가 해당 명령의 처리를 완료했음을 의미하며 AUV 본체 동작 완료와는 구분한다.
+    - RF-2 ACK/완료 bit/Body 결과가 한 Telegram에서 동시에 유효한지 확인이 필요하다.
+    - XSD에는 bit-mask 필터가 없어 completionCommand를 exact word로 적었다. 다른 완료 bit가 함께 설정되면 확장이 필요하다.
+-->
+<CommBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+    <Controls semantic_id="control">
+        <!--
+            Binding: configureRf
+            RF-1 COMMAND=RF_CONFIG(bit25)|RF_EXEC(bit31)=0x82000000.
+            RF-2 ACK=0x82000000, COMMAND.RF_CMD_COMPLETE=1, RF 설정 echo를 단일 Reply로 사용한다.
+        -->
+        <ControlBinding semantic_id="configureRf">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER: START(4), INFO_NUM(1), COUNT(4), COMMAND(4), reverse ACK(2). -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x82000000"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!--
+                RF-1 bytes 15..39 INFORMATION1:
+                RESERVE(2), RF_CONF_MODE(1: 운용모드/Time Slot/UHF·L-Band 채널),
+                RF_CONF_PWR(1: UHF/L-Band 출력), EDM_BATTERY(1), CH_SCAN(6), PER(2),
+                STAT_code(1), RESERVE(11).
+            -->
+            <FixedField name="reserveInformation1" value="0"/>
+            <DerivedField name="rfConfMode"
+                          sourceField="Communication.RF.Configuration.OperationMode,Communication.RF.Configuration.TimeSlot,Communication.RF.Configuration.UHF.Channel,Communication.RF.Configuration.LBand.Channel"
+                          converter="PackRfConfMode"/>
+            <DerivedField name="rfConfPower"
+                          sourceField="Communication.RF.Configuration.UHF.Power,Communication.RF.Configuration.LBand.Power"
+                          converter="PackRfConfPower"/>
+            <FixedField name="edmBattery" value="0"/>
+            <FixedField name="channelScan" value="0"/>
+            <FixedField name="packetErrorRate" value="0"/>
+            <FixedField name="statusCode" value="0"/>
+            <FixedField name="reserveInformation1Tail" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL: CHECKSUM(2), STOP(2)=0x8181. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="configureRfReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER: START(4), COUNT(4), COMMAND(2), ACK(4). -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <!-- RF_CMD_COMPLETE=bit13. exact 0x2000은 KEY_COMPLETE와 동시 설정되지 않는다는 잠정 가정이다. -->
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x82000000"/>
+                <!--
+                    RF-2 bytes 14..75는 모든 응답에서 같은 62-byte Body이다.
+                    이 Reply는 bytes 64..65 RF_CONF_MODE/RF_CONF_PWR echo만 Semantic 결과로 소비한다.
+                -->
+                <Field name="rfConfMode" converter="UnpackRfConfMode"/>
+                <Field name="rfConfPower" converter="UnpackRfConfPower"/>
+                <!-- RF-2 bytes 76..79 TAIL: CHECKSUM(2), STOP(2). -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: scanRfChannels
+            RF-1 COMMAND=RF_CH_SCAN(bit26)|RF_EXEC=0x84000000.
+            RF-2 CH_SCAN 6 bytes와 PER 2 bytes를 바이트 그룹 그대로 사용한다.
+        -->
+        <ControlBinding semantic_id="scanRfChannels">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x84000000"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION1. 스캔 요청에서 각 Body 입력값의 유효 규칙은 명시되지 않음. -->
+            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="rfConfMode" value="0"/>
+            <FixedField name="rfConfPower" value="0"/>
+            <FixedField name="edmBattery" value="0"/>
+            <FixedField name="channelScan" value="0"/>
+            <FixedField name="packetErrorRate" value="0"/>
+            <FixedField name="statusCode" value="0"/>
+            <FixedField name="reserveInformation1Tail" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="scanRfChannelsReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x84000000"/>
+                <!-- RF-2 bytes 67..72 CH_SCAN: UHF ch1~3, L-Band ch1~3 수신감도(dB), 각 1 byte. -->
+                <Field name="uhfChannel1SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
+                <Field name="uhfChannel2SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
+                <Field name="uhfChannel3SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel"/>
+                <Field name="lBandChannel1SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel"/>
+                <Field name="lBandChannel2SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel"/>
+                <Field name="lBandChannel3SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel"/>
+                <!-- RF-2 bytes 73..74 PER: UHF PER, L-Band PER, 각 1 byte(0~100%). -->
+                <Field name="uhfPacketErrorRate" cdm="Communication.RF.UHF.PacketErrorRate"/>
+                <Field name="lBandPacketErrorRate" cdm="Communication.RF.LBand.PacketErrorRate"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: requestRfStatus
+            RF-1 COMMAND=RF_STATUS(bit24)|RF_EXEC=0x81000000.
+            RF-2의 설정/전원/채널/PER/상태 코드 영역을 한 응답으로 사용한다.
+        -->
+        <ControlBinding semantic_id="requestRfStatus">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x81000000"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION1. 상태 요청에서 송신 Body 값의 사용 규칙은 명시되지 않음. -->
+            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="rfConfMode" value="0"/>
+            <FixedField name="rfConfPower" value="0"/>
+            <FixedField name="edmBattery" value="0"/>
+            <FixedField name="channelScan" value="0"/>
+            <FixedField name="packetErrorRate" value="0"/>
+            <FixedField name="statusCode" value="0"/>
+            <FixedField name="reserveInformation1Tail" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="requestRfStatusReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x81000000"/>
+                <!-- RF-2 bytes 64..66: RF_CONF_MODE, RF_CONF_PWR, EDM_BATTERY(0~100). -->
+                <Field name="rfConfMode" converter="UnpackRfConfMode"/>
+                <Field name="rfConfPower" converter="UnpackRfConfPower"/>
+                <Field name="edmBatteryPercent" cdm="Equipment.RF.EncryptionModule.Battery.RemainingPercent"/>
+                <!-- RF-2 bytes 67..72: CH_SCAN 6개 수신감도. -->
+                <Field name="uhfChannel1SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
+                <Field name="uhfChannel2SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
+                <Field name="uhfChannel3SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel"/>
+                <Field name="lBandChannel1SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel"/>
+                <Field name="lBandChannel2SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel"/>
+                <Field name="lBandChannel3SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel"/>
+                <!-- RF-2 bytes 73..74: UHF/L-Band PER. -->
+                <Field name="uhfPacketErrorRate" cdm="Communication.RF.UHF.PacketErrorRate"/>
+                <Field name="lBandPacketErrorRate" cdm="Communication.RF.LBand.PacketErrorRate"/>
+                <!--
+                    RF-2 byte 75 STAT_code bit 그룹:
+                    RFM L-BAND, RFM UHF, EDM, PDM, MCM, DATA_LOCK, SYNC_LOCK, reserved.
+                    개별 bit가 아닌 원본 1-byte 상태 코드로 보존한다.
+                -->
+                <Field name="statusCode" converter="UInt8BitMask"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: requestPreLaunchCheck
+            RF-1 COMMAND=PLC_Req(bit16)|RF_EXEC=0x80010000.
+            별도 PLC_Result bit는 없으며 RF-2의 Pre_Launch-Check 2 bytes를 결과로 사용한다.
+        -->
+        <ControlBinding semantic_id="requestPreLaunchCheck">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x80010000"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION1. 점검 요청에서 Body 입력값의 유효 규칙은 명시되지 않음. -->
+            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="rfConfMode" value="0"/>
+            <FixedField name="rfConfPower" value="0"/>
+            <FixedField name="edmBattery" value="0"/>
+            <FixedField name="channelScan" value="0"/>
+            <FixedField name="packetErrorRate" value="0"/>
+            <FixedField name="statusCode" value="0"/>
+            <FixedField name="reserveInformation1Tail" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="requestPreLaunchCheckReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <FixedField name="completionCommand" value="0x2000"/>
+                <FixedField name="ack" value="0x80010000"/>
+                <!--
+                    RF-2 bytes 62..63 Pre_Launch-Check 2-byte 결과 그룹.
+                    ICD의 MSB 그룹에는 MCU, 모뎀/제어반, UHF, L-Band, 전원반, 암호화반과 reserved가 있고
+                    LSB 그룹은 reserved로 정의된다. 개별 bit 필드로 재작성하지 않고 raw word를 보존한다.
+                    표의 MSB/LSB 명칭과 little-endian wire byte의 대응은 구현 시 확인이 필요하다.
+                -->
+                <Field name="preLaunchCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!--
+            Binding: toggleRfGain
+            RF-1 COMMAND=RF_GAIN(bit27)|RF_EXEC=0x88000000.
+            합의에 따라 장치 내부 Gain 적용 상태를 반전하는 요청으로 해석하고 Reply는 정의하지 않는다.
+        -->
+        <ControlBinding semantic_id="toggleRfGain">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. RF_GAIN의 INFO 종류는 원문에 없어 INFO1로 잠정 매핑한다. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x88000000"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION1. Gain 값/방향을 전달하는 전용 필드는 존재하지 않는다. -->
+            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="rfConfMode" value="0"/>
+            <FixedField name="rfConfPower" value="0"/>
+            <FixedField name="edmBattery" value="0"/>
+            <FixedField name="channelScan" value="0"/>
+            <FixedField name="packetErrorRate" value="0"/>
+            <FixedField name="statusCode" value="0"/>
+            <FixedField name="reserveInformation1Tail" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <!--
+                Reply 없음.
+                RF_GAIN 전용 상태/결과가 없고 RF_CMD_COMPLETE와 이 명령의 관계도 확인되지 않았다.
+                실제 RF-2 ACK=0x88000000이 수신되더라도 현재 Semantic 응답으로 소비하지 않는다.
+            -->
+        </ControlBinding>
+
+        <!--
+            Binding: applyRfEncryptionKey
+            RF-1 COMMAND=KEY_CMD(bit28)|RF_EXEC=0x90000000.
+            키 데이터 필드는 없으며 RF-2 COMMAND.KEY_COMPLETE(bit12)를 적용 완료로 사용한다.
+        -->
+        <ControlBinding semantic_id="applyRfEncryptionKey">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. KEY_CMD의 INFO 종류는 원문에 없어 INFO1로 잠정 매핑한다. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <FixedField name="command" value="0x90000000"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION1. 사전 주입 키 자체를 싣는 필드는 존재하지 않는다. -->
+            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="rfConfMode" value="0"/>
+            <FixedField name="rfConfPower" value="0"/>
+            <FixedField name="edmBattery" value="0"/>
+            <FixedField name="channelScan" value="0"/>
+            <FixedField name="packetErrorRate" value="0"/>
+            <FixedField name="statusCode" value="0"/>
+            <FixedField name="reserveInformation1Tail" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="applyRfEncryptionKeyReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <!--
+                    KEY_COMPLETE=bit12. exact 0x1000은 RF_CMD_COMPLETE가 동시에 설정되지 않는다는 잠정 가정이다.
+                    두 bit가 함께 설정되거나 완료가 후속 Telegram으로 오면 mask 조건을 지원하도록 XSD 확장이 필요하다.
+                -->
+                <FixedField name="completionCommand" value="0x1000"/>
+                <FixedField name="ack" value="0x90000000"/>
+                <!-- RF-2 bytes 14..75 고정 Body에는 키 적용 전용 결과 필드가 없어 raw 그룹으로만 보존한다. -->
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+    </Controls>
+</CommBinding>

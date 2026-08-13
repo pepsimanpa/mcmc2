@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+  <!--라이다 정보처리장치 Semantic: 라이다 정보처리 CSC + 원격통제장치 CSCI + 공용 구조체/식별자 규칙 기반-->
+  <!--TransferIntraNetworkStatusType은 운항용카메라장치 CSCI 전용 전달 메시지이므로 원격통제장치 직접 연동 Semantic 대상에서 제외한다.-->
+  <ConstantSpecs id="constant">
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+      <Value>LidarProcessor</Value>
+    </TextConstantSpec>
+    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+      <Value>라이다 접촉물 처리, 상태 감시 및 원격 자체점검·장비 제어 인터페이스</Value>
+    </TextConstantSpec>
+  </ConstantSpecs>
+
+  <MonitorSpecs id="monitor">
+    <GroupSpec id="lidarContacts" name="라이다 접촉물 정보" cdm="Contact.Lidar">
+      <!--contactNum은 DDS 메시지에 독립 필드로 존재하므로 Collection 길이와 별도로 Semantic에 노출한다. 원본 CSCI에는 contactNum Range가 명시되어 있지 않아 Range를 지정하지 않는다.-->
+      <QuantitySpec id="contactCount" name="라이다 접촉물 개수" cdm="Contact.Lidar.Count">
+        <Unit>num</Unit>
+      </QuantitySpec>
+      <CollectionSpec id="contacts" name="라이다 접촉물 목록" cdm="Contact.Lidar.List" minOccurs="0" maxOccurs="256">
+        <ElementSpec id="lidarContact" name="라이다 접촉물" cdm="Contact.Lidar.Item">
+          <!--라이다 접촉물 식별번호는 공용 식별번호 규칙에 따라 30000~39999를 사용한다.-->
+          <QuantitySpec id="contactID" name="접촉물 식별번호" cdm="Contact.Identifier">
+            <Range min="30000" max="39999"/>
+          </QuantitySpec>
+          <QuantitySpec id="boxHeight" name="접촉물 높이" cdm="Contact.Lidar.Dimension.Height">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="boxWidth" name="접촉물 폭" cdm="Contact.Lidar.Dimension.Width">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="boxLength" name="접촉물 길이" cdm="Contact.Lidar.Dimension.Length">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="relativePositionX" name="상대 위치 X" cdm="Contact.Lidar.RelativePosition.X">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="relativePositionY" name="상대 위치 Y" cdm="Contact.Lidar.RelativePosition.Y">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="relativePositionZ" name="상대 위치 Z" cdm="Contact.Lidar.RelativePosition.Z">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="relativeAzimuth" name="상대 방위각" cdm="Contact.Lidar.Bearing.RelativeAzimuth">
+            <Unit>rad</Unit>
+            <Range min="0" max="6.283185307179586"/>
+          </QuantitySpec>
+        </ElementSpec>
+      </CollectionSpec>
+    </GroupSpec>
+
+    <GroupSpec id="cipeCbitStatus" name="라이다 처리카드 CBIT 상태" cdm="Health.CBIT.CIPE">
+      <!--라이다 정보처리 CSC Semantic에서는 공용 CIPE 상태값 중 라이다에 해당하는 20/23만 노출한다.-->
+      <ValueSetSpec id="cipeOperationalStatus" name="라이다 연동 상태" cdm="Health.CIPE.EquipmentLink">
+        <Values>
+          <Value cdm="Health.CIPE.Lidar.Connected">20</Value>
+          <Value cdm="Health.CIPE.Lidar.Disconnected">23</Value>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="operationalStatus" name="처리카드 정상 작동 여부" cdm="Health.CIPE.OperationalStatus">
+        <Values>
+          <Value cdm="Health.Normal">0</Value>
+          <Value cdm="Health.Degraded">1</Value>
+          <Value cdm="Health.Unavailable">2</Value>
+          <Value cdm="Health.NoResponse">3</Value>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+  </MonitorSpecs>
+
+  <ControlSpecs id="control">
+    <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
+    </ControlSpec>
+    <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response"/>
+    </ControlSpec>
+    <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
+      <Target cdm="Platform.Identifier.Numeric"/>
+      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response"/>
+    </ControlSpec>
+  </ControlSpecs>
+</SensorSpec>
