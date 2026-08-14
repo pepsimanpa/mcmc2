@@ -12,10 +12,7 @@
     - INFO_NUM은 AUV 1에서 INFO1/2/3=1/2/3, AUV 2에서 4/5/6이다.
     - RF-2 ACK는 RF-1 COMMAND 전체 4-byte word와 동일하다.
     - RF-3의 'ACK' 필드는 명령 ACK가 아니라 DATA TYPE과 Start/End frame flag이다.
-    - COMMAND, ACK, INFO_NUM, packed word와 RF-3 framing은 BindingOnly이므로 cdm을 부여하지 않는다.
-    - PackedField의 expectedValue는 개발자 확인용 최종 packed 값을 보존하며, expectedMask가 있으면 해당 bit만 조건으로 검사한다.
-    - AUV_CHECK_RESULT 점검 bit는 AUV_CHECK_RESULT_L과 동일 계열로 0=PASS, 1=FAIL을 적용한다.
-    - EOR bit는 0=미발생, 1=해당 비상종료 조건 발생, MODE bit는 0=비활성, 1=활성으로 해석한다.
+    - COMMAND, ACK, INFO_NUM, raw bitset과 RF-3 framing은 BindingOnly이므로 cdm을 부여하지 않는다.
 
     미확정 사항
     - TCPChannel의 messageType은 RF-1/RF-2/RF-3 물리 Telegram 형식을 나타내며 별도 infoCode는 사용하지 않는다.
@@ -69,8 +66,10 @@
 
             <Reply semantic_id="requestAuvCheckReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER: START(4), COUNT(4), COMMAND(2), ACK(4). -->
                 <FixedField name="startByte" value="0x7E7E7E7E"/>
                 <Field name="count" converter="UInt32LE"/>
+                <!-- KEY_COMPLETE/RF_CMD_COMPLETE가 들어 있는 RF 장치용 word이며 AUV 완료 판정에는 사용하지 않는다. -->
                 <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
                     <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
                 </PackedField>
@@ -78,108 +77,520 @@
                     <BitMember name="AUV_CHECK_Req" offset="0" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <!-- 표의 윗행을 bit0으로 적용하며 점검 bit는 0=PASS, 1=FAIL. -->
-                <PackedField name="mspdCheck" width="16" byteOrder="little">
-                    <BitMember name="MissionSensorProcessorModule1Boot" offset="0"/>
-                    <BitMember name="MissionSensorProcessorModule1Storage" offset="1"/>
-                    <BitMember name="ForwardLookingSonarCheck" offset="2"/>
-                    <BitMember name="SideScanSonarCheck" offset="3"/>
-                    <BitMember name="ForwardLookingSonarConnection" offset="4"/>
-                    <BitMember name="SideScanSonarConnection" offset="5"/>
-                    <BitMember name="AutonomousControlComputerConnection" offset="6"/>
-                    <BitMember name="CommunicationUnitConnection" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/>
-                    <BitMember name="reserved9" offset="9"/>
-                    <BitMember name="AcousticCameraCheck" offset="10"/>
-                    <BitMember name="OpticalCameraCheck" offset="11"/>
-                    <BitMember name="AcousticCameraConnection" offset="12"/>
-                    <BitMember name="OpticalCameraConnection" offset="13"/>
-                    <BitMember name="reserved14" offset="14"/>
-                    <BitMember name="reserved15" offset="15"/>
-                </PackedField>
-                <PackedField name="inbCheck" width="16" byteOrder="little">
-                    <BitMember name="MSB_reserved0" offset="0"/>
-                    <BitMember name="MSB_AutonomousControlComputerCommunication" offset="1"/>
-                    <BitMember name="MSB_MagneticSensorCommunication" offset="2"/>
-                    <BitMember name="MSB_GPSCommunication" offset="3"/>
-                    <BitMember name="MSB_DepthSensorCommunication" offset="4"/>
-                    <BitMember name="MSB_DVLCommunication" offset="5"/>
-                    <BitMember name="MSB_IMUCommunication" offset="6"/>
-                    <BitMember name="MSB_MemoryCheck" offset="7"/>
-                    <BitMember name="LSB_reserved8" offset="8"/>
-                    <BitMember name="LSB_reserved9" offset="9"/>
-                    <BitMember name="LSB_AutonomousControlComputerCommunication" offset="10"/>
-                    <BitMember name="LSB_MagneticSensorCommunication" offset="11"/>
-                    <BitMember name="LSB_GPSCommunication" offset="12"/>
-                    <BitMember name="LSB_DepthSensorCommunication" offset="13"/>
-                    <BitMember name="LSB_DVLCommunication" offset="14"/>
-                    <BitMember name="LSB_IMUCommunication" offset="15"/>
-                </PackedField>
-                <PackedField name="accCheck" width="16" byteOrder="little">
-                    <BitMember name="PowerControlDeviceCommunication" offset="0"/>
-                    <BitMember name="LeakSensorConnection" offset="1"/>
-                    <BitMember name="FlashLightCommunication" offset="2"/>
-                    <BitMember name="PingerCommunication" offset="3"/>
-                    <BitMember name="AutonomousControlComputerInterfaceCheck" offset="4"/>
-                    <BitMember name="AutonomousControlComputer28VDCCheck" offset="5"/>
-                    <BitMember name="AutonomousControlComputerMemoryCheck" offset="6"/>
-                    <BitMember name="AutonomousControlComputerBootCheck" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/>
-                    <BitMember name="FlashLightCheck" offset="9"/>
-                    <BitMember name="PingerCheck" offset="10"/>
-                    <BitMember name="PropulsionControllerCommunication" offset="11"/>
-                    <BitMember name="UnderwaterCommunicationDeviceConnection" offset="12"/>
-                    <BitMember name="RfCommunicationDeviceConnection" offset="13"/>
-                    <BitMember name="IntegratedNavigationComputerCommunication" offset="14"/>
-                    <BitMember name="MissionSensorProcessorCommunication" offset="15"/>
-                </PackedField>
-                <PackedField name="pcdCheck" width="16" byteOrder="little">
-                    <BitMember name="reserved0" offset="0"/><BitMember name="reserved1" offset="1"/><BitMember name="reserved2" offset="2"/><BitMember name="reserved3" offset="3"/>
-                    <BitMember name="PowerControlAndBmsConnectionCheck" offset="4"/>
-                    <BitMember name="BatteryPackTemperatureCheck" offset="5"/>
-                    <BitMember name="BatteryPackVoltageTemperatureBmsCheck" offset="6"/>
-                    <BitMember name="BatteryBmsCheck" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/><BitMember name="reserved9" offset="9"/><BitMember name="reserved10" offset="10"/><BitMember name="reserved11" offset="11"/><BitMember name="reserved12" offset="12"/><BitMember name="reserved13" offset="13"/><BitMember name="reserved14" offset="14"/><BitMember name="reserved15" offset="15"/>
-                </PackedField>
-                <PackedField name="mcCheck" width="16" byteOrder="little">
-                    <BitMember name="reserved0" offset="0"/><BitMember name="reserved1" offset="1"/><BitMember name="reserved2" offset="2"/><BitMember name="reserved3" offset="3"/><BitMember name="reserved4" offset="4"/>
-                    <BitMember name="PropulsionControllerCurrentSensorCheck" offset="5"/>
-                    <BitMember name="PropulsionControllerInputPowerCheck" offset="6"/>
-                    <BitMember name="PropulsionControllerTemperatureCheck" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/><BitMember name="reserved9" offset="9"/><BitMember name="reserved10" offset="10"/><BitMember name="reserved11" offset="11"/>
-                    <BitMember name="RightElevatorActuatorCheck" offset="12"/><BitMember name="LeftElevatorActuatorCheck" offset="13"/><BitMember name="LowerRudderActuatorCheck" offset="14"/><BitMember name="UpperRudderActuatorCheck" offset="15"/>
-                </PackedField>
-                <PackedField name="rcdCheck" width="16" byteOrder="little">
-                    <BitMember name="reserved0" offset="0"/><BitMember name="reserved1" offset="1"/><BitMember name="EncryptionUnitCheck" offset="2"/><BitMember name="PowerUnitCheck" offset="3"/><BitMember name="LBandTransceiverCheck" offset="4"/><BitMember name="UhfTransceiverCheck" offset="5"/><BitMember name="ModemControlPanelCheck" offset="6"/><BitMember name="McuCheck" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/><BitMember name="reserved9" offset="9"/><BitMember name="reserved10" offset="10"/><BitMember name="reserved11" offset="11"/><BitMember name="reserved12" offset="12"/><BitMember name="reserved13" offset="13"/><BitMember name="reserved14" offset="14"/><BitMember name="reserved15" offset="15"/>
-                </PackedField>
+                <!--
+                    RF-2 bytes 14..15 MSPD 2-byte 점검 그룹.
+                    첫 byte: 모듈#1 부팅/저장매체, FLS/SSS 점검·연동, 자율제어컴퓨터/통신부 연동.
+                    둘째 byte: 광학/초음파 카메라 점검·연동과 reserved.
+                -->
+                <Field name="mspdCheck" converter="UInt16LEBitMask"/>
+                <!--
+                    RF-2 bytes 16..17 INB 2-byte 점검 그룹.
+                    두 byte는 메모리 및 IMU/DVL/심도계/GPS/지자기/자율제어컴퓨터 통신 연동 상태를 담는다.
+                    ICD의 MSB/LSB 명칭과 실제 wire byte 대응은 확인이 필요하다.
+                -->
+                <Field name="inbCheck" converter="UInt16LEBitMask"/>
+                <!--
+                    RF-2 bytes 18..19 ACC 2-byte 점검 그룹.
+                    전원제어/누수/점멸등/핑어/ACC 자체점검과 MSPD/INB/RF/UCD/추진제어기 연동 상태를 담는다.
+                -->
+                <Field name="accCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 20..21 PCD 그룹: BMS, 전지팩 전압·온도, 제어/BMS 연동 상태와 reserved. -->
+                <Field name="pcdCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 22..23 MC 그룹: 추진제어기 온도·입력전원·전류센서와 방향타/승강타 구동기 상태. -->
+                <Field name="mcCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 24..25 RCD 그룹: MCU, 모뎀/제어반, UHF/L-Band 송수신반, 전원반, 암호화반과 reserved. -->
+                <Field name="rcdCheck" converter="UInt16LEBitMask"/>
+                <!-- RF-2 bytes 76..79 TAIL: CHECKSUM(2), STOP(2). -->
                 <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
                 <FixedField name="stopByte" value="0x8181"/>
             </Reply>
         </ControlBinding>
 
-        <!-- 이하 Control들은 기존 물리 정의를 유지하며 COMMAND/ACK를 PackedField로 표현한다. -->
+        <!--
+            Binding: transferMissionPlan
+            RF-1 COMMAND=MISSION_TRANS(bit1)|RF_SEND=0x40000002, INFORMATION2.
+            RF-2에는 임무계획 수신 성공/실패 전용 결과가 없어 ACK=0x40000002를 응답 식별자로 사용한다.
+        -->
         <ControlBinding semantic_id="transferMissionPlan">
             <TCPChannel messageType="AuvRf1Telegram"/>
-            <FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation2"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000002"><BitMember name="MISSION_TRANS" offset="1" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField>
+            <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 2 또는 5. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation2"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000002">
+                <BitMember name="MISSION_TRANS" offset="1" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
             <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
-            <Field name="auvId" cdm="Platform.Identifier.Numeric"/><Field name="missionMode" cdm="MissionPlan.OperationMode"/><Field name="velocity" cdm="MissionPlan.Speed"/><Field name="depth" cdm="MissionPlan.Depth"/><DerivedField name="waypointCount" cdm="MissionPlan.WaypointCount" sourceField="waypoints" converter="ArrayLengthUInt8"/><Field name="returnLatitude" cdm="MissionPlan.ReturnPosition.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/><Field name="returnLongitude" cdm="MissionPlan.ReturnPosition.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
-            <ArrayField name="waypoints" cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="100"><Element name="waypoint" cdm="MissionPlan.Waypoint"><Field name="latitude" cdm="MissionPlan.Waypoint.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/><Field name="longitude" cdm="MissionPlan.Waypoint.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/></Element></ArrayField><FixedField name="reserveInformation2" value="0"/><Field name="alignInterval" cdm="MissionPlan.AlignmentInterval"/><FixedField name="custom1" value="0"/><FixedField name="custom2" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/>
-            <Reply semantic_id="transferMissionPlanReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000002"><BitMember name="MISSION_TRANS" offset="1" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply>
+            <!--
+                RF-1 bytes 15..1031 INFORMATION2:
+                AUV_ID, MODE, Velocity, DEPTH, WAYPOINT count, RETURN 좌표,
+                Waypoint 좌표 영역, RESERVE, ALIGN_INTERVAL, Custom1/2.
+            -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <!-- 현재 유효값: 1=광역탐색모드, 2=정밀탐색모드. 3~8은 추후 결정이므로 송신하지 않는다. -->
+            <Field name="missionMode" cdm="MissionPlan.OperationMode"/>
+            <Field name="velocity" cdm="MissionPlan.Speed"/>
+            <Field name="depth" cdm="MissionPlan.Depth"/>
+            <DerivedField name="waypointCount" cdm="MissionPlan.WaypointCount" sourceField="waypoints" converter="ArrayLengthUInt8"/>
+            <Field name="returnLatitude" cdm="MissionPlan.ReturnPosition.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <Field name="returnLongitude" cdm="MissionPlan.ReturnPosition.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <!--
+                최대 100개라면 위·경도 쌍은 800 bytes이나 ICD는 중간 영역을 '~ 992 bytes'로 표기한다.
+                아래 배열은 의미 모델이며 실제 padding/추가 필드/offset은 반드시 확인해야 한다.
+            -->
+            <ArrayField name="waypoints" cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="100">
+                <Element name="waypoint" cdm="MissionPlan.Waypoint">
+                    <Field name="latitude" cdm="MissionPlan.Waypoint.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                    <Field name="longitude" cdm="MissionPlan.Waypoint.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                </Element>
+            </ArrayField>
+            <FixedField name="reserveInformation2" value="0"/>
+            <Field name="alignInterval" cdm="MissionPlan.AlignmentInterval"/>
+            <FixedField name="custom1" value="0"/>
+            <FixedField name="custom2" value="0"/>
+            <!-- RF-1 bytes 1032..1035 TAIL: CHECKSUM(2), STOP(2). -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="transferMissionPlanReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <!-- RF-2 bytes 0..13 HEADER. -->
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000002">
+                    <BitMember name="MISSION_TRANS" offset="1" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <!-- RF-2 bytes 14..75 고정 Body는 존재하지만 임무계획 전송 결과로 사용할 전용 필드는 정의되지 않았다. -->
+                <Field name="informationBody"/>
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
         </ControlBinding>
-        <ControlBinding semantic_id="controlAuvLocally"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000004"><BitMember name="RC_MODE" offset="2" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><Field name="remoteSpeed" cdm="Platform.Motion.Speed"/><Field name="remoteDirection" cdm="Platform.Motion.Direction" converter="Int8"/><FixedField name="dataType" value="0"/><FixedField name="fileFirst" value="0" converter="UInt16LE"/><FixedField name="fileFinal" value="0" converter="UInt16LE"/><FixedField name="emergencyLatitude" value="0" converter="Float32LE"/><FixedField name="emergencyLongitude" value="0" converter="Float32LE"/><FixedField name="brightness" value="0"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/><Reply semantic_id="controlAuvLocallyReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000004"><BitMember name="RC_MODE" offset="2" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
-        <ControlBinding semantic_id="requestAuvStatus"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000008"><BitMember name="Status_Chk" offset="3" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><FixedField name="remoteSpeed" value="0"/><FixedField name="remoteDirection" value="0"/><FixedField name="dataType" value="0"/><FixedField name="fileFirst" value="0" converter="UInt16LE"/><FixedField name="fileFinal" value="0" converter="UInt16LE"/><FixedField name="emergencyLatitude" value="0" converter="Float32LE"/><FixedField name="emergencyLongitude" value="0" converter="Float32LE"/><FixedField name="brightness" value="0"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/>
-            <Reply semantic_id="requestAuvStatusReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000008"><BitMember name="Status_Chk" offset="3" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="auvId" cdm="Platform.Identifier.Numeric"/><Field name="batteryPercent" cdm="Platform.Energy.Battery.RemainingPercent"/><Field name="gpsLatitude" cdm="Navigation.GNSS.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/><Field name="gpsLongitude" cdm="Navigation.GNSS.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/><Field name="waypointCount" cdm="MissionPlan.WaypointCount"/><Field name="alignmentStatus" cdm="Navigation.Integrated.Alignment.Status"/><Field name="integratedNavigationLatitude" cdm="Navigation.Integrated.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/><Field name="integratedNavigationLongitude" cdm="Navigation.Integrated.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/><Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" converter="UInt16LE"/><Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" converter="UInt16LE"/><Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/><Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/><Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" converter="UInt16LE"/>
-                <PackedField name="eor" width="16" byteOrder="little"><BitMember name="LEAK" offset="0"/><BitMember name="ROLL" offset="1"/><BitMember name="PITCH" offset="2"/><BitMember name="VEL" offset="3"/><BitMember name="COM" offset="4"/><BitMember name="PCD" offset="5"/><BitMember name="GPS" offset="6"/><BitMember name="RF_UCD" offset="7"/><BitMember name="CeilingDepth" offset="8"/><BitMember name="BT_SOC" offset="9"/><BitMember name="BT_TEMP" offset="10"/><BitMember name="BT_CO" offset="11"/><BitMember name="BT_V" offset="12"/><BitMember name="MC" offset="13"/><BitMember name="DIS" offset="14"/><BitMember name="EOM" offset="15"/></PackedField>
-                <PackedField name="mode" width="16" byteOrder="little"><BitMember name="PLC" offset="0"/><BitMember name="MS" offset="1"/><BitMember name="RC" offset="2"/><BitMember name="ALIGN" offset="3"/><BitMember name="MS_ST" offset="4"/><BitMember name="EMER" offset="5"/><BitMember name="FILE" offset="6"/><BitMember name="DATA" offset="7"/><BitMember name="MS_STOP" offset="8"/><BitMember name="REC_DEL" offset="9"/><BitMember name="RF_CONF" offset="10"/><BitMember name="EOR" offset="11"/><BitMember name="reserved12" offset="12"/><BitMember name="reserved13" offset="13"/><BitMember name="reserved14" offset="14"/><BitMember name="reserved15" offset="15"/></PackedField><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
-        <ControlBinding semantic_id="startMission"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation2"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000010"><BitMember name="MISSION_START" offset="4" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/><Reply semantic_id="startMissionReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000010"><BitMember name="MISSION_START" offset="4" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
-        <ControlBinding semantic_id="emergencyReturn"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000020"><BitMember name="EMER_RETURN" offset="5" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><FixedField name="remoteSpeed" value="0"/><FixedField name="remoteDirection" value="0"/><FixedField name="dataType" value="0"/><FixedField name="fileFirst" value="0" converter="UInt16LE"/><FixedField name="fileFinal" value="0" converter="UInt16LE"/><Field name="emergencyLatitude" cdm="Autonomy.EmergencyReturn.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/><Field name="emergencyLongitude" cdm="Autonomy.EmergencyReturn.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/><FixedField name="brightness" value="0"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/><Reply semantic_id="emergencyReturnReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000020"><BitMember name="EMER_RETURN" offset="5" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
-        <ControlBinding semantic_id="requestFileList"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000040"><BitMember name="File_List_Req" offset="6" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><FixedField name="remoteSpeed" value="0"/><FixedField name="remoteDirection" value="0"/><DerivedField name="dataType" cdm="RecordedData.FileList.DataType" sourceField="RecordedData.FileList.DataType" converter="PackSingleDataTypeBit"/><FixedField name="fileFirst" value="0" converter="UInt16LE"/><FixedField name="fileFinal" value="0" converter="UInt16LE"/><FixedField name="emergencyLatitude" value="0" converter="Float32LE"/><FixedField name="emergencyLongitude" value="0" converter="Float32LE"/><FixedField name="brightness" value="0"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/><Reply semantic_id="requestFileListReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000040"><BitMember name="File_List_Req" offset="6" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" converter="UInt16LE"/><Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" converter="UInt16LE"/><Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/><Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/><Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" converter="UInt16LE"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
-        <ControlBinding semantic_id="requestData"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000080"><BitMember name="Data_Req" offset="7" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><FixedField name="remoteSpeed" value="0"/><FixedField name="remoteDirection" value="0"/><DerivedField name="dataType" sourceField="RecordedData.Selection.Platform,RecordedData.Selection.SideScanSonar,RecordedData.Selection.OpticalCamera,RecordedData.Selection.AcousticCamera,RecordedData.Selection.ForwardLookingSonar" converter="PackDataTypeBits"/><Field name="fileFirst" cdm="RecordedData.FileRange.First" converter="UInt16LE"/><Field name="fileFinal" cdm="RecordedData.FileRange.Final" converter="UInt16LE"/><FixedField name="emergencyLatitude" value="0" converter="Float32LE"/><FixedField name="emergencyLongitude" value="0" converter="Float32LE"/><FixedField name="brightness" value="0"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></ControlBinding>
-        <ControlBinding semantic_id="stopMission"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000100"><BitMember name="MISSION_STOP" offset="8" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><FixedField name="remoteSpeed" value="0"/><FixedField name="remoteDirection" value="0"/><FixedField name="dataType" value="0"/><FixedField name="fileFirst" value="0" converter="UInt16LE"/><FixedField name="fileFinal" value="0" converter="UInt16LE"/><FixedField name="emergencyLatitude" value="0" converter="Float32LE"/><FixedField name="emergencyLongitude" value="0" converter="Float32LE"/><FixedField name="brightness" value="0"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/><Reply semantic_id="stopMissionReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000100"><BitMember name="MISSION_STOP" offset="8" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
-        <ControlBinding semantic_id="deleteAllRecords"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000200"><BitMember name="Record_Del" offset="9" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><FixedField name="remoteSpeed" value="0"/><FixedField name="remoteDirection" value="0"/><FixedField name="dataType" value="0"/><FixedField name="fileFirst" value="0" converter="UInt16LE"/><FixedField name="fileFinal" value="0" converter="UInt16LE"/><FixedField name="emergencyLatitude" value="0" converter="Float32LE"/><FixedField name="emergencyLongitude" value="0" converter="Float32LE"/><FixedField name="brightness" value="0"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/><Reply semantic_id="deleteAllRecordsReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000200"><BitMember name="Record_Del" offset="9" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
-        <ControlBinding semantic_id="enterMaintenanceMode"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000400"><BitMember name="MTE_MODE" offset="10" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><FixedField name="remoteSpeed" value="0"/><FixedField name="remoteDirection" value="0"/><FixedField name="dataType" value="0"/><FixedField name="fileFirst" value="0" converter="UInt16LE"/><FixedField name="fileFinal" value="0" converter="UInt16LE"/><FixedField name="emergencyLatitude" value="0" converter="Float32LE"/><FixedField name="emergencyLongitude" value="0" converter="Float32LE"/><FixedField name="brightness" value="0"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/><Reply semantic_id="enterMaintenanceModeReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000400"><BitMember name="MTE_MODE" offset="10" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
-        <ControlBinding semantic_id="setFlashBrightness"><TCPChannel messageType="AuvRf1Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/><DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/><PackedField name="command" width="32" byteOrder="little" expectedValue="0x40008000"><BitMember name="FLASH" offset="15" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/><Field name="auvId" cdm="Platform.Identifier.Numeric"/><FixedField name="remoteSpeed" value="0"/><FixedField name="remoteDirection" value="0"/><FixedField name="dataType" value="0"/><FixedField name="fileFirst" value="0" converter="UInt16LE"/><FixedField name="fileFinal" value="0" converter="UInt16LE"/><FixedField name="emergencyLatitude" value="0" converter="Float32LE"/><FixedField name="emergencyLongitude" value="0" converter="Float32LE"/><Field name="brightness" cdm="Equipment.Light.Brightness"/><FixedField name="reserveInformation3" value="0"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/><Reply semantic_id="setFlashBrightnessReply" required="true"><TCPChannel messageType="AuvRf2Telegram"/><FixedField name="startByte" value="0x7E7E7E7E"/><Field name="count" converter="UInt32LE"/><PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000"><BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/></PackedField><PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40008000"><BitMember name="FLASH" offset="15" fixedValue="1"/><BitMember name="RF_SEND" offset="30" fixedValue="1"/></PackedField><Field name="informationBody"/><DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/><FixedField name="stopByte" value="0x8181"/></Reply></ControlBinding>
+
+        <!--
+            Binding: controlAuvLocally
+            RF-1 COMMAND=RC_MODE(bit2)|RF_SEND=0x40000004, INFORMATION3.
+        -->
+        <ControlBinding semantic_id="controlAuvLocally">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 3 또는 6. -->
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000004">
+                <BitMember name="RC_MODE" offset="2" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <!-- RF-1 bytes 15..39 INFORMATION3. RC_SPEED와 signed RC_DIRECTION(-15~15)을 사용한다. -->
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <Field name="remoteSpeed" cdm="Platform.Motion.Speed"/>
+            <Field name="remoteDirection" cdm="Platform.Motion.Direction" converter="Int8"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <!-- RF-1 bytes 40..43 TAIL. -->
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="controlAuvLocallyReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000004">
+                    <BitMember name="RC_MODE" offset="2" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="informationBody"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: requestAuvStatus / Status_Chk(bit3)|RF_SEND=0x40000008, INFORMATION3. -->
+        <ControlBinding semantic_id="requestAuvStatus">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000008">
+                <BitMember name="Status_Chk" offset="3" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+
+            <Reply semantic_id="requestAuvStatusReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000008">
+                    <BitMember name="Status_Chk" offset="3" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+                <Field name="batteryPercent" cdm="Platform.Energy.Battery.RemainingPercent"/>
+                <Field name="gpsLatitude" cdm="Navigation.GNSS.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <Field name="gpsLongitude" cdm="Navigation.GNSS.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <Field name="waypointCount" cdm="MissionPlan.WaypointCount"/>
+                <Field name="alignmentStatus" cdm="Navigation.Alignment.Status"/>
+                <Field name="integratedNavigationLatitude" cdm="Navigation.Integrated.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <Field name="integratedNavigationLongitude" cdm="Navigation.Integrated.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+                <Field name="auvDataFileCount" cdm="RecordedData.AUV.FileCount" converter="UInt16LE"/>
+                <Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" converter="UInt16LE"/>
+                <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/>
+                <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/>
+                <Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" converter="UInt16LE"/>
+                <!-- EOR/MODE bit 의미는 별도 bit mapping 확정 전 raw bitset으로 보존한다. -->
+                <Field name="emergencyReasonMask" converter="UInt16LEBitMask"/>
+                <Field name="modeMask" converter="UInt16LEBitMask"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: startMission / MISSION_START(bit4)|RF_SEND=0x40000010. -->
+        <ControlBinding semantic_id="startMission">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000010">
+                <BitMember name="MISSION_START" offset="4" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <Reply semantic_id="startMissionReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000010">
+                    <BitMember name="MISSION_START" offset="4" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="informationBody"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: emergencyReturn / EMER_RETURN(bit5)|RF_SEND=0x40000020. -->
+        <ControlBinding semantic_id="emergencyReturn">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000020">
+                <BitMember name="EMER_RETURN" offset="5" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <Field name="emergencyLatitude" cdm="Autonomy.EmergencyReturn.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <Field name="emergencyLongitude" cdm="Autonomy.EmergencyReturn.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <Reply semantic_id="emergencyReturnReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000020">
+                    <BitMember name="EMER_RETURN" offset="5" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="informationBody"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: requestFileList / File_List_Req(bit6)|RF_SEND=0x40000040. -->
+        <ControlBinding semantic_id="requestFileList">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000040">
+                <BitMember name="File_List_Req" offset="6" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <Reply semantic_id="requestFileListReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000040">
+                    <BitMember name="File_List_Req" offset="6" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="auvDataFileCount" cdm="RecordedData.AUV.FileCount" converter="UInt16LE"/>
+                <Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" converter="UInt16LE"/>
+                <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/>
+                <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/>
+                <Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" converter="UInt16LE"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: requestData / Data_Req(bit7)|RF_SEND=0x40000080. RF-3 데이터 스트림 시작 요청. -->
+        <ControlBinding semantic_id="requestData">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000080">
+                <BitMember name="Data_Req" offset="7" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <DerivedField name="dataType" sourceField="RecordedData.Transfer.DataType" converter="PackDataTypeBits"/>
+            <Field name="fileFirst" cdm="RecordedData.Transfer.FileFirst" converter="UInt16LE"/>
+            <Field name="fileFinal" cdm="RecordedData.Transfer.FileFinal" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <Reply semantic_id="requestDataReply" required="true">
+                <TCPChannel messageType="AuvRf3Telegram"/>
+                <!-- RF-3 framing/data fields are distinct from RF-2 command ACK. -->
+                <Field name="dataAck" converter="UInt16LEBitMask"/>
+                <Field name="dataLength" converter="UInt32LE"/>
+                <Field name="dataPayload"/>
+                <DerivedField name="checksum" sourceField="System.Frame.DataAckThroughPayload" converter="ByteSumModulo65536LE"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: stopMission / MISSION_STOP(bit8)|RF_SEND=0x40000100. -->
+        <ControlBinding semantic_id="stopMission">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000100">
+                <BitMember name="MISSION_STOP" offset="8" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <Reply semantic_id="stopMissionReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000100">
+                    <BitMember name="MISSION_STOP" offset="8" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="informationBody"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: deleteAllRecords / Record_Del(bit9)|RF_SEND=0x40000200. -->
+        <ControlBinding semantic_id="deleteAllRecords">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000200">
+                <BitMember name="Record_Del" offset="9" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <Reply semantic_id="deleteAllRecordsReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000200">
+                    <BitMember name="Record_Del" offset="9" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="informationBody"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: enterMaintenanceMode / MTE_MODE(bit10)|RF_SEND=0x40000400. -->
+        <ControlBinding semantic_id="enterMaintenanceMode">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40000400">
+                <BitMember name="MTE_MODE" offset="10" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <FixedField name="brightness" value="0"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <Reply semantic_id="enterMaintenanceModeReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40000400">
+                    <BitMember name="MTE_MODE" offset="10" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="informationBody"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
+
+        <!-- Binding: setFlashBrightness / FLASH(bit15)|RF_SEND=0x40008000. -->
+        <ControlBinding semantic_id="setFlashBrightness">
+            <TCPChannel messageType="AuvRf1Telegram"/>
+            <FixedField name="startByte" value="0x7E7E7E7E"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation3"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x40008000">
+                <BitMember name="FLASH" offset="15" fixedValue="1"/>
+                <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+            </PackedField>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
+            <FixedField name="remoteSpeed" value="0"/>
+            <FixedField name="remoteDirection" value="0"/>
+            <FixedField name="dataType" value="0"/>
+            <FixedField name="fileFirst" value="0" converter="UInt16LE"/>
+            <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
+            <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
+            <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
+            <Field name="brightness" cdm="Equipment.Flash.Brightness"/>
+            <FixedField name="reserveInformation3" value="0"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181"/>
+            <Reply semantic_id="setFlashBrightnessReply" required="true">
+                <TCPChannel messageType="AuvRf2Telegram"/>
+                <FixedField name="startByte" value="0x7E7E7E7E"/>
+                <Field name="count" converter="UInt32LE"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x40008000">
+                    <BitMember name="FLASH" offset="15" fixedValue="1"/>
+                    <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
+                </PackedField>
+                <Field name="informationBody"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181"/>
+            </Reply>
+        </ControlBinding>
     </Controls>
 </PlatformBinding>
