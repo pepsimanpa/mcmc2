@@ -8,6 +8,7 @@
     - 한 요청에는 RF 장치 주 기능 COMMAND bit를 하나만 설정한다.
     - Binding은 주 기능 bit와 RF_EXEC를 함께 설정한다.
     - RF-2는 요청에 대한 응답이며, 주기 상태 메시지 근거가 없어 MonitorSpecs를 정의하지 않는다.
+    - Reply의 Results는 auv origin.csv에서 해당 요청의 반환 의미가 확인되는 항목만 선언한다.
     - KEY_CMD는 새 키를 전송하거나 암호화를 on/off하는 명령이 아니라 이미 주입된 키를 적용하는 명령이다.
     - RF 기능은 RFCommunication/Security Capability로 분류하고 AUV는 해당 Capability를 선택한 Profile로 본다.
 
@@ -50,7 +51,16 @@
                 <Profile cdm="Communication.RF.Configuration.UHF.Power"/>
                 <Profile cdm="Communication.RF.Configuration.LBand.Power"/>
             </Parameters>
-            <Reply cdm="Control.Communication.RF.Configuration.Response" bindRef="configureRfReply" required="true"/>
+            <Reply cdm="Control.Communication.RF.Configuration.Response" bindRef="configureRfReply" required="true">
+                <Results>
+                    <Result name="RF 운용모드" cdm="Communication.RF.Configuration.OperationMode"/>
+                    <Result name="RF Time Slot" cdm="Communication.RF.Configuration.TimeSlot"/>
+                    <Result name="UHF 채널" cdm="Communication.RF.Configuration.UHF.Channel"/>
+                    <Result name="L-Band 채널" cdm="Communication.RF.Configuration.LBand.Channel"/>
+                    <Result name="UHF 출력" cdm="Communication.RF.Configuration.UHF.Power"/>
+                    <Result name="L-Band 출력" cdm="Communication.RF.Configuration.LBand.Power"/>
+                </Results>
+            </Reply>
         </ControlSpec>
 
         <!--
@@ -59,7 +69,50 @@
         -->
         <ControlSpec id="scanRfChannels" name="RF 채널 스캔" cdm="Request.Communication.RF.ChannelScan">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.Communication.RF.ChannelScan.Response" bindRef="scanRfChannelsReply" required="true"/>
+            <Reply cdm="Request.Communication.RF.ChannelScan.Response" bindRef="scanRfChannelsReply" required="true">
+                <Results>
+                    <QuantityResult name="UHF ch.1 수신감도" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="UHF ch.2 수신감도" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="UHF ch.3 수신감도" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="L-Band ch.1 수신감도" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="L-Band ch.2 수신감도" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="L-Band ch.3 수신감도" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="UHF Packet Error Rate" cdm="Communication.RF.UHF.PacketErrorRate">
+                        <Unit>%</Unit>
+                        <Range min="0" max="100"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="L-Band Packet Error Rate" cdm="Communication.RF.LBand.PacketErrorRate">
+                        <Unit>%</Unit>
+                        <Range min="0" max="100"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                </Results>
+            </Reply>
         </ControlSpec>
 
         <!--
@@ -68,7 +121,70 @@
         -->
         <ControlSpec id="requestRfStatus" name="RF 상태 요청" cdm="Request.Communication.RF.Status">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.Communication.RF.Status.Response" bindRef="requestRfStatusReply" required="true"/>
+            <Reply cdm="Request.Communication.RF.Status.Response" bindRef="requestRfStatusReply" required="true">
+                <Results>
+                    <Result name="RF 운용모드" cdm="Communication.RF.Configuration.OperationMode"/>
+                    <Result name="RF Time Slot" cdm="Communication.RF.Configuration.TimeSlot"/>
+                    <Result name="UHF 채널" cdm="Communication.RF.Configuration.UHF.Channel"/>
+                    <Result name="L-Band 채널" cdm="Communication.RF.Configuration.LBand.Channel"/>
+                    <Result name="UHF 출력" cdm="Communication.RF.Configuration.UHF.Power"/>
+                    <Result name="L-Band 출력" cdm="Communication.RF.Configuration.LBand.Power"/>
+                    <QuantityResult name="암호화반 코인셀 배터리" cdm="Equipment.RF.EncryptionModule.Battery.RemainingPercent">
+                        <Unit>%</Unit>
+                        <Range min="0" max="100"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="UHF ch.1 수신감도" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="UHF ch.2 수신감도" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="UHF ch.3 수신감도" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="L-Band ch.1 수신감도" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="L-Band ch.2 수신감도" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="L-Band ch.3 수신감도" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel">
+                        <Unit>dB</Unit>
+                        <Range min="-128" max="127"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="UHF Packet Error Rate" cdm="Communication.RF.UHF.PacketErrorRate">
+                        <Unit>%</Unit>
+                        <Range min="0" max="100"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <QuantityResult name="L-Band Packet Error Rate" cdm="Communication.RF.LBand.PacketErrorRate">
+                        <Unit>%</Unit>
+                        <Range min="0" max="100"/>
+                        <Resolution>1</Resolution>
+                    </QuantityResult>
+                    <GroupResult name="STAT_code">
+                        <Result name="RFM L-BAND"/>
+                        <Result name="RFM UHF"/>
+                        <Result name="EDM"/>
+                        <Result name="PDM"/>
+                        <Result name="MCM"/>
+                        <Result name="DATA_LOCK"/>
+                        <Result name="SYNC_LOCK"/>
+                    </GroupResult>
+                </Results>
+            </Reply>
         </ControlSpec>
 
         <!--
@@ -78,7 +194,18 @@
         -->
         <ControlSpec id="requestPreLaunchCheck" name="RF 출항 전 점검 요청" cdm="Request.Health.Check">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.Health.Check.Response" bindRef="requestPreLaunchCheckReply" required="true"/>
+            <Reply cdm="Request.Health.Check.Response" bindRef="requestPreLaunchCheckReply" required="true">
+                <Results>
+                    <GroupResult name="Pre_Launch-Check">
+                        <Result name="암호화반"/>
+                        <Result name="전원반"/>
+                        <Result name="송수신반 L-Band"/>
+                        <Result name="송수신반 UHF"/>
+                        <Result name="모뎀 및 제어반"/>
+                        <Result name="MCU"/>
+                    </GroupResult>
+                </Results>
+            </Reply>
         </ControlSpec>
 
         <!--
