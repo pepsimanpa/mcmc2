@@ -1,253 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    AUV 본체 기능 Semantic.
-    AUV ICD의 RF-1/RF-2/RF-3 및 UCD-1/UCD-2 Telegram을
-    전송 매체와 무관한 AUV 제어 의미로 분류한다.
+AUV 본체 기능 Semantic.
+AUV ICD의 RF-1/RF-2/RF-3 및 UCD-1/UCD-2 Telegram을
+전송 매체와 무관한 AUV 제어 의미로 분류한다.
 
-    확정 규칙
-    - 한 제어 요청에는 주 기능 COMMAND bit를 하나만 설정한다.
-    - RF 전송에서는 해당 기능 bit와 RF_SEND를 함께 사용한다.
-    - RF와 UCD의 물리 필드 차이는 각 Binding에서 표현한다.
-    - 공통 의미는 Platform/Health/Mission/RecordedData Core와 Underwater/Autonomy/Capability Extension으로 분류하고 AUV는 이를 조합한 Profile로 본다.
-    - ICD에서 주기 Telegram을 확인할 수 없어 MonitorSpecs를 정의하지 않는다.
-    - 각 Control은 의미상 Reply 하나만 가진다. RF/UCD별 실제 결과 필드는 Binding에서 달라질 수 있다.
+확정 규칙
+- 한 제어 요청에는 주 기능 COMMAND bit를 하나만 설정한다.
+- RF 전송에서는 해당 기능 bit와 RF_SEND를 함께 사용한다.
+- RF와 UCD의 물리 필드 차이는 각 Binding에서 표현한다.
+- 공통 의미는 Platform/Health/Mission/RecordedData Core와 Underwater/Autonomy/Capability Extension으로 분류하고 AUV는 이를 조합한 Profile로 본다.
+- ICD에서 주기 Telegram을 확인할 수 없어 MonitorSpecs를 정의하지 않는다.
+- 각 Control은 의미상 Reply 하나만 가진다. Reply의 Results는 원문에서 반환 의미가 확인되는 데이터만 선언한다.
+- RF/UCD처럼 같은 Semantic Reply가 서로 다른 상세도를 제공하면 Results의 대체 결과 묶음을 required="false"로 구분한다.
 
-    미확정 사항
-    - ICD에는 Reply timeout이 정의되어 있지 않으므로 timeout 속성을 임의로 넣지 않았다.
-    - RF-2의 RF_CMD_COMPLETE는 RF통신장치가 해당 명령의 처리/전달을 완료했음을 의미하며 AUV 본체 동작 완료를 의미하지 않는다.
-    - UCD-2 ACK는 요청 COMMAND 식별에는 사용되지만 AUV 본체 동작 완료/성공을 직접 나타내는 필드는 확인되지 않았다.
+미확정 사항
+- ICD에는 Reply timeout이 정의되어 있지 않으므로 timeout 속성을 임의로 넣지 않았다.
+- RF-2의 RF_CMD_COMPLETE는 RF통신장치가 해당 명령의 처리/전달을 완료했음을 의미하며 AUV 본체 동작 완료를 의미하지 않는다.
+- UCD-2 ACK는 요청 COMMAND 식별에는 사용되지만 AUV 본체 동작 완료/성공을 직접 나타내는 필드는 확인되지 않았다.
 -->
-<PlatformSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
-    <ConstantSpecs id="constant">
-        <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
-            <Value>AUV Platform Interface</Value>
-        </TextConstantSpec>
-        <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
-            <Value>Transport-independent AUV body control and reply semantic specification</Value>
-        </TextConstantSpec>
-    </ConstantSpecs>
-
-    <ControlSpecs id="control">
-        <!--
-            AUV 점검 요청.
-            RF: RF-1 INFORMATION3의 AUV_CHECK_Req + RF_SEND, RF-2의 동일 ACK와 12-byte 상세 점검 결과.
-            UCD: UCD-1 AUV_CHECK_Req_L, UCD-2의 동일 ACK와 1-byte 요약 점검 결과.
-            하나의 Semantic Reply를 두 Binding이 서로 다른 상세도로 구현한다.
-        -->
-        <ControlSpec id="requestAuvCheck" name="AUV 점검 요청" cdm="Request.Health.Check">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.Health.Check.Response" bindRef="requestAuvCheckReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            AUV 임무계획 전송.
-            RF-1의 MISSION_TRANS + RF_SEND와 INFORMATION2를 사용한다.
-            DEPTH 필드명과 '주행 고도' 설명이 함께 기재되어 있어 정확한 기준면/부호는 확인이 필요하다.
-            최대 100개 Waypoint는 좌표당 8 bytes이지만 ICD의 '~ 992 bytes' 표기 및 INFO2 총 길이와
-            산술적으로 일치하지 않으므로 실제 배열/예약 영역 배치는 확인이 필요하다.
-            ALIGN_INTERVAL의 단위와 범위, Custom1/Custom2의 의미는 정의되지 않았다.
-        -->
-        <ControlSpec id="transferMissionPlan" name="AUV 임무계획 전송" cdm="Request.MissionPlan.Transfer">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Parameters>
-                <QuantityProfile cdm="MissionPlan.OperationMode">
-                    <!-- 현재 확정 운용모드: 1=광역탐색모드, 2=정밀탐색모드. 3~8은 추후 결정 항목이므로 현재 선택 범위에서 제외한다. -->
-                    <Range min="1" max="2"/>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-                <QuantityProfile cdm="MissionPlan.Speed">
-                    <Unit>kts</Unit>
-                    <Range min="0" max="7"/>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-                <QuantityProfile cdm="MissionPlan.Depth">
-                    <Unit>m</Unit>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-                <QuantityProfile cdm="MissionPlan.ReturnPosition.Latitude">
-                    <Unit>rad</Unit>
-                </QuantityProfile>
-                <QuantityProfile cdm="MissionPlan.ReturnPosition.Longitude">
-                    <Unit>rad</Unit>
-                </QuantityProfile>
-                <CollectionProfile cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="100">
-                    <ElementProfile cdm="MissionPlan.Waypoint">
-                        <QuantityProfile cdm="MissionPlan.Waypoint.Latitude">
-                            <Unit>rad</Unit>
-                        </QuantityProfile>
-                        <QuantityProfile cdm="MissionPlan.Waypoint.Longitude">
-                            <Unit>rad</Unit>
-                        </QuantityProfile>
-                    </ElementProfile>
-                </CollectionProfile>
-                <QuantityProfile cdm="MissionPlan.AlignmentInterval">
-                    <!-- ICD에 단위와 범위가 없어 수치 프로파일만 선언한다. -->
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-            </Parameters>
-            <Reply cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            근거리 위치 통제.
-            RF-1 INFORMATION3의 RC_MODE + RF_SEND를 사용하며 RC_SPEED와 RC_DIRECTION을 전달한다.
-            RC_DIRECTION은 1 byte이면서 -15~15 범위이므로 signed 표현 방식 확인이 필요하다.
-        -->
-        <ControlSpec id="controlAuvLocally" name="AUV 근거리 위치 통제" cdm="Control.Platform.Motion">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Parameters>
-                <QuantityProfile cdm="Platform.Motion.Speed">
-                    <Range min="0" max="255"/>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-                <QuantityProfile cdm="Platform.Motion.Direction">
-                    <Unit>deg</Unit>
-                    <Range min="-15" max="15"/>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-            </Parameters>
-            <Reply cdm="Control.Platform.Motion.Response" bindRef="controlAuvLocallyReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            AUV 상태 요청.
-            RF-1 INFORMATION3의 Status_Chk + RF_SEND를 사용한다.
-            RF-2 고정 Body의 항법, 파일 현황, EOR, MODE 필드를 하나의 응답으로 해석한다.
-        -->
-        <ControlSpec id="requestAuvStatus" name="AUV 상태 요청" cdm="Request.Platform.Status">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.Platform.Status.Response" bindRef="requestAuvStatusReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            AUV 임무 시작.
-            ICD의 COMMAND 표는 MISSION_START를 INFORMATION2로 지정한다.
-            다만 시작할 때 INFORMATION2 전체 임무계획을 다시 보내야 하는지, 기존 계획을 참조하는지는
-            설명되어 있지 않아 별도 Semantic Parameter를 확정하지 않았다.
-        -->
-        <ControlSpec id="startMission" name="AUV 임무 시작" cdm="Control.Mission.Start">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            AUV 비상복귀.
-            RF에서는 INFORMATION3, UCD에서는 UCD-1 INFORMATION의 RETURN_LAT/RETURN_LONG을 사용한다.
-            두 좌표의 ICD 단위는 rad이며 허용 범위는 기재되어 있지 않다.
-        -->
-        <ControlSpec id="emergencyReturn" name="AUV 비상복귀" cdm="Control.Mission.EmergencyReturn">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Parameters>
-                <QuantityProfile cdm="Autonomy.EmergencyReturn.Position.Latitude">
-                    <Unit>rad</Unit>
-                </QuantityProfile>
-                <QuantityProfile cdm="Autonomy.EmergencyReturn.Position.Longitude">
-                    <Unit>rad</Unit>
-                </QuantityProfile>
-            </Parameters>
-            <Reply cdm="Control.Mission.EmergencyReturn.Response" bindRef="emergencyReturnReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            저장 파일 목록 요청.
-            File_List_Req 사용 시 INFORMATION3의 DATA_TYPE을 반드시 함께 설정한다.
-            AUV/SSS/OC/FLS/AC 중 정확히 1개만 선택해야 하며 중복 선택은 허용하지 않는다.
-            File_list는 1분 단위로 저장된 해당 데이터 파일의 개수를 의미한다.
-        -->
-        <ControlSpec id="requestFileList" name="AUV 파일 목록 요청" cdm="Request.RecordedData.FileList">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Parameters>
-                <!-- 단일 선택 의미값. Binding에서 AUV/SSS/OC/FLS/AC one-hot DATA_TYPE bit로 변환한다. -->
-                <Profile cdm="RecordedData.FileList.DataType"/>
-            </Parameters>
-            <Reply cdm="Request.RecordedData.FileList.Response" bindRef="requestFileListReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            저장 데이터 전송 요청.
-            RF-1 INFORMATION3의 Data_Req + RF_SEND, DATA TYPE, File_First, File_Final을 사용한다.
-            실제 RF-3 데이터 프레임은 SensorProductSpecs/ProductBinding으로 분리하여 표현한다.
-            동시에 여러 DATA TYPE을 선택할 수 있는지와 병행 전송 상관관계는 확인이 필요하다.
-        -->
-        <ControlSpec id="requestData" name="AUV 데이터 전송 요청" cdm="Request.RecordedData.Transfer">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Parameters>
-                <BooleanProfile cdm="RecordedData.Selection.Platform" required="false" default="false"/>
-                <BooleanProfile cdm="RecordedData.Selection.SideScanSonar" required="false" default="false"/>
-                <BooleanProfile cdm="RecordedData.Selection.OpticalCamera" required="false" default="false"/>
-                <BooleanProfile cdm="RecordedData.Selection.AcousticCamera" required="false" default="false"/>
-                <BooleanProfile cdm="RecordedData.Selection.ForwardLookingSonar" required="false" default="false"/>
-                <QuantityProfile cdm="RecordedData.FileRange.First">
-                    <Range min="0" max="65535"/>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-                <QuantityProfile cdm="RecordedData.FileRange.Final">
-                    <Range min="0" max="65535"/>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-            </Parameters>
-        </ControlSpec>
-
-        <!-- RF-1 INFORMATION3의 MISSION_STOP + RF_SEND. RF-2에는 임무 중지 성공/실패 전용 필드가 없다. -->
-        <ControlSpec id="stopMission" name="AUV 임무 중지" cdm="Control.Mission.Stop">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            저장자료 전체 삭제.
-            RF와 UCD의 Record_Del은 모두 저장된 기록 전체를 삭제하는 기능으로 정의한다.
-            DATA_TYPE 및 File_First/File_Final은 삭제 대상 선택에 사용하지 않는다.
-        -->
-        <ControlSpec id="deleteAllRecords" name="AUV 저장자료 전체 삭제" cdm="Request.RecordedData.DeleteAll">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.RecordedData.DeleteAll.Response" bindRef="deleteAllRecordsReply" required="true"/>
-        </ControlSpec>
-
-        <!--
-            AUV 정비장비모드 진입.
-            MTE_MODE는 제어장치가 bit를 1로 설정하여 전송하면 자율제어컴퓨터가 정비장비모드를 수행하는 명령이다.
-            별도의 해제 명령은 현재 ICD에서 확인되지 않았으므로 진입 기능만 정의한다.
-        -->
-        <ControlSpec id="enterMaintenanceMode" name="AUV 정비장비모드 진입" cdm="Control.Platform.MaintenanceMode.Enter">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Control.Platform.MaintenanceMode.Enter.Response" bindRef="enterMaintenanceModeReply" required="true"/>
-        </ControlSpec>
-
-        <!-- RF-1 INFORMATION3의 FLASH + RF_SEND와 BRIGHTNESS(1~10)를 사용한다. -->
-        <ControlSpec id="setFlashBrightness" name="AUV 점멸등 밝기 설정" cdm="Control.Equipment.Light.Brightness">
-            <Target cdm="Platform.Identifier.Numeric"/>
-            <Parameters>
-                <QuantityProfile cdm="Equipment.Light.Brightness">
-                    <Range min="1" max="10"/>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
-            </Parameters>
-            <Reply cdm="Control.Equipment.Light.Brightness.Response" bindRef="setFlashBrightnessReply" required="true"/>
-        </ControlSpec>
-    </ControlSpecs>
-
-    <!--
-        AUV 저장 센서/운용자료 산출물.
-        전송 요청 자체는 requestData Control로 유지하고, 실제 RF-3 데이터는 ProductFileSpec으로 분리한다.
-    -->
-    <SensorProductSpecs id="sensorProduct">
-        <ProductFileSpec id="auvData" name="AUV 데이터" cdm="RecordedData.Platform">
-            <ProductKind cdm="ProductKind.RecordedData"/>
-        </ProductFileSpec>
-        <ProductFileSpec id="sideScanSonarData" name="측면주사소나 데이터" cdm="RecordedData.SideScanSonar">
-            <ProductKind cdm="ProductKind.RecordedData"/>
-        </ProductFileSpec>
-        <ProductFileSpec id="opticalCameraData" name="광학카메라 데이터" cdm="RecordedData.OpticalCamera">
-            <ProductKind cdm="ProductKind.RecordedData"/>
-        </ProductFileSpec>
-        <ProductFileSpec id="acousticCameraData" name="초음파카메라 데이터" cdm="RecordedData.AcousticCamera">
-            <ProductKind cdm="ProductKind.RecordedData"/>
-        </ProductFileSpec>
-        <ProductFileSpec id="forwardLookingSonarData" name="전방주사소나 데이터" cdm="RecordedData.ForwardLookingSonar">
-            <ProductKind cdm="ProductKind.RecordedData"/>
-        </ProductFileSpec>
-    </SensorProductSpecs>
+<PlatformSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+<ConstantSpecs id="constant">
+<TextConstantSpec id="productName" name="제품명" cdm="Product.Name"><Value>AUV Platform Interface</Value></TextConstantSpec>
+<TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description"><Value>Transport-independent AUV body control and reply semantic specification</Value></TextConstantSpec>
+</ConstantSpecs>
+<ControlSpecs id="control">
+<!-- AUV 점검 요청. RF는 AUV_CHECK_RESULT 12-byte 상세 결과, UCD는 AUV_CHECK_RESULT_L 1-byte 요약 결과를 반환한다. -->
+<ControlSpec id="requestAuvCheck" name="AUV 점검 요청" cdm="Request.Health.Check">
+<Target cdm="Platform.Identifier.Numeric"/>
+<Reply cdm="Request.Health.Check.Response" bindRef="requestAuvCheckReply" required="true"><Results>
+<!-- 각 bit의 0/1 의미와 정확한 offset은 Binding bit 작업에서 확정한다. -->
+<GroupResult name="상세 점검 결과" required="false">
+<GroupResult name="MSPD 점검 결과">
+<Result name="통신부 연동상태"/><Result name="자율제어컴퓨터 연동상태"/><Result name="측면주사소나 연동상태"/><Result name="전방주사소나 연동상태"/><Result name="측면주사소나 상태점검"/><Result name="전방주사소나 상태점검"/><Result name="임무센서처리장치 모듈 #1 저장매체 상태"/><Result name="임무센서처리장치 모듈 #1 부팅상태"/><Result name="수중광학카메라 연동상태"/><Result name="수중초음파카메라 연동상태"/><Result name="수중광학카메라 점검"/><Result name="수중초음파카메라 점검"/>
+</GroupResult>
+<GroupResult name="INB 점검 결과">
+<Result name="메모리 점검"/><Result name="INB MSB IMU 통신연동"/><Result name="INB MSB DVL 통신연동"/><Result name="INB MSB 심도계 통신연동"/><Result name="INB MSB GPS 통신연동"/><Result name="INB MSB 지자기센서 통신연동"/><Result name="INB MSB 자율제어컴퓨터 통신연동"/><Result name="INB LSB IMU 통신연동"/><Result name="INB LSB DVL 통신연동"/><Result name="INB LSB 심도계 통신연동"/><Result name="INB LSB GPS 통신연동"/><Result name="INB LSB 지자기센서 통신연동"/><Result name="INB LSB 자율제어컴퓨터 통신연동"/>
+</GroupResult>
+<GroupResult name="ACC 점검 결과">
+<Result name="자율제어컴퓨터 BOOT 점검"/><Result name="자율제어컴퓨터 메모리 점검"/><Result name="자율제어컴퓨터 28VDC 점검"/><Result name="자율제어컴퓨터 인터페이스 점검"/><Result name="핑어 통신연동"/><Result name="점멸등 통신연동"/><Result name="누수센서 연동"/><Result name="전원제어장치 통신연동"/><Result name="임무센서처리장치 통신연동"/><Result name="복합항법컴퓨터 통신연동"/><Result name="RF 통신장치 통신연동"/><Result name="수중통신장치 통신연동"/><Result name="추진제어기 통신연동"/><Result name="핑어 자체점검"/><Result name="점멸등 자체점검"/>
+</GroupResult>
+<GroupResult name="PCD 점검 결과"><Result name="전지 BMS 상태 점검"/><Result name="전지팩 전압, 온도, BMS 연동상태 점검"/><Result name="전지팩 온도 점검"/><Result name="전원제어장치 제어상태, BMS 연동상태 점검"/></GroupResult>
+<GroupResult name="MC 점검 결과"><Result name="추진제어기 온도 점검"/><Result name="추진제어기 입력 전원 점검"/><Result name="추진제어기 전류 센서 점검"/><Result name="상방향타 구동기 점검"/><Result name="하방향타 구동기 점검"/><Result name="좌승강타 구동기 점검"/><Result name="우승강타 구동기 점검"/></GroupResult>
+<GroupResult name="RCD 점검 결과"><Result name="MCU"/><Result name="모뎀 및 제어반"/><Result name="송수신반 UHF"/><Result name="송수신반 L-Band"/><Result name="전원반"/><Result name="암호화반"/></GroupResult>
+</GroupResult>
+<GroupResult name="요약 점검 결과" required="false"><Result name="MSS_TEST"/><Result name="CCS_TEST"/><Result name="NS_TEST"/><Result name="BS_TEST"/><Result name="PRS_TEST"/><Result name="MCS_TEST"/></GroupResult>
+</Results></Reply>
+</ControlSpec>
+<ControlSpec id="transferMissionPlan" name="AUV 임무계획 전송" cdm="Request.MissionPlan.Transfer">
+<Target cdm="Platform.Identifier.Numeric"/><Parameters>
+<QuantityProfile cdm="MissionPlan.OperationMode"><Range min="1" max="2"/><Resolution>1</Resolution></QuantityProfile>
+<QuantityProfile cdm="MissionPlan.Speed"><Unit>kts</Unit><Range min="0" max="7"/><Resolution>1</Resolution></QuantityProfile>
+<QuantityProfile cdm="MissionPlan.Depth"><Unit>m</Unit><Resolution>1</Resolution></QuantityProfile>
+<QuantityProfile cdm="MissionPlan.ReturnPosition.Latitude"><Unit>rad</Unit></QuantityProfile><QuantityProfile cdm="MissionPlan.ReturnPosition.Longitude"><Unit>rad</Unit></QuantityProfile>
+<CollectionProfile cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="100"><ElementProfile cdm="MissionPlan.Waypoint"><QuantityProfile cdm="MissionPlan.Waypoint.Latitude"><Unit>rad</Unit></QuantityProfile><QuantityProfile cdm="MissionPlan.Waypoint.Longitude"><Unit>rad</Unit></QuantityProfile></ElementProfile></CollectionProfile>
+<QuantityProfile cdm="MissionPlan.AlignmentInterval"><Resolution>1</Resolution></QuantityProfile>
+</Parameters><Reply cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true"/></ControlSpec>
+<ControlSpec id="controlAuvLocally" name="AUV 근거리 위치 통제" cdm="Control.Platform.Motion"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Platform.Motion.Speed"><Range min="0" max="255"/><Resolution>1</Resolution></QuantityProfile><QuantityProfile cdm="Platform.Motion.Direction"><Unit>deg</Unit><Range min="-15" max="15"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Platform.Motion.Response" bindRef="controlAuvLocallyReply" required="true"/></ControlSpec>
+<ControlSpec id="requestAuvStatus" name="AUV 상태 요청" cdm="Request.Platform.Status"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Request.Platform.Status.Response" bindRef="requestAuvStatusReply" required="true"><Results>
+<QuantityResult name="AUV ID" cdm="Platform.Identifier.Numeric"/>
+<QuantityResult name="배터리 용량" cdm="Platform.Energy.Battery.RemainingPercent"><Unit>%</Unit><Range min="0" max="100"/><Resolution>1</Resolution></QuantityResult>
+<QuantityResult name="GPS 위도" cdm="Navigation.GNSS.Position.Latitude"><Unit>rad</Unit></QuantityResult><QuantityResult name="GPS 경도" cdm="Navigation.GNSS.Position.Longitude"><Unit>rad</Unit></QuantityResult>
+<QuantityResult name="WayPoint 개수" cdm="MissionPlan.WaypointCount"><Range min="0" max="100"/><Resolution>1</Resolution></QuantityResult><Result name="정렬확인" cdm="Navigation.Integrated.Alignment.Status"/>
+<QuantityResult name="복합항법 위도" cdm="Navigation.Integrated.Position.Latitude"><Unit>rad</Unit></QuantityResult><QuantityResult name="복합항법 경도" cdm="Navigation.Integrated.Position.Longitude"><Unit>rad</Unit></QuantityResult>
+<QuantityResult name="AUV 데이터 파일 개수" cdm="RecordedData.Platform.FileCount"/><QuantityResult name="측면주사소나 파일 개수" cdm="RecordedData.SideScanSonar.FileCount"/><QuantityResult name="광학카메라 파일 개수" cdm="RecordedData.OpticalCamera.FileCount"/><QuantityResult name="초음파카메라 파일 개수" cdm="RecordedData.AcousticCamera.FileCount"/><QuantityResult name="전방주사소나 파일 개수" cdm="RecordedData.ForwardLookingSonar.FileCount"/>
+<GroupResult name="비상종료 항목(EOR)"><Result name="LEAK"/><Result name="ROLL"/><Result name="PITCH"/><Result name="VEL"/><Result name="COM"/><Result name="PCD"/><Result name="GPS"/><Result name="RF/UCD"/><Result name="Ceiling Depth"/><Result name="BT_SOC"/><Result name="BT_TEMP"/><Result name="BT_CO"/><Result name="BT_V"/><Result name="MC"/><Result name="DIS"/><Result name="EOM"/></GroupResult>
+<GroupResult name="MODE 항목"><Result name="PLC"/><Result name="MS"/><Result name="RC"/><Result name="ALIGN"/><Result name="MS_ST"/><Result name="EMER"/><Result name="FILE"/><Result name="DATA"/><Result name="MS_STOP"/><Result name="REC_DEL"/><Result name="RF_CONF"/><Result name="EOR"/></GroupResult>
+</Results></Reply></ControlSpec>
+<ControlSpec id="startMission" name="AUV 임무 시작" cdm="Control.Mission.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true"/></ControlSpec>
+<ControlSpec id="emergencyReturn" name="AUV 비상복귀" cdm="Control.Mission.EmergencyReturn"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Autonomy.EmergencyReturn.Position.Latitude"><Unit>rad</Unit></QuantityProfile><QuantityProfile cdm="Autonomy.EmergencyReturn.Position.Longitude"><Unit>rad</Unit></QuantityProfile></Parameters><Reply cdm="Control.Mission.EmergencyReturn.Response" bindRef="emergencyReturnReply" required="true"/></ControlSpec>
+<ControlSpec id="requestFileList" name="AUV 파일 목록 요청" cdm="Request.RecordedData.FileList"><Target cdm="Platform.Identifier.Numeric"/><Parameters><Profile cdm="RecordedData.FileList.DataType"/></Parameters><Reply cdm="Request.RecordedData.FileList.Response" bindRef="requestFileListReply" required="true"><Results><QuantityResult name="AUV 데이터 파일 개수" cdm="RecordedData.Platform.FileCount"/><QuantityResult name="측면주사소나 파일 개수" cdm="RecordedData.SideScanSonar.FileCount"/><QuantityResult name="광학카메라 파일 개수" cdm="RecordedData.OpticalCamera.FileCount"/><QuantityResult name="초음파카메라 파일 개수" cdm="RecordedData.AcousticCamera.FileCount"/><QuantityResult name="전방주사소나 파일 개수" cdm="RecordedData.ForwardLookingSonar.FileCount"/></Results></Reply></ControlSpec>
+<ControlSpec id="requestData" name="AUV 데이터 전송 요청" cdm="Request.RecordedData.Transfer"><Target cdm="Platform.Identifier.Numeric"/><Parameters><BooleanProfile cdm="RecordedData.Selection.Platform" required="false" default="false"/><BooleanProfile cdm="RecordedData.Selection.SideScanSonar" required="false" default="false"/><BooleanProfile cdm="RecordedData.Selection.OpticalCamera" required="false" default="false"/><BooleanProfile cdm="RecordedData.Selection.AcousticCamera" required="false" default="false"/><BooleanProfile cdm="RecordedData.Selection.ForwardLookingSonar" required="false" default="false"/><QuantityProfile cdm="RecordedData.FileRange.First"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile><QuantityProfile cdm="RecordedData.FileRange.Final"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile></Parameters></ControlSpec>
+<ControlSpec id="stopMission" name="AUV 임무 중지" cdm="Control.Mission.Stop"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true"/></ControlSpec>
+<ControlSpec id="deleteAllRecords" name="AUV 저장자료 전체 삭제" cdm="Request.RecordedData.DeleteAll"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Request.RecordedData.DeleteAll.Response" bindRef="deleteAllRecordsReply" required="true"/></ControlSpec>
+<ControlSpec id="enterMaintenanceMode" name="AUV 정비장비모드 진입" cdm="Control.Platform.MaintenanceMode.Enter"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Control.Platform.MaintenanceMode.Enter.Response" bindRef="enterMaintenanceModeReply" required="true"/></ControlSpec>
+<ControlSpec id="setFlashBrightness" name="AUV 점멸등 밝기 설정" cdm="Control.Equipment.Light.Brightness"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Equipment.Light.Brightness"><Range min="1" max="10"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Equipment.Light.Brightness.Response" bindRef="setFlashBrightnessReply" required="true"/></ControlSpec>
+</ControlSpecs>
+<SensorProductSpecs id="sensorProduct"><ProductFileSpec id="auvData" name="AUV 데이터" cdm="RecordedData.Platform"><ProductKind cdm="ProductKind.RecordedData"/></ProductFileSpec><ProductFileSpec id="sideScanSonarData" name="측면주사소나 데이터" cdm="RecordedData.SideScanSonar"><ProductKind cdm="ProductKind.RecordedData"/></ProductFileSpec><ProductFileSpec id="opticalCameraData" name="광학카메라 데이터" cdm="RecordedData.OpticalCamera"><ProductKind cdm="ProductKind.RecordedData"/></ProductFileSpec><ProductFileSpec id="acousticCameraData" name="초음파카메라 데이터" cdm="RecordedData.AcousticCamera"><ProductKind cdm="ProductKind.RecordedData"/></ProductFileSpec><ProductFileSpec id="forwardLookingSonarData" name="전방주사소나 데이터" cdm="RecordedData.ForwardLookingSonar"><ProductKind cdm="ProductKind.RecordedData"/></ProductFileSpec></SensorProductSpecs>
 </PlatformSpec>
