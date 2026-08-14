@@ -9,8 +9,10 @@
     - RF-2: 80 bytes = HEADER 14 + 고정 INFORMATION 62 + TAIL 4.
     - little-endian이며 COMMAND 표의 위 행을 bit0으로 해석한다.
     - RF 장치 요청은 주 기능 bit 하나와 RF_EXEC(bit31)를 결합한다.
-    - COMMAND, ACK, 완료 bit, INFO_NUM, packed word와 raw 상태 bitset은 BindingOnly이므로 cdm을 부여하지 않는다.
+    - COMMAND, ACK, 완료 bit, INFO_NUM, packed word와 상태 bitset은 BindingOnly이므로 cdm을 부여하지 않는다.
     - PackedField의 expectedValue는 개발자 확인용 최종 packed 값을 보존하며, expectedMask가 있으면 해당 bit만 조건으로 검사한다.
+    - STAT_code bit0~4는 0=정상, 1=비정상이며 bit5/6은 DATA_LOCK/SYNC_LOCK flag 자체를 나타낸다.
+    - Pre_Launch-Check는 AUV_CHECK_RESULT 계열과 동일한 자체점검 규칙으로 0=PASS, 1=FAIL을 적용한다.
     - checksum은 COUNT부터 INFORMATION 마지막 byte까지의 unsigned byte 합을 65536으로 나눈 나머지이며 UInt16 little-endian으로 전송한다.
 
     미확정 사항
@@ -200,11 +202,20 @@
                 <Field name="uhfPacketErrorRate" cdm="Communication.RF.UHF.PacketErrorRate"/>
                 <Field name="lBandPacketErrorRate" cdm="Communication.RF.LBand.PacketErrorRate"/>
                 <!--
-                    RF-2 byte 75 STAT_code bit 그룹:
-                    RFM L-BAND, RFM UHF, EDM, PDM, MCM, DATA_LOCK, SYNC_LOCK, reserved.
-                    개별 bit가 아닌 원본 1-byte 상태 코드로 보존한다.
+                    RF-2 byte 75 STAT_code bit 그룹.
+                    bit0~4는 각 반 상태(0=정상, 1=비정상), bit5=DATA_LOCK, bit6=SYNC_LOCK, bit7=reserved.
+                    DATA_LOCK/SYNC_LOCK은 flag 자체만 표현하며 정상/비정상 의미를 추가하지 않는다.
                 -->
-                <Field name="statusCode" converter="UInt8BitMask"/>
+                <PackedField name="statusCode" width="8" byteOrder="little">
+                    <BitMember name="RFM_L_BAND" offset="0"/>
+                    <BitMember name="RFM_UHF" offset="1"/>
+                    <BitMember name="EDM" offset="2"/>
+                    <BitMember name="PDM" offset="3"/>
+                    <BitMember name="MCM" offset="4"/>
+                    <BitMember name="DATA_LOCK" offset="5"/>
+                    <BitMember name="SYNC_LOCK" offset="6"/>
+                    <BitMember name="reserved7" offset="7"/>
+                </PackedField>
                 <!-- RF-2 bytes 76..79 TAIL. -->
                 <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
                 <FixedField name="stopByte" value="0x8181"/>
@@ -254,11 +265,28 @@
                 </PackedField>
                 <!--
                     RF-2 bytes 62..63 Pre_Launch-Check 2-byte 결과 그룹.
-                    ICD의 MSB 그룹에는 MCU, 모뎀/제어반, UHF, L-Band, 전원반, 암호화반과 reserved가 있고
-                    LSB 그룹은 reserved로 정의된다. 개별 bit 필드로 재작성하지 않고 raw word를 보존한다.
-                    표의 MSB/LSB 명칭과 little-endian wire byte의 대응은 구현 시 확인이 필요하다.
+                    표의 윗행을 bit0으로 적용: bit0/1 reserved, bit2 암호화반, bit3 전원반,
+                    bit4 L-Band, bit5 UHF, bit6 모뎀 및 제어반, bit7 MCU, bit8~15 reserved.
+                    원문 표 자체에는 0/1 결과 의미가 직접 기재되지 않았으나 AUV_CHECK_RESULT 계열과 동일한 자체점검 규칙(0=PASS, 1=FAIL)을 적용한다.
                 -->
-                <Field name="preLaunchCheck" converter="UInt16LEBitMask"/>
+                <PackedField name="preLaunchCheck" width="16" byteOrder="little">
+                    <BitMember name="reserved0" offset="0"/>
+                    <BitMember name="reserved1" offset="1"/>
+                    <BitMember name="EncryptionUnit" offset="2"/>
+                    <BitMember name="PowerUnit" offset="3"/>
+                    <BitMember name="LBandTransceiver" offset="4"/>
+                    <BitMember name="UhfTransceiver" offset="5"/>
+                    <BitMember name="ModemControlPanel" offset="6"/>
+                    <BitMember name="MCU" offset="7"/>
+                    <BitMember name="reserved8" offset="8"/>
+                    <BitMember name="reserved9" offset="9"/>
+                    <BitMember name="reserved10" offset="10"/>
+                    <BitMember name="reserved11" offset="11"/>
+                    <BitMember name="reserved12" offset="12"/>
+                    <BitMember name="reserved13" offset="13"/>
+                    <BitMember name="reserved14" offset="14"/>
+                    <BitMember name="reserved15" offset="15"/>
+                </PackedField>
                 <!-- RF-2 bytes 76..79 TAIL. -->
                 <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
                 <FixedField name="stopByte" value="0x8181"/>
