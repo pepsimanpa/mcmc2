@@ -10,6 +10,7 @@
     - little-endian이며 COMMAND 표의 위 행을 bit0으로 해석한다.
     - RF 장치 요청은 주 기능 bit 하나와 RF_EXEC(bit31)를 결합한다.
     - COMMAND, ACK, 완료 bit, INFO_NUM, packed word와 raw 상태 bitset은 BindingOnly이므로 cdm을 부여하지 않는다.
+    - PackedField의 expectedValue는 개발자 확인용 최종 packed 값을 보존하며, expectedMask가 있으면 해당 bit만 조건으로 검사한다.
     - checksum은 COUNT부터 INFORMATION 마지막 byte까지의 unsigned byte 합을 65536으로 나눈 나머지이며 UInt16 little-endian으로 전송한다.
 
     미확정 사항
@@ -19,7 +20,6 @@
     - RF-1의 2-byte ACK는 반대 방향 RF-2 COMMAND 완료 bit의 echo이며 현재 요청 COMMAND와 다른 필드이다.
     - RF_CMD_COMPLETE(bit13)=1은 RF통신장치가 해당 명령의 처리를 완료했음을 의미하며 AUV 본체 동작 완료와는 구분한다.
     - RF-2 ACK/완료 bit/Body 결과가 한 Telegram에서 동시에 유효한지 확인이 필요하다.
-    - XSD에는 bit-mask 필터가 없어 completionCommand를 exact word로 적었다. 다른 완료 bit가 함께 설정되면 확장이 필요하다.
 -->
 <CommBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -36,7 +36,10 @@
             <FixedField name="startByte" value="0x7E7E7E7E"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
             <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <FixedField name="command" value="0x82000000"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x82000000">
+                <BitMember name="RF_CONFIG" offset="25" fixedValue="1"/>
+                <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+            </PackedField>
             <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
             <!--
                 RF-1 bytes 15..39 INFORMATION1:
@@ -65,9 +68,13 @@
                 <!-- RF-2 bytes 0..13 HEADER: START(4), COUNT(4), COMMAND(2), ACK(4). -->
                 <FixedField name="startByte" value="0x7E7E7E7E"/>
                 <Field name="count" converter="UInt32LE"/>
-                <!-- RF_CMD_COMPLETE=bit13. exact 0x2000은 KEY_COMPLETE와 동시 설정되지 않는다는 잠정 가정이다. -->
-                <FixedField name="completionCommand" value="0x2000"/>
-                <FixedField name="ack" value="0x82000000"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x82000000">
+                    <BitMember name="RF_CONFIG" offset="25" fixedValue="1"/>
+                    <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+                </PackedField>
                 <!--
                     RF-2 bytes 14..75는 모든 응답에서 같은 62-byte Body이다.
                     이 Reply는 bytes 64..65 RF_CONF_MODE/RF_CONF_PWR echo만 Semantic 결과로 소비한다.
@@ -91,7 +98,10 @@
             <FixedField name="startByte" value="0x7E7E7E7E"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
             <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <FixedField name="command" value="0x84000000"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x84000000">
+                <BitMember name="RF_CH_SCAN" offset="26" fixedValue="1"/>
+                <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+            </PackedField>
             <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. 스캔 요청에서 각 Body 입력값의 유효 규칙은 명시되지 않음. -->
             <FixedField name="reserveInformation1" value="0"/>
@@ -111,8 +121,13 @@
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E"/>
                 <Field name="count" converter="UInt32LE"/>
-                <FixedField name="completionCommand" value="0x2000"/>
-                <FixedField name="ack" value="0x84000000"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x84000000">
+                    <BitMember name="RF_CH_SCAN" offset="26" fixedValue="1"/>
+                    <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+                </PackedField>
                 <!-- RF-2 bytes 67..72 CH_SCAN: UHF ch1~3, L-Band ch1~3 수신감도(dB), 각 1 byte. -->
                 <Field name="uhfChannel1SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
                 <Field name="uhfChannel2SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
@@ -140,7 +155,10 @@
             <FixedField name="startByte" value="0x7E7E7E7E"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
             <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <FixedField name="command" value="0x81000000"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x81000000">
+                <BitMember name="RF_STATUS" offset="24" fixedValue="1"/>
+                <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+            </PackedField>
             <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. 상태 요청에서 송신 Body 값의 사용 규칙은 명시되지 않음. -->
             <FixedField name="reserveInformation1" value="0"/>
@@ -160,8 +178,13 @@
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E"/>
                 <Field name="count" converter="UInt32LE"/>
-                <FixedField name="completionCommand" value="0x2000"/>
-                <FixedField name="ack" value="0x81000000"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x81000000">
+                    <BitMember name="RF_STATUS" offset="24" fixedValue="1"/>
+                    <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+                </PackedField>
                 <!-- RF-2 bytes 64..66: RF_CONF_MODE, RF_CONF_PWR, EDM_BATTERY(0~100). -->
                 <Field name="rfConfMode" converter="UnpackRfConfMode"/>
                 <Field name="rfConfPower" converter="UnpackRfConfPower"/>
@@ -199,7 +222,10 @@
             <FixedField name="startByte" value="0x7E7E7E7E"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
             <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <FixedField name="command" value="0x80010000"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x80010000">
+                <BitMember name="PLC_Req" offset="16" fixedValue="1"/>
+                <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+            </PackedField>
             <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. 점검 요청에서 Body 입력값의 유효 규칙은 명시되지 않음. -->
             <FixedField name="reserveInformation1" value="0"/>
@@ -219,8 +245,13 @@
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E"/>
                 <Field name="count" converter="UInt32LE"/>
-                <FixedField name="completionCommand" value="0x2000"/>
-                <FixedField name="ack" value="0x80010000"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                    <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x80010000">
+                    <BitMember name="PLC_Req" offset="16" fixedValue="1"/>
+                    <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+                </PackedField>
                 <!--
                     RF-2 bytes 62..63 Pre_Launch-Check 2-byte 결과 그룹.
                     ICD의 MSB 그룹에는 MCU, 모뎀/제어반, UHF, L-Band, 전원반, 암호화반과 reserved가 있고
@@ -245,7 +276,10 @@
             <FixedField name="startByte" value="0x7E7E7E7E"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
             <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <FixedField name="command" value="0x88000000"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x88000000">
+                <BitMember name="RF_GAIN" offset="27" fixedValue="1"/>
+                <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+            </PackedField>
             <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. Gain 값/방향을 전달하는 전용 필드는 존재하지 않는다. -->
             <FixedField name="reserveInformation1" value="0"/>
@@ -277,7 +311,10 @@
             <FixedField name="startByte" value="0x7E7E7E7E"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
             <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <FixedField name="command" value="0x90000000"/>
+            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x90000000">
+                <BitMember name="KEY_CMD" offset="28" fixedValue="1"/>
+                <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+            </PackedField>
             <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. 사전 주입 키 자체를 싣는 필드는 존재하지 않는다. -->
             <FixedField name="reserveInformation1" value="0"/>
@@ -297,12 +334,13 @@
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E"/>
                 <Field name="count" converter="UInt32LE"/>
-                <!--
-                    KEY_COMPLETE=bit12. exact 0x1000은 RF_CMD_COMPLETE가 동시에 설정되지 않는다는 잠정 가정이다.
-                    두 bit가 함께 설정되거나 완료가 후속 Telegram으로 오면 mask 조건을 지원하도록 XSD 확장이 필요하다.
-                -->
-                <FixedField name="completionCommand" value="0x1000"/>
-                <FixedField name="ack" value="0x90000000"/>
+                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x1000" expectedMask="0x1000">
+                    <BitMember name="KEY_COMPLETE" offset="12" fixedValue="1"/>
+                </PackedField>
+                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x90000000">
+                    <BitMember name="KEY_CMD" offset="28" fixedValue="1"/>
+                    <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
+                </PackedField>
                 <!-- RF-2 bytes 14..75 고정 Body에는 키 적용 전용 결과 필드가 없어 raw 그룹으로만 보존한다. -->
                 <Field name="informationBody"/>
                 <!-- RF-2 bytes 76..79 TAIL. -->
