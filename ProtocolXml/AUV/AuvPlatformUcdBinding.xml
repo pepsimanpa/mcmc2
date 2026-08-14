@@ -5,7 +5,7 @@
     UCD-2(수중통신장치→제어장치, 16 bytes) 두 종류뿐이다.
     아래 ControlBinding은 새 메시지를 만드는 것이 아니라 같은 UCD-1/UCD-2를
     COMMAND/ACK 값으로 구분한 논리 뷰이다.
-    COMMAND, ACK와 의미가 확정되지 않은 raw 점검/status bitset은 BindingOnly이므로 cdm을 부여하지 않는다.
+    COMMAND, ACK와 점검/status bitset은 BindingOnly이므로 cdm을 부여하지 않는다.
 
     확정 사항
     - UCD 구간은 RS422로 연동하며 RS422Channel의 messageType은 물리 Telegram 형식을 나타낸다.
@@ -13,7 +13,9 @@
     - checksum은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지를 UInt16LE로 저장한다.
     - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지 계산한다.
     - PackedField의 offset=0은 little-endian 정규화 후 LSB(bit0)를 의미한다.
-    - expectedValue는 BitMember 구성으로 만들어지는 개발자 확인용 최종 packed 값을 함께 보존한다.
+    - PackedField의 expectedValue는 개발자 확인용 최종 packed 값을 보존한다.
+    - AUV_CHECK_RESULT_L 점검 bit는 원문 근거에 따라 0=PASS, 1=FAIL로 해석한다.
+    - UCD EOR bit는 0=미발생, 1=해당 비상종료 조건 발생으로 해석한다.
 
     미확정 사항
     - UCD-1에는 AUV_ID가 없으므로 Semantic Target이 실제 링크/장치 선택과 어떻게 연결되는지 확인이 필요하다.
@@ -50,17 +52,31 @@
                 <PackedField name="ack" width="16" byteOrder="little" expectedValue="0x0001">
                     <BitMember name="AUV_CHECK_Req_L" offset="0" fixedValue="1"/>
                 </PackedField>
-                <!--
-                    UCD-2 byte 4: AUV_CHECK_RESULT_L.
-                    bit 그룹은 reserved, MSS_TEST, CCS_TEST, NS_TEST, BS_TEST, PRS_TEST, MCS_TEST, reserved 순서이다.
-                    개별 bit 번호를 새 필드로 재정의하지 않고 원본 1-byte 결과를 보존한다.
-                -->
-                <Field name="auvCheckResult" converter="UInt8BitMask"/>
+                <!-- UCD-2 byte 4: AUV_CHECK_RESULT_L. bit1~6은 0=PASS, 1=FAIL이며 bit0/7은 reserved. -->
+                <PackedField name="auvCheckResult" width="8" byteOrder="little">
+                    <BitMember name="reserved0" offset="0"/>
+                    <BitMember name="MSS_TEST" offset="1"/>
+                    <BitMember name="CCS_TEST" offset="2"/>
+                    <BitMember name="NS_TEST" offset="3"/>
+                    <BitMember name="BS_TEST" offset="4"/>
+                    <BitMember name="PRS_TEST" offset="5"/>
+                    <BitMember name="MCS_TEST" offset="6"/>
+                    <BitMember name="reserved7" offset="7"/>
+                </PackedField>
                 <!-- UCD-2 bytes 5..12: IMU_LAT/IMU_LONG(rad, float32 LE). 이 명령에서의 유효성은 명시되지 않음. -->
                 <Field name="imuLatitude" converter="Float32LE"/>
                 <Field name="imuLongitude" converter="Float32LE"/>
-                <!-- UCD-2 byte 13: EOR bit 그룹(LEAK, DIS, Ceiling Depth, VEL, COM, PCD, GPS, RF/UCD). -->
-                <Field name="eor" converter="UInt8BitMask"/>
+                <!-- UCD-2 byte 13: EOR. offset 0..7=LEAK, DIS, Ceiling Depth, VEL, COM, PCD, GPS, RF/UCD. -->
+                <PackedField name="eor" width="8" byteOrder="little">
+                    <BitMember name="LEAK" offset="0"/>
+                    <BitMember name="DIS" offset="1"/>
+                    <BitMember name="CeilingDepth" offset="2"/>
+                    <BitMember name="VEL" offset="3"/>
+                    <BitMember name="COM" offset="4"/>
+                    <BitMember name="PCD" offset="5"/>
+                    <BitMember name="GPS" offset="6"/>
+                    <BitMember name="RF_UCD" offset="7"/>
+                </PackedField>
                 <!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. -->
                 <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" converter="ByteSumModulo65536LE"/>
             </Reply>
@@ -93,13 +109,31 @@
                 <PackedField name="ack" width="16" byteOrder="little" expectedValue="0x0020">
                     <BitMember name="EMER_RETURN" offset="5" fixedValue="1"/>
                 </PackedField>
-                <!-- UCD-2 byte 4: AUV_CHECK_RESULT_L. 비상복귀 응답에서의 유효성은 명시되지 않음. -->
-                <Field name="auvCheckResult" converter="UInt8BitMask"/>
+                <!-- UCD-2 byte 4: AUV_CHECK_RESULT_L. 비상복귀 응답에서의 업무 유효성은 명시되지 않았지만 물리 bit 구조는 동일하다. -->
+                <PackedField name="auvCheckResult" width="8" byteOrder="little">
+                    <BitMember name="reserved0" offset="0"/>
+                    <BitMember name="MSS_TEST" offset="1"/>
+                    <BitMember name="CCS_TEST" offset="2"/>
+                    <BitMember name="NS_TEST" offset="3"/>
+                    <BitMember name="BS_TEST" offset="4"/>
+                    <BitMember name="PRS_TEST" offset="5"/>
+                    <BitMember name="MCS_TEST" offset="6"/>
+                    <BitMember name="reserved7" offset="7"/>
+                </PackedField>
                 <!-- UCD-2 bytes 5..12: 현재 복합항법 위치(rad, float32 LE). -->
                 <Field name="imuLatitude" cdm="Navigation.Integrated.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
                 <Field name="imuLongitude" cdm="Navigation.Integrated.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
                 <!-- UCD-2 byte 13: EOR bit 그룹. 비상복귀 완료/성공을 직접 나타내는 값인지는 확인이 필요하다. -->
-                <Field name="eor" converter="UInt8BitMask"/>
+                <PackedField name="eor" width="8" byteOrder="little">
+                    <BitMember name="LEAK" offset="0"/>
+                    <BitMember name="DIS" offset="1"/>
+                    <BitMember name="CeilingDepth" offset="2"/>
+                    <BitMember name="VEL" offset="3"/>
+                    <BitMember name="COM" offset="4"/>
+                    <BitMember name="PCD" offset="5"/>
+                    <BitMember name="GPS" offset="6"/>
+                    <BitMember name="RF_UCD" offset="7"/>
+                </PackedField>
                 <!-- UCD-2 bytes 14..15: CHECKSUM. -->
                 <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" converter="ByteSumModulo65536LE"/>
             </Reply>
@@ -134,12 +168,30 @@
                 </PackedField>
                 <!--
                     UCD-2 bytes 4..13은 항상 같은 물리 Body(AUV_CHECK_RESULT_L, IMU 위치, EOR)이다.
-                    삭제 요청과의 인과관계/유효성이 명시되지 않아 CDM 결과로 승격하지 않고 raw 필드로 보존한다.
+                    삭제 요청과의 인과관계/유효성이 명시되지 않아 CDM 결과로 승격하지 않고 물리 bit 구조만 보존한다.
                 -->
-                <Field name="auvCheckResult" converter="UInt8BitMask"/>
+                <PackedField name="auvCheckResult" width="8" byteOrder="little">
+                    <BitMember name="reserved0" offset="0"/>
+                    <BitMember name="MSS_TEST" offset="1"/>
+                    <BitMember name="CCS_TEST" offset="2"/>
+                    <BitMember name="NS_TEST" offset="3"/>
+                    <BitMember name="BS_TEST" offset="4"/>
+                    <BitMember name="PRS_TEST" offset="5"/>
+                    <BitMember name="MCS_TEST" offset="6"/>
+                    <BitMember name="reserved7" offset="7"/>
+                </PackedField>
                 <Field name="imuLatitude" converter="Float32LE"/>
                 <Field name="imuLongitude" converter="Float32LE"/>
-                <Field name="eor" converter="UInt8BitMask"/>
+                <PackedField name="eor" width="8" byteOrder="little">
+                    <BitMember name="LEAK" offset="0"/>
+                    <BitMember name="DIS" offset="1"/>
+                    <BitMember name="CeilingDepth" offset="2"/>
+                    <BitMember name="VEL" offset="3"/>
+                    <BitMember name="COM" offset="4"/>
+                    <BitMember name="PCD" offset="5"/>
+                    <BitMember name="GPS" offset="6"/>
+                    <BitMember name="RF_UCD" offset="7"/>
+                </PackedField>
                 <!-- UCD-2 bytes 14..15: CHECKSUM. -->
                 <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" converter="ByteSumModulo65536LE"/>
             </Reply>
