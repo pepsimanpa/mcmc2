@@ -12,6 +12,7 @@
     - UCD Telegram에는 별도 infoCode가 없으므로 RS422Channel에 infoCode를 사용하지 않는다.
     - checksum은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지를 UInt16LE로 저장한다.
     - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지 계산한다.
+    - PackedField의 offset=0은 little-endian 정규화 후 LSB(bit0)를 의미한다.
 
     미확정 사항
     - UCD-1에는 AUV_ID가 없으므로 Semantic Target이 실제 링크/장치 선택과 어떻게 연결되는지 확인이 필요하다.
@@ -30,7 +31,9 @@
             <RS422Channel messageType="AuvUcd1Telegram"/>
             <!-- UCD-1 bytes 0..3: START(2)=0x7E7E, COMMAND(2 LE). -->
             <FixedField name="startByte" value="0x7E7E"/>
-            <FixedField name="command" value="0x0001"/>
+            <PackedField name="command" width="16" byteOrder="little">
+                <BitMember name="AUV_CHECK_Req_L" offset="0" fixedValue="1"/>
+            </PackedField>
             <!-- UCD-1 bytes 4..13: RESERVE1, RESERVE2, RETURN_LAT(4), RETURN_LONG(4). 점검 요청 시 유효값 규칙은 미정. -->
             <FixedField name="reserve1" value="0"/>
             <FixedField name="reserve2" value="0"/>
@@ -43,7 +46,9 @@
                 <RS422Channel messageType="AuvUcd2Telegram"/>
                 <!-- UCD-2 bytes 0..3: START(2)=0x7E7E, ACK(2 LE)=요청 COMMAND. -->
                 <FixedField name="startByte" value="0x7E7E"/>
-                <FixedField name="ack" value="0x0001"/>
+                <PackedField name="ack" width="16" byteOrder="little">
+                    <BitMember name="AUV_CHECK_Req_L" offset="0" fixedValue="1"/>
+                </PackedField>
                 <!--
                     UCD-2 byte 4: AUV_CHECK_RESULT_L.
                     bit 그룹은 reserved, MSS_TEST, CCS_TEST, NS_TEST, BS_TEST, PRS_TEST, MCS_TEST, reserved 순서이다.
@@ -69,7 +74,9 @@
             <RS422Channel messageType="AuvUcd1Telegram"/>
             <!-- UCD-1 bytes 0..3: START(2), COMMAND(2 LE). -->
             <FixedField name="startByte" value="0x7E7E"/>
-            <FixedField name="command" value="0x0020"/>
+            <PackedField name="command" width="16" byteOrder="little">
+                <BitMember name="EMER_RETURN" offset="5" fixedValue="1"/>
+            </PackedField>
             <!-- UCD-1 bytes 4..13: RESERVE1/2와 비상복귀 위치(rad, float32 LE). -->
             <FixedField name="reserve1" value="0"/>
             <FixedField name="reserve2" value="0"/>
@@ -82,7 +89,9 @@
                 <RS422Channel messageType="AuvUcd2Telegram"/>
                 <!-- UCD-2 bytes 0..3: START(2), ACK(2 LE)=0x0020. -->
                 <FixedField name="startByte" value="0x7E7E"/>
-                <FixedField name="ack" value="0x0020"/>
+                <PackedField name="ack" width="16" byteOrder="little">
+                    <BitMember name="EMER_RETURN" offset="5" fixedValue="1"/>
+                </PackedField>
                 <!-- UCD-2 byte 4: AUV_CHECK_RESULT_L. 비상복귀 응답에서의 유효성은 명시되지 않음. -->
                 <Field name="auvCheckResult" converter="UInt8BitMask"/>
                 <!-- UCD-2 bytes 5..12: 현재 복합항법 위치(rad, float32 LE). -->
@@ -104,7 +113,9 @@
             <RS422Channel messageType="AuvUcd1Telegram"/>
             <!-- UCD-1 bytes 0..3: START(2), COMMAND(2 LE). -->
             <FixedField name="startByte" value="0x7E7E"/>
-            <FixedField name="command" value="0x0200"/>
+            <PackedField name="command" width="16" byteOrder="little">
+                <BitMember name="Record_Del" offset="9" fixedValue="1"/>
+            </PackedField>
             <!-- UCD-1 bytes 4..13: 전체삭제 명령에서는 대상 선택값을 전달하지 않으므로 고정 0으로 채운다. -->
             <FixedField name="reserve1" value="0"/>
             <FixedField name="reserve2" value="0"/>
@@ -117,7 +128,9 @@
                 <RS422Channel messageType="AuvUcd2Telegram"/>
                 <!-- UCD-2 bytes 0..3: START(2), ACK(2 LE)=0x0200. -->
                 <FixedField name="startByte" value="0x7E7E"/>
-                <FixedField name="ack" value="0x0200"/>
+                <PackedField name="ack" width="16" byteOrder="little">
+                    <BitMember name="Record_Del" offset="9" fixedValue="1"/>
+                </PackedField>
                 <!--
                     UCD-2 bytes 4..13은 항상 같은 물리 Body(AUV_CHECK_RESULT_L, IMU 위치, EOR)이다.
                     삭제 요청과의 인과관계/유효성이 명시되지 않아 CDM 결과로 승격하지 않고 raw 필드로 보존한다.
