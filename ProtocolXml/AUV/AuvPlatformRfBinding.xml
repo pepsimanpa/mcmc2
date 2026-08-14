@@ -12,7 +12,10 @@
     - INFO_NUM은 AUV 1에서 INFO1/2/3=1/2/3, AUV 2에서 4/5/6이다.
     - RF-2 ACK는 RF-1 COMMAND 전체 4-byte word와 동일하다.
     - RF-3의 'ACK' 필드는 명령 ACK가 아니라 DATA TYPE과 Start/End frame flag이다.
-    - COMMAND, ACK, INFO_NUM, raw bitset과 RF-3 framing은 BindingOnly이므로 cdm을 부여하지 않는다.
+    - COMMAND, ACK, INFO_NUM, packed word와 RF-3 framing은 BindingOnly이므로 cdm을 부여하지 않는다.
+    - PackedField의 expectedValue는 개발자 확인용 최종 packed 값을 보존하며, expectedMask가 있으면 해당 bit만 조건으로 검사한다.
+    - AUV_CHECK_RESULT는 AUV_CHECK_RESULT_L과 동일한 점검 결과 계열로 0=PASS, 1=FAIL을 적용한다.
+    - EOR bit는 0=미발생, 1=해당 비상종료 조건 발생, MODE bit는 0=비활성, 1=활성으로 해석한다.
 
     미확정 사항
     - TCPChannel의 messageType은 RF-1/RF-2/RF-3 물리 Telegram 형식을 나타내며 별도 infoCode는 사용하지 않는다.
@@ -78,28 +81,118 @@
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
                 <!--
-                    RF-2 bytes 14..15 MSPD 2-byte 점검 그룹.
-                    첫 byte: 모듈#1 부팅/저장매체, FLS/SSS 점검·연동, 자율제어컴퓨터/통신부 연동.
-                    둘째 byte: 광학/초음파 카메라 점검·연동과 reserved.
+                    RF-2 bytes 14..25 AUV_CHECK_RESULT 상세 점검 결과.
+                    각 16-bit 그룹은 원문 표의 윗행부터 offset 0~15로 매핑하며 0=PASS, 1=FAIL이다.
+                    원문 MSB/LSB 그룹명은 bit offset을 뒤집는 기준으로 사용하지 않는다.
                 -->
-                <Field name="mspdCheck" converter="UInt16LEBitMask"/>
-                <!--
-                    RF-2 bytes 16..17 INB 2-byte 점검 그룹.
-                    두 byte는 메모리 및 IMU/DVL/심도계/GPS/지자기/자율제어컴퓨터 통신 연동 상태를 담는다.
-                    ICD의 MSB/LSB 명칭과 실제 wire byte 대응은 확인이 필요하다.
-                -->
-                <Field name="inbCheck" converter="UInt16LEBitMask"/>
-                <!--
-                    RF-2 bytes 18..19 ACC 2-byte 점검 그룹.
-                    전원제어/누수/점멸등/핑어/ACC 자체점검과 MSPD/INB/RF/UCD/추진제어기 연동 상태를 담는다.
-                -->
-                <Field name="accCheck" converter="UInt16LEBitMask"/>
-                <!-- RF-2 bytes 20..21 PCD 그룹: BMS, 전지팩 전압·온도, 제어/BMS 연동 상태와 reserved. -->
-                <Field name="pcdCheck" converter="UInt16LEBitMask"/>
-                <!-- RF-2 bytes 22..23 MC 그룹: 추진제어기 온도·입력전원·전류센서와 방향타/승강타 구동기 상태. -->
-                <Field name="mcCheck" converter="UInt16LEBitMask"/>
-                <!-- RF-2 bytes 24..25 RCD 그룹: MCU, 모뎀/제어반, UHF/L-Band 송수신반, 전원반, 암호화반과 reserved. -->
-                <Field name="rcdCheck" converter="UInt16LEBitMask"/>
+                <PackedField name="mspdCheck" width="16" byteOrder="little">
+                    <BitMember name="MissionSensorProcessorModule1Boot" offset="0"/>
+                    <BitMember name="MissionSensorProcessorModule1Storage" offset="1"/>
+                    <BitMember name="ForwardLookingSonarCheck" offset="2"/>
+                    <BitMember name="SideScanSonarCheck" offset="3"/>
+                    <BitMember name="ForwardLookingSonarConnection" offset="4"/>
+                    <BitMember name="SideScanSonarConnection" offset="5"/>
+                    <BitMember name="AutonomousControlComputerConnection" offset="6"/>
+                    <BitMember name="CommunicationUnitConnection" offset="7"/>
+                    <BitMember name="reserved8" offset="8"/>
+                    <BitMember name="reserved9" offset="9"/>
+                    <BitMember name="AcousticCameraCheck" offset="10"/>
+                    <BitMember name="OpticalCameraCheck" offset="11"/>
+                    <BitMember name="AcousticCameraConnection" offset="12"/>
+                    <BitMember name="OpticalCameraConnection" offset="13"/>
+                    <BitMember name="reserved14" offset="14"/>
+                    <BitMember name="reserved15" offset="15"/>
+                </PackedField>
+                <PackedField name="inbCheck" width="16" byteOrder="little">
+                    <BitMember name="MSB_reserved" offset="0"/>
+                    <BitMember name="MSB_AutonomousControlComputerCommunication" offset="1"/>
+                    <BitMember name="MSB_MagneticSensorCommunication" offset="2"/>
+                    <BitMember name="MSB_GPSCommunication" offset="3"/>
+                    <BitMember name="MSB_DepthSensorCommunication" offset="4"/>
+                    <BitMember name="MSB_DVLCommunication" offset="5"/>
+                    <BitMember name="MSB_IMUCommunication" offset="6"/>
+                    <BitMember name="MSB_MemoryCheck" offset="7"/>
+                    <BitMember name="LSB_reserved8" offset="8"/>
+                    <BitMember name="LSB_reserved9" offset="9"/>
+                    <BitMember name="LSB_AutonomousControlComputerCommunication" offset="10"/>
+                    <BitMember name="LSB_MagneticSensorCommunication" offset="11"/>
+                    <BitMember name="LSB_GPSCommunication" offset="12"/>
+                    <BitMember name="LSB_DepthSensorCommunication" offset="13"/>
+                    <BitMember name="LSB_DVLCommunication" offset="14"/>
+                    <BitMember name="LSB_IMUCommunication" offset="15"/>
+                </PackedField>
+                <PackedField name="accCheck" width="16" byteOrder="little">
+                    <BitMember name="PowerControlDeviceCommunication" offset="0"/>
+                    <BitMember name="LeakSensorConnection" offset="1"/>
+                    <BitMember name="FlashLightCommunication" offset="2"/>
+                    <BitMember name="PingerCommunication" offset="3"/>
+                    <BitMember name="AutonomousControlComputerInterfaceCheck" offset="4"/>
+                    <BitMember name="AutonomousControlComputer28VDCCheck" offset="5"/>
+                    <BitMember name="AutonomousControlComputerMemoryCheck" offset="6"/>
+                    <BitMember name="AutonomousControlComputerBootCheck" offset="7"/>
+                    <BitMember name="reserved8" offset="8"/>
+                    <BitMember name="FlashLightCheck" offset="9"/>
+                    <BitMember name="PingerCheck" offset="10"/>
+                    <BitMember name="PropulsionControllerCommunication" offset="11"/>
+                    <BitMember name="UnderwaterCommunicationDeviceConnection" offset="12"/>
+                    <BitMember name="RfCommunicationDeviceConnection" offset="13"/>
+                    <BitMember name="IntegratedNavigationComputerCommunication" offset="14"/>
+                    <BitMember name="MissionSensorProcessorCommunication" offset="15"/>
+                </PackedField>
+                <PackedField name="pcdCheck" width="16" byteOrder="little">
+                    <BitMember name="reserved0" offset="0"/>
+                    <BitMember name="reserved1" offset="1"/>
+                    <BitMember name="reserved2" offset="2"/>
+                    <BitMember name="reserved3" offset="3"/>
+                    <BitMember name="PowerControlAndBmsConnectionCheck" offset="4"/>
+                    <BitMember name="BatteryPackTemperatureCheck" offset="5"/>
+                    <BitMember name="BatteryPackVoltageTemperatureBmsCheck" offset="6"/>
+                    <BitMember name="BatteryBmsCheck" offset="7"/>
+                    <BitMember name="reserved8" offset="8"/>
+                    <BitMember name="reserved9" offset="9"/>
+                    <BitMember name="reserved10" offset="10"/>
+                    <BitMember name="reserved11" offset="11"/>
+                    <BitMember name="reserved12" offset="12"/>
+                    <BitMember name="reserved13" offset="13"/>
+                    <BitMember name="reserved14" offset="14"/>
+                    <BitMember name="reserved15" offset="15"/>
+                </PackedField>
+                <PackedField name="mcCheck" width="16" byteOrder="little">
+                    <BitMember name="reserved0" offset="0"/>
+                    <BitMember name="reserved1" offset="1"/>
+                    <BitMember name="reserved2" offset="2"/>
+                    <BitMember name="reserved3" offset="3"/>
+                    <BitMember name="reserved4" offset="4"/>
+                    <BitMember name="PropulsionControllerCurrentSensorCheck" offset="5"/>
+                    <BitMember name="PropulsionControllerInputPowerCheck" offset="6"/>
+                    <BitMember name="PropulsionControllerTemperatureCheck" offset="7"/>
+                    <BitMember name="reserved8" offset="8"/>
+                    <BitMember name="reserved9" offset="9"/>
+                    <BitMember name="reserved10" offset="10"/>
+                    <BitMember name="reserved11" offset="11"/>
+                    <BitMember name="RightElevatorActuatorCheck" offset="12"/>
+                    <BitMember name="LeftElevatorActuatorCheck" offset="13"/>
+                    <BitMember name="LowerRudderActuatorCheck" offset="14"/>
+                    <BitMember name="UpperRudderActuatorCheck" offset="15"/>
+                </PackedField>
+                <PackedField name="rcdCheck" width="16" byteOrder="little">
+                    <BitMember name="reserved0" offset="0"/>
+                    <BitMember name="reserved1" offset="1"/>
+                    <BitMember name="EncryptionUnitCheck" offset="2"/>
+                    <BitMember name="PowerUnitCheck" offset="3"/>
+                    <BitMember name="LBandTransceiverCheck" offset="4"/>
+                    <BitMember name="UhfTransceiverCheck" offset="5"/>
+                    <BitMember name="ModemControlPanelCheck" offset="6"/>
+                    <BitMember name="McuCheck" offset="7"/>
+                    <BitMember name="reserved8" offset="8"/>
+                    <BitMember name="reserved9" offset="9"/>
+                    <BitMember name="reserved10" offset="10"/>
+                    <BitMember name="reserved11" offset="11"/>
+                    <BitMember name="reserved12" offset="12"/>
+                    <BitMember name="reserved13" offset="13"/>
+                    <BitMember name="reserved14" offset="14"/>
+                    <BitMember name="reserved15" offset="15"/>
+                </PackedField>
                 <!-- RF-2 bytes 76..79 TAIL: CHECKSUM(2), STOP(2). -->
                 <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
                 <FixedField name="stopByte" value="0x8181"/>
@@ -268,9 +361,44 @@
                 <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/>
                 <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/>
                 <Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" converter="UInt16LE"/>
-                <!-- EOR/MODE bit 의미는 별도 bit mapping 확정 전 raw bitset으로 보존한다. -->
-                <Field name="emergencyReasonMask" converter="UInt16LEBitMask"/>
-                <Field name="modeMask" converter="UInt16LEBitMask"/>
+                <!-- EOR: offset0~15=LEAK,ROLL,PITCH,VEL,COM,PCD,GPS,RF/UCD,Ceiling Depth,BT_SOC,BT_TEMP,BT_CO,BT_V,MC,DIS,EOM. -->
+                <PackedField name="emergencyReasonMask" width="16" byteOrder="little">
+                    <BitMember name="LEAK" offset="0"/>
+                    <BitMember name="ROLL" offset="1"/>
+                    <BitMember name="PITCH" offset="2"/>
+                    <BitMember name="VEL" offset="3"/>
+                    <BitMember name="COM" offset="4"/>
+                    <BitMember name="PCD" offset="5"/>
+                    <BitMember name="GPS" offset="6"/>
+                    <BitMember name="RF_UCD" offset="7"/>
+                    <BitMember name="CeilingDepth" offset="8"/>
+                    <BitMember name="BT_SOC" offset="9"/>
+                    <BitMember name="BT_TEMP" offset="10"/>
+                    <BitMember name="BT_CO" offset="11"/>
+                    <BitMember name="BT_V" offset="12"/>
+                    <BitMember name="MC" offset="13"/>
+                    <BitMember name="DIS" offset="14"/>
+                    <BitMember name="EOM" offset="15"/>
+                </PackedField>
+                <!-- MODE: offset0~11=PLC,MS,RC,ALIGN,MS_ST,EMER,FILE,DATA,MS_STOP,REC_DEL,RF_CONF,EOR; 12~15 reserved. -->
+                <PackedField name="modeMask" width="16" byteOrder="little">
+                    <BitMember name="PLC" offset="0"/>
+                    <BitMember name="MS" offset="1"/>
+                    <BitMember name="RC" offset="2"/>
+                    <BitMember name="ALIGN" offset="3"/>
+                    <BitMember name="MS_ST" offset="4"/>
+                    <BitMember name="EMER" offset="5"/>
+                    <BitMember name="FILE" offset="6"/>
+                    <BitMember name="DATA" offset="7"/>
+                    <BitMember name="MS_STOP" offset="8"/>
+                    <BitMember name="REC_DEL" offset="9"/>
+                    <BitMember name="RF_CONF" offset="10"/>
+                    <BitMember name="EOR" offset="11"/>
+                    <BitMember name="reserved12" offset="12"/>
+                    <BitMember name="reserved13" offset="13"/>
+                    <BitMember name="reserved14" offset="14"/>
+                    <BitMember name="reserved15" offset="15"/>
+                </PackedField>
                 <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
                 <FixedField name="stopByte" value="0x8181"/>
             </Reply>
