@@ -103,6 +103,8 @@
         - transmit: defaultValue is the base value and fixedValue/sourceField members overlay their bit slices.
         - receive: fixedValue on a BitMember constrains only that slice; unspecified bits are don't-care.
         - sourceField/cdm members provide semantic packing/unpacking hooks. Exact enum/one-hot conversions may still use converter.
+        - expectedValue preserves the developer-visible packed hexadecimal/reference value. Without expectedMask it is an exact whole-word assertion/reference.
+        - expectedMask limits expectedValue comparison to significant receive bits, e.g. expectedValue=0x2000 expectedMask=0x2000 checks RF_CMD_COMPLETE(bit13) without requiring all other bits to be zero.
     -->
     <xs:simpleType name="ByteOrderType">
         <xs:restriction base="xs:string">
@@ -130,6 +132,8 @@
         <xs:attribute name="width" type="xs:positiveInteger" use="required"/>
         <xs:attribute name="byteOrder" type="ByteOrderType" default="little"/>
         <xs:attribute name="defaultValue" type="xs:string" default="0"/>
+        <xs:attribute name="expectedValue" type="xs:string"/>
+        <xs:attribute name="expectedMask" type="xs:string"/>
         <xs:attribute name="converter" type="xs:string"/>
     </xs:complexType>
 
