@@ -1,38 +1,249 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://lignex1.com/mcmc2/umsSchema" xmlns="http://lignex1.com/mcmc2/umsSchema" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://lignex1.com/mcmc2/umsSchema"
+           xmlns="http://lignex1.com/mcmc2/umsSchema"
+           elementFormDefault="qualified">
     <!-- AUV Reply 내장 Binding 확장 스키마 / 생성일시: 2026-08-04 11:51:54 KST -->
     <!-- 프로토콜 일반화 확장: ControlBinding/MonitorBinding 및 DDS/TCP/UDP/RS422 Channel 추가 / 2026-08-06 -->
+    <!-- packed bit-field 확장: PackedField/BitMember 추가 / 2026-08-14 -->
+
     <xs:element name="SensorBinding" type="BindingCompositionType"/>
     <xs:element name="PlatformBinding" type="BindingCompositionType"/>
     <xs:element name="PayloadBinding" type="BindingCompositionType"/>
     <xs:element name="CommBinding" type="BindingCompositionType"/>
-    <xs:complexType name="BindingCompositionType"><xs:sequence><xs:element name="Monitors" type="MonitorsType" minOccurs="0"/><xs:element name="Controls" type="ControlsType" minOccurs="0"/><xs:element name="SensorProducts" type="SensorProductsType" minOccurs="0"/></xs:sequence></xs:complexType>
-    <xs:complexType name="MonitorsType"><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:element name="MonitorBindingDDS" type="MonitorBindingDDSType"/><xs:element name="MonitorBinding" type="MonitorBindingType"/></xs:choice><xs:attribute name="semantic_id" type="xs:string" use="required"/></xs:complexType>
-    <xs:complexType name="ControlsType"><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:element name="ControlBindingDDS" type="ControlBindingDDSType"/><xs:element name="ControlBinding" type="ControlBindingType"/></xs:choice><xs:attribute name="semantic_id" type="xs:string" use="required"/></xs:complexType>
+
+    <xs:complexType name="BindingCompositionType">
+        <xs:sequence>
+            <xs:element name="Monitors" type="MonitorsType" minOccurs="0"/>
+            <xs:element name="Controls" type="ControlsType" minOccurs="0"/>
+            <xs:element name="SensorProducts" type="SensorProductsType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="MonitorsType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="MonitorBindingDDS" type="MonitorBindingDDSType"/>
+            <xs:element name="MonitorBinding" type="MonitorBindingType"/>
+        </xs:choice>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="ControlsType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="ControlBindingDDS" type="ControlBindingDDSType"/>
+            <xs:element name="ControlBinding" type="ControlBindingType"/>
+        </xs:choice>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+    </xs:complexType>
+
     <!-- 센서 산출물 Binding: Semantic SensorProductSpecs의 ProductStreamSpec과 실제 전송 Channel을 연결 -->
-    <xs:complexType name="SensorProductsType"><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:element name="ProductBinding" type="ProductBindingType"/></xs:choice><xs:attribute name="semantic_id" type="xs:string" use="required"/></xs:complexType>
+    <xs:complexType name="SensorProductsType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="ProductBinding" type="ProductBindingType"/>
+        </xs:choice>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+    </xs:complexType>
+
     <!-- 기존 DDS 전용 Binding XML 하위 호환용 Channel -->
-    <xs:complexType name="ChannelType"><xs:attribute name="topicName" type="xs:string" use="required"/><xs:attribute name="typeName" type="xs:string" use="required"/></xs:complexType>
+    <xs:complexType name="ChannelType">
+        <xs:attribute name="topicName" type="xs:string" use="required"/>
+        <xs:attribute name="typeName" type="xs:string" use="required"/>
+    </xs:complexType>
+
     <!-- 신규 프로토콜별 Channel -->
-    <xs:complexType name="DDSChannelType"><xs:attribute name="topicName" type="xs:string" use="required"/><xs:attribute name="typeName" type="xs:string" use="required"/></xs:complexType>
-    <xs:complexType name="MessageChannelType"><xs:attribute name="infoCode" type="xs:unsignedShort"/><xs:attribute name="messageType" type="xs:string" use="required"/></xs:complexType>
+    <xs:complexType name="DDSChannelType">
+        <xs:attribute name="topicName" type="xs:string" use="required"/>
+        <xs:attribute name="typeName" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="MessageChannelType">
+        <xs:attribute name="infoCode" type="xs:unsignedShort"/>
+        <xs:attribute name="messageType" type="xs:string" use="required"/>
+    </xs:complexType>
+
     <!-- RTP는 스트림 방식만 식별하며 IP/Port 등 통신 설정은 Binding 명세 범위에서 제외 -->
     <xs:complexType name="RTPChannelType"/>
-    <xs:group name="ProtocolChannelChoice"><xs:choice><xs:element name="DDSChannel" type="DDSChannelType"/><xs:element name="TCPChannel" type="MessageChannelType"/><xs:element name="UDPChannel" type="MessageChannelType"/><xs:element name="RS422Channel" type="MessageChannelType"/><xs:element name="RTPChannel" type="RTPChannelType"/></xs:choice></xs:group>
-    <xs:complexType name="FieldType"><xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="cdm" type="xs:string"/><xs:attribute name="inputUnit" type="xs:string"/><xs:attribute name="outputUnit" type="xs:string"/><xs:attribute name="converter" type="xs:string"/></xs:complexType>
-    <xs:complexType name="FixedFieldType"><xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="cdm" type="xs:string"/><xs:attribute name="value" type="xs:string" use="required"/><xs:attribute name="converter" type="xs:string"/></xs:complexType>
-    <xs:complexType name="DerivedFieldType"><xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="cdm" type="xs:string"/><xs:attribute name="sourceField" type="xs:string"/><xs:attribute name="converter" type="xs:string"/></xs:complexType>
-    <xs:complexType name="ElementType"><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:element name="Field" type="FieldType"/><xs:element name="FixedField" type="FixedFieldType"/><xs:element name="DerivedField" type="DerivedFieldType"/><xs:element name="ArrayField" type="ArrayFieldType"/></xs:choice><xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="cdm" type="xs:string"/></xs:complexType>
-    <xs:complexType name="ArrayFieldType"><xs:sequence><xs:element name="Element" type="ElementType"/></xs:sequence><xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="cdm" type="xs:string"/><xs:attribute name="minOccurs" type="xs:nonNegativeInteger"/><xs:attribute name="maxOccurs" type="xs:string"/></xs:complexType>
-    <xs:group name="BindingFieldChoice"><xs:choice><xs:element name="Field" type="FieldType"/><xs:element name="FixedField" type="FixedFieldType"/><xs:element name="DerivedField" type="DerivedFieldType"/><xs:element name="ArrayField" type="ArrayFieldType"/></xs:choice></xs:group>
-    <xs:complexType name="MatchFieldType"><xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="mask" type="xs:string" use="optional"/><xs:attribute name="value" type="xs:string" use="required"/></xs:complexType>
-    <xs:complexType name="ProductBindingType"><xs:sequence><xs:group ref="ProtocolChannelChoice"/><xs:element name="MatchField" type="MatchFieldType" minOccurs="0"/></xs:sequence><xs:attribute name="semantic_id" type="xs:string" use="required"/></xs:complexType>
+
+    <xs:group name="ProtocolChannelChoice">
+        <xs:choice>
+            <xs:element name="DDSChannel" type="DDSChannelType"/>
+            <xs:element name="TCPChannel" type="MessageChannelType"/>
+            <xs:element name="UDPChannel" type="MessageChannelType"/>
+            <xs:element name="RS422Channel" type="MessageChannelType"/>
+            <xs:element name="RTPChannel" type="RTPChannelType"/>
+        </xs:choice>
+    </xs:group>
+
+    <xs:complexType name="FieldType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="cdm" type="xs:string"/>
+        <xs:attribute name="inputUnit" type="xs:string"/>
+        <xs:attribute name="outputUnit" type="xs:string"/>
+        <xs:attribute name="converter" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="FixedFieldType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="cdm" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+        <xs:attribute name="converter" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="DerivedFieldType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="cdm" type="xs:string"/>
+        <xs:attribute name="sourceField" type="xs:string"/>
+        <xs:attribute name="converter" type="xs:string"/>
+    </xs:complexType>
+
+    <!--
+        PackedField bit numbering convention
+        - wire bytes are first normalized according to byteOrder.
+        - offset=0 is the LSB of the normalized integer.
+        - transmit: defaultValue is the base value and fixedValue/sourceField members overlay their bit slices.
+        - receive: fixedValue on a BitMember constrains only that slice; unspecified bits are don't-care.
+        - sourceField/cdm members provide semantic packing/unpacking hooks. Exact enum/one-hot conversions may still use converter.
+    -->
+    <xs:simpleType name="ByteOrderType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="little"/>
+            <xs:enumeration value="big"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="BitMemberType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="cdm" type="xs:string"/>
+        <xs:attribute name="sourceField" type="xs:string"/>
+        <xs:attribute name="offset" type="xs:nonNegativeInteger" use="required"/>
+        <xs:attribute name="width" type="xs:positiveInteger" default="1"/>
+        <xs:attribute name="fixedValue" type="xs:string"/>
+        <xs:attribute name="converter" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="PackedFieldType">
+        <xs:sequence>
+            <xs:element name="BitMember" type="BitMemberType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="cdm" type="xs:string"/>
+        <xs:attribute name="width" type="xs:positiveInteger" use="required"/>
+        <xs:attribute name="byteOrder" type="ByteOrderType" default="little"/>
+        <xs:attribute name="defaultValue" type="xs:string" default="0"/>
+        <xs:attribute name="converter" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="ElementType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="Field" type="FieldType"/>
+            <xs:element name="FixedField" type="FixedFieldType"/>
+            <xs:element name="DerivedField" type="DerivedFieldType"/>
+            <xs:element name="PackedField" type="PackedFieldType"/>
+            <xs:element name="ArrayField" type="ArrayFieldType"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="cdm" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="ArrayFieldType">
+        <xs:sequence>
+            <xs:element name="Element" type="ElementType"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="cdm" type="xs:string"/>
+        <xs:attribute name="minOccurs" type="xs:nonNegativeInteger"/>
+        <xs:attribute name="maxOccurs" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:group name="BindingFieldChoice">
+        <xs:choice>
+            <xs:element name="Field" type="FieldType"/>
+            <xs:element name="FixedField" type="FixedFieldType"/>
+            <xs:element name="DerivedField" type="DerivedFieldType"/>
+            <xs:element name="PackedField" type="PackedFieldType"/>
+            <xs:element name="ArrayField" type="ArrayFieldType"/>
+        </xs:choice>
+    </xs:group>
+
+    <xs:complexType name="MatchFieldType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="mask" type="xs:string" use="optional"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="ProductBindingType">
+        <xs:sequence>
+            <xs:group ref="ProtocolChannelChoice"/>
+            <xs:element name="MatchField" type="MatchFieldType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+    </xs:complexType>
+
     <!-- 기존 DDS 전용 Binding 타입: 기존 XML 검증 호환을 위해 유지 -->
-    <xs:complexType name="MonitorBindingDDSType"><xs:sequence><xs:element name="Channel" type="ChannelType"/><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice></xs:sequence><xs:attribute name="semantic_id" type="xs:string" use="required"/></xs:complexType>
-    <xs:complexType name="ReplyBindingType"><xs:sequence><xs:element name="Channel" type="ChannelType"/><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice></xs:sequence><xs:attribute name="semantic_id" type="xs:string" use="required"/><xs:attribute name="required" type="xs:boolean"/><xs:attribute name="timeout" type="xs:decimal"/></xs:complexType>
-    <xs:complexType name="ControlBindingDDSType"><xs:sequence><xs:element name="Channel" type="ChannelType"/><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice><xs:element name="Reply" type="ReplyBindingType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence><xs:attribute name="semantic_id" type="xs:string" use="required"/></xs:complexType>
+    <xs:complexType name="MonitorBindingDDSType">
+        <xs:sequence>
+            <xs:element name="Channel" type="ChannelType"/>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="BindingFieldChoice"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="ReplyBindingType">
+        <xs:sequence>
+            <xs:element name="Channel" type="ChannelType"/>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="BindingFieldChoice"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+        <xs:attribute name="required" type="xs:boolean"/>
+        <xs:attribute name="timeout" type="xs:decimal"/>
+    </xs:complexType>
+
+    <xs:complexType name="ControlBindingDDSType">
+        <xs:sequence>
+            <xs:element name="Channel" type="ChannelType"/>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="BindingFieldChoice"/>
+            </xs:choice>
+            <xs:element name="Reply" type="ReplyBindingType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+    </xs:complexType>
+
     <!-- 신규 프로토콜 독립 Binding 타입 -->
-    <xs:complexType name="MonitorBindingType"><xs:sequence><xs:group ref="ProtocolChannelChoice"/><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice></xs:sequence><xs:attribute name="semantic_id" type="xs:string" use="required"/></xs:complexType>
-    <xs:complexType name="ProtocolReplyBindingType"><xs:sequence><xs:group ref="ProtocolChannelChoice"/><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice></xs:sequence><xs:attribute name="semantic_id" type="xs:string" use="required"/><xs:attribute name="required" type="xs:boolean"/><xs:attribute name="timeout" type="xs:decimal"/></xs:complexType>
-    <xs:complexType name="ControlBindingType"><xs:sequence><xs:group ref="ProtocolChannelChoice"/><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice><xs:element name="Reply" type="ProtocolReplyBindingType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence><xs:attribute name="semantic_id" type="xs:string" use="required"/></xs:complexType>
+    <xs:complexType name="MonitorBindingType">
+        <xs:sequence>
+            <xs:group ref="ProtocolChannelChoice"/>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="BindingFieldChoice"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="ProtocolReplyBindingType">
+        <xs:sequence>
+            <xs:group ref="ProtocolChannelChoice"/>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="BindingFieldChoice"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+        <xs:attribute name="required" type="xs:boolean"/>
+        <xs:attribute name="timeout" type="xs:decimal"/>
+    </xs:complexType>
+
+    <xs:complexType name="ControlBindingType">
+        <xs:sequence>
+            <xs:group ref="ProtocolChannelChoice"/>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="BindingFieldChoice"/>
+            </xs:choice>
+            <xs:element name="Reply" type="ProtocolReplyBindingType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="semantic_id" type="xs:string" use="required"/>
+    </xs:complexType>
 </xs:schema>
