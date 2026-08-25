@@ -55,17 +55,31 @@ Binding에서 정의하는 항목:
 - ACK와 실제 BIT/상태 결과가 별도 데이터라면 하나로 합치지 않는다.
 - 명확한 주기 메시지 근거가 없으면 Monitor를 임의로 만들지 않는다.
 
-## 5. Semantic Result 표현 원칙
+### Heartbeat 방향 모델링 TBD
 
-Semantic Result는 사용자가 이해할 수 있는 논리 의미를 표현한다.
+`rov_common.csv`의 `T_HEARTBEAT`는 1초 주기 양방향 송수신이며 `heartBeatCnt`는 송신 시 1씩 증가하도록 직접 정의되어 있다.
+
+다만 **자체 송신 Heartbeat를 Semantic Monitor 대상으로 보는 것이 장기 구조상 적절한지 여부는 확정하지 않는다.**
+현재 MDV/EMDW의 `transmitHeartbeat` / `receiveHeartbeat` 표현은 기존 구조를 유지하고, 향후 Monitor의 방향성 및 통신관리 전용 Semantic/Binding 모델을 검토한 뒤 결정한다.
+
+## 5. Semantic Result / 선택값 표현 원칙
+
+Semantic Result와 HMI 선택형 Parameter는 사용자가 이해할 수 있는 논리 의미를 표현한다.
 
 예:
 - 정상 / 고장
 - 발생 / 미발생
 - 활성 / 비활성
-- 가능 / 불가능
+- 성공 / 실패
+- 이동 / 탐색 / 식별
 
-물리값 `0/1`, bit offset, mask와 같은 wire 표현은 Binding에 둔다.
+물리값 `0/1`, enum code, bit offset, mask와 같은 wire 표현은 Binding에 둔다.
+
+이를 위해 신규 설계에서는:
+- HMI 선택형 Parameter: `ValueSetProfile`
+- Reply 논리 상태 결과: `ValueSetResult`
+
+를 사용한다. 두 형식의 `<Value>`에는 의미 이름과 CDM을 정의하며 wire 숫자값을 기록하지 않는다.
 
 Semantic Result와 Binding의 Field/BitMember는 이름이나 선언 순서가 아니라 동일 CDM을 연결키로 사용한다.
 
@@ -78,6 +92,7 @@ Reserved bit는 Semantic Result를 만들지 않으며 CDM도 부여하지 않�
 - 장치 내부 고유 의미만 장치/도메인 특화 CDM을 사용한다.
 - 단순히 한 XML 내부의 Semantic/Binding 문자열을 맞추기 위해 새 CDM을 만들지 않는다.
 - CDM 정합성은 장치 단위가 아니라 시스템 전반에서 검토한다.
+- 원 ICD의 상태 의미가 다른 경우 명칭이 비슷하다는 이유만으로 하나의 CDM에 강제 통합하지 않는다. 예: `Warning/Abnormal`과 `Degraded/Unavailable`은 직접 동일 의미가 확인될 때만 통합한다.
 
 ## 7. PackedField / BitMember 규칙
 
@@ -91,6 +106,8 @@ XSD 1.0으로 직접 보장하기 어려운 다음 조건은 별도 Validator에
 - BitMember 간 overlap 없음
 - expectedValue/expectedMask가 PackedField width를 초과하지 않음
 - fixedValue가 BitMember width를 초과하지 않음
+
+원 ICD가 반복 데이터 전체에 대한 조건을 지정하면 XSD에 억지로 넣지 않고 Validator/OM 규칙으로 관리할 수 있다. 예: MDV/EMDW 임무계획의 **마지막 Waypoint Action은 대기**.
 
 ## 8. 미사용 Field 처리 규칙
 
@@ -124,8 +141,10 @@ Semantic/Binding 변경 후 최소 확인:
 3. Semantic Reply bindRef ↔ Binding Reply semantic_id
 4. Parameter CDM ↔ Binding sourceField/CDM
 5. Result CDM ↔ Binding Field/BitMember CDM
-6. PackedField bit width/overlap
-7. Telegram 순서/길이/endian
-8. Reserved/misused field zero-fill
-9. 기존 공통 CDM 재사용 여부
-10. TBD를 추정으로 확정하지 않았는지 확인
+6. ValueSetProfile/ValueSetResult 논리 상태 ↔ Binding raw code 변환
+7. PackedField bit width/overlap
+8. Telegram 순서/길이/endian
+9. Reserved/misused field zero-fill
+10. 반복/상호조건 Validator 규칙
+11. 기존 공통 CDM 재사용 여부
+12. TBD를 추정으로 확정하지 않았는지 확인
