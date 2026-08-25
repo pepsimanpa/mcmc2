@@ -14,28 +14,15 @@
 
 원 ICD의 물리 enum을 운용 기능 단위 Control로 분리한 현재 구조를 유지한다.
 
-MDV/EMDW `missionCtrlCmd`:
-- 정지
-- 시작
-- 일시정지
-- 재개
+MDV/EMDW `missionCtrlCmd`: 정지 / 시작 / 일시정지 / 재개
 
-MDV 운용모드:
-- 레거시모드
-- 자율운항모드
+MDV 운용모드: 레거시모드 / 자율운항모드
 
-EMDW 운용모드:
-- 관제터미널모드
-- 통합통제모드
+EMDW 운용모드: 관제터미널모드 / 통합통제모드
 
-비상정지 유형:
-- 즉시정지
-- 임무중지 후 대기
+비상정지 유형: 즉시정지 / 임무중지 후 대기
 
-EMDW 처리 명령:
-- 처리 취소
-- 처리 준비
-- 처리 실행
+EMDW 처리 명령: 처리 취소 / 처리 준비 / 처리 실행
 
 실제 wire enum code는 Binding에서 고정/변환한다.
 
@@ -43,9 +30,7 @@ EMDW 처리 명령:
 
 **Status: RESOLVED**
 
-`T_MDV_CTRL_RESP`, `T_EMDW_CTRL_RESP`의 `result`는 원 ICD 기준:
-- 성공
-- 실패
+`T_MDV_CTRL_RESP`, `T_EMDW_CTRL_RESP`의 `result`는 원 ICD 기준 성공/실패이다.
 
 Semantic Reply는 처리결과와 사유를 논리 상태로 제공한다. 실제 `0=성공`, `1=실패` 및 reasonCode 숫자값은 Binding에서 변환한다.
 
@@ -71,19 +56,14 @@ Control 응답 성공은 전체 임무 수행 완료와 동일하지 않다. 임
 **Status: RESOLVED**
 
 ### Waypoint Action
-Semantic 선택 의미:
-- 통과
-- 대기
+Semantic 선택 의미: 통과 / 대기
 
-wire code는 Binding에서 변환한다.
+wire code: `0=통과`, `1=대기`
 
 ### Mission Type
-Semantic 선택 의미:
-- 이동
-- 탐색
-- 식별
+Semantic 선택 의미: 이동 / 탐색 / 식별
 
-wire code는 Binding에서 변환한다.
+wire code: `0=이동`, `1=탐색`, `2=식별`
 
 ## 4. 마지막 Waypoint 규칙
 
@@ -91,23 +71,20 @@ wire code는 Binding에서 변환한다.
 
 원 ICD에 `마지막 경로점은 대기(1)로 설정`이 직접 명시되어 있다.
 
-따라서 임무계획 Validator/OM은:
-- Waypoint 목록이 존재할 때 마지막 Waypoint Action = 대기
-
-를 검증한다.
+Waypoint 목록이 존재할 때 Validator/OM은 마지막 Waypoint Action이 대기인지 확인한다.
 
 ## 5. Emergency Stop Reason
 
 **Status: RESOLVED**
 
-Semantic 선택 의미:
-- 운용자 명령
-- 체계 판단
-- 통신 이상
-- 장애 발생
-- 기타
+Semantic 선택 의미와 wire code:
+- `0` 운용자 명령
+- `1` 체계 판단
+- `2` 통신 이상
+- `3` 장애 발생
+- `4` 기타
 
-실제 0~4 wire code는 Binding에서 변환한다.
+Semantic에는 의미를 노출하고 실제 숫자값은 Binding에서 변환한다.
 
 ## 6. Platform Status Reason Code
 
@@ -175,11 +152,73 @@ Semantic Target을 별도로 강제하지 않는다.
 - USV의 `Degraded/Unavailable/NoResponse` 상태와 MDV/EMDW의 `Warning/Abnormal` 상태는 의미 체계가 다르므로 이름이 비슷하다는 이유로 강제 통합하지 않는다.
 - 신규 세부 CDM 명칭은 전체 시스템 CDM audit에서 최종 확인한다.
 
-## 12. 후속 구현 체크
+## 12. Binding Converter Mapping
 
-- `ValueSetProfile` ↔ Binding raw enum converter
-- `ValueSetResult` ↔ Binding result/reasonCode converter
-- `currentWaypointIndex` raw `0xFFFF` sentinel 변환
-- 마지막 Waypoint Action Validator
-- 송신 Reserved zero-fill 확인
+**Status: IMPLEMENTED IN BINDING / ADAPTER IMPLEMENTATION REQUIRED**
+
+Binding에 다음 converter 식별자를 사용한다. converter의 정확한 동작은 아래 매핑을 따라야 한다.
+
+### `CommandResultCodeToState`
+- raw `0` → 성공 (`Command.Result.Success`)
+- raw `1` → 실패 (`Command.Result.Failure`)
+
+### `UInt16LEToMdvCommandReasonState`
+little-endian uint16 decode 후:
+- `0` 없음
+- `1` 요청값 오류
+- `2` 임무계획 오류
+- `3` 모드전환 불가
+- `4` 모드 불일치
+- `5` MDV 미연동
+- `6` 운용상태 비정상
+- `7` 기타 오류
+
+### `UInt16LEToEmdwCommandReasonState`
+little-endian uint16 decode 후:
+- `0` 없음
+- `1` 요청값 오류
+- `2` 임무계획 오류
+- `3` 모드전환 불가
+- `4` 모드 불일치
+- `5` EMDW 미연동
+- `6` 운용상태 비정상
+- `7` 처리(Disposal)조건 불충족
+- `8` 기타 오류
+
+### `MissionWaypointActionToCode`
+- 통과 → `0`
+- 대기 → `1`
+
+### `MissionTypeToCode`
+- 이동 → `0`
+- 탐색 → `1`
+- 식별 → `2`
+
+### `EmergencyStopReasonToCode`
+- 운용자 명령 → `0`
+- 체계 판단 → `1`
+- 통신 이상 → `2`
+- 장애 발생 → `3`
+- 기타 → `4`
+
+### `UInt16LECurrentWaypointIndexOrNone`
+- raw `0~65534` → 동일 0-based 현재 Waypoint index
+- raw `0xFFFF` → 현재 추종 경유점 없음
+
+## 13. 구현/검증 상태
+
+반영 완료:
+- `ValueSetProfile` XSD 추가
+- `ValueSetResult` XSD 추가
+- MDV/EMDW Reply Result 의미 추가
+- Mission Type / Waypoint Action / Emergency Stop Reason 의미형 Parameter 적용
+- MDV statusCode 의미 보강
+- currentWaypointIndex 정상 범위 `0~65534` 적용
+- Binding raw-code converter 연결
+- 송신 Heartbeat Header Reserved zero-fill
+
+별도 후속 검증/구현:
+- 위 converter의 Adapter 실제 구현 여부 확인
+- 마지막 Waypoint Action Validator/OM 구현
+- 전체 시스템 CDM audit
 - Heartbeat Semantic 방향 모델은 별도 결정 전까지 구조 변경 금지
