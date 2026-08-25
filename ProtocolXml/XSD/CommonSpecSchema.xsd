@@ -49,6 +49,16 @@
 
     <!--
     Summary:
+        물리 코드값 없이 Semantic 선택 상태의 표시명/CDM만 선언하는 타입.
+        실제 wire 값(0/1/enum code)은 Binding에서 변환한다.
+    -->
+    <xs:complexType name="SemanticValueType">
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+    </xs:complexType>
+
+    <!--
+    Summary:
         Binding 키 정보를 담는 Element 타입 선언
     -->
     <xs:simpleType name="BindRefType">
@@ -383,6 +393,24 @@
 
     <!--
     Summary:
+        물리 숫자코드 없이 Semantic 논리 상태 집합으로 표현하는 Reply 결과.
+        실제 raw code와 상태 매핑은 Binding이 담당한다.
+    -->
+    <xs:complexType name="ValueSetResultType">
+        <xs:sequence>
+            <xs:element name="Values">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Value" type="SemanticValueType" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attributeGroup ref="ResultAttrs" />
+    </xs:complexType>
+
+    <!--
+    Summary:
         서로 관련된 Reply 결과를 계층적으로 묶는 그룹
     -->
     <xs:complexType name="GroupResultType">
@@ -390,6 +418,7 @@
             <xs:element name="Result" type="ResultType" />
             <xs:element name="QuantityResult" type="QuantityResultType" />
             <xs:element name="BooleanResult" type="BooleanResultType" />
+            <xs:element name="ValueSetResult" type="ValueSetResultType" />
             <xs:element name="GroupResult" type="GroupResultType" />
         </xs:choice>
         <xs:attributeGroup ref="ResultAttrs" />
@@ -400,6 +429,7 @@
             <xs:element name="Result" type="ResultType" />
             <xs:element name="QuantityResult" type="QuantityResultType" />
             <xs:element name="BooleanResult" type="BooleanResultType" />
+            <xs:element name="ValueSetResult" type="ValueSetResultType" />
             <xs:element name="GroupResult" type="GroupResultType" />
         </xs:choice>
     </xs:complexType>
@@ -428,6 +458,24 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="Resolution" type="xs:decimal" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+    </xs:complexType>
+
+    <!--
+    Summary:
+        물리 숫자코드 없이 운용자가 선택하는 논리 상태를 정의하는 제어 파라미터 프로파일.
+        실제 raw code와 상태 매핑은 Binding이 담당한다.
+    -->
+    <xs:complexType name="ValueSetProfileType">
+        <xs:sequence>
+            <xs:element name="Values">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Value" type="SemanticValueType" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
         <xs:attribute name="cdm" type="CdmRefType" use="optional" />
     </xs:complexType>
@@ -471,6 +519,7 @@
         <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:element name="Profile" type="CdmRefAttrType" />
             <xs:element name="QuantityProfile" type="QuantityProfileType" />
+            <xs:element name="ValueSetProfile" type="ValueSetProfileType" />
             <xs:element name="BooleanProfile" type="BooleanProfileType" />
             <xs:element name="CollectionProfile" type="CollectionProfileType" />
         </xs:choice>
