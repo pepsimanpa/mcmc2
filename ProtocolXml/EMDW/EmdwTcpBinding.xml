@@ -1,918 +1,108 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
 EMDW 플랫폼 TCP Binding - 기능 중심 Semantic 대응 재정의본.
-물리 메시지/정보코드/패킷 길이/필드 순서는 2026-08-06 원본 Binding을 유지한다.
-Semantic 행위 분리에 따라 동일 TCP 메시지를 여러 ControlBinding이 공유하고 enum 선택값은 FixedField로 결정한다.
+물리 메시지/정보코드/패킷 길이/필드 순서는 원본 ICD를 유지한다.
+Semantic 행위 분리에 따라 동일 TCP 메시지를 여러 ControlBinding이 공유하고 물리 enum은 FixedField/Converter에서 결정한다.
 Monitor는 동일 수신 패킷을 의미 그룹별로 복수 해석하되 물리 포맷은 변경하지 않는다.
-setTargetInformation Target 매핑 문제는 사용자 결정에 따라 이번 수정에서 보류한다.
-T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을 임시 유지한다.
+setTargetInformation Target 매핑 문제는 별도 TBD로 유지한다.
+T_HEARTBEAT는 원 ICD상 1초 주기 양방향 송수신이지만 송신 정보를 Semantic Monitor로 표현하는 장기 구조는 TBD로 유지한다.
 -->
 <PlatformBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
     <Monitors semantic_id="monitor">
         <MonitorBinding semantic_id="positionInfo">
             <TCPChannel infoCode="4302" messageType="T_EMDW_POSITION_INFO"/>
-            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4302, packetLength=44 여부는 Adapter 검증 조건이다. -->
-            <Field name="preamble"/>
-            <Field name="sourceDeviceId" converter="UInt16LE"/>
-            <Field name="destinationDeviceId" converter="UInt16LE"/>
-            <Field name="infoCode" converter="UInt16LE"/>
-            <Field name="packetLength" converter="UInt32LE"/>
-            <Field name="systemTimeYear" converter="UInt16LE"/>
-            <Field name="systemTimeMonth"/>
-            <Field name="systemTimeDate"/>
-            <Field name="systemTimeHour"/>
-            <Field name="systemTimeMinute"/>
-            <Field name="systemTimeSecond"/>
-            <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_EMDW_POSITION_INFO Body(16 bytes). -->
-            <Field name="emdwDepth" cdm="Navigation.Depth" converter="UInt16LE"/>
-            <Field name="emdwHeading" cdm="Navigation.Heading" converter="UInt16Scale10ToDecimalLE"/>
-            <Field name="emdwLatitude" cdm="Navigation.Position.Latitude" converter="Int32Scale10000000ToDecimalLE"/>
-            <Field name="emdwLongitude" cdm="Navigation.Position.Longitude" converter="Int32Scale10000000ToDecimalLE"/>
-            <Field name="speed" cdm="Motion.Speed" converter="UInt16Scale10ToDecimalLE"/>
-            <Field name="reserved"/>
-            <Field name="tail" converter="UInt32LE"/>
+            <Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/>
+            <Field name="emdwDepth" cdm="Navigation.Depth" converter="UInt16LE"/><Field name="emdwHeading" cdm="Navigation.Heading" converter="UInt16Scale10ToDecimalLE"/><Field name="emdwLatitude" cdm="Navigation.Position.Latitude" converter="Int32Scale10000000ToDecimalLE"/><Field name="emdwLongitude" cdm="Navigation.Position.Longitude" converter="Int32Scale10000000ToDecimalLE"/><Field name="speed" cdm="Motion.Speed" converter="UInt16Scale10ToDecimalLE"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/>
         </MonitorBinding>
         <MonitorBinding semantic_id="communicationStatus">
             <TCPChannel infoCode="4303" messageType="T_EMDW_STATUS_INFO"/>
-            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4303, packetLength=40 여부는 Adapter 검증 조건이다. -->
-            <Field name="preamble"/>
-            <Field name="sourceDeviceId" converter="UInt16LE"/>
-            <Field name="destinationDeviceId" converter="UInt16LE"/>
-            <Field name="infoCode" converter="UInt16LE"/>
-            <Field name="packetLength" converter="UInt32LE"/>
-            <Field name="systemTimeYear" converter="UInt16LE"/>
-            <Field name="systemTimeMonth"/>
-            <Field name="systemTimeDate"/>
-            <Field name="systemTimeHour"/>
-            <Field name="systemTimeMinute"/>
-            <Field name="systemTimeSecond"/>
-            <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_EMDW_STATUS_INFO Body(12 bytes). -->
-            <Field name="emdwId" converter="UInt16LE"/>
-            <Field name="consoleLinkStatus" cdm="Communication.Link.Console.Status"/>
-            <Field name="emdwLinkStatus" cdm="Communication.Link.Platform.Status"/>
-            <Field name="consoleHealthStatus"/>
-            <Field name="emdwHealthStatus"/>
-            <Field name="operationMode"/>
-            <Field name="statusCode" converter="UInt16LE"/>
-            <Field name="reserved"/>
-            <Field name="tail" converter="UInt32LE"/>
+            <Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/>
+            <Field name="emdwId" converter="UInt16LE"/><Field name="consoleLinkStatus" cdm="Communication.Link.Console.Status"/><Field name="emdwLinkStatus" cdm="Communication.Link.Platform.Status"/><Field name="consoleHealthStatus"/><Field name="emdwHealthStatus"/><Field name="operationMode"/><Field name="statusCode" converter="UInt16LE"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/>
         </MonitorBinding>
         <MonitorBinding semantic_id="healthStatus">
             <TCPChannel infoCode="4303" messageType="T_EMDW_STATUS_INFO"/>
-            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4303, packetLength=40 여부는 Adapter 검증 조건이다. -->
-            <Field name="preamble"/>
-            <Field name="sourceDeviceId" converter="UInt16LE"/>
-            <Field name="destinationDeviceId" converter="UInt16LE"/>
-            <Field name="infoCode" converter="UInt16LE"/>
-            <Field name="packetLength" converter="UInt32LE"/>
-            <Field name="systemTimeYear" converter="UInt16LE"/>
-            <Field name="systemTimeMonth"/>
-            <Field name="systemTimeDate"/>
-            <Field name="systemTimeHour"/>
-            <Field name="systemTimeMinute"/>
-            <Field name="systemTimeSecond"/>
-            <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_EMDW_STATUS_INFO Body(12 bytes). -->
-            <Field name="emdwId" converter="UInt16LE"/>
-            <Field name="consoleLinkStatus"/>
-            <Field name="emdwLinkStatus"/>
-            <Field name="consoleHealthStatus" cdm="Health.Console.Status"/>
-            <Field name="emdwHealthStatus" cdm="Health.Platform.Status"/>
-            <Field name="operationMode"/>
-            <Field name="statusCode" cdm="Platform.Status.ReasonCode" converter="UInt16LE"/>
-            <Field name="reserved"/>
-            <Field name="tail" converter="UInt32LE"/>
+            <Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/>
+            <Field name="emdwId" converter="UInt16LE"/><Field name="consoleLinkStatus"/><Field name="emdwLinkStatus"/><Field name="consoleHealthStatus" cdm="Health.Console.Status"/><Field name="emdwHealthStatus" cdm="Health.Platform.Status"/><Field name="operationMode"/><Field name="statusCode" cdm="Platform.Status.ReasonCode" converter="UInt16LE"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/>
         </MonitorBinding>
         <MonitorBinding semantic_id="operationModeStatus">
             <TCPChannel infoCode="4303" messageType="T_EMDW_STATUS_INFO"/>
-            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4303, packetLength=40 여부는 Adapter 검증 조건이다. -->
-            <Field name="preamble"/>
-            <Field name="sourceDeviceId" converter="UInt16LE"/>
-            <Field name="destinationDeviceId" converter="UInt16LE"/>
-            <Field name="infoCode" converter="UInt16LE"/>
-            <Field name="packetLength" converter="UInt32LE"/>
-            <Field name="systemTimeYear" converter="UInt16LE"/>
-            <Field name="systemTimeMonth"/>
-            <Field name="systemTimeDate"/>
-            <Field name="systemTimeHour"/>
-            <Field name="systemTimeMinute"/>
-            <Field name="systemTimeSecond"/>
-            <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_EMDW_STATUS_INFO Body(12 bytes). -->
-            <Field name="emdwId" converter="UInt16LE"/>
-            <Field name="consoleLinkStatus"/>
-            <Field name="emdwLinkStatus"/>
-            <Field name="consoleHealthStatus"/>
-            <Field name="emdwHealthStatus"/>
-            <Field name="operationMode" cdm="Platform.OperationMode"/>
-            <Field name="statusCode" converter="UInt16LE"/>
-            <Field name="reserved"/>
-            <Field name="tail" converter="UInt32LE"/>
+            <Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/>
+            <Field name="emdwId" converter="UInt16LE"/><Field name="consoleLinkStatus"/><Field name="emdwLinkStatus"/><Field name="consoleHealthStatus"/><Field name="emdwHealthStatus"/><Field name="operationMode" cdm="Platform.OperationMode"/><Field name="statusCode" converter="UInt16LE"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/>
         </MonitorBinding>
         <MonitorBinding semantic_id="missionExecutionStatus">
             <TCPChannel infoCode="4304" messageType="T_EMDW_MISSION_PROGRESS_INFO"/>
-            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4304, packetLength=52 여부는 Adapter 검증 조건이다. -->
-            <Field name="preamble"/>
-            <Field name="sourceDeviceId" converter="UInt16LE"/>
-            <Field name="destinationDeviceId" converter="UInt16LE"/>
-            <Field name="infoCode" converter="UInt16LE"/>
-            <Field name="packetLength" converter="UInt32LE"/>
-            <Field name="systemTimeYear" converter="UInt16LE"/>
-            <Field name="systemTimeMonth"/>
-            <Field name="systemTimeDate"/>
-            <Field name="systemTimeHour"/>
-            <Field name="systemTimeMinute"/>
-            <Field name="systemTimeSecond"/>
-            <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_EMDW_MISSION_PROGRESS_INFO Body(24 bytes). -->
-            <Field name="emdwId" converter="UInt16LE"/>
-            <Field name="missionState" cdm="Mission.Execution.State"/>
-            <Field name="guidanceStatus"/>
-            <Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <Field name="currentWaypointIndex" cdm="MissionPlan.CurrentWaypointIndex" converter="UInt16LE"/>
-            <Field name="waypointCount" cdm="MissionPlan.WaypointCount" converter="UInt16LE"/>
-            <Field name="distanceToWaypoint" converter="Float32LE"/>
-            <Field name="targetHeading" converter="Float32LE"/>
-            <Field name="targetPitch" converter="Float32LE"/>
-            <Field name="tail" converter="UInt32LE"/>
+            <Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/>
+            <Field name="emdwId" converter="UInt16LE"/><Field name="missionState" cdm="Mission.Execution.State"/><Field name="guidanceStatus"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><Field name="currentWaypointIndex" cdm="MissionPlan.CurrentWaypointIndex" converter="UInt16LECurrentWaypointIndexOrNone"/><Field name="waypointCount" cdm="MissionPlan.WaypointCount" converter="UInt16LE"/><Field name="distanceToWaypoint" converter="Float32LE"/><Field name="targetHeading" converter="Float32LE"/><Field name="targetPitch" converter="Float32LE"/><Field name="tail" converter="UInt32LE"/>
         </MonitorBinding>
         <MonitorBinding semantic_id="guidanceStatusInfo">
             <TCPChannel infoCode="4304" messageType="T_EMDW_MISSION_PROGRESS_INFO"/>
-            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4304, packetLength=52 여부는 Adapter 검증 조건이다. -->
-            <Field name="preamble"/>
-            <Field name="sourceDeviceId" converter="UInt16LE"/>
-            <Field name="destinationDeviceId" converter="UInt16LE"/>
-            <Field name="infoCode" converter="UInt16LE"/>
-            <Field name="packetLength" converter="UInt32LE"/>
-            <Field name="systemTimeYear" converter="UInt16LE"/>
-            <Field name="systemTimeMonth"/>
-            <Field name="systemTimeDate"/>
-            <Field name="systemTimeHour"/>
-            <Field name="systemTimeMinute"/>
-            <Field name="systemTimeSecond"/>
-            <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_EMDW_MISSION_PROGRESS_INFO Body(24 bytes). -->
-            <Field name="emdwId" converter="UInt16LE"/>
-            <Field name="missionState"/>
-            <Field name="guidanceStatus" cdm="Autonomy.Guidance.Status"/>
-            <Field name="missionId" converter="UInt32LE"/>
-            <Field name="currentWaypointIndex" converter="UInt16LE"/>
-            <Field name="waypointCount" converter="UInt16LE"/>
-            <Field name="distanceToWaypoint" cdm="Autonomy.Guidance.DistanceToWaypoint" converter="Float32LE"/>
-            <Field name="targetHeading" cdm="Autonomy.Guidance.TargetHeading" converter="Float32LE"/>
-            <Field name="targetPitch" cdm="Autonomy.Guidance.TargetPitch" converter="Float32LE"/>
-            <Field name="tail" converter="UInt32LE"/>
+            <Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/>
+            <Field name="emdwId" converter="UInt16LE"/><Field name="missionState"/><Field name="guidanceStatus" cdm="Autonomy.Guidance.Status"/><Field name="missionId" converter="UInt32LE"/><Field name="currentWaypointIndex" converter="UInt16LE"/><Field name="waypointCount" converter="UInt16LE"/><Field name="distanceToWaypoint" cdm="Autonomy.Guidance.DistanceToWaypoint" converter="Float32LE"/><Field name="targetHeading" cdm="Autonomy.Guidance.TargetHeading" converter="Float32LE"/><Field name="targetPitch" cdm="Autonomy.Guidance.TargetPitch" converter="Float32LE"/><Field name="tail" converter="UInt32LE"/>
         </MonitorBinding>
         <MonitorBinding semantic_id="disposalStatusInfo">
             <TCPChannel infoCode="4305" messageType="T_EMDW_DISPOSAL_STATUS_INFO"/>
-            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4305, packetLength=40 여부는 Adapter 검증 조건이다. -->
-            <Field name="preamble"/>
-            <Field name="sourceDeviceId" converter="UInt16LE"/>
-            <Field name="destinationDeviceId" converter="UInt16LE"/>
-            <Field name="infoCode" converter="UInt16LE"/>
-            <Field name="packetLength" converter="UInt32LE"/>
-            <Field name="systemTimeYear" converter="UInt16LE"/>
-            <Field name="systemTimeMonth"/>
-            <Field name="systemTimeDate"/>
-            <Field name="systemTimeHour"/>
-            <Field name="systemTimeMinute"/>
-            <Field name="systemTimeSecond"/>
-            <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_EMDW_DISPOSAL_STATUS_INFO Body(12 bytes). -->
-            <Field name="emdwId" converter="UInt16LE"/>
-            <Field name="disposalState" cdm="Mission.Disposal.State"/>
-            <Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/>
-            <Field name="reserved"/>
-            <Field name="tail" converter="UInt32LE"/>
+            <Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/>
+            <Field name="emdwId" converter="UInt16LE"/><Field name="disposalState" cdm="Mission.Disposal.State"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/>
         </MonitorBinding>
         <MonitorBinding semantic_id="transmitHeartbeat">
-            <TCPChannel infoCode="10000" messageType="T_HEARTBEAT"/>
-            <!-- 송신 T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="headerSourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="headerDestinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="10000"/>
-            <FixedField name="packetLength" value="36"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_HEARTBEAT Body(8 bytes). 송신 시 카운트가 1씩 증가한다. -->
-            <DerivedField name="sourceDeviceId" cdm="Communication.Endpoint.Source.Identifier" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" cdm="Communication.Endpoint.Destination.Identifier" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <DerivedField name="heartbeatCount" cdm="Communication.Heartbeat.Sequence" sourceField="System.Generated.HeartbeatSequence" converter="IncrementingUInt32LE"/>
-            <FixedField name="tail" value="0x55555555"/>
+            <TCPChannel infoCode="10000" messageType="T_HEARTBEAT"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="headerSourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="headerDestinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="10000"/><FixedField name="packetLength" value="36"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="sourceDeviceId" cdm="Communication.Endpoint.Source.Identifier" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" cdm="Communication.Endpoint.Destination.Identifier" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><DerivedField name="heartbeatCount" cdm="Communication.Heartbeat.Sequence" sourceField="System.Generated.HeartbeatSequence" converter="IncrementingUInt32LE"/><FixedField name="tail" value="0x55555555"/>
         </MonitorBinding>
         <MonitorBinding semantic_id="receiveHeartbeat">
-            <TCPChannel infoCode="10000" messageType="T_HEARTBEAT"/>
-            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=10000, packetLength=36 여부는 Adapter 검증 조건이다. -->
-            <Field name="preamble"/>
-            <Field name="headerSourceDeviceId" converter="UInt16LE"/>
-            <Field name="headerDestinationDeviceId" converter="UInt16LE"/>
-            <Field name="infoCode" converter="UInt16LE"/>
-            <Field name="packetLength" converter="UInt32LE"/>
-            <Field name="systemTimeYear" converter="UInt16LE"/>
-            <Field name="systemTimeMonth"/>
-            <Field name="systemTimeDate"/>
-            <Field name="systemTimeHour"/>
-            <Field name="systemTimeMinute"/>
-            <Field name="systemTimeSecond"/>
-            <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-            <Field name="headerReserved"/>
-            <!-- T_HEARTBEAT Body(8 bytes). -->
-            <Field name="sourceDeviceId" cdm="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <Field name="destinationDeviceId" cdm="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <Field name="heartbeatCount" cdm="Communication.Heartbeat.Sequence" converter="UInt32LE"/>
-            <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-            <Field name="tail" converter="UInt32LE"/>
+            <TCPChannel infoCode="10000" messageType="T_HEARTBEAT"/><Field name="preamble"/><Field name="headerSourceDeviceId" converter="UInt16LE"/><Field name="headerDestinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="sourceDeviceId" cdm="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><Field name="destinationDeviceId" cdm="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><Field name="heartbeatCount" cdm="Communication.Heartbeat.Sequence" converter="UInt32LE"/><Field name="tail" converter="UInt32LE"/>
         </MonitorBinding>
     </Monitors>
+
     <Controls semantic_id="control">
         <ControlBinding semantic_id="stopMission">
-            <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4001"/>
-            <FixedField name="packetLength" value="56"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_MISSION_CTRL_CMD Body(28 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="missionCtrlCmd" value="0"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="stopMissionReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4001"/><FixedField name="packetLength" value="56"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="missionCtrlCmd" value="0"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="stopMissionReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><!-- result는 원 ICD의 명령 처리 결과로 0=성공, 1=실패이며 reasonCode는 실패/거부/처리중 사유를 제공한다. 실제 임무 진행/완료 상태는 관련 주기 상태정보로 확인한다. --><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="startMission">
-            <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4001"/>
-            <FixedField name="packetLength" value="56"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_MISSION_CTRL_CMD Body(28 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="missionCtrlCmd" value="1"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="startMissionReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4001"/><FixedField name="packetLength" value="56"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="missionCtrlCmd" value="1"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="startMissionReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="pauseMission">
-            <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4001"/>
-            <FixedField name="packetLength" value="56"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_MISSION_CTRL_CMD Body(28 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="missionCtrlCmd" value="2"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="pauseMissionReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4001"/><FixedField name="packetLength" value="56"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="missionCtrlCmd" value="2"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="pauseMissionReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="resumeMission">
-            <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4001"/>
-            <FixedField name="packetLength" value="56"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_MISSION_CTRL_CMD Body(28 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="missionCtrlCmd" value="3"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="resumeMissionReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4001"/><FixedField name="packetLength" value="56"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="missionCtrlCmd" value="3"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="resumeMissionReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="setTerminalControlMode">
-            <TCPChannel infoCode="4002" messageType="T_EMDW_MODE_SET_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4002"/>
-            <FixedField name="packetLength" value="52"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_MODE_SET_CMD Body(24 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="operationMode" value="0"/><FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="setTerminalControlModeReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4002와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4002" messageType="T_EMDW_MODE_SET_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4002"/><FixedField name="packetLength" value="52"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="operationMode" value="0"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="setTerminalControlModeReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="setIntegratedControlMode">
-            <TCPChannel infoCode="4002" messageType="T_EMDW_MODE_SET_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4002"/>
-            <FixedField name="packetLength" value="52"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_MODE_SET_CMD Body(24 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="operationMode" value="1"/><FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="setIntegratedControlModeReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4002와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4002" messageType="T_EMDW_MODE_SET_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4002"/><FixedField name="packetLength" value="52"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="operationMode" value="1"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="setIntegratedControlModeReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="transferMissionPlan">
-            <TCPChannel infoCode="4003" messageType="T_EMDW_MISSION_PLAN_INFO"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4003"/>
-            <FixedField name="packetLength" value="376"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_MISSION_PLAN_INFO Body(348 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <DerivedField name="waypointCount" cdm="MissionPlan.WaypointCount" sourceField="waypointList" converter="ArrayLengthUInt16"/>
-            <ArrayField name="waypointList" cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="20">
-                <Element name="waypoint" cdm="MissionPlan.Waypoint">
-                    <Field name="latitude" cdm="MissionPlan.Waypoint.Latitude" converter="DecimalToInt32Scale10000000LE"/>
-                    <Field name="longitude" cdm="MissionPlan.Waypoint.Longitude" converter="DecimalToInt32Scale10000000LE"/>
-                    <Field name="speed" cdm="MissionPlan.Waypoint.Speed" converter="DecimalToUInt16Scale10LE"/>
-                    <Field name="depth" cdm="MissionPlan.Waypoint.Depth" converter="UInt16LE"/>
-                    <Field name="action" cdm="MissionPlan.Waypoint.Action"/>
-                    <FixedField name="reserved" value="0"/>
-                </Element>
-            </ArrayField>
-            <Field name="missionType" cdm="Mission.Type"/>
-            <FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="transferMissionPlanReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4003와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4003" messageType="T_EMDW_MISSION_PLAN_INFO"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4003"/><FixedField name="packetLength" value="376"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><DerivedField name="waypointCount" cdm="MissionPlan.WaypointCount" sourceField="waypointList" converter="ArrayLengthUInt16"/><ArrayField name="waypointList" cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="20"><Element name="waypoint" cdm="MissionPlan.Waypoint"><Field name="latitude" cdm="MissionPlan.Waypoint.Latitude" converter="DecimalToInt32Scale10000000LE"/><Field name="longitude" cdm="MissionPlan.Waypoint.Longitude" converter="DecimalToInt32Scale10000000LE"/><Field name="speed" cdm="MissionPlan.Waypoint.Speed" converter="DecimalToUInt16Scale10LE"/><Field name="depth" cdm="MissionPlan.Waypoint.Depth" converter="UInt16LE"/><Field name="action" cdm="MissionPlan.Waypoint.Action" converter="MissionWaypointActionToCode"/><FixedField name="reserved" value="0"/></Element></ArrayField><Field name="missionType" cdm="Mission.Type" converter="MissionTypeToCode"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="transferMissionPlanReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="immediateEmergencyStop">
-            <TCPChannel infoCode="4004" messageType="T_EMDW_EMERGENCY_STOP_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4004"/>
-            <FixedField name="packetLength" value="48"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_EMERGENCY_STOP_CMD Body(20 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="emergencyStopType" value="0"/><Field name="emergencyStopReason" cdm="Platform.EmergencyStop.Reason"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="immediateEmergencyStopReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4004와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4004" messageType="T_EMDW_EMERGENCY_STOP_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4004"/><FixedField name="packetLength" value="48"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="emergencyStopType" value="0"/><Field name="emergencyStopReason" cdm="Platform.EmergencyStop.Reason" converter="EmergencyStopReasonToCode"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="immediateEmergencyStopReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="emergencyStopAndStandby">
-            <TCPChannel infoCode="4004" messageType="T_EMDW_EMERGENCY_STOP_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4004"/>
-            <FixedField name="packetLength" value="48"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_EMERGENCY_STOP_CMD Body(20 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="emergencyStopType" value="1"/><Field name="emergencyStopReason" cdm="Platform.EmergencyStop.Reason"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="emergencyStopAndStandbyReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4004와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4004" messageType="T_EMDW_EMERGENCY_STOP_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4004"/><FixedField name="packetLength" value="48"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="emergencyStopType" value="1"/><Field name="emergencyStopReason" cdm="Platform.EmergencyStop.Reason" converter="EmergencyStopReasonToCode"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="emergencyStopAndStandbyReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
         <ControlBinding semantic_id="setTargetInformation">
-            <TCPChannel infoCode="4005" messageType="T_EMDW_TARGET_INFO_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4005"/>
-            <FixedField name="packetLength" value="44"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_TARGET_INFO_CMD Body(16 bytes). -->
-            <Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/>
-            <Field name="targetBearing" cdm="Mission.Target.Bearing" converter="DecimalToUInt16Scale10LE"/>
-            <Field name="targetRange" cdm="Mission.Target.Range" converter="DecimalToUInt16Scale10LE"/>
-            <Field name="targetDepth" cdm="Mission.Target.Depth" converter="UInt16LE"/>
-            <Field name="latitude" cdm="Mission.Target.Position.Latitude" converter="DecimalToInt32Scale10000000LE"/>
-            <Field name="longitude" cdm="Mission.Target.Position.Longitude" converter="DecimalToInt32Scale10000000LE"/>
-            <FixedField name="tail" value="0x55555555"/>
+            <TCPChannel infoCode="4005" messageType="T_EMDW_TARGET_INFO_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4005"/><FixedField name="packetLength" value="44"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/><Field name="targetBearing" cdm="Mission.Target.Bearing" converter="DecimalToUInt16Scale10LE"/><Field name="targetRange" cdm="Mission.Target.Range" converter="DecimalToUInt16Scale10LE"/><Field name="targetDepth" cdm="Mission.Target.Depth" converter="UInt16LE"/><Field name="latitude" cdm="Mission.Target.Position.Latitude" converter="DecimalToInt32Scale10000000LE"/><Field name="longitude" cdm="Mission.Target.Position.Longitude" converter="DecimalToInt32Scale10000000LE"/><FixedField name="tail" value="0x55555555"/>
         </ControlBinding>
         <ControlBinding semantic_id="cancelDisposal">
-            <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4006"/>
-            <FixedField name="packetLength" value="56"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_DISPOSAL_CMD Body(28 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="disposalCmd" value="0"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/>
-            <FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="cancelDisposalReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4006와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+            <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4006"/><FixedField name="packetLength" value="56"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="disposalCmd" value="0"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="cancelDisposalReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
-    <ControlBinding semantic_id="prepareDisposal">
-            <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4006"/>
-            <FixedField name="packetLength" value="56"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_DISPOSAL_CMD Body(28 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="disposalCmd" value="1"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/>
-            <FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="prepareDisposalReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4006와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+        <ControlBinding semantic_id="prepareDisposal">
+            <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4006"/><FixedField name="packetLength" value="56"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="disposalCmd" value="1"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="prepareDisposalReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
-    <ControlBinding semantic_id="executeDisposal">
-            <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD"/>
-            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
-            <FixedField name="preamble" value="0xAAAAAAAA"/>
-            <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
-            <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
-            <FixedField name="infoCode" value="4006"/>
-            <FixedField name="packetLength" value="56"/>
-            <DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/>
-            <DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/>
-            <DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/>
-            <DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/>
-            <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
-            <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
-            <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <FixedField name="headerReserved" value="0"/>
-            <!-- T_EMDW_DISPOSAL_CMD Body(28 bytes). -->
-            <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
-            <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="disposalCmd" value="2"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/>
-            <FixedField name="reserved" value="0"/>
-            <FixedField name="tail" value="0x55555555"/>
-            <Reply semantic_id="executeDisposalReply" required="true">
-                <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/>
-                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
-                <Field name="preamble"/>
-                <Field name="sourceDeviceId" converter="UInt16LE"/>
-                <Field name="destinationDeviceId" converter="UInt16LE"/>
-                <Field name="infoCode" converter="UInt16LE"/>
-                <Field name="packetLength" converter="UInt32LE"/>
-                <Field name="systemTimeYear" converter="UInt16LE"/>
-                <Field name="systemTimeMonth"/>
-                <Field name="systemTimeDate"/>
-                <Field name="systemTimeHour"/>
-                <Field name="systemTimeMinute"/>
-                <Field name="systemTimeSecond"/>
-                <Field name="systemTimeMillisecond" converter="UInt16LE"/>
-                <Field name="headerReserved"/>
-                <!--
-                    T_EMDW_CTRL_RESP(28 bytes).
-                    requestInfoCode=4006와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
-                -->
-                <Field name="requestInfoCode" converter="UInt16LE"/>
-                <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
-                <Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
-                <Field name="reserved"/>
-                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
-                <Field name="tail" converter="UInt32LE"/>
-            </Reply>
+        <ControlBinding semantic_id="executeDisposal">
+            <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD"/><FixedField name="preamble" value="0xAAAAAAAA"/><DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/><DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/><FixedField name="infoCode" value="4006"/><FixedField name="packetLength" value="56"/><DerivedField name="systemTimeYear" sourceField="System.Time.Now" converter="YearToUInt16LE"/><DerivedField name="systemTimeMonth" sourceField="System.Time.Now" converter="MonthToUInt8"/><DerivedField name="systemTimeDate" sourceField="System.Time.Now" converter="DateToUInt8"/><DerivedField name="systemTimeHour" sourceField="System.Time.Now" converter="HourToUInt8"/><DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/><DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/><DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/><FixedField name="headerReserved" value="0"/><DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><FixedField name="disposalCmd" value="2"/><Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/><Field name="targetId" cdm="Mission.Target.Identifier" converter="UInt16LE"/><FixedField name="reserved" value="0"/><FixedField name="tail" value="0x55555555"/>
+            <Reply semantic_id="executeDisposalReply" required="true"><TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP"/><Field name="preamble"/><Field name="sourceDeviceId" converter="UInt16LE"/><Field name="destinationDeviceId" converter="UInt16LE"/><Field name="infoCode" converter="UInt16LE"/><Field name="packetLength" converter="UInt32LE"/><Field name="systemTimeYear" converter="UInt16LE"/><Field name="systemTimeMonth"/><Field name="systemTimeDate"/><Field name="systemTimeHour"/><Field name="systemTimeMinute"/><Field name="systemTimeSecond"/><Field name="systemTimeMillisecond" converter="UInt16LE"/><Field name="headerReserved"/><Field name="requestInfoCode" converter="UInt16LE"/><Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/><Field name="emdwId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/><Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/><Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToEmdwCommandReasonState"/><Field name="reserved"/><Field name="tail" converter="UInt32LE"/></Reply>
         </ControlBinding>
     </Controls>
 </PlatformBinding>
