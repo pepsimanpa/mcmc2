@@ -154,9 +154,9 @@ Semantic Target을 별도로 강제하지 않는다.
 
 ## 12. Binding Converter Mapping
 
-**Status: IMPLEMENTED IN BINDING / ADAPTER IMPLEMENTATION REQUIRED**
+**Status: MAPPING RESOLVED / MINIMAL BINDING PATCH PENDING**
 
-Binding에 다음 converter 식별자를 사용한다. converter의 정확한 동작은 아래 매핑을 따라야 한다.
+아래 converter 식별자와 매핑은 확정안이다. 현재 Binding XML은 불필요한 대량 포맷 변경을 피하기 위해 기존 형식으로 복원했으며, 실제 converter 속성 추가는 **원본 서식/주석을 유지하는 최소 diff 방식으로 반영**한다.
 
 ### `CommandResultCodeToState`
 - raw `0` → 성공 (`Command.Result.Success`)
@@ -214,11 +214,16 @@ little-endian uint16 decode 후:
 - Mission Type / Waypoint Action / Emergency Stop Reason 의미형 Parameter 적용
 - MDV statusCode 의미 보강
 - currentWaypointIndex 정상 범위 `0~65534` 적용
-- Binding raw-code converter 연결
-- 송신 Heartbeat Header Reserved zero-fill
+- Heartbeat Semantic 방향 문제를 TBD로 명시
 
-별도 후속 검증/구현:
-- 위 converter의 Adapter 실제 구현 여부 확인
+최소 Binding patch 대기:
+- 위 raw-code converter 연결
+- `currentWaypointIndex` raw `0xFFFF` sentinel converter 연결
+- 송신 Heartbeat Header Reserved zero-fill
+- 기존 `result=0=명령 수락` 과해석 주석 수정
+
+별도 후속 구현/검증:
+- converter의 Adapter 실제 구현 여부 확인
 - 마지막 Waypoint Action Validator/OM 구현
 - 전체 시스템 CDM audit
 - Heartbeat Semantic 방향 모델은 별도 결정 전까지 구조 변경 금지
