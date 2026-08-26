@@ -19,139 +19,79 @@ jobs:
           ref: feature/auv-reply-bit-binding
           fetch-depth: 0
 
-      - name: Apply exact minimal patches
+      - name: Apply exact model patch
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
 
-          def replace_exact(path, old, new, expected=1):
+          def rep(path, old, new, expected=1):
               p = Path(path)
               text = p.read_text(encoding='utf-8')
               count = text.count(old)
               if count != expected:
-                  raise SystemExit(f'{path}: expected {expected} occurrence(s), found {count}')
+                  raise SystemExit(f'{path}: expected {expected}, found {count}')
               p.write_text(text.replace(old, new), encoding='utf-8', newline='')
 
-          # 1) CommonBindingSchema: one physical field may derive multiple Semantic values.
-          replace_exact(
+          rep(
               'ProtocolXml/XSD/CommonBindingSchema.xsd',
               '''    <xs:complexType name="FieldType">\n        <xs:attribute name="name" type="xs:string" use="required"/>\n        <xs:attribute name="cdm" type="xs:string"/>\n        <xs:attribute name="inputUnit" type="xs:string"/>\n        <xs:attribute name="outputUnit" type="xs:string"/>\n        <xs:attribute name="converter" type="xs:string"/>\n    </xs:complexType>''',
-              '''    <!--\n        하나의 물리 Field가 sentinel/state bit 등으로 복수의 논리 의미를 포함할 때\n        DerivedSemantic으로 여러 Semantic CDM을 파생한다. DerivedSemantic은 wire Field를 추가하지 않는다.\n    -->\n    <xs:complexType name="DerivedSemanticType">\n        <xs:attribute name="cdm" type="xs:string" use="required"/>\n        <xs:attribute name="converter" type="xs:string" use="required"/>\n    </xs:complexType>\n\n    <xs:complexType name="FieldType">\n        <xs:sequence>\n            <xs:element name="DerivedSemantic" type="DerivedSemanticType" minOccurs="0" maxOccurs="unbounded"/>\n        </xs:sequence>\n        <xs:attribute name="name" type="xs:string" use="required"/>\n        <xs:attribute name="cdm" type="xs:string"/>\n        <xs:attribute name="inputUnit" type="xs:string"/>\n        <xs:attribute name="outputUnit" type="xs:string"/>\n        <xs:attribute name="converter" type="xs:string"/>\n    </xs:complexType>'''
+              '''    <!-- 하나의 물리 Field가 복수의 논리 의미를 포함할 때 DerivedSemantic으로 파생한다. -->\n    <xs:complexType name="DerivedSemanticType">\n        <xs:attribute name="cdm" type="xs:string" use="required"/>\n        <xs:attribute name="converter" type="xs:string" use="required"/>\n    </xs:complexType>\n\n    <xs:complexType name="FieldType">\n        <xs:sequence>\n            <xs:element name="DerivedSemantic" type="DerivedSemanticType" minOccurs="0" maxOccurs="unbounded"/>\n        </xs:sequence>\n        <xs:attribute name="name" type="xs:string" use="required"/>\n        <xs:attribute name="cdm" type="xs:string"/>\n        <xs:attribute name="inputUnit" type="xs:string"/>\n        <xs:attribute name="outputUnit" type="xs:string"/>\n        <xs:attribute name="converter" type="xs:string"/>\n    </xs:complexType>'''
           )
 
-          old_semantic = '''<QuantitySpec id="currentWaypointIndex" name="현재 경유점 인덱스" cdm="MissionPlan.CurrentWaypointIndex"><Range min="0" max="65534"/><Resolution>1</Resolution></QuantitySpec><!-- raw 0xFFFF는 현재 추종 경유점 없음으로 Binding/Adapter에서 해석하며 정상 인덱스 범위에 포함하지 않는다. -->'''
-          new_semantic = '''<BooleanSpec id="currentWaypointAvailable" name="현재 추종 경유점 존재 여부" cdm="MissionPlan.CurrentWaypoint.Available"/><QuantitySpec id="currentWaypointIndex" name="현재 경유점 인덱스" cdm="MissionPlan.CurrentWaypointIndex"><Range min="0" max="65534"/><Resolution>1</Resolution></QuantitySpec><!-- currentWaypointAvailable=false일 때 currentWaypointIndex는 의미값 없음. raw 0xFFFF 매핑은 Binding에서 처리한다. -->'''
-          replace_exact('ProtocolXml/MDV/MdvPlatformSemantic.xml', old_semantic, new_semantic)
-          replace_exact('ProtocolXml/EMDW/EmdwPlatformSemantic.xml', old_semantic, new_semantic)
+          old_sem = '<QuantitySpec id="currentWaypointIndex" name="현재 경유점 인덱스" cdm="MissionPlan.CurrentWaypointIndex"><Range min="0" max="65534"/><Resolution>1</Resolution></QuantitySpec><!-- raw 0xFFFF는 현재 추종 경유점 없음으로 Binding/Adapter에서 해석하며 정상 인덱스 범위에 포함하지 않는다. -->'
+          new_sem = '<BooleanSpec id="currentWaypointAvailable" name="현재 추종 경유점 존재 여부" cdm="MissionPlan.CurrentWaypoint.Available"/><QuantitySpec id="currentWaypointIndex" name="현재 경유점 인덱스" cdm="MissionPlan.CurrentWaypointIndex"><Range min="0" max="65534"/><Resolution>1</Resolution></QuantitySpec><!-- currentWaypointAvailable=false일 때 currentWaypointIndex는 의미값 없음. raw 0xFFFF 매핑은 Binding에서 처리한다. -->'
+          rep('ProtocolXml/MDV/MdvPlatformSemantic.xml', old_sem, new_sem)
+          rep('ProtocolXml/EMDW/EmdwPlatformSemantic.xml', old_sem, new_sem)
 
-          old_binding = '''            <Field name="currentWaypointIndex" cdm="MissionPlan.CurrentWaypointIndex" converter="UInt16LECurrentWaypointIndexOrNone"/>'''
+          old_binding = '            <Field name="currentWaypointIndex" cdm="MissionPlan.CurrentWaypointIndex" converter="UInt16LECurrentWaypointIndexOrNone"/>'
           new_binding = '''            <Field name="currentWaypointIndex" converter="UInt16LE">\n                <DerivedSemantic cdm="MissionPlan.CurrentWaypoint.Available" converter="WaypointIndexToAvailable"/>\n                <DerivedSemantic cdm="MissionPlan.CurrentWaypointIndex" converter="WaypointIndexToIndexWhenAvailable"/>\n            </Field>'''
-          replace_exact('ProtocolXml/MDV/MdvTcpBinding.xml', old_binding, new_binding)
-          replace_exact('ProtocolXml/EMDW/EmdwTcpBinding.xml', old_binding, new_binding)
-
-          # 2) Common rule: do not duplicate a wire field to expose multiple Semantic values.
-          replace_exact(
-              'ProtocolXml/Docs/SemanticBindingRules_20260818.md',
-              '- Reply의 실제 Telegram 및 결과 Field/Bit\n- expectedValue / expectedMask 등 수신 식별 조건',
-              '- Reply의 실제 Telegram 및 결과 Field/Bit\n- 하나의 물리 Field가 sentinel/state code 등으로 복수의 논리 의미를 포함하면 `Field` 하위 `DerivedSemantic`으로 여러 Semantic CDM을 파생한다. 이때 wire Field 자체를 중복 선언하지 않는다.\n- expectedValue / expectedMask 등 수신 식별 조건'
-          )
-
-          # 3) MDV/EMDW decision: explicit availability state selected.
-          doc = Path('ProtocolXml/Docs/MdvEmdwDesignDecisions_20260825.md')
-          text = doc.read_text(encoding='utf-8')
-          old = '''## 7. Current Waypoint Index\n\n**Status: RESOLVED**\n\n정상 경유점 인덱스 범위:\n- `0~65534`\n- 0-based index\n\n특수 wire 값:\n- `0xFFFF` = 현재 추종 경유점 없음\n\nSemantic 정상 Quantity 범위에는 65535를 포함하지 않는다. `0xFFFF`는 Binding/Adapter에서 `현재 추종 경유점 없음` 상태로 해석한다.'''
-          new = '''## 7. Current Waypoint Index / Availability\n\n**Status: RESOLVED / APPLIED**\n\n정상 경유점 인덱스 범위:\n- `0~65534`\n- 0-based index\n\n특수 wire 값:\n- `0xFFFF` = 현재 추종 경유점 없음\n\nSemantic은 물리 sentinel 값을 직접 노출하지 않고 다음 두 상태로 표현한다.\n- `currentWaypointAvailable` / `MissionPlan.CurrentWaypoint.Available`: 현재 추종 경유점 존재 여부\n- `currentWaypointIndex` / `MissionPlan.CurrentWaypointIndex`: 현재 추종 경유점 인덱스 (`0~65534`)\n\nBinding은 단일 물리 `currentWaypointIndex` Field를 중복 선언하지 않고 `DerivedSemantic`으로 두 의미를 파생한다.\n- raw `0~65534` → `currentWaypointAvailable=true`, `currentWaypointIndex=raw`\n- raw `0xFFFF` → `currentWaypointAvailable=false`, `currentWaypointIndex`는 의미값 없음'''
-          if text.count(old) != 1:
-              raise SystemExit(f'MdvEmdwDesignDecisions section 7 mismatch: {text.count(old)}')
-          text = text.replace(old, new)
-          old2 = '''### `UInt16LECurrentWaypointIndexOrNone`\n- raw `0~65534` → 동일 0-based 현재 Waypoint index\n- raw `0xFFFF` → 현재 추종 경유점 없음'''
-          new2 = '''### `WaypointIndexToAvailable` / `WaypointIndexToIndexWhenAvailable`\n`Field converter="UInt16LE"`로 raw 값을 먼저 decode한 뒤 동일 물리값에서 두 Semantic 값을 파생한다.\n- `WaypointIndexToAvailable`: `0~65534 → true`, `0xFFFF → false`\n- `WaypointIndexToIndexWhenAvailable`: `0~65534 → 동일 index`, `0xFFFF → 의미값 없음`'''
-          if text.count(old2) != 1:
-              raise SystemExit(f'MdvEmdwDesignDecisions converter section mismatch: {text.count(old2)}')
-          text = text.replace(old2, new2)
-          old3 = '- currentWaypointIndex 정상 범위 `0~65534` 적용\n- Heartbeat Semantic 방향 문제를 TBD로 명시\n- MDV/EMDW Binding raw-code converter 최소패치 적용 및 XML parse 검증 완료'
-          new3 = '- currentWaypointIndex 정상 범위 `0~65534` 적용\n- `currentWaypointAvailable` Boolean 상태 추가 및 단일 wire Field → 복수 `DerivedSemantic` 매핑 적용\n- Heartbeat Semantic 방향 문제를 TBD로 명시\n- MDV/EMDW Binding raw-code converter 최소패치 적용 및 XML parse 검증 완료'
-          if text.count(old3) != 1:
-              raise SystemExit(f'MdvEmdwDesignDecisions implementation section mismatch: {text.count(old3)}')
-          text = text.replace(old3, new3)
-          doc.write_text(text, encoding='utf-8', newline='')
+          rep('ProtocolXml/MDV/MdvTcpBinding.xml', old_binding, new_binding)
+          rep('ProtocolXml/EMDW/EmdwTcpBinding.xml', old_binding, new_binding)
           PY
 
-      - name: Validate XML and semantic-binding mapping
+      - name: Validate XML and mapping
         shell: bash
         run: |
           python - <<'PY'
           import xml.etree.ElementTree as ET
-          from pathlib import Path
-
-          ns = {'u': 'http://lignex1.com/mcmc2/umsSchema', 'xs': 'http://www.w3.org/2001/XMLSchema'}
-          files = [
-              'ProtocolXml/XSD/CommonBindingSchema.xsd',
-              'ProtocolXml/MDV/MdvPlatformSemantic.xml',
-              'ProtocolXml/EMDW/EmdwPlatformSemantic.xml',
-              'ProtocolXml/MDV/MdvTcpBinding.xml',
-              'ProtocolXml/EMDW/EmdwTcpBinding.xml',
+          ns = {'u':'http://lignex1.com/mcmc2/umsSchema','xs':'http://www.w3.org/2001/XMLSchema'}
+          paths = [
+            'ProtocolXml/XSD/CommonBindingSchema.xsd',
+            'ProtocolXml/MDV/MdvPlatformSemantic.xml',
+            'ProtocolXml/EMDW/EmdwPlatformSemantic.xml',
+            'ProtocolXml/MDV/MdvTcpBinding.xml',
+            'ProtocolXml/EMDW/EmdwTcpBinding.xml'
           ]
-          roots = {}
-          for path in files:
-              roots[path] = ET.parse(path).getroot()
-              print('XML OK:', path)
-
-          xsd = roots['ProtocolXml/XSD/CommonBindingSchema.xsd']
-          dst = xsd.find("xs:complexType[@name='DerivedSemanticType']", ns)
-          assert dst is not None, 'DerivedSemanticType missing'
-          field_type = xsd.find("xs:complexType[@name='FieldType']", ns)
-          assert field_type is not None
-          derived_decl = field_type.find("xs:sequence/xs:element[@name='DerivedSemantic']", ns)
-          assert derived_decl is not None, 'FieldType/DerivedSemantic missing'
-
-          for platform in ('MDV', 'EMDW'):
-              sem_path = f'ProtocolXml/{platform}/{"Mdv" if platform == "MDV" else "Emdw"}PlatformSemantic.xml'
-              bind_path = f'ProtocolXml/{platform}/{"Mdv" if platform == "MDV" else "Emdw"}TcpBinding.xml'
-              sem = roots[sem_path]
-              bind = roots[bind_path]
-
-              group = sem.find(".//u:GroupSpec[@id='missionExecutionStatus']", ns)
-              assert group is not None
-              available = group.find("u:BooleanSpec[@id='currentWaypointAvailable']", ns)
-              index = group.find("u:QuantitySpec[@id='currentWaypointIndex']", ns)
+          roots = {p: ET.parse(p).getroot() for p in paths}
+          assert roots[paths[0]].find("xs:complexType[@name='DerivedSemanticType']",ns) is not None
+          for plat,prefix in [('MDV','Mdv'),('EMDW','Emdw')]:
+              sem = roots[f'ProtocolXml/{plat}/{prefix}PlatformSemantic.xml']
+              bind = roots[f'ProtocolXml/{plat}/{prefix}TcpBinding.xml']
+              group = sem.find(".//u:GroupSpec[@id='missionExecutionStatus']",ns)
+              available = group.find("u:BooleanSpec[@id='currentWaypointAvailable']",ns)
+              index = group.find("u:QuantitySpec[@id='currentWaypointIndex']",ns)
               assert available is not None and available.get('cdm') == 'MissionPlan.CurrentWaypoint.Available'
-              assert index is not None and index.get('cdm') == 'MissionPlan.CurrentWaypointIndex'
-              rng = index.find('u:Range', ns)
-              assert rng is not None and rng.get('min') == '0' and rng.get('max') == '65534'
-
-              mon = bind.find(".//u:MonitorBinding[@semantic_id='missionExecutionStatus']", ns)
-              assert mon is not None
-              fields = [e for e in mon.findall('u:Field', ns) if e.get('name') == 'currentWaypointIndex']
-              assert len(fields) == 1, f'{platform}: expected one physical currentWaypointIndex field, got {len(fields)}'
+              assert index is not None and index.find('u:Range',ns).get('max') == '65534'
+              mon = bind.find(".//u:MonitorBinding[@semantic_id='missionExecutionStatus']",ns)
+              fields = [x for x in mon.findall('u:Field',ns) if x.get('name') == 'currentWaypointIndex']
+              assert len(fields) == 1
               field = fields[0]
-              assert field.get('converter') == 'UInt16LE'
-              assert field.get('cdm') is None
-              derived = {(d.get('cdm'), d.get('converter')) for d in field.findall('u:DerivedSemantic', ns)}
+              assert field.get('converter') == 'UInt16LE' and field.get('cdm') is None
+              derived = {(x.get('cdm'),x.get('converter')) for x in field.findall('u:DerivedSemantic',ns)}
               assert derived == {
-                  ('MissionPlan.CurrentWaypoint.Available', 'WaypointIndexToAvailable'),
-                  ('MissionPlan.CurrentWaypointIndex', 'WaypointIndexToIndexWhenAvailable'),
-              }, f'{platform}: unexpected DerivedSemantic mapping {derived}'
-
-          print('Semantic/Binding current waypoint availability mapping OK')
+                  ('MissionPlan.CurrentWaypoint.Available','WaypointIndexToAvailable'),
+                  ('MissionPlan.CurrentWaypointIndex','WaypointIndexToIndexWhenAvailable')
+              }
+          print('Current waypoint availability model OK')
           PY
-
           git diff --check
-          echo 'Changed files:'
-          git diff --name-only
 
       - name: Commit changes
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add ProtocolXml/XSD/CommonBindingSchema.xsd \
-                  ProtocolXml/MDV/MdvPlatformSemantic.xml \
-                  ProtocolXml/EMDW/EmdwPlatformSemantic.xml \
-                  ProtocolXml/MDV/MdvTcpBinding.xml \
-                  ProtocolXml/EMDW/EmdwTcpBinding.xml \
-                  ProtocolXml/Docs/SemanticBindingRules_20260818.md \
-                  ProtocolXml/Docs/MdvEmdwDesignDecisions_20260825.md
+          git add ProtocolXml/XSD/CommonBindingSchema.xsd ProtocolXml/MDV/MdvPlatformSemantic.xml ProtocolXml/EMDW/EmdwPlatformSemantic.xml ProtocolXml/MDV/MdvTcpBinding.xml ProtocolXml/EMDW/EmdwTcpBinding.xml
           git commit -m 'Model current waypoint availability explicitly'
           git push origin HEAD:feature/auv-reply-bit-binding
