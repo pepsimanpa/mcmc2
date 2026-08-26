@@ -1,0 +1,72 @@
+name: Apply MDV EMDW Binding Patch
+
+on:
+  push:
+    branches:
+      - feature/auv-reply-bit-binding
+    paths:
+      - '.github/workflows/apply-mdv-emdw-binding-patch.yml'
+      - 'ProtocolXml/Tools/ApplyMdvEmdwBindingPatch.py'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/auv-reply-bit-binding
+          fetch-depth: 0
+
+      - name: Preflight patch
+        run: python ProtocolXml/Tools/ApplyMdvEmdwBindingPatch.py --check
+
+      - name: Apply patch
+        run: python ProtocolXml/Tools/ApplyMdvEmdwBindingPatch.py --apply
+
+      - name: Validate XML and intended diff
+        shell: bash
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          files = [
+              Path('ProtocolXml/MDV/MdvTcpBinding.xml'),
+              Path('ProtocolXml/EMDW/EmdwTcpBinding.xml'),
+          ]
+          for path in files:
+              ET.parse(path)
+              print(f'XML OK: {path}')
+          PY
+
+          git diff --check
+          changed="$(git diff --name-only)"
+          printf '%s\n' "$changed"
+          test "$changed" = $'ProtocolXml/EMDW/EmdwTcpBinding.xml\nProtocolXml/MDV/MdvTcpBinding.xml' \
+            || test "$changed" = $'ProtocolXml/MDV/MdvTcpBinding.xml\nProtocolXml/EMDW/EmdwTcpBinding.xml'
+
+          grep -q 'converter="CommandResultCodeToState"' ProtocolXml/MDV/MdvTcpBinding.xml
+          grep -q 'converter="UInt16LEToMdvCommandReasonState"' ProtocolXml/MDV/MdvTcpBinding.xml
+          grep -q 'converter="CommandResultCodeToState"' ProtocolXml/EMDW/EmdwTcpBinding.xml
+          grep -q 'converter="UInt16LEToEmdwCommandReasonState"' ProtocolXml/EMDW/EmdwTcpBinding.xml
+          grep -q 'converter="UInt16LECurrentWaypointIndexOrNone"' ProtocolXml/MDV/MdvTcpBinding.xml
+          grep -q 'converter="UInt16LECurrentWaypointIndexOrNone"' ProtocolXml/EMDW/EmdwTcpBinding.xml
+          ! grep -q 'result=0은 요청 검증 완료 및 명령 수락' ProtocolXml/MDV/MdvTcpBinding.xml
+          ! grep -q 'result=0은 요청 검증 완료 및 명령 수락' ProtocolXml/EMDW/EmdwTcpBinding.xml
+
+      - name: Commit patched bindings
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/MDV/MdvTcpBinding.xml ProtocolXml/EMDW/EmdwTcpBinding.xml
+          git commit -m 'Apply MDV EMDW semantic binding mappings'
+          git push origin HEAD:feature/auv-reply-bit-binding
