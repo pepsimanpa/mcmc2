@@ -1,3 +1,4 @@
+# one-shot formatting cleanup
 name: Cleanup AUV Derived Mapping Format
 
 on:
@@ -27,7 +28,6 @@ jobs:
           for p in files:
               s=p.read_text(encoding='utf-8')
               before=len(re.findall(r'<!--[\s\S]*?-->',s))
-              # Remove accidental blank lines inside informationNumber SourceValueMap blocks only.
               s=re.sub(
                   r'(<DerivedField name="informationNumber"[^>]*>)\n\s*\n(\s*<SourceValueMap>)\n\s*\n(\s*<Map sourceValue="1" value="[1-3]"/>)\n\s*\n(\s*<Map sourceValue="2" value="[4-6]"/>)\n\s*\n(\s*</SourceValueMap>)\n\s*\n(\s*</DerivedField>)',
                   r'\1\n\2\n\3\n\4\n\5\n\6',s)
