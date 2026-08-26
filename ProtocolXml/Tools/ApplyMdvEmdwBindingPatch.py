@@ -44,7 +44,7 @@ def replace_in_tag_block(
     label: str,
 ) -> str:
     pattern = re.compile(
-        rf'(<{tag}\s+semantic_id="{re.escape(semantic_id)}"\b[\s\S]*?</{tag}>)'
+        rf'(<{tag}\s+semantic_id="{re.escape(semantic_id)}"[\s\S]*?</{tag}>)'
     )
     matches = list(pattern.finditer(text))
     if len(matches) != 1:
