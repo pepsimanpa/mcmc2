@@ -1,0 +1,35 @@
+name: Audit MDV EMDW Field Types
+on:
+  push:
+    branches: [feature/auv-reply-bit-binding]
+    paths: ['.github/workflows/audit-mdv-emdw-field-types.yml']
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-reply-bit-binding
+      - name: Audit untyped fields
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          NS='http://lignex1.com/mcmc2/umsSchema'; q=lambda n:f'{{{NS}}}{n}'
+          for path in ['ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/EMDW/EmdwTcpBinding.xml']:
+              root=ET.parse(path).getroot(); print('\n###',path)
+              total=0
+              for container in list(root.iter(q('MonitorBinding'))) + list(root.iter(q('ControlBinding'))) + list(root.iter(q('Reply'))):
+                  ch=container.find(q('TCPChannel'))
+                  msg=ch.get('messageType') if ch is not None else '-'
+                  sid=container.get('semantic_id','-')
+                  for el in container.iter():
+                      local=el.tag.rsplit('}',1)[-1]
+                      if local not in {'Field','FixedField','DerivedField'}: continue
+                      if el.get('dataType'): continue
+                      # Ignore nested fields that will also be reported by a more specific nested Reply container only by de-duping on object id later is hard;
+                      # print all, message context is what matters.
+                      total+=1
+                      print(f'{msg:32} semantic={sid:30} {local:12} name={el.get("name")} value={el.get("value")} length={el.get("length")} cdm={el.get("cdm")} source={el.get("sourceField")}')
+              print('UNTYPED_TOTAL=',total)
+          PY
