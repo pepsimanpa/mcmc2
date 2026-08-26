@@ -134,6 +134,7 @@
             최대 100개 Waypoint는 좌표당 8 bytes이지만 ICD의 '~ 992 bytes' 표기 및 INFO2 총 길이와
             산술적으로 일치하지 않으므로 실제 배열/예약 영역 배치는 확인이 필요하다.
             ALIGN_INTERVAL의 단위와 범위, Custom1/Custom2의 의미는 정의되지 않았다.
+            WAYPOINT count는 사용자 입력 Parameter로 중복 노출하지 않고 Waypoints collection 길이에서 파생되는 전송 지원 값으로 취급한다.
         -->
         <ControlSpec id="transferMissionPlan" name="AUV 임무계획 전송" cdm="Request.MissionPlan.Transfer">
             <Target cdm="Platform.Identifier.Numeric"/>

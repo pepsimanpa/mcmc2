@@ -679,7 +679,7 @@ ACK bit:
 - `requestData`는 RF-1의 데이터 전송 요청 Control이다.
 - 실제 RF-3 파일 데이터는 SensorProduct / ProductBinding으로 표현한다.
 - `requestData` Semantic에는 일반 RF-2/RF-3 Reply를 두지 않는다.
-- Binding에 존재하는 `requestDataReply`는 제거 대상이다.
+- Binding의 기존 `requestDataReply`는 제거 완료하였다.
 
 ## Issue 6. CDM system-wide consistency
 
@@ -828,6 +828,29 @@ RF-2는 모든 Reply에서 동일한 고정 80-byte 물리 구조를 유지한�
 `RF_CMD_COMPLETE=1`은 AUV 본체의 실제 임무/동작 성공 또는 완료를 의미하지 않는다.
 
 ACK + RF_CMD_COMPLETE + Body 결과가 항상 동일 RF-2 Telegram에서 동시에 유효한지는 직접 근거가 없어 TBD로 유지한다.
+
+## Issue 14. AUV 파생 converter 정리
+
+**Status: RESOLVED**
+
+AUV RF Binding의 다음 계산성 converter를 선언형/책임분리 구조로 정리한다.
+
+- `TargetAuvToInformation1/2/3` 제거
+  - `Platform.Identifier.Numeric`은 AUV 대상 `1` 또는 `2`가 입력된다고 전제한다.
+  - `DerivedField/SourceValueMap`으로 INFO_NUM을 선언한다.
+  - INFORMATION1: `1→1`, `2→4`
+  - INFORMATION2: `1→2`, `2→5`
+  - INFORMATION3: `1→3`, `2→6`
+- `ArrayLengthUInt8` 제거
+  - `MissionPlan.WaypointCount`는 `MissionPlan.Waypoints` collection 길이에서 파생되어 준비되는 값이다.
+  - Semantic/HMI에 별도 중복 입력 Parameter로 노출하지 않는다.
+  - Binding은 준비된 `MissionPlan.WaypointCount`를 `UInt8`로 기록한다.
+- `ByteSumModulo65536LE` 제거
+  - RF-1 checksum 계산식 자체는 ICD 규칙을 유지한다: COUNT부터 INFORMATION 마지막 byte까지 unsigned byte 합의 modulo 65536.
+  - checksum 계산은 RF framing 단계 책임이며 Binding은 준비된 `System.Frame.Checksum`을 `UInt16`로 기록한다.
+  - RF-2 수신 checksum은 이미 일반 wire `Field UInt16`으로 표현한다.
+
+공통 XSD에는 의미 enum의 `ValueMap`과 구분하여, 준비된 scalar source 값에서 wire 값으로의 선언형 매핑을 위한 `SourceValueMap`을 추가한다. 계산 함수명이나 특정 구현 함수는 Binding에 두지 않는다.
 
 ## 확정된 별도 bit 규칙
 

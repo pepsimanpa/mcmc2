@@ -19,7 +19,7 @@
 
     미확정 사항
     - TCPChannel의 messageType은 RF-1/RF-2/RF-3 물리 Telegram 형식을 나타내며 별도 infoCode는 사용하지 않는다.
-    - INFO_NUM converter와 실제 AUV 대상 선택 방식은 adapter 구현 확인이 필요하다.
+    - INFO_NUM은 Platform.Identifier.Numeric=1/2를 입력으로 하며 SourceValueMap으로 INFORMATION1/2/3의 1~6 값을 선언한다.
     - RF-1 COUNT와 RF-2/RF-3 COUNT 사이의 상관관계는 정의되어 있지 않다.
     - RF-2 COMMAND의 RF_CMD_COMPLETE(bit13)=1은 RF통신장치가 휴대용콘솔에서 받은 명령의 처리/전달을 완료했음을 의미한다.
     - RF_CMD_COMPLETE는 AUV 본체의 실제 동작 완료를 의미하지 않으며, AUV 본체 성공/실패 또는 동작 완료는 별도 상태로 판단해야 한다.
@@ -40,7 +40,17 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER: START(4), INFO_NUM(1), COUNT(4), COMMAND(4), reverse ACK(2). -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000001">
                 <BitMember name="AUV_CHECK_Req" offset="0" fixedValue="1"/>
@@ -64,7 +74,7 @@
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <!-- RF-1 bytes 40..43 TAIL: CHECKSUM(2), STOP(2)=0x8181. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="requestAuvCheckReply" required="true">
@@ -238,7 +248,17 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 2 또는 5. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation2"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="2"/>
+
+                    <Map sourceValue="2" value="5"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000002">
                 <BitMember name="MISSION_TRANS" offset="1" fixedValue="1"/>
@@ -260,7 +280,7 @@
             </Field>
             <Field name="velocity" cdm="MissionPlan.Speed" dataType="UInt8"/>
             <Field name="depth" cdm="MissionPlan.Depth" dataType="UInt8"/>
-            <DerivedField name="waypointCount" cdm="MissionPlan.WaypointCount" sourceField="waypoints" dataType="UInt8" converter="ArrayLengthUInt8"/>
+            <DerivedField name="waypointCount" cdm="MissionPlan.WaypointCount" sourceField="MissionPlan.WaypointCount" dataType="UInt8"/>
             <Field name="returnLatitude" cdm="MissionPlan.ReturnPosition.Latitude" inputUnit="rad" outputUnit="rad" dataType="Float32"/>
             <Field name="returnLongitude" cdm="MissionPlan.ReturnPosition.Longitude" inputUnit="rad" outputUnit="rad" dataType="Float32"/>
             <!--
@@ -278,7 +298,7 @@
             <FixedField name="custom1" value="0" dataType="UInt8"/>
             <FixedField name="custom2" value="0" dataType="UInt8"/>
             <!-- RF-1 bytes 1032..1035 TAIL: CHECKSUM(2), STOP(2). -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="transferMissionPlanReply" required="true">
@@ -344,7 +364,17 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 3 또는 6. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000004">
                 <BitMember name="RC_MODE" offset="2" fixedValue="1"/>
@@ -363,7 +393,7 @@
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <!-- RF-1 bytes 40..43 TAIL. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="controlAuvLocallyReply" required="true">
@@ -422,7 +452,17 @@
         <ControlBinding semantic_id="requestAuvStatus">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000008">
                 <BitMember name="Status_Chk" offset="3" fixedValue="1"/>
@@ -439,7 +479,7 @@
             <FixedField name="emergencyLongitude" value="0" dataType="Float32"/>
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="requestAuvStatusReply" required="true">
@@ -534,7 +574,17 @@
         <ControlBinding semantic_id="startMission">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000010">
                 <BitMember name="MISSION_START" offset="4" fixedValue="1"/>
@@ -551,7 +601,7 @@
             <FixedField name="emergencyLongitude" value="0" dataType="Float32"/>
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             <Reply semantic_id="startMissionReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
@@ -609,7 +659,17 @@
         <ControlBinding semantic_id="emergencyReturn">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000020">
                 <BitMember name="EMER_RETURN" offset="5" fixedValue="1"/>
@@ -626,7 +686,7 @@
             <Field name="emergencyLongitude" cdm="Autonomy.EmergencyReturn.Position.Longitude" inputUnit="rad" outputUnit="rad" dataType="Float32"/>
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             <Reply semantic_id="emergencyReturnReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
@@ -684,7 +744,17 @@
         <ControlBinding semantic_id="requestFileList">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000040">
                 <BitMember name="File_List_Req" offset="6" fixedValue="1"/>
@@ -701,7 +771,7 @@
             <FixedField name="emergencyLongitude" value="0" dataType="Float32"/>
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             <Reply semantic_id="requestFileListReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
@@ -759,7 +829,17 @@
         <ControlBinding semantic_id="requestData">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000080">
                 <BitMember name="Data_Req" offset="7" fixedValue="1"/>
@@ -782,7 +862,7 @@
             <FixedField name="emergencyLongitude" value="0" dataType="Float32"/>
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
         </ControlBinding>
 
@@ -790,7 +870,17 @@
         <ControlBinding semantic_id="stopMission">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000100">
                 <BitMember name="MISSION_STOP" offset="8" fixedValue="1"/>
@@ -807,7 +897,7 @@
             <FixedField name="emergencyLongitude" value="0" dataType="Float32"/>
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             <Reply semantic_id="stopMissionReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
@@ -865,7 +955,17 @@
         <ControlBinding semantic_id="deleteAllRecords">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000200">
                 <BitMember name="Record_Del" offset="9" fixedValue="1"/>
@@ -882,7 +982,7 @@
             <FixedField name="emergencyLongitude" value="0" dataType="Float32"/>
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             <Reply semantic_id="deleteAllRecordsReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
@@ -940,7 +1040,17 @@
         <ControlBinding semantic_id="enterMaintenanceMode">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000400">
                 <BitMember name="MTE_MODE" offset="10" fixedValue="1"/>
@@ -957,7 +1067,7 @@
             <FixedField name="emergencyLongitude" value="0" dataType="Float32"/>
             <FixedField name="brightness" value="0" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             <Reply semantic_id="enterMaintenanceModeReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
@@ -1015,7 +1125,17 @@
         <ControlBinding semantic_id="setFlashBrightness">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation3"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
+
+                <SourceValueMap>
+
+                    <Map sourceValue="1" value="3"/>
+
+                    <Map sourceValue="2" value="6"/>
+
+                </SourceValueMap>
+
+            </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40008000">
                 <BitMember name="FLASH" offset="15" fixedValue="1"/>
@@ -1032,7 +1152,7 @@
             <FixedField name="emergencyLongitude" value="0" dataType="Float32"/>
             <Field name="brightness" cdm="Equipment.Light.Brightness" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             <Reply semantic_id="setFlashBrightnessReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
