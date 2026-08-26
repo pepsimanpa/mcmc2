@@ -105,9 +105,9 @@ MDV와 EMDW 원 ICD는 동일한 의미 구조를 사용한다.
 
 플랫폼 명칭만 MDV/EMDW로 달라지며 공통 `Platform.Status.Reason.*` 의미를 재사용한다.
 
-## 7. Current Waypoint Index
+## 7. Current Waypoint Index / Availability
 
-**Status: RESOLVED / BINDING APPLIED**
+**Status: RESOLVED / APPLIED**
 
 정상 경유점 인덱스 범위:
 - `0~65534`
@@ -116,9 +116,13 @@ MDV와 EMDW 원 ICD는 동일한 의미 구조를 사용한다.
 특수 wire 값:
 - `0xFFFF` = 현재 추종 경유점 없음
 
-Semantic 정상 Quantity 범위에는 65535를 포함하지 않는다. Binding은 `UInt16LECurrentWaypointIndexOrNone`을 사용해 `0xFFFF`를 `현재 추종 경유점 없음`으로 해석한다.
+Semantic은 물리 sentinel 값을 직접 노출하지 않고 다음 두 항목으로 표현한다.
+- `currentWaypointAvailable` / `MissionPlan.CurrentWaypoint.Available`: 현재 추종 경유점 존재 여부
+- `currentWaypointIndex` / `MissionPlan.CurrentWaypointIndex`: 현재 추종 경유점 인덱스 (`0~65534`)
 
-Semantic에서 이 `None` 상태를 Quantity 미제공/null로 둘지 별도 availability 상태로 표현할지는 후속 모델링 항목이다. `65535`를 정상 Semantic Quantity 값으로 재도입하지 않는다.
+Binding은 단일 물리 `currentWaypointIndex` Field를 중복 선언하지 않고 `DerivedSemantic`으로 두 의미를 파생한다.
+- raw `0~65534` → `currentWaypointAvailable=true`, `currentWaypointIndex=raw`
+- raw `0xFFFF` → `currentWaypointAvailable=false`, `currentWaypointIndex`는 의미값 없음
 
 ## 8. setTargetInformation
 
@@ -222,15 +226,17 @@ MDV/EMDW `transferMissionPlan`에 적용하였다.
 
 MDV/EMDW의 두 비상정지 Control에 적용하였다.
 
-### `UInt16LECurrentWaypointIndexOrNone`
-- raw `0~65534` → 동일 0-based 현재 Waypoint index
-- raw `0xFFFF` → 현재 추종 경유점 없음
+### `WaypointIndexToAvailable` / `WaypointIndexToIndexWhenAvailable`
+`Field converter="UInt16LE"`로 raw 값을 decode한 뒤 동일 물리값에서 두 Semantic 값을 파생한다.
+- `WaypointIndexToAvailable`: `0~65534 → true`, `0xFFFF → false`
+- `WaypointIndexToIndexWhenAvailable`: `0~65534 → 동일 index`, `0xFFFF → 의미값 없음`
 
 MDV/EMDW Mission Progress Binding에 적용하였다.
 
 ## 13. 구현/검증 상태
 
 **Binding patch commit:** `1772faf5feed15f8e796c8f5bcf0008ca8b38625`
+**Current Waypoint availability commit:** `35bc0a89cd22af0679905184c9671971d16325cd`
 
 반영 및 확인 완료:
 - `ValueSetProfile` XSD 추가
@@ -240,15 +246,15 @@ MDV/EMDW Mission Progress Binding에 적용하였다.
 - 기존 `result=0=명령 수락` 과해석 주석 제거
 - Mission Type / Waypoint Action / Emergency Stop Reason 의미형 Parameter 및 Binding converter 연결
 - MDV statusCode 의미 보강
-- currentWaypointIndex 정상 범위 `0~65534` 및 sentinel converter 연결
+- `currentWaypointAvailable` Boolean 상태 추가
+- currentWaypointIndex 정상 범위 `0~65534` 유지
+- 단일 물리 currentWaypointIndex Field → `currentWaypointAvailable` + `currentWaypointIndex` 복수 `DerivedSemantic` 매핑 적용
 - 송신 Heartbeat Header Reserved zero-fill
 - Heartbeat Semantic 방향 문제 TBD 유지
 - 패치 후 MDV/EMDW Binding XML parse 성공
-- 변경 대상이 MDV/EMDW Binding 두 파일뿐인지 diff 검증 성공
 
 별도 후속 구현/검증:
 - converter 식별자에 대응하는 Adapter 실제 변환 구현/등록 여부 확인
-- `currentWaypointIndex`의 Semantic `None` 표현 방식 결정
 - 마지막 Waypoint Action Validator/OM 구현
 - 전체 시스템 CDM audit
 - 기존 Monitor `ValueSetSpec`의 raw 숫자값을 Binding으로 이전할지 공통 XSD 차원에서 검토
