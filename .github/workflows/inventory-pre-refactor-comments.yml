@@ -1,0 +1,33 @@
+name: Inventory Pre-refactor XML Comments
+on:
+  push:
+    branches: [feature/auv-reply-bit-binding]
+    paths: ['.github/workflows/inventory-pre-refactor-comments.yml']
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-reply-bit-binding
+          fetch-depth: 0
+      - name: Print comments from pre-refactor XML
+        run: |
+          python - <<'PY'
+          import re, subprocess
+          base='86db0296dce6dbaee1e3f9f47ec5b2752d2b871b'
+          files=[
+            'ProtocolXml/MDV/MdvPlatformSemantic.xml',
+            'ProtocolXml/MDV/MdvTcpBinding.xml',
+            'ProtocolXml/EMDW/EmdwPlatformSemantic.xml',
+            'ProtocolXml/EMDW/EmdwTcpBinding.xml',
+          ]
+          for path in files:
+            text=subprocess.check_output(['git','show',f'{base}:{path}'],text=True)
+            comments=re.findall(r'<!--([\s\S]*?)-->',text)
+            print('\n===== '+path+' comments='+str(len(comments))+' =====')
+            for i,c in enumerate(comments,1):
+              c='\n'.join(line.rstrip() for line in c.strip().splitlines())
+              print(f'--- COMMENT {i} ---')
+              print(c)
+          PY
