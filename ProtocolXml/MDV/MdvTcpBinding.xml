@@ -4,7 +4,7 @@ MDV 플랫폼 TCP Binding - 기능 중심 Semantic 대응 재정의본.
 물리 메시지/정보코드/패킷 길이/필드 순서는 2026-08-06 원본 Binding을 유지한다.
 Semantic 행위 분리에 따라 같은 TCP 메시지를 여러 ControlBinding이 공유하며 선택 enum은 FixedField로 결정한다.
 Monitor 역시 동일 수신 패킷을 의미 그룹별로 복수 해석하되 물리 포맷은 변경하지 않는다.
-T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을 임시 유지한다.
+T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방향성은 별도 TBD로 관리한다.
 -->
 <PlatformBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
     <Monitors semantic_id="monitor">
@@ -233,7 +233,7 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
             <Field name="missionState" cdm="Mission.Execution.State"/>
             <Field name="guidanceStatus"/>
             <Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <Field name="currentWaypointIndex" cdm="MissionPlan.CurrentWaypointIndex" converter="UInt16LE"/>
+            <Field name="currentWaypointIndex" cdm="MissionPlan.CurrentWaypointIndex" converter="UInt16LECurrentWaypointIndexOrNone"/>
             <Field name="waypointCount" cdm="MissionPlan.WaypointCount" converter="UInt16LE"/>
             <Field name="distanceToWaypoint" converter="Float32LE"/>
             <Field name="targetHeading" converter="Float32LE"/>
@@ -285,7 +285,7 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
             <DerivedField name="systemTimeMinute" sourceField="System.Time.Now" converter="MinuteToUInt8"/>
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Now" converter="SecondToUInt8"/>
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Now" converter="MillisecondToUInt16LE"/>
-            <Field name="headerReserved"/>
+            <FixedField name="headerReserved" value="0"/>
             <!-- T_HEARTBEAT Body(8 bytes). 송신 시 카운트가 1씩 증가한다. -->
             <DerivedField name="sourceDeviceId" cdm="Communication.Endpoint.Source.Identifier" sourceField="Communication.Endpoint.Source.Identifier" converter="UInt16LE"/>
             <DerivedField name="destinationDeviceId" cdm="Communication.Endpoint.Destination.Identifier" sourceField="Communication.Endpoint.Destination.Identifier" converter="UInt16LE"/>
@@ -360,13 +360,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
@@ -414,13 +414,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
@@ -468,13 +468,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
@@ -522,13 +522,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
@@ -575,13 +575,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3002와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
@@ -628,13 +628,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3002와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
@@ -668,11 +668,11 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                     <Field name="longitude" cdm="MissionPlan.Waypoint.Longitude" converter="DecimalToInt32Scale10000000LE"/>
                     <Field name="speed" cdm="MissionPlan.Waypoint.Speed" converter="DecimalToUInt16Scale10LE"/>
                     <Field name="depth" cdm="MissionPlan.Waypoint.Depth" converter="UInt16LE"/>
-                    <Field name="action" cdm="MissionPlan.Waypoint.Action"/>
+                    <Field name="action" cdm="MissionPlan.Waypoint.Action" converter="MissionWaypointActionToCode"/>
                     <FixedField name="reserved" value="0"/>
                 </Element>
             </ArrayField>
-            <Field name="missionType" cdm="Mission.Type"/>
+            <Field name="missionType" cdm="Mission.Type" converter="MissionTypeToCode"/>
             <FixedField name="reserved" value="0"/>
             <FixedField name="tail" value="0x55555555"/>
             <Reply semantic_id="transferMissionPlanReply" required="true">
@@ -694,13 +694,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3003와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
@@ -726,7 +726,7 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
             <!-- T_MDV_EMERGENCY_STOP_CMD Body(20 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
             <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="emergencyStopType" value="0"/><Field name="emergencyStopReason" cdm="Platform.EmergencyStop.Reason"/>
+            <FixedField name="emergencyStopType" value="0"/><Field name="emergencyStopReason" cdm="Platform.EmergencyStop.Reason" converter="EmergencyStopReasonToCode"/>
             <FixedField name="tail" value="0x55555555"/>
             <Reply semantic_id="immediateEmergencyStopReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP"/>
@@ -747,13 +747,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3004와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
@@ -779,7 +779,7 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
             <!-- T_MDV_EMERGENCY_STOP_CMD Body(20 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" converter="UuidToUInt8Array16"/>
             <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-            <FixedField name="emergencyStopType" value="1"/><Field name="emergencyStopReason" cdm="Platform.EmergencyStop.Reason"/>
+            <FixedField name="emergencyStopType" value="1"/><Field name="emergencyStopReason" cdm="Platform.EmergencyStop.Reason" converter="EmergencyStopReasonToCode"/>
             <FixedField name="tail" value="0x55555555"/>
             <Reply semantic_id="emergencyStopAndStandbyReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP"/>
@@ -800,13 +800,13 @@ T_HEARTBEAT는 현 XSD의 Binding-only 표현 부재로 기존 MonitorBinding을
                 <!--
                     T_MDV_CTRL_RESP(28 bytes).
                     requestInfoCode=3004와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
-                    result=0은 요청 검증 완료 및 명령 수락을 의미하며, 실제 진행/완료는 관련 상태정보로 확인한다.
+                    result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다.
                 -->
                 <Field name="requestInfoCode" converter="UInt16LE"/>
                 <Field name="commandId" cdm="Command.Identifier.UUID" converter="UInt8Array16"/>
                 <Field name="mdvId" cdm="Platform.Identifier.Numeric" converter="UInt16LE"/>
-                <Field name="result" cdm="Command.Result"/>
-                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LE"/>
+                <Field name="result" cdm="Command.Result" converter="CommandResultCodeToState"/>
+                <Field name="reasonCode" cdm="Command.Result.ReasonCode" converter="UInt16LEToMdvCommandReasonState"/>
                 <Field name="reserved"/>
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" converter="UInt32LE"/>
