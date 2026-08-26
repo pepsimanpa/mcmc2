@@ -1,0 +1,53 @@
+name: Merge AUV Decisions
+on:
+  push:
+    branches: [feature/auv-reply-bit-binding]
+    paths: ['.github/workflows/merge-auv-decisions.yml']
+permissions:
+  contents: write
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-reply-bit-binding
+      - name: Merge docs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          u=Path('ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md')
+          a=Path('ProtocolXml/AUV/AuvDesignDecisions_20260818.md')
+          s=u.read_text(encoding='utf-8')
+          old=a.read_text(encoding='utf-8')
+          start=old.index('## Issue 1.')
+          body=old[start:]
+          body=body.replace('## 현재 남은 작업', '## AUV 설계 범위 내 남은 확인사항')
+          body=body.replace('6. Validator 항목 구현 또는 검증 스크립트 마련\n','')
+          body=body.replace('7. XML/XSD 전체 검증\n','')
+          body=body.replace('**Status: RESOLVED direction / implementation required**','**Status: RESOLVED direction**')
+          body=body.replace('별도 Validator에서 확인:', '설계 정합성 검사 시 확인:')
+          body=body.replace('선택형 Control Parameter를 명시적으로 표현하기 위한 XSD 확장이 필요할 수 있다.','선택형 Control Parameter 표현은 공통 XSD 규칙을 따른다.')
+          body=body.replace('1. Issue 6 전체 CDM 정합성 감사\n','1. Issue 6 전체 CDM 정합성 확인\n')
+          body=body.replace('2. 위 결정에 따른 Semantic/Binding/XSD 최소 수정\n','2. 위 결정에 따른 Semantic/Binding/XSD 정합성 유지\n')
+          body=body.replace('3. RF-3 ProductBinding 구조 반영\n','3. RF-3 ProductBinding 구조 확인\n')
+          body=body.replace('4. RF_CONF_MODE/PWR PackedField 반영\n','4. RF_CONF_MODE/PWR PackedField 정합성 확인\n')
+          body=body.replace('5. Result ↔ BitMember CDM 연결 반영\n','5. Result ↔ BitMember CDM 연결 정합성 확인\n')
+          body=body.replace('8. RF-2 ACK/RF_CMD_COMPLETE/Body 동시 유효성 원문 추가 확인\n','6. RF-2 ACK/RF_CMD_COMPLETE/Body 동시 유효성 원문 추가 확인\n')
+          insert='''## 16. AUV 장치 고유 결정사항\n\n이 절은 기존 `ProtocolXml/AUV/AuvDesignDecisions_20260818.md`의 내용을 통합한 기록이다. 공통 Semantic / Binding / Specification 규칙은 본 문서 앞 절을 따르며, 아래 항목은 AUV RF ICD에 의해 필요한 장치 고유 결정사항이다. OM/Validator 실제 구현은 본 문서 범위 밖이다.\n\n'''+body+'\n\n---\n\n'
+          marker='## 16. 현재 남은 주요 TBD / 후속작업\n'
+          if marker not in s: raise SystemExit('global todo marker missing')
+          s=s.replace(marker,insert+'## 17. 현재 남은 주요 TBD / 후속작업\n',1)
+          s=s.replace('- AUV / USV를 동일 선언형 Binding 규칙으로 마이그레이션할지 단계별 검토','- AUV / USV의 legacy Binding을 동일 선언형 규칙으로 단계적으로 마이그레이션할지 검토')
+          u.write_text(s,encoding='utf-8',newline='')
+          PY
+          git rm ProtocolXml/AUV/AuvDesignDecisions_20260818.md
+          git rm .github/workflows/scan-mdv-emdw-converters.yml
+          git diff --check
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Unify AUV decisions into common UMS design rules'
+          git push origin HEAD:feature/auv-reply-bit-binding
