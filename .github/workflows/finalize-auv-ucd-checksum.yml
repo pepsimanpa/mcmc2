@@ -1,4 +1,4 @@
-# one-shot trigger
+# one-shot trigger v2
 name: Finalize AUV UCD Checksum Binding
 
 on:
@@ -42,23 +42,26 @@ jobs:
           if s.count(rx_old) != 3:
               raise SystemExit(f'unexpected UCD-2 checksum converter count: {s.count(rx_old)}')
 
-          s = s.replace(tx_old, tx_new)
-          s = s.replace(rx_old, rx_new)
+          s = s.replace(tx_old, tx_new).replace(rx_old, rx_new)
 
-          old_header = '- checksum은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지를 UInt16LE로 저장한다.\n    - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지 계산한다.'
-          new_header = '- checksum 계산식은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지이며 UInt16 little-endian으로 저장한다.\n    - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지를 계산 범위로 사용한다.\n    - checksum 생성과 수신 checksum 검증은 OM/실행 계층 책임이며 Binding은 계산/검증을 수행하지 않는다.\n    - UCD-1 Binding은 OM/실행 계층이 준비한 System.Frame.Checksum을 UInt16으로 기록하고, UCD-2 Binding은 수신된 checksum을 일반 UInt16 Field로 표현한다.'
+          old_header = '\n'.join([
+              '    - checksum은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지를 UInt16LE로 저장한다.',
+              '    - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지 계산한다.',
+          ])
+          new_header = '\n'.join([
+              '    - checksum 계산식은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지이며 UInt16 little-endian으로 저장한다.',
+              '    - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지를 계산 범위로 사용한다.',
+              '    - checksum 생성과 수신 checksum 검증은 OM/실행 계층 책임이며 Binding은 계산/검증을 수행하지 않는다.',
+              '    - UCD-1 Binding은 OM/실행 계층이 준비한 System.Frame.Checksum을 UInt16으로 기록하고, UCD-2 Binding은 수신된 checksum을 일반 UInt16 Field로 표현한다.',
+          ])
           if old_header not in s:
               raise SystemExit('UCD checksum header comment marker not found')
           s = s.replace(old_header, new_header, 1)
 
-          s = s.replace('<!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. -->',
-                        '<!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->')
-          s = s.replace('<!-- UCD-1 bytes 14..15: CHECKSUM. -->',
-                        '<!-- UCD-1 bytes 14..15: CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->')
-          s = s.replace('<!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. -->',
-                        '<!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->')
-          s = s.replace('<!-- UCD-2 bytes 14..15: CHECKSUM. -->',
-                        '<!-- UCD-2 bytes 14..15: CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->')
+          s = s.replace('<!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. -->', '<!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->')
+          s = s.replace('<!-- UCD-1 bytes 14..15: CHECKSUM. -->', '<!-- UCD-1 bytes 14..15: CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->')
+          s = s.replace('<!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. -->', '<!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->')
+          s = s.replace('<!-- UCD-2 bytes 14..15: CHECKSUM. -->', '<!-- UCD-2 bytes 14..15: CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->')
 
           ucd.write_text(s, encoding='utf-8', newline='')
           after_comments = len(re.findall(r'<!--[\s\S]*?-->', s))
@@ -66,20 +69,23 @@ jobs:
               raise SystemExit(f'UCD comment count changed: {before_comments}->{after_comments}')
 
           d = doc.read_text(encoding='utf-8')
-          old = '''- `ByteSumModulo65536LE` 제거
-  - RF-1 checksum 계산식 자체는 ICD 규칙을 유지한다: COUNT부터 INFORMATION 마지막 byte까지 unsigned byte 합의 modulo 65536.
-  - checksum 계산은 RF framing 단계 책임이며 Binding은 준비된 `System.Frame.Checksum`을 `UInt16`로 기록한다.
-  - RF-2 수신 checksum은 이미 일반 wire `Field UInt16`으로 표현한다.'''
-          new = '''- `ByteSumModulo65536LE` 제거
-  - RF-1 checksum 계산식 자체는 ICD 규칙을 유지한다: COUNT부터 INFORMATION 마지막 byte까지 unsigned byte 합의 modulo 65536.
-  - UCD checksum 계산식도 기존 ICD 규칙을 유지한다: UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지를 계산 범위로 사용한다.
-  - 송신 checksum 생성과 수신 checksum 검증은 OM/실행 계층 책임이며 Binding은 계산/검증을 수행하지 않는다.
-  - RF-1/UCD-1 Binding은 준비된 `System.Frame.Checksum`을 `UInt16`로 기록한다.
-  - RF-2/UCD-2 수신 checksum은 일반 wire `Field UInt16`으로 표현한다.'''
+          old = '\n'.join([
+              '- `ByteSumModulo65536LE` 제거',
+              '  - RF-1 checksum 계산식 자체는 ICD 규칙을 유지한다: COUNT부터 INFORMATION 마지막 byte까지 unsigned byte 합의 modulo 65536.',
+              '  - checksum 계산은 RF framing 단계 책임이며 Binding은 준비된 `System.Frame.Checksum`을 `UInt16`로 기록한다.',
+              '  - RF-2 수신 checksum은 이미 일반 wire `Field UInt16`으로 표현한다.',
+          ])
+          new = '\n'.join([
+              '- `ByteSumModulo65536LE` 제거',
+              '  - RF-1 checksum 계산식 자체는 ICD 규칙을 유지한다: COUNT부터 INFORMATION 마지막 byte까지 unsigned byte 합의 modulo 65536.',
+              '  - UCD checksum 계산식도 기존 ICD 규칙을 유지한다: UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지를 계산 범위로 사용한다.',
+              '  - 송신 checksum 생성과 수신 checksum 검증은 OM/실행 계층 책임이며 Binding은 계산/검증을 수행하지 않는다.',
+              '  - RF-1/UCD-1 Binding은 준비된 `System.Frame.Checksum`을 `UInt16`로 기록한다.',
+              '  - RF-2/UCD-2 수신 checksum은 일반 wire `Field UInt16`으로 표현한다.',
+          ])
           if old not in d:
               raise SystemExit('design doc checksum section marker not found')
-          d = d.replace(old, new, 1)
-          doc.write_text(d, encoding='utf-8', newline='')
+          doc.write_text(d.replace(old, new, 1), encoding='utf-8', newline='')
 
           schema = etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
           bindings = [
@@ -94,8 +100,8 @@ jobs:
               print('PASS XSD', f)
 
           auv_text = ''.join(p.read_text(encoding='utf-8') for p in Path('ProtocolXml/AUV').glob('*Binding.xml'))
-          if 'converter=' in auv_text:
-              names = re.findall(r'converter="([^"]+)"', auv_text)
+          names = re.findall(r'converter="([^"]+)"', auv_text)
+          if names:
               raise SystemExit(f'AUV converters remain: {names}')
           print('AUV converter count: 0')
           print('UCD comments preserved:', before_comments)
