@@ -1,0 +1,179 @@
+name: Normalize AUV RF2 Layout
+on:
+  push:
+    branches: [feature/auv-declarative-binding-cleanup]
+    paths: ['.github/workflows/normalize-auv-rf2-layout.yml']
+permissions:
+  contents: write
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-declarative-binding-cleanup
+          fetch-depth: 0
+      - name: Normalize every RF-2 Reply to the fixed 80-byte physical telegram
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          files=[Path('ProtocolXml/AUV/AuvPlatformRfBinding.xml'),Path('ProtocolXml/AUV/AuvRfCommBinding.xml')]
+          before_comments={p:len(re.findall(r'<!--[\s\S]*?-->',p.read_text(encoding='utf-8'))) for p in files}
+
+          canonical=[
+            ('mspdCheck','<Field name="mspdCheck" dataType="UInt16"/>'),
+            ('inbCheck','<Field name="inbCheck" dataType="UInt16"/>'),
+            ('accCheck','<Field name="accCheck" dataType="UInt16"/>'),
+            ('pcdCheck','<Field name="pcdCheck" dataType="UInt16"/>'),
+            ('mcCheck','<Field name="mcCheck" dataType="UInt16"/>'),
+            ('rcdCheck','<Field name="rcdCheck" dataType="UInt16"/>'),
+            ('auvId','<Field name="auvId" dataType="UInt8"/>'),
+            ('batteryPercent','<Field name="batteryPercent" dataType="UInt8"/>'),
+            ('gpsLatitude','<Field name="gpsLatitude" dataType="Float32"/>'),
+            ('gpsLongitude','<Field name="gpsLongitude" dataType="Float32"/>'),
+            ('waypointCount','<Field name="waypointCount" dataType="UInt8"/>'),
+            ('alignmentStatus','<Field name="alignmentStatus" dataType="UInt8"/>'),
+            ('integratedNavigationLatitude','<Field name="integratedNavigationLatitude" dataType="Float32"/>'),
+            ('integratedNavigationLongitude','<Field name="integratedNavigationLongitude" dataType="Float32"/>'),
+            ('auvDataFileCount','<Field name="auvDataFileCount" dataType="UInt16"/>'),
+            ('sideScanSonarFileCount','<Field name="sideScanSonarFileCount" dataType="UInt16"/>'),
+            ('opticalCameraFileCount','<Field name="opticalCameraFileCount" dataType="UInt16"/>'),
+            ('acousticCameraFileCount','<Field name="acousticCameraFileCount" dataType="UInt16"/>'),
+            ('forwardLookingSonarFileCount','<Field name="forwardLookingSonarFileCount" dataType="UInt16"/>'),
+            ('emergencyReasonMask','<Field name="emergencyReasonMask" dataType="UInt16"/>'),
+            ('modeMask','<Field name="modeMask" dataType="UInt16"/>'),
+            ('reserveRf','<Field name="reserveRf" dataType="UInt8" length="2"/>'),
+            ('preLaunchCheck','<Field name="preLaunchCheck" dataType="UInt16"/>'),
+            ('rfConfMode','<Field name="rfConfMode" dataType="UInt8"/>'),
+            ('rfConfPower','<Field name="rfConfPower" dataType="UInt8"/>'),
+            ('edmBatteryPercent','<Field name="edmBatteryPercent" dataType="UInt8"/>'),
+            ('uhfChannel1SignalDb','<Field name="uhfChannel1SignalDb" dataType="Int8"/>'),
+            ('uhfChannel2SignalDb','<Field name="uhfChannel2SignalDb" dataType="Int8"/>'),
+            ('uhfChannel3SignalDb','<Field name="uhfChannel3SignalDb" dataType="Int8"/>'),
+            ('lBandChannel1SignalDb','<Field name="lBandChannel1SignalDb" dataType="Int8"/>'),
+            ('lBandChannel2SignalDb','<Field name="lBandChannel2SignalDb" dataType="Int8"/>'),
+            ('lBandChannel3SignalDb','<Field name="lBandChannel3SignalDb" dataType="Int8"/>'),
+            ('uhfPacketErrorRate','<Field name="uhfPacketErrorRate" dataType="UInt8"/>'),
+            ('lBandPacketErrorRate','<Field name="lBandPacketErrorRate" dataType="UInt8"/>'),
+            ('statusCode','<Field name="statusCode" dataType="UInt8"/>'),
+          ]
+
+          def elem_span(text,name):
+              m=re.search(r'<(?:Field|FixedField|DerivedField|PackedField)\b[^>]*\bname="'+re.escape(name)+r'"[^>]*>',text)
+              if not m:
+                  m=re.search(r'<(?:Field|FixedField|DerivedField)\b[^>]*\bname="'+re.escape(name)+r'"[^>]*/>',text)
+                  if not m:return None
+              start=m.start(); tag=m.group(0)
+              if tag.rstrip().endswith('/>'): return start,m.end()
+              if tag.startswith('<PackedField'):
+                  e=text.find('</PackedField>',m.end())
+                  if e<0: raise SystemExit('unterminated PackedField '+name)
+                  return start,e+len('</PackedField>')
+              # Non-self-closing scalar with children (ValueMap/Sentinel) if ever present.
+              tagname=re.match(r'<(Field|FixedField|DerivedField)',tag).group(1)
+              e=text.find(f'</{tagname}>',m.end())
+              if e<0: raise SystemExit('unterminated '+tagname+' '+name)
+              return start,e+len(f'</{tagname}>')
+
+          def get_elem(text,name):
+              sp=elem_span(text,name)
+              return text[sp[0]:sp[1]] if sp else None
+
+          def indent_block(x,spaces=16):
+              pad=' '*spaces
+              lines=x.strip().splitlines()
+              # normalize only leading indentation of transplanted element, not inner relative indentation
+              if not lines:return ''
+              nonempty=[len(l)-len(l.lstrip()) for l in lines if l.strip()]
+              base=min(nonempty) if nonempty else 0
+              return '\n'.join(pad+(l[base:] if len(l)>=base else l) for l in lines)
+
+          def normalize_reply(match):
+              opening=match.group(1); body=match.group(2); closing='</Reply>'
+              if 'messageType="AuvRf2Telegram"' not in body:return match.group(0)
+              acksp=elem_span(body,'ack'); chksp=elem_span(body,'checksum'); stopsp=elem_span(body,'stopByte')
+              if not acksp or not chksp or not stopsp: raise SystemExit('RF2 reply missing ack/checksum/stop: '+opening)
+              prefix=body[:acksp[1]]
+              middle=body[acksp[1]:chksp[0]]
+              suffix=body[chksp[0]:]
+              # Preserve every existing body comment, but discard old partial/body placeholder fields.
+              comments=re.findall(r'<!--[\s\S]*?-->',middle)
+              old={name:get_elem(middle,name) for name,_ in canonical}
+              # Received checksum is a physical field, not a generated TX value.
+              suffix=re.sub(r'<DerivedField name="checksum"[^>]*/>', '<Field name="checksum" dataType="UInt16"/>', suffix, count=1)
+              out=[]
+              if comments:
+                  out.extend(indent_block(c,16) for c in comments)
+              out.append('                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->')
+              for name,default in canonical:
+                  out.append(indent_block(old[name] if old[name] else default,16))
+              return opening+prefix+'\n'+'\n'.join(out)+'\n'+suffix+closing
+
+          pat=re.compile(r'(<Reply semantic_id="[^"]+"[^>]*>)([\s\S]*?)(</Reply>)')
+          for p in files:
+              s=p.read_text(encoding='utf-8')
+              s,n=pat.subn(normalize_reply,s)
+              if n==0: raise SystemExit('no replies found '+str(p))
+              s=s.replace('<Field name="informationBody" dataType="UInt8" length="62"/>','')
+              p.write_text(s,encoding='utf-8',newline='')
+              after=len(re.findall(r'<!--[\s\S]*?-->',s))
+              if after < before_comments[p]: raise SystemExit(f'comment loss {p}: {before_comments[p]} -> {after}')
+              print('comments',p,before_comments[p],'->',after)
+          PY
+          git diff --check
+      - name: Validate XSD and exact RF-2 byte layout
+        run: |
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from lxml import etree
+          from pathlib import Path
+          import re
+          NS='http://lignex1.com/mcmc2/umsSchema'; q=lambda n:f'{{{NS}}}{n}'
+          SZ={'UInt8':1,'Int8':1,'UInt16':2,'Int16':2,'UInt32':4,'Int32':4,'UInt64':8,'Int64':8,'Float32':4,'Float64':8}
+          files=['ProtocolXml/AUV/AuvPlatformRfBinding.xml','ProtocolXml/AUV/AuvRfCommBinding.xml']
+          schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          expected=['startByte','count','completionCommand','ack','mspdCheck','inbCheck','accCheck','pcdCheck','mcCheck','rcdCheck','auvId','batteryPercent','gpsLatitude','gpsLongitude','waypointCount','alignmentStatus','integratedNavigationLatitude','integratedNavigationLongitude','auvDataFileCount','sideScanSonarFileCount','opticalCameraFileCount','acousticCameraFileCount','forwardLookingSonarFileCount','emergencyReasonMask','modeMask','reserveRf','preLaunchCheck','rfConfMode','rfConfPower','edmBatteryPercent','uhfChannel1SignalDb','uhfChannel2SignalDb','uhfChannel3SignalDb','lBandChannel1SignalDb','lBandChannel2SignalDb','lBandChannel3SignalDb','uhfPacketErrorRate','lBandPacketErrorRate','statusCode','checksum','stopByte']
+          for path in files:
+              doc=etree.parse(path); schema.assertValid(doc); print('XSD PASS',path)
+              for r in doc.xpath('//*[local-name()="Reply"]'):
+                  ch=r[0] if len(r) else None
+                  if ch is None or ch.get('messageType')!='AuvRf2Telegram': continue
+                  children=[e for e in r if isinstance(e.tag,str) and e.tag.rsplit('}',1)[-1] in {'Field','FixedField','DerivedField','PackedField'}]
+                  names=[e.get('name') for e in children]
+                  if names!=expected: raise SystemExit(f'{r.get("semantic_id")} sequence mismatch\n{names}')
+                  total=0
+                  for e in children:
+                      t=e.tag.rsplit('}',1)[-1]
+                      if t=='PackedField': total+=int(e.get('width'))//8
+                      else:
+                          dt=e.get('dataType')
+                          if dt not in SZ: raise SystemExit(f'{r.get("semantic_id")} {e.get("name")} missing type {dt}')
+                          total+=SZ[dt]*int(e.get('length','1'))
+                  if total!=80: raise SystemExit(f'{r.get("semantic_id")} size={total}')
+                  print('RF2 PASS',r.get('semantic_id'),'80 bytes')
+          for path in files:
+              s=Path(path).read_text(encoding='utf-8')
+              if 'informationBody' in s: raise SystemExit('informationBody remains '+path)
+          PY
+      - name: Update unified design record
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md')
+          s=p.read_text(encoding='utf-8')
+          old='''## Issue 13. RF-2 ACK / RF_CMD_COMPLETE / Body\n\n**Status: PARTIALLY RESOLVED / simultaneity TBD**'''
+          new='''## Issue 13. RF-2 ACK / RF_CMD_COMPLETE / Body\n\n**Status: PHYSICAL LAYOUT RESOLVED / command-specific simultaneity TBD**\n\nRF-2는 모든 Reply에서 동일한 고정 80-byte 물리 구조를 유지한다. Semantic에서 사용하지 않는 Body 필드도 Binding에는 CDM 없이 남겨 실제 byte offset을 보존한다.\n\n- Header: 14 bytes\n- Fixed Body: 62 bytes\n- Tail: 4 bytes\n- Total: 80 bytes\n\n`AuvPlatformRfBinding.xml`과 `AuvRfCommBinding.xml`의 모든 `AuvRf2Telegram` Reply는 동일 필드 순서와 80-byte 크기를 갖도록 정규화하였다. 수신 checksum은 생성값이 아니라 wire Field로 표현한다.'''
+          if old not in s: raise SystemExit('Issue 13 header not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8',newline='')
+          PY
+          git diff --check
+      - name: Commit RF-2 normalization
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/AUV/AuvPlatformRfBinding.xml ProtocolXml/AUV/AuvRfCommBinding.xml ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md
+          git commit -m 'Normalize AUV RF-2 physical reply layout'
+          git push origin HEAD:feature/auv-declarative-binding-cleanup
