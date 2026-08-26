@@ -1,0 +1,60 @@
+name: Update UMS Scope Boundary
+
+on:
+  push:
+    branches: [feature/auv-reply-bit-binding]
+    paths: ['.github/workflows/update-ums-scope-boundary.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-reply-bit-binding
+      - name: Patch unified rules
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md')
+          s=p.read_text(encoding='utf-8')
+
+          s=s.replace(
+            '- Scope: MCMC2 전체 UMS(AUV / MDV / EMDW / USV 및 이후 추가 UMS)\n',
+            '- Scope: MCMC2 전체 UMS(AUV / MDV / EMDW / USV 및 이후 추가 UMS)의 Semantic / Binding / Specification 설계\n- Out of Scope: OM 실행 알고리즘, Validator 코드, 런타임 구현 및 실제 소프트웨어 구현 검증\n',1)
+
+          s=s.replace('### 2.2 OM / 실행 로직\n','### 2.2 OM / 실행 로직과의 책임 경계\n',1)
+          old='''Binding이 OM 실행 알고리즘을 대신하지 않는다.\n'''
+          new='''Binding이 OM 실행 알고리즘을 대신하지 않는다.\n\n본 설계의 범위는 **OM이 어떤 값을 준비해야 하는지, 어떤 운용 제약을 실행 계층에서 검증해야 하는지에 대한 책임 경계를 정의하는 것까지**다.\nOM 내부 알고리즘, Validator 코드 작성, 구현 방식 및 실제 구현 여부 확인은 본 Semantic / Binding 설계 범위에 포함하지 않는다.\n'''
+          if old not in s: raise SystemExit('OM boundary insertion point not found')
+          s=s.replace(old,new,1)
+
+          # Keep documentation examples aligned with the actual shared Semantic CDM.
+          s=s.replace('Mission.Type.Identification','Mission.Type.Identify')
+
+          s=s.replace('## 10. Validator / OM 규칙\n','## 10. 운용 제약과 실행 계층 책임 경계\n',1)
+          old='''XSD가 표현하기 부적절한 상호조건은 Validator/OM에서 검사한다.\n'''
+          new='''XSD 또는 Binding이 표현하기 부적절한 상호조건은 Semantic / Binding에서 임의로 보정하거나 실행하지 않는다.\n본 문서에는 **실행 계층에서 검증되어야 하는 운용 제약 자체만 설계 요구사항으로 기록**하며, 실제 Validator/OM 구현은 범위 밖으로 둔다.\n'''
+          if old not in s: raise SystemExit('section 10 intro not found')
+          s=s.replace(old,new,1)
+
+          old='''실제 임무계획 전송 전에 OM Validator가 다음을 확인한다.\n\n- Waypoint 목록이 존재하는 경우 마지막 Waypoint Action == `대기`\n- 오류라면 Binding이 임의로 `대기`로 수정하지 않고 임무계획 오류로 처리\n'''
+          new='''운용 제약은 다음과 같다.\n\n- Waypoint 목록이 존재하는 경우 마지막 Waypoint Action == `대기`\n- Binding은 이를 임의로 `대기`로 수정하거나 강제하지 않는다.\n- 실제 실행 계층은 이 제약을 만족하지 않는 임무계획을 정상 전송 대상으로 취급해서는 안 된다.\n- 단, 이를 검사하는 Validator/OM의 실제 코드와 구현 여부는 본 설계 범위에서 검토하지 않는다.\n'''
+          if old not in s: raise SystemExit('last waypoint implementation paragraph not found')
+          s=s.replace(old,new,1)
+
+          s=s.replace('- 마지막 Waypoint Action Validator 실제 OM 구현 확인\n','')
+
+          p.write_text(s,encoding='utf-8',newline='')
+          PY
+          git diff --check
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md
+          git commit -m 'Clarify Semantic Binding design scope boundary'
+          git push origin HEAD:feature/auv-reply-bit-binding
