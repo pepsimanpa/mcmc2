@@ -1,0 +1,189 @@
+name: Fix MDV EMDW Consistency
+
+on:
+  push:
+    branches: [feature/auv-reply-bit-binding]
+    paths: ['.github/workflows/fix-mdv-emdw-consistency.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-reply-bit-binding
+          fetch-depth: 0
+
+      - name: Apply minimal text patches
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          files=[
+            Path('ProtocolXml/MDV/MdvTcpBinding.xml'),
+            Path('ProtocolXml/EMDW/EmdwTcpBinding.xml'),
+          ]
+
+          for p in files:
+            s=p.read_text(encoding='utf-8')
+            old=s
+            s=s.replace('cdm="MissionPlan.Waypoint.Action.Pass" value="0"',
+                        'cdm="MissionPlan.Waypoint.Action.PassThrough" value="0"')
+            s=s.replace('cdm="Mission.Type.Identification" value="2"',
+                        'cdm="Mission.Type.Identify" value="2"')
+            if s==old:
+              raise SystemExit(f'{p}: expected ValueMap replacements not found')
+            p.write_text(s,encoding='utf-8',newline='')
+
+          def patch_reply(path, reply_id):
+            p=Path(path); s=p.read_text(encoding='utf-8')
+            start=s.find(f'<Reply semantic_id="{reply_id}"')
+            if start<0: raise SystemExit(f'{path}: Reply {reply_id} not found')
+            end=s.find('</Reply>',start)
+            if end<0: raise SystemExit(f'{path}: Reply {reply_id} end not found')
+            end+=len('</Reply>')
+            block=s[start:end]
+            old='<Field name="reserved" dataType="UInt8" length="3" />'
+            new='<Field name="reserved" dataType="UInt8" length="5" />'
+            if block.count(old)!=1:
+              raise SystemExit(f'{path}: Reply {reply_id} expected exactly one reserved length=3, got {block.count(old)}')
+            block=block.replace(old,new,1)
+            s=s[:start]+block+s[end:]
+            p.write_text(s,encoding='utf-8',newline='')
+
+          patch_reply('ProtocolXml/MDV/MdvTcpBinding.xml','transferMissionPlanReply')
+          for rid in ['transferMissionPlanReply','cancelDisposalReply','prepareDisposalReply','executeDisposalReply']:
+            patch_reply('ProtocolXml/EMDW/EmdwTcpBinding.xml',rid)
+
+          for p in files:
+            ET.parse(p)
+            print('XML OK',p)
+          PY
+          git diff --check
+
+      - name: Structural consistency audit
+        run: |
+          python - <<'PY'
+          import re
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          from collections import defaultdict
+
+          NS='http://lignex1.com/mcmc2/umsSchema'; q=lambda n:f'{{{NS}}}{n}'
+          SZ={'UInt8':1,'Int8':1,'UInt16':2,'Int16':2,'UInt32':4,'Int32':4,'UInt64':8,'Int64':8,'Float32':4,'Float64':8}
+          cfgs={
+            'MDV':('ProtocolXml/MDV/MdvPlatformSemantic.xml','ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/MDV/MdvSpecification.xml',{
+              'T_MDV_MISSION_CTRL_CMD':28,'T_MDV_MODE_SET_CMD':24,'T_MDV_MISSION_PLAN_INFO':348,'T_MDV_EMERGENCY_STOP_CMD':20,'T_MDV_TARGET_INFO_CMD':16,'T_MDV_CTRL_RESP':28,'T_MDV_TRACKING_INFO':52,'T_MDV_STATUS_INFO':12,'T_MDV_MISSION_PROGRESS_INFO':24,'T_HEARTBEAT':8}),
+            'EMDW':('ProtocolXml/EMDW/EmdwPlatformSemantic.xml','ProtocolXml/EMDW/EmdwTcpBinding.xml','ProtocolXml/EMDW/EmdwSpecification.xml',{
+              'T_EMDW_MISSION_CTRL_CMD':28,'T_EMDW_MODE_SET_CMD':24,'T_EMDW_MISSION_PLAN_INFO':348,'T_EMDW_EMERGENCY_STOP_CMD':20,'T_EMDW_TARGET_INFO_CMD':16,'T_EMDW_DISPOSAL_CMD':28,'T_EMDW_CTRL_RESP':28,'T_EMDW_POSITION_INFO':16,'T_EMDW_STATUS_INFO':12,'T_EMDW_MISSION_PROGRESS_INFO':24,'T_EMDW_DISPOSAL_STATUS_INFO':12,'T_HEARTBEAT':8})}
+          issues=[]
+          def add(p,k,m): issues.append((p,k,m))
+          def ln(e): return e.tag.rsplit('}',1)[-1]
+          def elems(c): return [x for x in list(c) if ln(x) in {'Field','FixedField','DerivedField','PackedField','ArrayField'}]
+          def size(e):
+            t=ln(e)
+            if t in {'Field','FixedField','DerivedField'}:
+              dt=e.get('dataType')
+              if dt not in SZ: raise ValueError(f'{t}:{e.get("name")} dataType={dt}')
+              return SZ[dt]*int(e.get('length','1'))
+            if t=='PackedField':
+              w=int(e.get('width'))
+              if w%8: raise ValueError(f'PackedField {e.get("name")} width={w}')
+              return w//8
+            if t=='ArrayField':
+              mx=e.get('maxOccurs'); el=e.find(q('Element'))
+              if not mx or not mx.isdigit() or el is None: raise ValueError(f'ArrayField {e.get("name")} maxOccurs={mx}')
+              return int(mx)*sum(size(x) for x in elems(el))
+            return 0
+          def sig(e):
+            t=ln(e)
+            if t in {'Field','FixedField','DerivedField'}: return (e.get('name'),e.get('dataType'),e.get('length','1'))
+            if t=='PackedField': return (e.get('name'),'Packed',e.get('width'))
+            if t=='ArrayField':
+              el=e.find(q('Element'))
+              return (e.get('name'),'Array',e.get('maxOccurs'),tuple(sig(x) for x in elems(el)))
+
+          for p,(sp,bp,vp,body_sizes) in cfgs.items():
+            sr=ET.parse(sp).getroot(); br=ET.parse(bp).getroot(); vr=ET.parse(vp).getroot()
+            bt=Path(bp).read_text(encoding='utf-8')
+            enc=vr.find(q('DataEncoding'))
+            if enc is None or enc.get('byteOrder')!='little': add(p,'DataEncoding','missing/mismatch')
+            for bad in ['converter=','generator=','sourceMember=']:
+              if bad in bt: add(p,'Legacy',bad)
+            for e in br.iter():
+              t=ln(e)
+              if t in {'Field','FixedField','DerivedField'} and not e.get('dataType'): add(p,'DataType',f'{t}:{e.get("name")}')
+              if e.get('name')=='reserved' and t in {'Field','FixedField','DerivedField'}:
+                if e.get('dataType')!='UInt8' or not e.get('length'): add(p,'Reserved',ET.tostring(e,encoding='unicode'))
+
+            ms=sr.find(q('MonitorSpecs')); cs=sr.find(q('ControlSpecs')); bm=br.find(q('Monitors')); bc=br.find(q('Controls'))
+            sm={e.get('id') for e in list(ms) if e.get('id')} if ms is not None else set(); sc={e.get('id') for e in list(cs) if e.get('id')} if cs is not None else set()
+            xm={e.get('semantic_id') for e in list(bm) if e.get('semantic_id')} if bm is not None else set(); xc={e.get('semantic_id') for e in list(bc) if e.get('semantic_id')} if bc is not None else set()
+            if sm!=xm: add(p,'MonitorID',f'{sm-xm}|{xm-sm}')
+            if sc!=xc: add(p,'ControlID',f'{sc-xc}|{xc-sc}')
+
+            srep={e.get('bindRef'):e for e in sr.iter(q('Reply')) if e.get('bindRef')}; brep={e.get('semantic_id'):e for e in br.iter(q('Reply')) if e.get('semantic_id')}
+            if set(srep)!=set(brep): add(p,'ReplyRef',f'{set(srep)-set(brep)}|{set(brep)-set(srep)}')
+
+            sem_cdms={e.get('cdm') for e in sr.iter() if e.get('cdm')}
+            for e in br.iter():
+              t=ln(e); c=e.get('cdm')
+              if t=='Map' and c not in sem_cdms: add(p,'ValueMapCDM',c or '<none>')
+              if t in {'Set','Bind'} and c not in sem_cdms: add(p,'SentinelCDM',c or '<none>')
+
+            for tag in ['ValueSetSpec','ValueSetProfile','ValueSetResult']:
+              for vs in sr.iter(q(tag)):
+                vals=vs.find(q('Values'))
+                if vals is not None:
+                  for v in vals.findall(q('Value')):
+                    txt=(v.text or '').strip()
+                    if re.fullmatch(r'(?:0x[0-9A-Fa-f]+|-?\d+)',txt): add(p,'SemanticRawCode',f'{tag}:{txt}')
+
+            by=defaultdict(list)
+            for tag in ['MonitorBinding','ControlBinding','Reply']:
+              for c in br.iter(q(tag)):
+                ch=c.find(q('TCPChannel'))
+                if ch is None: continue
+                msg=ch.get('messageType')
+                total=sum(size(x) for x in elems(c)); sg=tuple(sig(x) for x in elems(c)); by[msg].append((c.get('semantic_id'),total,sg))
+                if msg in body_sizes and total!=body_sizes[msg]+28: add(p,'PacketSize',f'{msg}/{c.get("semantic_id")}: {total}!={body_sizes[msg]+28}')
+                for x in elems(c):
+                  if ln(x)=='FixedField' and x.get('name')=='packetLength' and int(x.get('value'),0)!=total:
+                    add(p,'PacketLength',f'{msg}/{c.get("semantic_id")}: {x.get("value")}!={total}')
+            for msg,rows in by.items():
+              if len({r[2] for r in rows})>1: add(p,'MessageSignature',f'{msg}:{[r[0] for r in rows]}')
+
+          print('=== FINAL AUDIT ===')
+          for x in issues: print(' | '.join(x))
+          print('TOTAL_ERRORS',len(issues))
+          if issues: raise SystemExit(2)
+          PY
+
+      - name: XSD validation
+        run: |
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from lxml import etree
+          pairs=[
+            ('ProtocolXml/MDV/MdvPlatformSemantic.xml','ProtocolXml/XSD/CommonSpecSchema.xsd'),
+            ('ProtocolXml/EMDW/EmdwPlatformSemantic.xml','ProtocolXml/XSD/CommonSpecSchema.xsd'),
+            ('ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/XSD/CommonBindingSchema.xsd'),
+            ('ProtocolXml/EMDW/EmdwTcpBinding.xml','ProtocolXml/XSD/CommonBindingSchema.xsd'),
+            ('ProtocolXml/MDV/MdvSpecification.xml','ProtocolXml/XSD/VehicleSpecificationSchema.xsd'),
+            ('ProtocolXml/EMDW/EmdwSpecification.xml','ProtocolXml/XSD/VehicleSpecificationSchema.xsd')]
+          for xml,xsd in pairs:
+            etree.XMLSchema(etree.parse(xsd)).assertValid(etree.parse(xml))
+            print('XSD PASS',xml)
+          PY
+
+      - name: Commit fixes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/MDV/MdvTcpBinding.xml ProtocolXml/EMDW/EmdwTcpBinding.xml
+          git commit -m 'Fix MDV EMDW binding consistency'
+          git push origin HEAD:feature/auv-reply-bit-binding
