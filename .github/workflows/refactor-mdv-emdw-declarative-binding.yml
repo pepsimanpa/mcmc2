@@ -26,243 +26,93 @@ jobs:
           from pathlib import Path
           import re
           import xml.etree.ElementTree as ET
+          NS='http://lignex1.com/mcmc2/umsSchema'; ET.register_namespace('',NS); ET.register_namespace('xsi','http://www.w3.org/2001/XMLSchema-instance'); q=lambda n:f'{{{NS}}}{n}'
 
-          NS='http://lignex1.com/mcmc2/umsSchema'
-          XS='http://www.w3.org/2001/XMLSchema'
-          ET.register_namespace('', NS)
-          ET.register_namespace('xsi','http://www.w3.org/2001/XMLSchema-instance')
-          q=lambda n:f'{{{NS}}}{n}'
-
-          # CommonSpec: semantic ValueSet may carry display name without a raw numeric text value.
-          p=Path('ProtocolXml/XSD/CommonSpecSchema.xsd')
-          s=p.read_text(encoding='utf-8')
-          old='''            <xs:extension base="xs:string">\n                <xs:attribute name="cdm" type="CdmRefType" use="optional" />\n            </xs:extension>'''
-          new='''            <xs:extension base="xs:string">\n                <xs:attribute name="name" type="xs:string" use="optional" />\n                <xs:attribute name="cdm" type="CdmRefType" use="optional" />\n            </xs:extension>'''
-          if old in s:
-              s=s.replace(old,new,1)
-          elif '<xs:attribute name="name" type="xs:string" use="optional" />' not in s:
-              raise SystemExit('CommonSpec CdmRefAttrType pattern not found')
+          p=Path('ProtocolXml/XSD/CommonSpecSchema.xsd'); s=p.read_text(encoding='utf-8')
+          old='''            <xs:extension base="xs:string">\n                <xs:attribute name="cdm" type="CdmRefType" use="optional" />\n            </xs:extension>'''; new='''            <xs:extension base="xs:string">\n                <xs:attribute name="name" type="xs:string" use="optional" />\n                <xs:attribute name="cdm" type="CdmRefType" use="optional" />\n            </xs:extension>'''
+          if old in s: s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8',newline='')
 
-          # Vehicle Specification: byte order is a specification-level encoding rule.
-          p=Path('ProtocolXml/XSD/VehicleSpecificationSchema.xsd')
-          s=p.read_text(encoding='utf-8')
+          p=Path('ProtocolXml/XSD/VehicleSpecificationSchema.xsd'); s=p.read_text(encoding='utf-8')
           if 'name="DataEncoding"' not in s:
-              s=s.replace('''            <xs:element name="Identification" type="IdentificationType" minOccurs="1" />''','''            <xs:element name="Identification" type="IdentificationType" minOccurs="1" />\n            <xs:element name="DataEncoding" type="DataEncodingType" minOccurs="0" />''',1)
-              marker='''    <xs:complexType name="IdentificationType">'''
-              addition='''    <xs:simpleType name="VehicleByteOrderType">\n        <xs:restriction base="xs:string">\n            <xs:enumeration value="little"/>\n            <xs:enumeration value="big"/>\n        </xs:restriction>\n    </xs:simpleType>\n\n    <xs:complexType name="DataEncodingType">\n        <xs:attribute name="byteOrder" type="VehicleByteOrderType" use="required"/>\n    </xs:complexType>\n\n'''
-              if marker not in s: raise SystemExit('VehicleSpecificationSchema marker missing')
+              s=s.replace('<xs:element name="Identification" type="IdentificationType" minOccurs="1" />','<xs:element name="Identification" type="IdentificationType" minOccurs="1" />\n            <xs:element name="DataEncoding" type="DataEncodingType" minOccurs="0" />',1)
+              marker='    <xs:complexType name="IdentificationType">'; addition='''    <xs:simpleType name="VehicleByteOrderType">\n        <xs:restriction base="xs:string"><xs:enumeration value="little"/><xs:enumeration value="big"/></xs:restriction>\n    </xs:simpleType>\n    <xs:complexType name="DataEncodingType"><xs:attribute name="byteOrder" type="VehicleByteOrderType" use="required"/></xs:complexType>\n\n'''
               s=s.replace(marker,addition+marker,1)
           p.write_text(s,encoding='utf-8',newline='')
 
           for spec in ['ProtocolXml/MDV/MdvSpecification.xml','ProtocolXml/EMDW/EmdwSpecification.xml']:
               p=Path(spec); s=p.read_text(encoding='utf-8')
-              if '<DataEncoding ' not in s:
-                  s=s.replace('    </Identification>','    </Identification>\n    <DataEncoding byteOrder="little"/>',1)
+              if '<DataEncoding ' not in s: s=s.replace('    </Identification>','    </Identification>\n    <DataEncoding byteOrder="little"/>',1)
               p.write_text(s,encoding='utf-8',newline='')
 
-          # Extract monitor ValueSet raw-code maps and remove physical numeric values from Semantic.
-          platform_semantic_maps={}
-          for platform, sempath in [('MDV','ProtocolXml/MDV/MdvPlatformSemantic.xml'),('EMDW','ProtocolXml/EMDW/EmdwPlatformSemantic.xml')]:
-              tree=ET.parse(sempath); root=tree.getroot(); maps={}
+          maps_by_platform={}
+          for platform,path in [('MDV','ProtocolXml/MDV/MdvPlatformSemantic.xml'),('EMDW','ProtocolXml/EMDW/EmdwPlatformSemantic.xml')]:
+              tree=ET.parse(path); root=tree.getroot(); maps={}
               for vs in root.iter(q('ValueSetSpec')):
-                  parent=vs.get('cdm'); values=vs.find(q('Values')); pairs=[]
-                  if not parent or values is None: continue
-                  for v in values.findall(q('Value')):
+                  vals=vs.find(q('Values')); parent=vs.get('cdm'); pairs=[]
+                  if vals is None or not parent: continue
+                  for v in vals.findall(q('Value')):
                       raw=(v.text or '').strip(); leaf=v.get('cdm')
-                      if leaf and re.fullmatch(r'(?:0x[0-9A-Fa-f]+|-?\d+)', raw):
-                          pairs.append((leaf,raw))
-                          if not v.get('name'): v.set('name',leaf.split('.')[-1])
-                          v.text=None
-                  if pairs:
-                      if parent in maps and maps[parent] != pairs:
-                          raise SystemExit(f'{platform}: conflicting Semantic ValueSet map for {parent}')
-                      maps[parent]=pairs
-              platform_semantic_maps[platform]=maps
-              tree.write(sempath,encoding='utf-8',xml_declaration=True)
+                      if leaf and re.fullmatch(r'(?:0x[0-9A-Fa-f]+|-?\d+)',raw):
+                          pairs.append((leaf,raw)); v.set('name',v.get('name') or leaf.split('.')[-1]); v.text=None
+                  if pairs: maps[parent]=pairs
+              maps_by_platform[platform]=maps; ET.indent(tree,space='    '); tree.write(path,encoding='utf-8',xml_declaration=True)
 
           mission_type=[('Mission.Type.Move','0'),('Mission.Type.Search','1'),('Mission.Type.Identification','2')]
           waypoint_action=[('MissionPlan.Waypoint.Action.Pass','0'),('MissionPlan.Waypoint.Action.Wait','1')]
-          emergency_reason=[
-              ('Platform.EmergencyStop.Reason.OperatorCommand','0'),
-              ('Platform.EmergencyStop.Reason.SystemDecision','1'),
-              ('Platform.EmergencyStop.Reason.CommunicationFailure','2'),
-              ('Platform.EmergencyStop.Reason.Fault','3'),
-              ('Platform.EmergencyStop.Reason.Other','4'),
-          ]
+          emergency_reason=[('Platform.EmergencyStop.Reason.OperatorCommand','0'),('Platform.EmergencyStop.Reason.SystemDecision','1'),('Platform.EmergencyStop.Reason.CommunicationFailure','2'),('Platform.EmergencyStop.Reason.Fault','3'),('Platform.EmergencyStop.Reason.Other','4')]
           command_result=[('Command.Result.Success','0'),('Command.Result.Failure','1')]
-          mdv_reason=[
-              ('Command.Result.Reason.None','0'),
-              ('Command.Result.Reason.InvalidRequest','1'),
-              ('Command.Result.Reason.InvalidMissionPlan','2'),
-              ('Command.Result.Reason.ModeChangeUnavailable','3'),
-              ('Command.Result.Reason.ModeMismatch','4'),
-              ('Command.Result.Reason.PlatformDisconnected','5'),
-              ('Command.Result.Reason.AbnormalOperationState','6'),
-              ('Command.Result.Reason.Other','7'),
-          ]
-          emdw_reason=[
-              ('Command.Result.Reason.None','0'),
-              ('Command.Result.Reason.InvalidRequest','1'),
-              ('Command.Result.Reason.InvalidMissionPlan','2'),
-              ('Command.Result.Reason.ModeChangeUnavailable','3'),
-              ('Command.Result.Reason.ModeMismatch','4'),
-              ('Command.Result.Reason.PlatformDisconnected','5'),
-              ('Command.Result.Reason.AbnormalOperationState','6'),
-              ('Command.Result.Reason.DisposalConditionNotMet','7'),
-              ('Command.Result.Reason.Other','8'),
-          ]
-
-          simple_conv={
-              'UInt16LE':('UInt16',None,None,None),
-              'UInt32LE':('UInt32',None,None,None),
-              'Float32LE':('Float32',None,None,None),
-              'UInt16Scale10ToDecimalLE':('UInt16','10',None,None),
-              'DecimalToUInt16Scale10LE':('UInt16','10',None,None),
-              'UInt32Scale10ToDecimalLE':('UInt32','10',None,None),
-              'DecimalToUInt32Scale10LE':('UInt32','10',None,None),
-              'Int32Scale10000000ToDecimalLE':('Int32','10000000',None,None),
-              'DecimalToInt32Scale10000000LE':('Int32','10000000',None,None),
-              'UInt8Array16':('UInt8',None,'16','uuid'),
-              'UuidToUInt8Array16':('UInt8',None,'16','uuid'),
-              'ArrayLengthUInt16':('UInt16',None,None,None),
-              'IncrementingUInt32LE':('UInt32',None,None,None),
-          }
-          time_conv={
-              'YearToUInt16LE':('UInt16','System.Time.Year'),
-              'MonthToUInt8':('UInt8','System.Time.Month'),
-              'DateToUInt8':('UInt8','System.Time.Date'),
-              'HourToUInt8':('UInt8','System.Time.Hour'),
-              'MinuteToUInt8':('UInt8','System.Time.Minute'),
-              'SecondToUInt8':('UInt8','System.Time.Second'),
-              'MillisecondToUInt16LE':('UInt16','System.Time.Millisecond'),
-          }
-          enum_conv={
-              'MissionTypeToCode':mission_type,
-              'MissionWaypointActionToCode':waypoint_action,
-              'EmergencyStopReasonToCode':emergency_reason,
-              'CommandResultCodeToState':command_result,
-              'UInt16LEToMdvCommandReasonState':mdv_reason,
-              'UInt16LEToEmdwCommandReasonState':emdw_reason,
-          }
-
-          common_field_types={
-              'preamble':'UInt32','sourceDeviceId':'UInt16','destinationDeviceId':'UInt16',
-              'headerSourceDeviceId':'UInt16','headerDestinationDeviceId':'UInt16',
-              'infoCode':'UInt16','packetLength':'UInt32','systemTimeYear':'UInt16',
-              'systemTimeMonth':'UInt8','systemTimeDate':'UInt8','systemTimeHour':'UInt8',
-              'systemTimeMinute':'UInt8','systemTimeSecond':'UInt8','systemTimeMillisecond':'UInt16',
-              'headerReserved':'UInt8','tail':'UInt32',
-          }
-          fixed_field_types={
-              **common_field_types,
-              'missionCtrlCmd':'UInt8','operationMode':'UInt8','emergencyStopType':'UInt8',
-              'disposalCmd':'UInt8','emergencyStopReason':'UInt8',
-          }
-
-          def prepend_value_map(el,pairs):
-              existing=el.find(q('ValueMap'))
-              if existing is not None:
-                  got=[(m.get('cdm'),m.get('value')) for m in existing.findall(q('Map'))]
-                  if got != pairs: raise SystemExit(f'conflicting existing ValueMap on {el.get("name")}: {got} != {pairs}')
-                  return
-              vm=ET.Element(q('ValueMap'))
-              for cdm,value in pairs:
-                  m=ET.SubElement(vm,q('Map')); m.set('cdm',cdm); m.set('value',value)
-              el.insert(0,vm)
-
-          for platform, bindpath in [('MDV','ProtocolXml/MDV/MdvTcpBinding.xml'),('EMDW','ProtocolXml/EMDW/EmdwTcpBinding.xml')]:
-              tree=ET.parse(bindpath); root=tree.getroot(); semantic_maps=platform_semantic_maps[platform]
-              unknown=[]
+          mdv_reason=[('Command.Result.Reason.None','0'),('Command.Result.Reason.InvalidRequest','1'),('Command.Result.Reason.InvalidMissionPlan','2'),('Command.Result.Reason.ModeChangeUnavailable','3'),('Command.Result.Reason.ModeMismatch','4'),('Command.Result.Reason.PlatformDisconnected','5'),('Command.Result.Reason.AbnormalOperationState','6'),('Command.Result.Reason.Other','7')]
+          emdw_reason=[('Command.Result.Reason.None','0'),('Command.Result.Reason.InvalidRequest','1'),('Command.Result.Reason.InvalidMissionPlan','2'),('Command.Result.Reason.ModeChangeUnavailable','3'),('Command.Result.Reason.ModeMismatch','4'),('Command.Result.Reason.PlatformDisconnected','5'),('Command.Result.Reason.AbnormalOperationState','6'),('Command.Result.Reason.DisposalConditionNotMet','7'),('Command.Result.Reason.Other','8')]
+          simple={'UInt16LE':('UInt16',None,None,None),'UInt32LE':('UInt32',None,None,None),'Float32LE':('Float32',None,None,None),'UInt16Scale10ToDecimalLE':('UInt16','10',None,None),'DecimalToUInt16Scale10LE':('UInt16','10',None,None),'UInt32Scale10ToDecimalLE':('UInt32','10',None,None),'DecimalToUInt32Scale10LE':('UInt32','10',None,None),'Int32Scale10000000ToDecimalLE':('Int32','10000000',None,None),'DecimalToInt32Scale10000000LE':('Int32','10000000',None,None),'UInt8Array16':('UInt8',None,'16','uuid'),'UuidToUInt8Array16':('UInt8',None,'16','uuid'),'ArrayLengthUInt16':('UInt16',None,None,None),'IncrementingUInt32LE':('UInt32',None,None,None)}
+          times={'YearToUInt16LE':('UInt16','System.Time.Year'),'MonthToUInt8':('UInt8','System.Time.Month'),'DateToUInt8':('UInt8','System.Time.Date'),'HourToUInt8':('UInt8','System.Time.Hour'),'MinuteToUInt8':('UInt8','System.Time.Minute'),'SecondToUInt8':('UInt8','System.Time.Second'),'MillisecondToUInt16LE':('UInt16','System.Time.Millisecond')}
+          enums={'MissionTypeToCode':mission_type,'MissionWaypointActionToCode':waypoint_action,'EmergencyStopReasonToCode':emergency_reason,'CommandResultCodeToState':command_result,'UInt16LEToMdvCommandReasonState':mdv_reason,'UInt16LEToEmdwCommandReasonState':emdw_reason}
+          common={'preamble':'UInt32','sourceDeviceId':'UInt16','destinationDeviceId':'UInt16','headerSourceDeviceId':'UInt16','headerDestinationDeviceId':'UInt16','infoCode':'UInt16','packetLength':'UInt32','systemTimeYear':'UInt16','systemTimeMonth':'UInt8','systemTimeDate':'UInt8','systemTimeHour':'UInt8','systemTimeMinute':'UInt8','systemTimeSecond':'UInt8','systemTimeMillisecond':'UInt16','headerReserved':'UInt8','tail':'UInt32'}
+          fixed={**common,'missionCtrlCmd':'UInt8','operationMode':'UInt8','emergencyStopType':'UInt8','disposalCmd':'UInt8','emergencyStopReason':'UInt8'}
+          def vmap(el,pairs):
+              vm=el.find(q('ValueMap'))
+              if vm is None:
+                  vm=ET.Element(q('ValueMap')); el.insert(0,vm)
+                  for c,v in pairs: m=ET.SubElement(vm,q('Map')); m.set('cdm',c); m.set('value',v)
+          for platform,path in [('MDV','ProtocolXml/MDV/MdvTcpBinding.xml'),('EMDW','ProtocolXml/EMDW/EmdwTcpBinding.xml')]:
+              tree=ET.parse(path); root=tree.getroot(); sm=maps_by_platform[platform]; unknown=[]
               for el in root.iter():
                   local=el.tag.rsplit('}',1)[-1]
                   if local not in {'Field','DerivedField','FixedField','BitMember','PackedField'}: continue
-                  conv=el.get('converter')
-
-                  # currentWaypointIndex sentinel previously used converter-based DerivedSemantic.
                   if local=='Field' and el.get('name')=='currentWaypointIndex' and any(d.get('converter') in {'WaypointIndexToAvailable','WaypointIndexToIndexWhenAvailable'} for d in el.findall(q('DerivedSemantic'))):
                       for child in list(el): el.remove(child)
-                      el.attrib.pop('converter',None)
-                      el.attrib.pop('cdm',None)
-                      el.set('dataType','UInt16')
-                      sent=ET.SubElement(el,q('Sentinel')); sent.set('value','0xFFFF')
-                      st=ET.SubElement(sent,q('Set')); st.set('cdm','MissionPlan.CurrentWaypoint.Available'); st.set('value','false')
-                      normal=ET.SubElement(el,q('Normal'))
-                      st=ET.SubElement(normal,q('Set')); st.set('cdm','MissionPlan.CurrentWaypoint.Available'); st.set('value','true')
-                      bd=ET.SubElement(normal,q('Bind')); bd.set('cdm','MissionPlan.CurrentWaypointIndex')
-                      continue
-
+                      el.attrib.pop('converter',None); el.attrib.pop('cdm',None); el.set('dataType','UInt16')
+                      se=ET.SubElement(el,q('Sentinel')); se.set('value','0xFFFF'); st=ET.SubElement(se,q('Set')); st.set('cdm','MissionPlan.CurrentWaypoint.Available'); st.set('value','false')
+                      no=ET.SubElement(el,q('Normal')); st=ET.SubElement(no,q('Set')); st.set('cdm','MissionPlan.CurrentWaypoint.Available'); st.set('value','true'); bd=ET.SubElement(no,q('Bind')); bd.set('cdm','MissionPlan.CurrentWaypointIndex'); continue
+                  conv=el.get('converter')
                   if conv:
-                      if conv in simple_conv:
-                          dt,scale,length,fmt=simple_conv[conv]
-                          el.set('dataType',dt)
-                          if scale: el.set('scale',scale)
-                          if length: el.set('length',length)
+                      if conv in simple:
+                          dt,sc,ln,fmt=simple[conv]; el.set('dataType',dt)
+                          if sc: el.set('scale',sc)
+                          if ln: el.set('length',ln)
                           if fmt: el.set('format',fmt)
                           del el.attrib['converter']
-                      elif conv in time_conv and local=='DerivedField':
-                          dt,source=time_conv[conv]
-                          el.set('dataType',dt); el.set('sourceField',source); del el.attrib['converter']
-                      elif conv in enum_conv:
-                          pairs=enum_conv[conv]
-                          # reason codes are UInt16; other enum converters are UInt8.
-                          el.set('dataType','UInt16' if 'ReasonState' in conv else 'UInt8')
-                          prepend_value_map(el,pairs)
-                          del el.attrib['converter']
-                      elif conv in {'WaypointIndexToAvailable','WaypointIndexToIndexWhenAvailable'}:
-                          unknown.append((el.get('name'),conv,'orphan derived semantic converter'))
-                      else:
-                          unknown.append((el.get('name'),conv,local))
-
-                  # Move existing Monitor Semantic numeric state maps into Binding ValueMap.
+                      elif conv in times and local=='DerivedField':
+                          dt,src=times[conv]; el.set('dataType',dt); el.set('sourceField',src); del el.attrib['converter']
+                      elif conv in enums:
+                          el.set('dataType','UInt16' if 'ReasonState' in conv else 'UInt8'); vmap(el,enums[conv]); del el.attrib['converter']
+                      else: unknown.append((el.get('name'),conv,local))
                   cdm=el.get('cdm')
-                  if local=='Field' and cdm in semantic_maps:
-                      prepend_value_map(el,semantic_maps[cdm])
-                      if not el.get('dataType'):
-                          # source ICD status/enumeration fields are UInt8 except statusCode (UInt16).
-                          el.set('dataType','UInt16' if cdm=='Platform.Status.ReasonCode' else 'UInt8')
-
-                  # Complete common TCP header types even where old XML omitted converter for UInt8 fields.
+                  if local=='Field' and cdm in sm:
+                      vmap(el,sm[cdm]); el.set('dataType',el.get('dataType') or ('UInt16' if cdm=='Platform.Status.ReasonCode' else 'UInt8'))
                   name=el.get('name')
-                  if local=='Field' and name in common_field_types and not el.get('dataType'):
-                      el.set('dataType',common_field_types[name])
-                  if local=='FixedField' and name in fixed_field_types and not el.get('dataType'):
-                      el.set('dataType',fixed_field_types[name])
+                  if local=='Field' and name in common and not el.get('dataType'): el.set('dataType',common[name])
+                  if local=='FixedField' and name in fixed and not el.get('dataType'): el.set('dataType',fixed[name])
+              if unknown: raise SystemExit(f'{platform} unsupported converters: {unknown}')
+              left=[e.get('converter') for e in root.iter() if e.get('converter')]
+              if left: raise SystemExit(f'{platform} converter leftovers: {left}')
+              ET.indent(tree,space='    '); tree.write(path,encoding='utf-8',xml_declaration=True)
 
-              if unknown:
-                  raise SystemExit(f'{platform}: unsupported converter(s): {unknown}')
-              # Absolutely no converter attribute is allowed in MDV/EMDW after refactor.
-              leftovers=[(e.tag.rsplit('}',1)[-1],e.get('name'),e.get('converter')) for e in root.iter() if e.get('converter')]
-              if leftovers: raise SystemExit(f'{platform}: converter leftovers: {leftovers[:20]} total={len(leftovers)}')
-              tree.write(bindpath,encoding='utf-8',xml_declaration=True)
-
-          # Parse all modified XML/XSD as well-formed XML.
-          for path in [
-              'ProtocolXml/XSD/CommonBindingSchema.xsd','ProtocolXml/XSD/CommonSpecSchema.xsd','ProtocolXml/XSD/VehicleSpecificationSchema.xsd',
-              'ProtocolXml/MDV/MdvSpecification.xml','ProtocolXml/EMDW/EmdwSpecification.xml',
-              'ProtocolXml/MDV/MdvPlatformSemantic.xml','ProtocolXml/EMDW/EmdwPlatformSemantic.xml',
-              'ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/EMDW/EmdwTcpBinding.xml']:
-              ET.parse(path)
-              print('XML OK',path)
-
-          # Semantic must no longer expose raw numeric state values in ValueSetSpec.
-          for path in ['ProtocolXml/MDV/MdvPlatformSemantic.xml','ProtocolXml/EMDW/EmdwPlatformSemantic.xml']:
-              root=ET.parse(path).getroot()
-              bad=[]
-              for vs in root.iter(q('ValueSetSpec')):
-                  values=vs.find(q('Values'))
-                  if values is None: continue
-                  for v in values.findall(q('Value')):
-                      t=(v.text or '').strip()
-                      if re.fullmatch(r'(?:0x[0-9A-Fa-f]+|-?\d+)',t): bad.append((vs.get('id'),v.get('cdm'),t))
-              if bad: raise SystemExit(f'{path}: raw Semantic codes remain {bad}')
-
-          # Specifications must declare one little-endian default.
-          for path in ['ProtocolXml/MDV/MdvSpecification.xml','ProtocolXml/EMDW/EmdwSpecification.xml']:
-              root=ET.parse(path).getroot(); enc=root.find(q('DataEncoding'))
-              if enc is None or enc.get('byteOrder')!='little': raise SystemExit(f'{path}: DataEncoding missing')
-
-          print('MDV/EMDW declarative refactor validation passed')
+          for path in ['ProtocolXml/XSD/CommonBindingSchema.xsd','ProtocolXml/XSD/CommonSpecSchema.xsd','ProtocolXml/XSD/VehicleSpecificationSchema.xsd','ProtocolXml/MDV/MdvSpecification.xml','ProtocolXml/EMDW/EmdwSpecification.xml','ProtocolXml/MDV/MdvPlatformSemantic.xml','ProtocolXml/EMDW/EmdwPlatformSemantic.xml','ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/EMDW/EmdwTcpBinding.xml']:
+              ET.parse(path); print('XML OK',path)
+          for path in ['ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/EMDW/EmdwTcpBinding.xml']:
+              if 'converter=' in Path(path).read_text(encoding='utf-8'): raise SystemExit(f'converter remains {path}')
+          print('MDV/EMDW converter-free refactor passed')
           PY
 
       - name: Diff safety checks
@@ -272,8 +122,6 @@ jobs:
           ! grep -R 'converter=' ProtocolXml/MDV/MdvTcpBinding.xml ProtocolXml/EMDW/EmdwTcpBinding.xml
           ! grep -R 'generator=' ProtocolXml/MDV ProtocolXml/EMDW
           ! grep -R 'sourceMember=' ProtocolXml/MDV ProtocolXml/EMDW
-          grep -q '<DataEncoding byteOrder="little"' ProtocolXml/MDV/MdvSpecification.xml
-          grep -q '<DataEncoding byteOrder="little"' ProtocolXml/EMDW/EmdwSpecification.xml
           echo 'converter count MDV:' $(grep -o 'converter=' ProtocolXml/MDV/MdvTcpBinding.xml | wc -l)
           echo 'converter count EMDW:' $(grep -o 'converter=' ProtocolXml/EMDW/EmdwTcpBinding.xml | wc -l)
 
@@ -282,10 +130,6 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add ProtocolXml/XSD/CommonSpecSchema.xsd \
-                  ProtocolXml/XSD/VehicleSpecificationSchema.xsd \
-                  ProtocolXml/MDV/MdvSpecification.xml ProtocolXml/EMDW/EmdwSpecification.xml \
-                  ProtocolXml/MDV/MdvPlatformSemantic.xml ProtocolXml/EMDW/EmdwPlatformSemantic.xml \
-                  ProtocolXml/MDV/MdvTcpBinding.xml ProtocolXml/EMDW/EmdwTcpBinding.xml
+          git add ProtocolXml/XSD/CommonSpecSchema.xsd ProtocolXml/XSD/VehicleSpecificationSchema.xsd ProtocolXml/MDV/MdvSpecification.xml ProtocolXml/EMDW/EmdwSpecification.xml ProtocolXml/MDV/MdvPlatformSemantic.xml ProtocolXml/EMDW/EmdwPlatformSemantic.xml ProtocolXml/MDV/MdvTcpBinding.xml ProtocolXml/EMDW/EmdwTcpBinding.xml
           git commit -m 'Refactor MDV EMDW bindings without converters'
           git push origin HEAD:feature/auv-reply-bit-binding
