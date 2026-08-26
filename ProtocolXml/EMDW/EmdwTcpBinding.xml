@@ -1,8 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
+<!--
+EMDW 플랫폼 TCP Binding - 기능 중심 Semantic 대응 재정의본.
+물리 메시지/정보코드/패킷 길이/필드 순서는 2026-08-06 원본 Binding을 유지한다.
+Semantic 행위 분리에 따라 동일 TCP 메시지를 여러 ControlBinding이 공유하고 고정 명령 enum은 FixedField로 결정하고 의미형 선택값은 ValueMap으로 매핑한다.
+Monitor는 동일 수신 패킷을 의미 그룹별로 복수 해석하되 물리 포맷은 변경하지 않는다.
+setTargetInformation Target 매핑 문제는 사용자 결정에 따라 이번 수정에서 보류한다.
+T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방향성은 별도 TBD로 관리한다.
+-->
 <PlatformBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
     <Monitors semantic_id="monitor">
         <MonitorBinding semantic_id="positionInfo">
             <TCPChannel infoCode="4302" messageType="T_EMDW_POSITION_INFO" />
+            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4302, packetLength=44 여부는 Adapter 검증 조건이다. -->
             <Field name="preamble" dataType="UInt32" />
             <Field name="sourceDeviceId" dataType="UInt16" />
             <Field name="destinationDeviceId" dataType="UInt16" />
@@ -16,6 +25,7 @@
             <Field name="systemTimeSecond" dataType="UInt8" />
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
+            <!-- T_EMDW_POSITION_INFO Body(16 bytes). -->
             <Field name="emdwDepth" cdm="Navigation.Depth" dataType="UInt16" />
             <Field name="emdwHeading" cdm="Navigation.Heading" dataType="UInt16" scale="10" />
             <Field name="emdwLatitude" cdm="Navigation.Position.Latitude" dataType="Int32" scale="10000000" />
@@ -26,6 +36,7 @@
         </MonitorBinding>
         <MonitorBinding semantic_id="communicationStatus">
             <TCPChannel infoCode="4303" messageType="T_EMDW_STATUS_INFO" />
+            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4303, packetLength=40 여부는 Adapter 검증 조건이다. -->
             <Field name="preamble" dataType="UInt32" />
             <Field name="sourceDeviceId" dataType="UInt16" />
             <Field name="destinationDeviceId" dataType="UInt16" />
@@ -39,6 +50,7 @@
             <Field name="systemTimeSecond" dataType="UInt8" />
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
+            <!-- T_EMDW_STATUS_INFO Body(12 bytes). -->
             <Field name="emdwId" dataType="UInt16" />
             <Field name="consoleLinkStatus" cdm="Communication.Link.Console.Status" dataType="UInt8">
                 <ValueMap>
@@ -63,6 +75,7 @@
         </MonitorBinding>
         <MonitorBinding semantic_id="healthStatus">
             <TCPChannel infoCode="4303" messageType="T_EMDW_STATUS_INFO" />
+            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4303, packetLength=40 여부는 Adapter 검증 조건이다. -->
             <Field name="preamble" dataType="UInt32" />
             <Field name="sourceDeviceId" dataType="UInt16" />
             <Field name="destinationDeviceId" dataType="UInt16" />
@@ -76,6 +89,7 @@
             <Field name="systemTimeSecond" dataType="UInt8" />
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
+            <!-- T_EMDW_STATUS_INFO Body(12 bytes). -->
             <Field name="emdwId" dataType="UInt16" />
             <Field name="consoleLinkStatus" dataType="UInt8" />
             <Field name="emdwLinkStatus" dataType="UInt8" />
@@ -109,6 +123,7 @@
         </MonitorBinding>
         <MonitorBinding semantic_id="operationModeStatus">
             <TCPChannel infoCode="4303" messageType="T_EMDW_STATUS_INFO" />
+            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4303, packetLength=40 여부는 Adapter 검증 조건이다. -->
             <Field name="preamble" dataType="UInt32" />
             <Field name="sourceDeviceId" dataType="UInt16" />
             <Field name="destinationDeviceId" dataType="UInt16" />
@@ -122,6 +137,7 @@
             <Field name="systemTimeSecond" dataType="UInt8" />
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
+            <!-- T_EMDW_STATUS_INFO Body(12 bytes). -->
             <Field name="emdwId" dataType="UInt16" />
             <Field name="consoleLinkStatus" dataType="UInt8" />
             <Field name="emdwLinkStatus" dataType="UInt8" />
@@ -139,6 +155,7 @@
         </MonitorBinding>
         <MonitorBinding semantic_id="missionExecutionStatus">
             <TCPChannel infoCode="4304" messageType="T_EMDW_MISSION_PROGRESS_INFO" />
+            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4304, packetLength=52 여부는 Adapter 검증 조건이다. -->
             <Field name="preamble" dataType="UInt32" />
             <Field name="sourceDeviceId" dataType="UInt16" />
             <Field name="destinationDeviceId" dataType="UInt16" />
@@ -152,6 +169,7 @@
             <Field name="systemTimeSecond" dataType="UInt8" />
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
+            <!-- T_EMDW_MISSION_PROGRESS_INFO Body(24 bytes). -->
             <Field name="emdwId" dataType="UInt16" />
             <Field name="missionState" cdm="Mission.Execution.State" dataType="UInt8">
                 <ValueMap>
@@ -183,6 +201,7 @@
         </MonitorBinding>
         <MonitorBinding semantic_id="guidanceStatusInfo">
             <TCPChannel infoCode="4304" messageType="T_EMDW_MISSION_PROGRESS_INFO" />
+            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4304, packetLength=52 여부는 Adapter 검증 조건이다. -->
             <Field name="preamble" dataType="UInt32" />
             <Field name="sourceDeviceId" dataType="UInt16" />
             <Field name="destinationDeviceId" dataType="UInt16" />
@@ -196,6 +215,7 @@
             <Field name="systemTimeSecond" dataType="UInt8" />
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
+            <!-- T_EMDW_MISSION_PROGRESS_INFO Body(24 bytes). -->
             <Field name="emdwId" dataType="UInt16" />
             <Field name="missionState" dataType="UInt8" />
             <Field name="guidanceStatus" cdm="Autonomy.Guidance.Status" dataType="UInt8">
@@ -217,6 +237,7 @@
         </MonitorBinding>
         <MonitorBinding semantic_id="disposalStatusInfo">
             <TCPChannel infoCode="4305" messageType="T_EMDW_DISPOSAL_STATUS_INFO" />
+            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4305, packetLength=40 여부는 Adapter 검증 조건이다. -->
             <Field name="preamble" dataType="UInt32" />
             <Field name="sourceDeviceId" dataType="UInt16" />
             <Field name="destinationDeviceId" dataType="UInt16" />
@@ -230,6 +251,7 @@
             <Field name="systemTimeSecond" dataType="UInt8" />
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
+            <!-- T_EMDW_DISPOSAL_STATUS_INFO Body(12 bytes). -->
             <Field name="emdwId" dataType="UInt16" />
             <Field name="disposalState" cdm="Mission.Disposal.State" dataType="UInt8">
                 <ValueMap>
@@ -248,6 +270,7 @@
         </MonitorBinding>
         <MonitorBinding semantic_id="transmitHeartbeat">
             <TCPChannel infoCode="10000" messageType="T_HEARTBEAT" />
+            <!-- 송신 T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="headerSourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="headerDestinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -261,6 +284,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_HEARTBEAT Body(8 bytes). 송신 시 카운트가 1씩 증가한다. -->
             <DerivedField name="sourceDeviceId" cdm="Communication.Endpoint.Source.Identifier" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" cdm="Communication.Endpoint.Destination.Identifier" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
             <DerivedField name="heartbeatCount" cdm="Communication.Heartbeat.Sequence" sourceField="System.Generated.HeartbeatSequence" dataType="UInt32" />
@@ -268,6 +292,7 @@
         </MonitorBinding>
         <MonitorBinding semantic_id="receiveHeartbeat">
             <TCPChannel infoCode="10000" messageType="T_HEARTBEAT" />
+            <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=10000, packetLength=36 여부는 Adapter 검증 조건이다. -->
             <Field name="preamble" dataType="UInt32" />
             <Field name="headerSourceDeviceId" dataType="UInt16" />
             <Field name="headerDestinationDeviceId" dataType="UInt16" />
@@ -281,15 +306,18 @@
             <Field name="systemTimeSecond" dataType="UInt8" />
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
+            <!-- T_HEARTBEAT Body(8 bytes). -->
             <Field name="sourceDeviceId" cdm="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <Field name="destinationDeviceId" cdm="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
             <Field name="heartbeatCount" cdm="Communication.Heartbeat.Sequence" dataType="UInt32" />
+            <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
             <Field name="tail" dataType="UInt32" />
         </MonitorBinding>
     </Monitors>
     <Controls semantic_id="control">
         <ControlBinding semantic_id="stopMission">
             <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -303,6 +331,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_MISSION_CTRL_CMD Body(28 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="missionCtrlCmd" value="0" dataType="UInt8" />
@@ -311,6 +340,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="stopMissionReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -324,6 +354,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -347,11 +380,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="5" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="startMission">
             <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -365,6 +400,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_MISSION_CTRL_CMD Body(28 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="missionCtrlCmd" value="1" dataType="UInt8" />
@@ -373,6 +409,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="startMissionReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -386,6 +423,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -409,11 +449,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="5" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="pauseMission">
             <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -427,6 +469,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_MISSION_CTRL_CMD Body(28 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="missionCtrlCmd" value="2" dataType="UInt8" />
@@ -435,6 +478,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="pauseMissionReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -448,6 +492,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -471,11 +518,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="5" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="resumeMission">
             <TCPChannel infoCode="4001" messageType="T_EMDW_MISSION_CTRL_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -489,6 +538,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_MISSION_CTRL_CMD Body(28 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="missionCtrlCmd" value="3" dataType="UInt8" />
@@ -497,6 +547,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="resumeMissionReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -510,6 +561,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4001와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -533,11 +587,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="5" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="setTerminalControlMode">
             <TCPChannel infoCode="4002" messageType="T_EMDW_MODE_SET_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -551,6 +607,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_MODE_SET_CMD Body(24 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="operationMode" value="0" dataType="UInt8" />
@@ -558,6 +615,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="setTerminalControlModeReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -571,6 +629,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4002와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -594,11 +655,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="5" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="setIntegratedControlMode">
             <TCPChannel infoCode="4002" messageType="T_EMDW_MODE_SET_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -612,6 +675,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_MODE_SET_CMD Body(24 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="operationMode" value="1" dataType="UInt8" />
@@ -619,6 +683,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="setIntegratedControlModeReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -632,6 +697,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4002와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -655,11 +723,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="5" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="transferMissionPlan">
             <TCPChannel infoCode="4003" messageType="T_EMDW_MISSION_PLAN_INFO" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -673,6 +743,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_MISSION_PLAN_INFO Body(348 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -703,6 +774,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="transferMissionPlanReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -716,6 +788,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4003와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -739,11 +814,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="3" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="immediateEmergencyStop">
             <TCPChannel infoCode="4004" messageType="T_EMDW_EMERGENCY_STOP_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -757,6 +834,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_EMERGENCY_STOP_CMD Body(20 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="emergencyStopType" value="0" dataType="UInt8" />
@@ -772,6 +850,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="immediateEmergencyStopReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -785,6 +864,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4004와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -808,11 +890,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="5" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="emergencyStopAndStandby">
             <TCPChannel infoCode="4004" messageType="T_EMDW_EMERGENCY_STOP_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -826,6 +910,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_EMERGENCY_STOP_CMD Body(20 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="emergencyStopType" value="1" dataType="UInt8" />
@@ -841,6 +926,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="emergencyStopAndStandbyReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -854,6 +940,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4004와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -877,11 +966,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="5" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="setTargetInformation">
             <TCPChannel infoCode="4005" messageType="T_EMDW_TARGET_INFO_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -895,6 +986,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_TARGET_INFO_CMD Body(16 bytes). -->
             <Field name="targetId" cdm="Mission.Target.Identifier" dataType="UInt16" />
             <Field name="targetBearing" cdm="Mission.Target.Bearing" dataType="UInt16" scale="10" />
             <Field name="targetRange" cdm="Mission.Target.Range" dataType="UInt16" scale="10" />
@@ -905,6 +997,7 @@
         </ControlBinding>
         <ControlBinding semantic_id="cancelDisposal">
             <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -918,6 +1011,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_DISPOSAL_CMD Body(28 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="disposalCmd" value="0" dataType="UInt8" />
@@ -927,6 +1021,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="cancelDisposalReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -940,6 +1035,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4006와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -963,11 +1061,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="3" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="prepareDisposal">
             <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -981,6 +1081,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_DISPOSAL_CMD Body(28 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="disposalCmd" value="1" dataType="UInt8" />
@@ -990,6 +1091,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="prepareDisposalReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -1003,6 +1105,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4006와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -1026,11 +1131,13 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="3" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
         <ControlBinding semantic_id="executeDisposal">
             <TCPChannel infoCode="4006" messageType="T_EMDW_DISPOSAL_CMD" />
+            <!-- T_TCP_HEADER(24 bytes). preamble은 4-byte unsigned int이며 byte order는 미확정이다. -->
             <FixedField name="preamble" value="0xAAAAAAAA" dataType="UInt32" />
             <DerivedField name="sourceDeviceId" sourceField="Communication.Endpoint.Source.Identifier" dataType="UInt16" />
             <DerivedField name="destinationDeviceId" sourceField="Communication.Endpoint.Destination.Identifier" dataType="UInt16" />
@@ -1044,6 +1151,7 @@
             <DerivedField name="systemTimeSecond" sourceField="System.Time.Second" dataType="UInt8" />
             <DerivedField name="systemTimeMillisecond" sourceField="System.Time.Millisecond" dataType="UInt16" />
             <FixedField name="headerReserved" value="0" dataType="UInt8" />
+            <!-- T_EMDW_DISPOSAL_CMD Body(28 bytes). -->
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="disposalCmd" value="2" dataType="UInt8" />
@@ -1053,6 +1161,7 @@
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="executeDisposalReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
+                <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=4301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
                 <Field name="sourceDeviceId" dataType="UInt16" />
                 <Field name="destinationDeviceId" dataType="UInt16" />
@@ -1066,6 +1175,9 @@
                 <Field name="systemTimeSecond" dataType="UInt8" />
                 <Field name="systemTimeMillisecond" dataType="UInt16" />
                 <Field name="headerReserved" dataType="UInt8" />
+                <!-- T_EMDW_CTRL_RESP(28 bytes).
+                                         requestInfoCode=4006와 원 요청 commandId 일치를 Reply 상관관계로 사용한다.
+                                         result는 원 ICD의 명령 처리 결과이며 0=성공, 1=실패이다. 실제 임무 진행/완료는 관련 상태정보로 확인한다. -->
                 <Field name="requestInfoCode" dataType="UInt16" />
                 <Field name="commandId" cdm="Command.Identifier.UUID" dataType="UInt8" length="16" format="uuid" />
                 <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
@@ -1089,6 +1201,7 @@
                     </ValueMap>
                 </Field>
                 <Field name="reserved" dataType="UInt8" length="3" />
+                <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>

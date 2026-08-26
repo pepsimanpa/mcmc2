@@ -1,4 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
+<!--
+MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
+원작자의 Semantic 의도(운용자가 인식하는 기능/상태 중심)와 기존 MDV 실제 TCP Binding을 결합한다.
+
+재정의 원칙
+- missionCtrlCmd, operationMode, emergencyStopType 같은 물리 enum 선택값은 Semantic 기능으로 분리한다.
+- Monitor는 물리 패킷 단위가 아니라 Navigation/USBL/Target/Link/Health/Mission/Guidance 의미 단위로 구분한다.
+- mdvId는 상태 자체가 아니라 대상 식별/상관관계 정보이므로 Monitor Semantic 항목에서 제외한다.
+- T_HEARTBEAT의 양방향 송수신 의미는 원 ICD에 확인되나 송신 정보를 Monitor로 표현하는 구조가 적절한지는 별도 TBD로 유지한다.
+- 복합 임무시작 조건은 현 XSD가 단일 Precondition만 지원하므로 임의로 축약하지 않고 OM 검증 대상으로 유지한다.
+- 제어응답의 처리결과/사유는 Semantic 논리 상태로 노출하고 실제 0/1 및 reasonCode 숫자값은 Binding ValueMap에서 매핑한다.
+- MissionPlan 마지막 경유점 Action은 원 ICD 규칙에 따라 반드시 대기 상태여야 하며 별도 Validator/OM에서 검증한다.
+-->
 <PlatformSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
     <ConstantSpecs id="constant">
         <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
@@ -161,6 +174,7 @@
                 <Range min="0" max="65534" />
                 <Resolution>1</Resolution>
             </QuantitySpec>
+            <!-- currentWaypointAvailable=false일 때 currentWaypointIndex는 의미값 없음. raw 0xFFFF 매핑은 Binding에서 처리한다. -->
             <QuantitySpec id="waypointCount" name="전체 경유점 개수" cdm="MissionPlan.WaypointCount">
                 <Range min="0" max="65535" />
                 <Resolution>1</Resolution>
