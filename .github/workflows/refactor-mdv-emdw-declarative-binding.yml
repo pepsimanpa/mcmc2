@@ -1,0 +1,209 @@
+name: Refactor MDV EMDW Declarative Binding
+
+on:
+  push:
+    branches: [feature/auv-reply-bit-binding]
+    paths: ['.github/workflows/refactor-mdv-emdw-declarative-binding.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-reply-bit-binding
+          fetch-depth: 0
+
+      - name: Refactor schemas and MDV EMDW XML
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import xml.etree.ElementTree as ET
+
+          NS='http://lignex1.com/mcmc2/umsSchema'
+          ET.register_namespace('', NS)
+          ET.register_namespace('xsi','http://www.w3.org/2001/XMLSchema-instance')
+          q=lambda n:f'{{{NS}}}{n}'
+
+          # ----- XSD: declarative Binding vocabulary, preserving converter only for legacy XML -----
+          p=Path('ProtocolXml/XSD/CommonBindingSchema.xsd')
+          s=p.read_text(encoding='utf-8')
+          anchor='''    <!-- 하나의 물리 Field가 복수의 논리 의미를 포함할 때 DerivedSemantic으로 파생한다. -->\n    <xs:complexType name="DerivedSemanticType">'''
+          insert='''    <!-- 선언형 wire 표현: converter 함수명 대신 자료형/scale/enum/sentinel/source rule을 XML에 명시한다. -->\n    <xs:simpleType name="WireDataType">\n        <xs:restriction base="xs:string">\n            <xs:enumeration value="UInt8"/><xs:enumeration value="Int8"/>\n            <xs:enumeration value="UInt16"/><xs:enumeration value="Int16"/>\n            <xs:enumeration value="UInt32"/><xs:enumeration value="Int32"/>\n            <xs:enumeration value="UInt64"/><xs:enumeration value="Int64"/>\n            <xs:enumeration value="Float32"/><xs:enumeration value="Float64"/>\n        </xs:restriction>\n    </xs:simpleType>\n    <xs:complexType name="ValueMapEntryType">\n        <xs:attribute name="cdm" type="xs:string" use="required"/>\n        <xs:attribute name="value" type="xs:string" use="required"/>\n    </xs:complexType>\n    <xs:complexType name="ValueMapType">\n        <xs:sequence><xs:element name="Map" type="ValueMapEntryType" minOccurs="1" maxOccurs="unbounded"/></xs:sequence>\n    </xs:complexType>\n    <xs:complexType name="SentinelSetType">\n        <xs:attribute name="cdm" type="xs:string" use="required"/>\n        <xs:attribute name="value" type="xs:string" use="required"/>\n    </xs:complexType>\n    <xs:complexType name="SentinelType">\n        <xs:sequence><xs:element name="Set" type="SentinelSetType" minOccurs="1" maxOccurs="unbounded"/></xs:sequence>\n        <xs:attribute name="value" type="xs:string" use="required"/>\n    </xs:complexType>\n    <xs:complexType name="NormalBindingType">\n        <xs:sequence>\n            <xs:element name="Set" type="SentinelSetType" minOccurs="0" maxOccurs="unbounded"/>\n            <xs:element name="Bind" minOccurs="0" maxOccurs="unbounded">\n                <xs:complexType><xs:attribute name="cdm" type="xs:string" use="required"/></xs:complexType>\n            </xs:element>\n        </xs:sequence>\n    </xs:complexType>\n\n'''+anchor
+          if anchor not in s: raise SystemExit('CommonBindingSchema anchor missing')
+          s=s.replace(anchor,insert,1)
+          s=s.replace('''    <xs:complexType name="DerivedSemanticType">\n        <xs:attribute name="cdm" type="xs:string" use="required"/>\n        <xs:attribute name="converter" type="xs:string" use="required"/>\n    </xs:complexType>''','''    <xs:complexType name="DerivedSemanticType">\n        <xs:attribute name="cdm" type="xs:string" use="required"/>\n        <xs:attribute name="source" type="xs:string" default="value"/>\n        <xs:attribute name="when" type="xs:string"/>\n        <xs:attribute name="value" type="xs:string"/>\n        <xs:attribute name="converter" type="xs:string" use="optional"/> <!-- legacy -->\n    </xs:complexType>''')
+          s=s.replace('''        <xs:sequence>\n            <xs:element name="DerivedSemantic" type="DerivedSemanticType" minOccurs="0" maxOccurs="unbounded"/>\n        </xs:sequence>\n        <xs:attribute name="name" type="xs:string" use="required"/>\n        <xs:attribute name="cdm" type="xs:string"/>\n        <xs:attribute name="inputUnit" type="xs:string"/>\n        <xs:attribute name="outputUnit" type="xs:string"/>\n        <xs:attribute name="converter" type="xs:string"/>\n    </xs:complexType>''','''        <xs:sequence>\n            <xs:element name="ValueMap" type="ValueMapType" minOccurs="0"/>\n            <xs:element name="Sentinel" type="SentinelType" minOccurs="0" maxOccurs="unbounded"/>\n            <xs:element name="Normal" type="NormalBindingType" minOccurs="0"/>\n            <xs:element name="DerivedSemantic" type="DerivedSemanticType" minOccurs="0" maxOccurs="unbounded"/>\n        </xs:sequence>\n        <xs:attribute name="name" type="xs:string" use="required"/>\n        <xs:attribute name="cdm" type="xs:string"/>\n        <xs:attribute name="dataType" type="WireDataType"/>\n        <xs:attribute name="scale" type="xs:decimal"/>\n        <xs:attribute name="length" type="xs:positiveInteger"/>\n        <xs:attribute name="format" type="xs:string"/>\n        <xs:attribute name="inputUnit" type="xs:string"/>\n        <xs:attribute name="outputUnit" type="xs:string"/>\n        <xs:attribute name="converter" type="xs:string"/> <!-- legacy -->\n    </xs:complexType>''',1)
+          s=s.replace('''        <xs:attribute name="sourceField" type="xs:string"/>\n        <xs:attribute name="converter" type="xs:string"/>\n    </xs:complexType>''','''        <xs:attribute name="sourceField" type="xs:string"/>\n        <xs:attribute name="sourceMember" type="xs:string"/>\n        <xs:attribute name="generator" type="xs:string"/>\n        <xs:attribute name="dataType" type="WireDataType"/>\n        <xs:attribute name="scale" type="xs:decimal"/>\n        <xs:attribute name="length" type="xs:positiveInteger"/>\n        <xs:attribute name="format" type="xs:string"/>\n        <xs:attribute name="converter" type="xs:string"/> <!-- legacy -->\n    </xs:complexType>''',1)
+          # PackedField no longer needs local byteOrder for new files; keep legacy attr for AUV/USV compatibility.
+          p.write_text(s,encoding='utf-8',newline='')
+
+          # Semantic legacy Value text can be empty and carry display name.
+          p=Path('ProtocolXml/XSD/CommonSpecSchema.xsd'); s=p.read_text(encoding='utf-8')
+          old='''            <xs:extension base="xs:string">\n                <xs:attribute name="cdm" type="CdmRefType" use="optional" />\n            </xs:extension>'''
+          new='''            <xs:extension base="xs:string">\n                <xs:attribute name="name" type="xs:string" use="optional" />\n                <xs:attribute name="cdm" type="CdmRefType" use="optional" />\n            </xs:extension>'''
+          if old not in s: raise SystemExit('CommonSpec CdmRefAttrType anchor missing')
+          p.write_text(s.replace(old,new,1),encoding='utf-8',newline='')
+
+          # Vehicle-level encoding default.
+          p=Path('ProtocolXml/XSD/VehicleSpecificationSchema.xsd'); s=p.read_text(encoding='utf-8')
+          s=s.replace('''            <xs:element name="Identification" type="IdentificationType" minOccurs="1" />''','''            <xs:element name="Identification" type="IdentificationType" minOccurs="1" />\n            <xs:element name="DataEncoding" type="DataEncodingType" minOccurs="0" />''',1)
+          marker='''    <xs:complexType name="IdentificationType">'''
+          addition='''    <xs:simpleType name="VehicleByteOrderType">\n        <xs:restriction base="xs:string"><xs:enumeration value="little"/><xs:enumeration value="big"/></xs:restriction>\n    </xs:simpleType>\n    <xs:complexType name="DataEncodingType">\n        <xs:attribute name="byteOrder" type="VehicleByteOrderType" use="required"/>\n    </xs:complexType>\n\n'''
+          if marker not in s: raise SystemExit('Vehicle schema marker missing')
+          p.write_text(s.replace(marker,addition+marker,1),encoding='utf-8',newline='')
+
+          for spec in ['ProtocolXml/MDV/MdvSpecification.xml','ProtocolXml/EMDW/EmdwSpecification.xml']:
+              p=Path(spec); s=p.read_text(encoding='utf-8')
+              if '<DataEncoding ' not in s:
+                  s=s.replace('    </Identification>','    </Identification>\n    <DataEncoding byteOrder="little"/>',1)
+              p.write_text(s,encoding='utf-8',newline='')
+
+          # Collect numeric Semantic ValueSet mappings and remove raw numbers from MDV/EMDW Semantic.
+          semantic_maps={}
+          for sempath in ['ProtocolXml/MDV/MdvPlatformSemantic.xml','ProtocolXml/EMDW/EmdwPlatformSemantic.xml']:
+              tree=ET.parse(sempath); root=tree.getroot()
+              for vs in root.iter(q('ValueSetSpec')):
+                  parent_cdm=vs.get('cdm')
+                  vals=[]
+                  values=vs.find(q('Values'))
+                  if values is None: continue
+                  for v in values.findall(q('Value')):
+                      raw=(v.text or '').strip(); cdm=v.get('cdm')
+                      if raw and cdm and re.fullmatch(r'(?:0x[0-9A-Fa-f]+|-?\d+)',raw):
+                          vals.append((cdm,raw))
+                          v.set('name', cdm.split('.')[-1]); v.text=None
+                  if parent_cdm and vals: semantic_maps[parent_cdm]=vals
+              tree.write(sempath,encoding='utf-8',xml_declaration=True)
+
+          # Explicit control/reply maps already semantic-only.
+          common_maps={
+            'Mission.Type':[('Mission.Type.Move','0'),('Mission.Type.Search','1'),('Mission.Type.Identification','2')],
+            'MissionPlan.Waypoint.Action':[('MissionPlan.Waypoint.Action.Pass','0'),('MissionPlan.Waypoint.Action.Wait','1')],
+            'Platform.EmergencyStop.Reason':[('Platform.EmergencyStop.Reason.OperatorCommand','0'),('Platform.EmergencyStop.Reason.SystemDecision','1'),('Platform.EmergencyStop.Reason.CommunicationFailure','2'),('Platform.EmergencyStop.Reason.Fault','3'),('Platform.EmergencyStop.Reason.Other','4')],
+            'Command.Result':[('Command.Result.Success','0'),('Command.Result.Failure','1')],
+          }
+          mdv_reason=[('Command.Result.ReasonCode.None','0'),('Command.Result.ReasonCode.InvalidRequest','1'),('Command.Result.ReasonCode.InvalidParameter','2'),('Command.Result.ReasonCode.InvalidState','3'),('Command.Result.ReasonCode.MissionPlanNotLoaded','4'),('Command.Result.ReasonCode.MissionIdMismatch','5'),('Command.Result.ReasonCode.ControlModeMismatch','6'),('Command.Result.ReasonCode.InternalError','7')]
+          emdw_reason=mdv_reason+[('Command.Result.ReasonCode.DisposalConditionNotMet','8')]
+
+          conv_re={
+            'UInt8':('UInt8',None),'UInt16LE':('UInt16',None),'UInt32LE':('UInt32',None),'Int32LE':('Int32',None),'Float32LE':('Float32',None),
+            'UInt16Scale10ToDecimalLE':('UInt16','10'),'UInt32Scale10ToDecimalLE':('UInt32','10'),
+            'DecimalToUInt16Scale10LE':('UInt16','10'),'DecimalToUInt32Scale10LE':('UInt32','10'),
+            'Int32Scale10000000ToDecimalLE':('Int32','10000000'),'DecimalToInt32Scale10000000LE':('Int32','10000000'),
+            'UInt8Array16':('UInt8',None),'UuidToUInt8Array16':('UInt8',None),
+          }
+          time_conv={
+            'YearToUInt16LE':('UInt16','year'),'MonthToUInt8':('UInt8','month'),'DateToUInt8':('UInt8','day'),
+            'HourToUInt8':('UInt8','hour'),'MinuteToUInt8':('UInt8','minute'),'SecondToUInt8':('UInt8','second'),'MillisecondToUInt16LE':('UInt16','millisecond')
+          }
+
+          def add_value_map(el, pairs):
+              vm=ET.Element(q('ValueMap'))
+              for cdm,val in pairs:
+                  m=ET.SubElement(vm,q('Map')); m.set('cdm',cdm); m.set('value',val)
+              el.insert(0,vm)
+
+          for bindpath,reason in [('ProtocolXml/MDV/MdvTcpBinding.xml',mdv_reason),('ProtocolXml/EMDW/EmdwTcpBinding.xml',emdw_reason)]:
+              tree=ET.parse(bindpath); root=tree.getroot()
+              for el in root.iter():
+                  if el.tag not in {q('Field'),q('DerivedField'),q('FixedField'),q('BitMember'),q('PackedField')}: continue
+                  conv=el.get('converter')
+                  cdm=el.get('cdm')
+                  if conv:
+                      if conv in conv_re:
+                          dt,scale=conv_re[conv]; el.set('dataType',dt)
+                          if scale: el.set('scale',scale)
+                          if conv in {'UInt8Array16','UuidToUInt8Array16'}:
+                              el.set('length','16'); el.set('format','uuid')
+                          del el.attrib['converter']
+                      elif conv in time_conv and el.tag==q('DerivedField'):
+                          dt,member=time_conv[conv]; el.set('dataType',dt); el.set('sourceMember',member); del el.attrib['converter']
+                      elif conv=='IncrementingUInt32LE' and el.tag==q('DerivedField'):
+                          el.set('dataType','UInt32'); el.set('generator','incrementing'); del el.attrib['converter']
+                      elif conv in {'MissionTypeToCode','MissionWaypointActionToCode','EmergencyStopReasonToCode','CommandResultCodeToState','UInt16LEToMdvCommandReasonState','UInt16LEToEmdwCommandReasonState'}:
+                          el.set('dataType','UInt16' if 'Reason' in conv else 'UInt8')
+                          pairs=(common_maps.get(cdm) or (mdv_reason if 'Mdv' in conv else emdw_reason if 'Emdw' in conv else None))
+                          if not pairs: raise SystemExit(f'No ValueMap for {bindpath} {el.get("name")} {conv} {cdm}')
+                          add_value_map(el,pairs); del el.attrib['converter']
+                      elif conv in {'WaypointIndexToAvailable','WaypointIndexToIndexWhenAvailable'}:
+                          # handled by parent sentinel conversion below
+                          pass
+                      else:
+                          raise SystemExit(f'Unhandled converter {conv} in {bindpath} field {el.get("name")}')
+
+                  # Existing Semantic numeric enum mappings become Binding ValueMap.
+                  cdm=el.get('cdm')
+                  if cdm in semantic_maps and el.find(q('ValueMap')) is None:
+                      add_value_map(el,semantic_maps[cdm])
+                      if 'dataType' not in el.attrib: el.set('dataType','UInt8')
+
+              # Replace current waypoint converter-derived semantics with declarative sentinel/normal.
+              for field in root.iter(q('Field')):
+                  if field.get('name')!='currentWaypointIndex': continue
+                  ds=field.findall(q('DerivedSemantic'))
+                  if any(x.get('converter') in {'WaypointIndexToAvailable','WaypointIndexToIndexWhenAvailable'} for x in ds):
+                      for x in ds: field.remove(x)
+                      field.attrib.pop('converter',None); field.set('dataType','UInt16')
+                      sent=ET.SubElement(field,q('Sentinel')); sent.set('value','0xFFFF')
+                      st=ET.SubElement(sent,q('Set')); st.set('cdm','MissionPlan.CurrentWaypoint.Available'); st.set('value','false')
+                      normal=ET.SubElement(field,q('Normal'))
+                      st=ET.SubElement(normal,q('Set')); st.set('cdm','MissionPlan.CurrentWaypoint.Available'); st.set('value','true')
+                      bd=ET.SubElement(normal,q('Bind')); bd.set('cdm','MissionPlan.CurrentWaypointIndex')
+
+              # Any Field with known primitive name but no explicit type remains byte-sized only when it is truly a 1-byte wire field.
+              # Do not guess unspecified fields; zero-converter goal concerns conversion functions, not mandatory typing of every legacy raw field.
+              tree.write(bindpath,encoding='utf-8',xml_declaration=True)
+
+          # Update design rules/decision notes.
+          p=Path('ProtocolXml/Docs/SemanticBindingRules_20260818.md'); s=p.read_text(encoding='utf-8')
+          s += '''\n\n## 11. Declarative Binding / Converter-free rule (2026-08-26)\n- Semantic은 의미, 단위, 범위, 논리 상태만 정의하고 raw enum/code를 포함하지 않는다.\n- Binding은 `dataType`, `scale`, `ValueMap`, `Sentinel`, `sourceMember`, `generator` 등으로 wire 표현을 선언한다.\n- 단순 enum/code는 반드시 `ValueMap`으로 명시한다.\n- byte order는 Field 단위가 아니라 상위 Specification의 `DataEncoding`에서 정의한다. MDV/EMDW는 `little`이다.\n- MDV/EMDW Binding에서는 `converter`를 사용하지 않는다.\n- 공통 XSD의 converter 속성은 기존 AUV/USV XML 호환을 위한 legacy 속성으로만 유지한다.\n'''
+          p.write_text(s,encoding='utf-8',newline='')
+
+          p=Path('ProtocolXml/Docs/MdvEmdwDesignDecisions_20260825.md'); s=p.read_text(encoding='utf-8')
+          s += '''\n\n## 14. Declarative Binding refactor (2026-08-26)\n**Status: RESOLVED / APPLIED**\n\nMDV/EMDW는 converter 함수명 기반 Binding을 사용하지 않는다.\n- primitive/endian: `dataType` + Specification `DataEncoding byteOrder=\"little\"`\n- fixed scale: `scale`\n- enum/code: `ValueMap`\n- `0xFFFF` current waypoint sentinel: `Sentinel` + `Normal`\n- system time extraction: `sourceMember`\n- heartbeat sequence: `generator=\"incrementing\"`\n- UUID 16-byte representation: `dataType=\"UInt8\" length=\"16\" format=\"uuid\"`\n\nSemantic에는 raw 숫자코드를 두지 않는다.\n'''
+          p.write_text(s,encoding='utf-8',newline='')
+          PY
+
+      - name: Validate refactor
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          for path in [
+            'ProtocolXml/XSD/CommonBindingSchema.xsd','ProtocolXml/XSD/CommonSpecSchema.xsd','ProtocolXml/XSD/VehicleSpecificationSchema.xsd',
+            'ProtocolXml/MDV/MdvSpecification.xml','ProtocolXml/EMDW/EmdwSpecification.xml',
+            'ProtocolXml/MDV/MdvPlatformSemantic.xml','ProtocolXml/EMDW/EmdwPlatformSemantic.xml',
+            'ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/EMDW/EmdwTcpBinding.xml']:
+              ET.parse(path); print('XML OK',path)
+          for path in ['ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/EMDW/EmdwTcpBinding.xml']:
+              text=Path(path).read_text(encoding='utf-8')
+              assert 'converter=' not in text, f'converter remains: {path}'
+              assert '<ValueMap' in text, f'ValueMap missing: {path}'
+              assert '<Sentinel' in text and '<Normal' in text, f'Sentinel mapping missing: {path}'
+          for path in ['ProtocolXml/MDV/MdvSpecification.xml','ProtocolXml/EMDW/EmdwSpecification.xml']:
+              assert '<DataEncoding byteOrder="little"' in Path(path).read_text(encoding='utf-8')
+          for path in ['ProtocolXml/MDV/MdvPlatformSemantic.xml','ProtocolXml/EMDW/EmdwPlatformSemantic.xml']:
+              root=ET.parse(path).getroot()
+              ns={'u':'http://lignex1.com/mcmc2/umsSchema'}
+              numeric=[]
+              for vs in root.findall('.//u:ValueSetSpec',ns):
+                  for v in vs.findall('u:Values/u:Value',ns):
+                      t=(v.text or '').strip()
+                      if t and (t.isdigit() or t.startswith('0x')): numeric.append((vs.get('id'),t))
+              assert not numeric, f'raw Semantic ValueSet codes remain in {path}: {numeric}'
+          print('MDV/EMDW converter-free declarative checks passed')
+          PY
+          git diff --check
+
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml
+          git commit -m 'Refactor MDV EMDW to declarative converter-free bindings'
+          git push origin HEAD:feature/auv-reply-bit-binding
