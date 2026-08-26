@@ -81,120 +81,150 @@
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
                 <!--
-                    RF-2 bytes 14..25 AUV_CHECK_RESULT 상세 점검 결과.
-                    각 16-bit 그룹은 원문 표의 윗행부터 offset 0~15로 매핑하며 0=PASS, 1=FAIL이다.
-                    원문 MSB/LSB 그룹명은 bit offset을 뒤집는 기준으로 사용하지 않는다.
-                -->
-                <PackedField name="mspdCheck" width="16">
-                    <BitMember name="MissionSensorProcessorModule1Boot" offset="0"/>
-                    <BitMember name="MissionSensorProcessorModule1Storage" offset="1"/>
-                    <BitMember name="ForwardLookingSonarCheck" offset="2"/>
-                    <BitMember name="SideScanSonarCheck" offset="3"/>
-                    <BitMember name="ForwardLookingSonarConnection" offset="4"/>
-                    <BitMember name="SideScanSonarConnection" offset="5"/>
-                    <BitMember name="AutonomousControlComputerConnection" offset="6"/>
-                    <BitMember name="CommunicationUnitConnection" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/>
-                    <BitMember name="reserved9" offset="9"/>
-                    <BitMember name="AcousticCameraCheck" offset="10"/>
-                    <BitMember name="OpticalCameraCheck" offset="11"/>
-                    <BitMember name="AcousticCameraConnection" offset="12"/>
-                    <BitMember name="OpticalCameraConnection" offset="13"/>
-                    <BitMember name="reserved14" offset="14"/>
-                    <BitMember name="reserved15" offset="15"/>
-                </PackedField>
-                <PackedField name="inbCheck" width="16">
-                    <BitMember name="MSB_reserved" offset="0"/>
-                    <BitMember name="MSB_AutonomousControlComputerCommunication" offset="1"/>
-                    <BitMember name="MSB_MagneticSensorCommunication" offset="2"/>
-                    <BitMember name="MSB_GPSCommunication" offset="3"/>
-                    <BitMember name="MSB_DepthSensorCommunication" offset="4"/>
-                    <BitMember name="MSB_DVLCommunication" offset="5"/>
-                    <BitMember name="MSB_IMUCommunication" offset="6"/>
-                    <BitMember name="MSB_MemoryCheck" offset="7"/>
-                    <BitMember name="LSB_reserved8" offset="8"/>
-                    <BitMember name="LSB_reserved9" offset="9"/>
-                    <BitMember name="LSB_AutonomousControlComputerCommunication" offset="10"/>
-                    <BitMember name="LSB_MagneticSensorCommunication" offset="11"/>
-                    <BitMember name="LSB_GPSCommunication" offset="12"/>
-                    <BitMember name="LSB_DepthSensorCommunication" offset="13"/>
-                    <BitMember name="LSB_DVLCommunication" offset="14"/>
-                    <BitMember name="LSB_IMUCommunication" offset="15"/>
-                </PackedField>
-                <PackedField name="accCheck" width="16">
-                    <BitMember name="PowerControlDeviceCommunication" offset="0"/>
-                    <BitMember name="LeakSensorConnection" offset="1"/>
-                    <BitMember name="FlashLightCommunication" offset="2"/>
-                    <BitMember name="PingerCommunication" offset="3"/>
-                    <BitMember name="AutonomousControlComputerInterfaceCheck" offset="4"/>
-                    <BitMember name="AutonomousControlComputer28VDCCheck" offset="5"/>
-                    <BitMember name="AutonomousControlComputerMemoryCheck" offset="6"/>
-                    <BitMember name="AutonomousControlComputerBootCheck" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/>
-                    <BitMember name="FlashLightCheck" offset="9"/>
-                    <BitMember name="PingerCheck" offset="10"/>
-                    <BitMember name="PropulsionControllerCommunication" offset="11"/>
-                    <BitMember name="UnderwaterCommunicationDeviceConnection" offset="12"/>
-                    <BitMember name="RfCommunicationDeviceConnection" offset="13"/>
-                    <BitMember name="IntegratedNavigationComputerCommunication" offset="14"/>
-                    <BitMember name="MissionSensorProcessorCommunication" offset="15"/>
-                </PackedField>
-                <PackedField name="pcdCheck" width="16">
-                    <BitMember name="reserved0" offset="0"/>
-                    <BitMember name="reserved1" offset="1"/>
-                    <BitMember name="reserved2" offset="2"/>
-                    <BitMember name="reserved3" offset="3"/>
-                    <BitMember name="PowerControlAndBmsConnectionCheck" offset="4"/>
-                    <BitMember name="BatteryPackTemperatureCheck" offset="5"/>
-                    <BitMember name="BatteryPackVoltageTemperatureBmsCheck" offset="6"/>
-                    <BitMember name="BatteryBmsCheck" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/>
-                    <BitMember name="reserved9" offset="9"/>
-                    <BitMember name="reserved10" offset="10"/>
-                    <BitMember name="reserved11" offset="11"/>
-                    <BitMember name="reserved12" offset="12"/>
-                    <BitMember name="reserved13" offset="13"/>
-                    <BitMember name="reserved14" offset="14"/>
-                    <BitMember name="reserved15" offset="15"/>
-                </PackedField>
-                <PackedField name="mcCheck" width="16">
-                    <BitMember name="reserved0" offset="0"/>
-                    <BitMember name="reserved1" offset="1"/>
-                    <BitMember name="reserved2" offset="2"/>
-                    <BitMember name="reserved3" offset="3"/>
-                    <BitMember name="reserved4" offset="4"/>
-                    <BitMember name="PropulsionControllerCurrentSensorCheck" offset="5"/>
-                    <BitMember name="PropulsionControllerInputPowerCheck" offset="6"/>
-                    <BitMember name="PropulsionControllerTemperatureCheck" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/>
-                    <BitMember name="reserved9" offset="9"/>
-                    <BitMember name="reserved10" offset="10"/>
-                    <BitMember name="reserved11" offset="11"/>
-                    <BitMember name="RightElevatorActuatorCheck" offset="12"/>
-                    <BitMember name="LeftElevatorActuatorCheck" offset="13"/>
-                    <BitMember name="LowerRudderActuatorCheck" offset="14"/>
-                    <BitMember name="UpperRudderActuatorCheck" offset="15"/>
-                </PackedField>
-                <PackedField name="rcdCheck" width="16">
-                    <BitMember name="reserved0" offset="0"/>
-                    <BitMember name="reserved1" offset="1"/>
-                    <BitMember name="EncryptionUnitCheck" offset="2"/>
-                    <BitMember name="PowerUnitCheck" offset="3"/>
-                    <BitMember name="LBandTransceiverCheck" offset="4"/>
-                    <BitMember name="UhfTransceiverCheck" offset="5"/>
-                    <BitMember name="ModemControlPanelCheck" offset="6"/>
-                    <BitMember name="McuCheck" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/>
-                    <BitMember name="reserved9" offset="9"/>
-                    <BitMember name="reserved10" offset="10"/>
-                    <BitMember name="reserved11" offset="11"/>
-                    <BitMember name="reserved12" offset="12"/>
-                    <BitMember name="reserved13" offset="13"/>
-                    <BitMember name="reserved14" offset="14"/>
-                    <BitMember name="reserved15" offset="15"/>
-                </PackedField>
+                                    RF-2 bytes 14..25 AUV_CHECK_RESULT 상세 점검 결과.
+                                    각 16-bit 그룹은 원문 표의 윗행부터 offset 0~15로 매핑하며 0=PASS, 1=FAIL이다.
+                                    원문 MSB/LSB 그룹명은 bit offset을 뒤집는 기준으로 사용하지 않는다.
+                                -->
                 <!-- RF-2 bytes 76..79 TAIL: CHECKSUM(2), STOP(2). -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <PackedField name="mspdCheck" width="16">
+                                    <BitMember name="MissionSensorProcessorModule1Boot" offset="0"/>
+                                    <BitMember name="MissionSensorProcessorModule1Storage" offset="1"/>
+                                    <BitMember name="ForwardLookingSonarCheck" offset="2"/>
+                                    <BitMember name="SideScanSonarCheck" offset="3"/>
+                                    <BitMember name="ForwardLookingSonarConnection" offset="4"/>
+                                    <BitMember name="SideScanSonarConnection" offset="5"/>
+                                    <BitMember name="AutonomousControlComputerConnection" offset="6"/>
+                                    <BitMember name="CommunicationUnitConnection" offset="7"/>
+                                    <BitMember name="reserved8" offset="8"/>
+                                    <BitMember name="reserved9" offset="9"/>
+                                    <BitMember name="AcousticCameraCheck" offset="10"/>
+                                    <BitMember name="OpticalCameraCheck" offset="11"/>
+                                    <BitMember name="AcousticCameraConnection" offset="12"/>
+                                    <BitMember name="OpticalCameraConnection" offset="13"/>
+                                    <BitMember name="reserved14" offset="14"/>
+                                    <BitMember name="reserved15" offset="15"/>
+                                </PackedField>
+                <PackedField name="inbCheck" width="16">
+                                    <BitMember name="MSB_reserved" offset="0"/>
+                                    <BitMember name="MSB_AutonomousControlComputerCommunication" offset="1"/>
+                                    <BitMember name="MSB_MagneticSensorCommunication" offset="2"/>
+                                    <BitMember name="MSB_GPSCommunication" offset="3"/>
+                                    <BitMember name="MSB_DepthSensorCommunication" offset="4"/>
+                                    <BitMember name="MSB_DVLCommunication" offset="5"/>
+                                    <BitMember name="MSB_IMUCommunication" offset="6"/>
+                                    <BitMember name="MSB_MemoryCheck" offset="7"/>
+                                    <BitMember name="LSB_reserved8" offset="8"/>
+                                    <BitMember name="LSB_reserved9" offset="9"/>
+                                    <BitMember name="LSB_AutonomousControlComputerCommunication" offset="10"/>
+                                    <BitMember name="LSB_MagneticSensorCommunication" offset="11"/>
+                                    <BitMember name="LSB_GPSCommunication" offset="12"/>
+                                    <BitMember name="LSB_DepthSensorCommunication" offset="13"/>
+                                    <BitMember name="LSB_DVLCommunication" offset="14"/>
+                                    <BitMember name="LSB_IMUCommunication" offset="15"/>
+                                </PackedField>
+                <PackedField name="accCheck" width="16">
+                                    <BitMember name="PowerControlDeviceCommunication" offset="0"/>
+                                    <BitMember name="LeakSensorConnection" offset="1"/>
+                                    <BitMember name="FlashLightCommunication" offset="2"/>
+                                    <BitMember name="PingerCommunication" offset="3"/>
+                                    <BitMember name="AutonomousControlComputerInterfaceCheck" offset="4"/>
+                                    <BitMember name="AutonomousControlComputer28VDCCheck" offset="5"/>
+                                    <BitMember name="AutonomousControlComputerMemoryCheck" offset="6"/>
+                                    <BitMember name="AutonomousControlComputerBootCheck" offset="7"/>
+                                    <BitMember name="reserved8" offset="8"/>
+                                    <BitMember name="FlashLightCheck" offset="9"/>
+                                    <BitMember name="PingerCheck" offset="10"/>
+                                    <BitMember name="PropulsionControllerCommunication" offset="11"/>
+                                    <BitMember name="UnderwaterCommunicationDeviceConnection" offset="12"/>
+                                    <BitMember name="RfCommunicationDeviceConnection" offset="13"/>
+                                    <BitMember name="IntegratedNavigationComputerCommunication" offset="14"/>
+                                    <BitMember name="MissionSensorProcessorCommunication" offset="15"/>
+                                </PackedField>
+                <PackedField name="pcdCheck" width="16">
+                                    <BitMember name="reserved0" offset="0"/>
+                                    <BitMember name="reserved1" offset="1"/>
+                                    <BitMember name="reserved2" offset="2"/>
+                                    <BitMember name="reserved3" offset="3"/>
+                                    <BitMember name="PowerControlAndBmsConnectionCheck" offset="4"/>
+                                    <BitMember name="BatteryPackTemperatureCheck" offset="5"/>
+                                    <BitMember name="BatteryPackVoltageTemperatureBmsCheck" offset="6"/>
+                                    <BitMember name="BatteryBmsCheck" offset="7"/>
+                                    <BitMember name="reserved8" offset="8"/>
+                                    <BitMember name="reserved9" offset="9"/>
+                                    <BitMember name="reserved10" offset="10"/>
+                                    <BitMember name="reserved11" offset="11"/>
+                                    <BitMember name="reserved12" offset="12"/>
+                                    <BitMember name="reserved13" offset="13"/>
+                                    <BitMember name="reserved14" offset="14"/>
+                                    <BitMember name="reserved15" offset="15"/>
+                                </PackedField>
+                <PackedField name="mcCheck" width="16">
+                                    <BitMember name="reserved0" offset="0"/>
+                                    <BitMember name="reserved1" offset="1"/>
+                                    <BitMember name="reserved2" offset="2"/>
+                                    <BitMember name="reserved3" offset="3"/>
+                                    <BitMember name="reserved4" offset="4"/>
+                                    <BitMember name="PropulsionControllerCurrentSensorCheck" offset="5"/>
+                                    <BitMember name="PropulsionControllerInputPowerCheck" offset="6"/>
+                                    <BitMember name="PropulsionControllerTemperatureCheck" offset="7"/>
+                                    <BitMember name="reserved8" offset="8"/>
+                                    <BitMember name="reserved9" offset="9"/>
+                                    <BitMember name="reserved10" offset="10"/>
+                                    <BitMember name="reserved11" offset="11"/>
+                                    <BitMember name="RightElevatorActuatorCheck" offset="12"/>
+                                    <BitMember name="LeftElevatorActuatorCheck" offset="13"/>
+                                    <BitMember name="LowerRudderActuatorCheck" offset="14"/>
+                                    <BitMember name="UpperRudderActuatorCheck" offset="15"/>
+                                </PackedField>
+                <PackedField name="rcdCheck" width="16">
+                                    <BitMember name="reserved0" offset="0"/>
+                                    <BitMember name="reserved1" offset="1"/>
+                                    <BitMember name="EncryptionUnitCheck" offset="2"/>
+                                    <BitMember name="PowerUnitCheck" offset="3"/>
+                                    <BitMember name="LBandTransceiverCheck" offset="4"/>
+                                    <BitMember name="UhfTransceiverCheck" offset="5"/>
+                                    <BitMember name="ModemControlPanelCheck" offset="6"/>
+                                    <BitMember name="McuCheck" offset="7"/>
+                                    <BitMember name="reserved8" offset="8"/>
+                                    <BitMember name="reserved9" offset="9"/>
+                                    <BitMember name="reserved10" offset="10"/>
+                                    <BitMember name="reserved11" offset="11"/>
+                                    <BitMember name="reserved12" offset="12"/>
+                                    <BitMember name="reserved13" offset="13"/>
+                                    <BitMember name="reserved14" offset="14"/>
+                                    <BitMember name="reserved15" offset="15"/>
+                                </PackedField>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -264,9 +294,44 @@
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
                 <!-- RF-2 bytes 14..75 고정 Body는 존재하지만 임무계획 전송 결과로 사용할 전용 필드는 정의되지 않았다. -->
-                <Field name="informationBody" dataType="UInt8" length="62"/>
                 <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -312,8 +377,43 @@
                     <BitMember name="RC_MODE" offset="2" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <Field name="informationBody" dataType="UInt8" length="62"/>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -353,6 +453,15 @@
                     <BitMember name="Status_Chk" offset="3" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
+                <!-- EOR: offset0~15=LEAK,ROLL,PITCH,VEL,COM,PCD,GPS,RF/UCD,Ceiling Depth,BT_SOC,BT_TEMP,BT_CO,BT_V,MC,DIS,EOM. -->
+                <!-- MODE: offset0~11=PLC,MS,RC,ALIGN,MS_ST,EMER,FILE,DATA,MS_STOP,REC_DEL,RF_CONF,EOR; 12~15 reserved. -->
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
                 <Field name="auvId" cdm="Platform.Identifier.Numeric" dataType="UInt8"/>
                 <Field name="batteryPercent" cdm="Platform.Energy.Battery.RemainingPercent" dataType="UInt8"/>
                 <Field name="gpsLatitude" cdm="Navigation.GNSS.Position.Latitude" inputUnit="rad" outputUnit="rad" dataType="Float32"/>
@@ -366,45 +475,57 @@
                 <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" dataType="UInt16"/>
                 <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" dataType="UInt16"/>
                 <Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" dataType="UInt16"/>
-                <!-- EOR: offset0~15=LEAK,ROLL,PITCH,VEL,COM,PCD,GPS,RF/UCD,Ceiling Depth,BT_SOC,BT_TEMP,BT_CO,BT_V,MC,DIS,EOM. -->
                 <PackedField name="emergencyReasonMask" width="16">
-                    <BitMember name="LEAK" offset="0"/>
-                    <BitMember name="ROLL" offset="1"/>
-                    <BitMember name="PITCH" offset="2"/>
-                    <BitMember name="VEL" offset="3"/>
-                    <BitMember name="COM" offset="4"/>
-                    <BitMember name="PCD" offset="5"/>
-                    <BitMember name="GPS" offset="6"/>
-                    <BitMember name="RF_UCD" offset="7"/>
-                    <BitMember name="CeilingDepth" offset="8"/>
-                    <BitMember name="BT_SOC" offset="9"/>
-                    <BitMember name="BT_TEMP" offset="10"/>
-                    <BitMember name="BT_CO" offset="11"/>
-                    <BitMember name="BT_V" offset="12"/>
-                    <BitMember name="MC" offset="13"/>
-                    <BitMember name="DIS" offset="14"/>
-                    <BitMember name="EOM" offset="15"/>
-                </PackedField>
-                <!-- MODE: offset0~11=PLC,MS,RC,ALIGN,MS_ST,EMER,FILE,DATA,MS_STOP,REC_DEL,RF_CONF,EOR; 12~15 reserved. -->
+                                    <BitMember name="LEAK" offset="0"/>
+                                    <BitMember name="ROLL" offset="1"/>
+                                    <BitMember name="PITCH" offset="2"/>
+                                    <BitMember name="VEL" offset="3"/>
+                                    <BitMember name="COM" offset="4"/>
+                                    <BitMember name="PCD" offset="5"/>
+                                    <BitMember name="GPS" offset="6"/>
+                                    <BitMember name="RF_UCD" offset="7"/>
+                                    <BitMember name="CeilingDepth" offset="8"/>
+                                    <BitMember name="BT_SOC" offset="9"/>
+                                    <BitMember name="BT_TEMP" offset="10"/>
+                                    <BitMember name="BT_CO" offset="11"/>
+                                    <BitMember name="BT_V" offset="12"/>
+                                    <BitMember name="MC" offset="13"/>
+                                    <BitMember name="DIS" offset="14"/>
+                                    <BitMember name="EOM" offset="15"/>
+                                </PackedField>
                 <PackedField name="modeMask" width="16">
-                    <BitMember name="PLC" offset="0"/>
-                    <BitMember name="MS" offset="1"/>
-                    <BitMember name="RC" offset="2"/>
-                    <BitMember name="ALIGN" offset="3"/>
-                    <BitMember name="MS_ST" offset="4"/>
-                    <BitMember name="EMER" offset="5"/>
-                    <BitMember name="FILE" offset="6"/>
-                    <BitMember name="DATA" offset="7"/>
-                    <BitMember name="MS_STOP" offset="8"/>
-                    <BitMember name="REC_DEL" offset="9"/>
-                    <BitMember name="RF_CONF" offset="10"/>
-                    <BitMember name="EOR" offset="11"/>
-                    <BitMember name="reserved12" offset="12"/>
-                    <BitMember name="reserved13" offset="13"/>
-                    <BitMember name="reserved14" offset="14"/>
-                    <BitMember name="reserved15" offset="15"/>
-                </PackedField>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                                    <BitMember name="PLC" offset="0"/>
+                                    <BitMember name="MS" offset="1"/>
+                                    <BitMember name="RC" offset="2"/>
+                                    <BitMember name="ALIGN" offset="3"/>
+                                    <BitMember name="MS_ST" offset="4"/>
+                                    <BitMember name="EMER" offset="5"/>
+                                    <BitMember name="FILE" offset="6"/>
+                                    <BitMember name="DATA" offset="7"/>
+                                    <BitMember name="MS_STOP" offset="8"/>
+                                    <BitMember name="REC_DEL" offset="9"/>
+                                    <BitMember name="RF_CONF" offset="10"/>
+                                    <BitMember name="EOR" offset="11"/>
+                                    <BitMember name="reserved12" offset="12"/>
+                                    <BitMember name="reserved13" offset="13"/>
+                                    <BitMember name="reserved14" offset="14"/>
+                                    <BitMember name="reserved15" offset="15"/>
+                                </PackedField>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -443,8 +564,43 @@
                     <BitMember name="MISSION_START" offset="4" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <Field name="informationBody" dataType="UInt8" length="62"/>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -483,8 +639,43 @@
                     <BitMember name="EMER_RETURN" offset="5" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <Field name="informationBody" dataType="UInt8" length="62"/>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -523,12 +714,43 @@
                     <BitMember name="File_List_Req" offset="6" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
                 <Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" dataType="UInt16"/>
                 <Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" dataType="UInt16"/>
                 <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" dataType="UInt16"/>
                 <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" dataType="UInt16"/>
                 <Field name="forwardLookingSonarFileCount" cdm="RecordedData.ForwardLookingSonar.FileCount" dataType="UInt16"/>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -598,8 +820,43 @@
                     <BitMember name="MISSION_STOP" offset="8" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <Field name="informationBody" dataType="UInt8" length="62"/>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -638,8 +895,43 @@
                     <BitMember name="Record_Del" offset="9" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <Field name="informationBody" dataType="UInt8" length="62"/>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -678,8 +970,43 @@
                     <BitMember name="MTE_MODE" offset="10" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <Field name="informationBody" dataType="UInt8" length="62"/>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -718,8 +1045,43 @@
                     <BitMember name="FLASH" offset="15" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <Field name="informationBody" dataType="UInt8" length="62"/>
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>

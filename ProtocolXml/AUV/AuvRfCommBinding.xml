@@ -94,33 +94,67 @@
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
                 <!--
-                    RF-2 bytes 14..75는 모든 응답에서 같은 62-byte Body이다.
-                    이 Reply는 bytes 64..65 RF_CONF_MODE/RF_CONF_PWR echo만 Semantic 결과로 소비한다.
-                -->
-                <PackedField name="rfConfMode" width="8">
-                <BitMember name="operationMode" cdm="Communication.RF.Configuration.OperationMode" offset="0" width="2">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.OperationMode.OneToOne" value="1"/><Map cdm="Communication.RF.Configuration.OperationMode.OneToTwo" value="2"/></ValueMap>
-                </BitMember>
-                <BitMember name="timeSlot" cdm="Communication.RF.Configuration.TimeSlot" offset="2" width="2">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.TimeSlot.Two" value="1"/><Map cdm="Communication.RF.Configuration.TimeSlot.Four" value="2"/></ValueMap>
-                </BitMember>
-                <BitMember name="uhfChannel" cdm="Communication.RF.Configuration.UHF.Channel" offset="4" width="2">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel3" value="3"/></ValueMap>
-                </BitMember>
-                <BitMember name="lBandChannel" cdm="Communication.RF.Configuration.LBand.Channel" offset="6" width="2">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel3" value="3"/></ValueMap>
-                </BitMember>
-            </PackedField>
-                <PackedField name="rfConfPower" width="8">
-                <BitMember name="uhfPower" cdm="Communication.RF.Configuration.UHF.Power" offset="0" width="3">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Power.High" value="4"/></ValueMap>
-                </BitMember>
-                <BitMember name="lBandPower" cdm="Communication.RF.Configuration.LBand.Power" offset="4" width="3">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Power.High" value="4"/></ValueMap>
-                </BitMember>
-            </PackedField>
+                                    RF-2 bytes 14..75는 모든 응답에서 같은 62-byte Body이다.
+                                    이 Reply는 bytes 64..65 RF_CONF_MODE/RF_CONF_PWR echo만 Semantic 결과로 소비한다.
+                                -->
                 <!-- RF-2 bytes 76..79 TAIL: CHECKSUM(2), STOP(2). -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <PackedField name="rfConfMode" width="8">
+                                <BitMember name="operationMode" cdm="Communication.RF.Configuration.OperationMode" offset="0" width="2">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.OperationMode.OneToOne" value="1"/><Map cdm="Communication.RF.Configuration.OperationMode.OneToTwo" value="2"/></ValueMap>
+                                </BitMember>
+                                <BitMember name="timeSlot" cdm="Communication.RF.Configuration.TimeSlot" offset="2" width="2">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.TimeSlot.Two" value="1"/><Map cdm="Communication.RF.Configuration.TimeSlot.Four" value="2"/></ValueMap>
+                                </BitMember>
+                                <BitMember name="uhfChannel" cdm="Communication.RF.Configuration.UHF.Channel" offset="4" width="2">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel3" value="3"/></ValueMap>
+                                </BitMember>
+                                <BitMember name="lBandChannel" cdm="Communication.RF.Configuration.LBand.Channel" offset="6" width="2">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel3" value="3"/></ValueMap>
+                                </BitMember>
+                            </PackedField>
+                <PackedField name="rfConfPower" width="8">
+                                <BitMember name="uhfPower" cdm="Communication.RF.Configuration.UHF.Power" offset="0" width="3">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Power.High" value="4"/></ValueMap>
+                                </BitMember>
+                                <BitMember name="lBandPower" cdm="Communication.RF.Configuration.LBand.Power" offset="4" width="3">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Power.High" value="4"/></ValueMap>
+                                </BitMember>
+                            </PackedField>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -167,17 +201,45 @@
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
                 <!-- RF-2 bytes 67..72 CH_SCAN: UHF ch1~3, L-Band ch1~3 수신감도(dB), 각 1 byte. -->
+                <!-- RF-2 bytes 73..74 PER: UHF PER, L-Band PER, 각 1 byte(0~100%). -->
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
                 <Field name="uhfChannel1SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
                 <Field name="uhfChannel2SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
                 <Field name="uhfChannel3SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel"/>
                 <Field name="lBandChannel1SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel"/>
                 <Field name="lBandChannel2SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel"/>
                 <Field name="lBandChannel3SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel"/>
-                <!-- RF-2 bytes 73..74 PER: UHF PER, L-Band PER, 각 1 byte(0~100%). -->
                 <Field name="uhfPacketErrorRate" dataType="UInt8" cdm="Communication.RF.UHF.PacketErrorRate"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8" cdm="Communication.RF.LBand.PacketErrorRate"/>
-                <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -224,56 +286,80 @@
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
                 <!-- RF-2 bytes 64..66: RF_CONF_MODE, RF_CONF_PWR, EDM_BATTERY(0~100). -->
-                <PackedField name="rfConfMode" width="8">
-                <BitMember name="operationMode" cdm="Communication.RF.Configuration.OperationMode" offset="0" width="2">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.OperationMode.OneToOne" value="1"/><Map cdm="Communication.RF.Configuration.OperationMode.OneToTwo" value="2"/></ValueMap>
-                </BitMember>
-                <BitMember name="timeSlot" cdm="Communication.RF.Configuration.TimeSlot" offset="2" width="2">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.TimeSlot.Two" value="1"/><Map cdm="Communication.RF.Configuration.TimeSlot.Four" value="2"/></ValueMap>
-                </BitMember>
-                <BitMember name="uhfChannel" cdm="Communication.RF.Configuration.UHF.Channel" offset="4" width="2">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel3" value="3"/></ValueMap>
-                </BitMember>
-                <BitMember name="lBandChannel" cdm="Communication.RF.Configuration.LBand.Channel" offset="6" width="2">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel3" value="3"/></ValueMap>
-                </BitMember>
-            </PackedField>
-                <PackedField name="rfConfPower" width="8">
-                <BitMember name="uhfPower" cdm="Communication.RF.Configuration.UHF.Power" offset="0" width="3">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Power.High" value="4"/></ValueMap>
-                </BitMember>
-                <BitMember name="lBandPower" cdm="Communication.RF.Configuration.LBand.Power" offset="4" width="3">
-                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Power.High" value="4"/></ValueMap>
-                </BitMember>
-            </PackedField>
-                <Field name="edmBatteryPercent" dataType="UInt8" cdm="Equipment.RF.EncryptionModule.Battery.RemainingPercent"/>
                 <!-- RF-2 bytes 67..72: CH_SCAN 6개 수신감도. -->
+                <!-- RF-2 bytes 73..74: UHF/L-Band PER. -->
+                <!--
+                                    RF-2 byte 75 STAT_code bit 그룹.
+                                    bit0~4는 각 반 상태(0=정상, 1=비정상), bit5=DATA_LOCK, bit6=SYNC_LOCK, bit7=reserved.
+                                    DATA_LOCK/SYNC_LOCK은 flag 자체만 표현하며 정상/비정상 의미를 추가하지 않는다.
+                                -->
+                <!-- RF-2 bytes 76..79 TAIL. -->
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <PackedField name="rfConfMode" width="8">
+                                <BitMember name="operationMode" cdm="Communication.RF.Configuration.OperationMode" offset="0" width="2">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.OperationMode.OneToOne" value="1"/><Map cdm="Communication.RF.Configuration.OperationMode.OneToTwo" value="2"/></ValueMap>
+                                </BitMember>
+                                <BitMember name="timeSlot" cdm="Communication.RF.Configuration.TimeSlot" offset="2" width="2">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.TimeSlot.Two" value="1"/><Map cdm="Communication.RF.Configuration.TimeSlot.Four" value="2"/></ValueMap>
+                                </BitMember>
+                                <BitMember name="uhfChannel" cdm="Communication.RF.Configuration.UHF.Channel" offset="4" width="2">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel3" value="3"/></ValueMap>
+                                </BitMember>
+                                <BitMember name="lBandChannel" cdm="Communication.RF.Configuration.LBand.Channel" offset="6" width="2">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel3" value="3"/></ValueMap>
+                                </BitMember>
+                            </PackedField>
+                <PackedField name="rfConfPower" width="8">
+                                <BitMember name="uhfPower" cdm="Communication.RF.Configuration.UHF.Power" offset="0" width="3">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Power.High" value="4"/></ValueMap>
+                                </BitMember>
+                                <BitMember name="lBandPower" cdm="Communication.RF.Configuration.LBand.Power" offset="4" width="3">
+                                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Power.High" value="4"/></ValueMap>
+                                </BitMember>
+                            </PackedField>
+                <Field name="edmBatteryPercent" dataType="UInt8" cdm="Equipment.RF.EncryptionModule.Battery.RemainingPercent"/>
                 <Field name="uhfChannel1SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
                 <Field name="uhfChannel2SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
                 <Field name="uhfChannel3SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel"/>
                 <Field name="lBandChannel1SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel"/>
                 <Field name="lBandChannel2SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel"/>
                 <Field name="lBandChannel3SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel"/>
-                <!-- RF-2 bytes 73..74: UHF/L-Band PER. -->
                 <Field name="uhfPacketErrorRate" dataType="UInt8" cdm="Communication.RF.UHF.PacketErrorRate"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8" cdm="Communication.RF.LBand.PacketErrorRate"/>
-                <!--
-                    RF-2 byte 75 STAT_code bit 그룹.
-                    bit0~4는 각 반 상태(0=정상, 1=비정상), bit5=DATA_LOCK, bit6=SYNC_LOCK, bit7=reserved.
-                    DATA_LOCK/SYNC_LOCK은 flag 자체만 표현하며 정상/비정상 의미를 추가하지 않는다.
-                -->
                 <PackedField name="statusCode" width="8">
-                    <BitMember name="RFM_L_BAND" offset="0"/>
-                    <BitMember name="RFM_UHF" offset="1"/>
-                    <BitMember name="EDM" offset="2"/>
-                    <BitMember name="PDM" offset="3"/>
-                    <BitMember name="MCM" offset="4"/>
-                    <BitMember name="DATA_LOCK" offset="5"/>
-                    <BitMember name="SYNC_LOCK" offset="6"/>
-                    <BitMember name="reserved7" offset="7"/>
-                </PackedField>
-                <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                                    <BitMember name="RFM_L_BAND" offset="0"/>
+                                    <BitMember name="RFM_UHF" offset="1"/>
+                                    <BitMember name="EDM" offset="2"/>
+                                    <BitMember name="PDM" offset="3"/>
+                                    <BitMember name="MCM" offset="4"/>
+                                    <BitMember name="DATA_LOCK" offset="5"/>
+                                    <BitMember name="SYNC_LOCK" offset="6"/>
+                                    <BitMember name="reserved7" offset="7"/>
+                                </PackedField>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -320,31 +406,66 @@
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
                 <!--
-                    RF-2 bytes 62..63 Pre_Launch-Check 2-byte 결과 그룹.
-                    표의 윗행을 bit0으로 적용: bit0/1 reserved, bit2 암호화반, bit3 전원반,
-                    bit4 L-Band, bit5 UHF, bit6 모뎀 및 제어반, bit7 MCU, bit8~15 reserved.
-                    원문 표 자체에는 0/1 결과 의미가 직접 기재되지 않았으나 AUV_CHECK_RESULT 계열과 동일한 자체점검 규칙(0=PASS, 1=FAIL)을 적용한다.
-                -->
-                <PackedField name="preLaunchCheck" width="16">
-                    <BitMember name="reserved0" offset="0"/>
-                    <BitMember name="reserved1" offset="1"/>
-                    <BitMember name="EncryptionUnit" offset="2"/>
-                    <BitMember name="PowerUnit" offset="3"/>
-                    <BitMember name="LBandTransceiver" offset="4"/>
-                    <BitMember name="UhfTransceiver" offset="5"/>
-                    <BitMember name="ModemControlPanel" offset="6"/>
-                    <BitMember name="MCU" offset="7"/>
-                    <BitMember name="reserved8" offset="8"/>
-                    <BitMember name="reserved9" offset="9"/>
-                    <BitMember name="reserved10" offset="10"/>
-                    <BitMember name="reserved11" offset="11"/>
-                    <BitMember name="reserved12" offset="12"/>
-                    <BitMember name="reserved13" offset="13"/>
-                    <BitMember name="reserved14" offset="14"/>
-                    <BitMember name="reserved15" offset="15"/>
-                </PackedField>
+                                    RF-2 bytes 62..63 Pre_Launch-Check 2-byte 결과 그룹.
+                                    표의 윗행을 bit0으로 적용: bit0/1 reserved, bit2 암호화반, bit3 전원반,
+                                    bit4 L-Band, bit5 UHF, bit6 모뎀 및 제어반, bit7 MCU, bit8~15 reserved.
+                                    원문 표 자체에는 0/1 결과 의미가 직접 기재되지 않았으나 AUV_CHECK_RESULT 계열과 동일한 자체점검 규칙(0=PASS, 1=FAIL)을 적용한다.
+                                -->
                 <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <PackedField name="preLaunchCheck" width="16">
+                                    <BitMember name="reserved0" offset="0"/>
+                                    <BitMember name="reserved1" offset="1"/>
+                                    <BitMember name="EncryptionUnit" offset="2"/>
+                                    <BitMember name="PowerUnit" offset="3"/>
+                                    <BitMember name="LBandTransceiver" offset="4"/>
+                                    <BitMember name="UhfTransceiver" offset="5"/>
+                                    <BitMember name="ModemControlPanel" offset="6"/>
+                                    <BitMember name="MCU" offset="7"/>
+                                    <BitMember name="reserved8" offset="8"/>
+                                    <BitMember name="reserved9" offset="9"/>
+                                    <BitMember name="reserved10" offset="10"/>
+                                    <BitMember name="reserved11" offset="11"/>
+                                    <BitMember name="reserved12" offset="12"/>
+                                    <BitMember name="reserved13" offset="13"/>
+                                    <BitMember name="reserved14" offset="14"/>
+                                    <BitMember name="reserved15" offset="15"/>
+                                </PackedField>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -426,9 +547,44 @@
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
                 <!-- RF-2 bytes 14..75 고정 Body에는 키 적용 전용 결과 필드가 없어 raw 그룹으로만 보존한다. -->
-                <Field name="informationBody"/>
                 <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->
+                <Field name="mspdCheck" dataType="UInt16"/>
+                <Field name="inbCheck" dataType="UInt16"/>
+                <Field name="accCheck" dataType="UInt16"/>
+                <Field name="pcdCheck" dataType="UInt16"/>
+                <Field name="mcCheck" dataType="UInt16"/>
+                <Field name="rcdCheck" dataType="UInt16"/>
+                <Field name="auvId" dataType="UInt8"/>
+                <Field name="batteryPercent" dataType="UInt8"/>
+                <Field name="gpsLatitude" dataType="Float32"/>
+                <Field name="gpsLongitude" dataType="Float32"/>
+                <Field name="waypointCount" dataType="UInt8"/>
+                <Field name="alignmentStatus" dataType="UInt8"/>
+                <Field name="integratedNavigationLatitude" dataType="Float32"/>
+                <Field name="integratedNavigationLongitude" dataType="Float32"/>
+                <Field name="auvDataFileCount" dataType="UInt16"/>
+                <Field name="sideScanSonarFileCount" dataType="UInt16"/>
+                <Field name="opticalCameraFileCount" dataType="UInt16"/>
+                <Field name="acousticCameraFileCount" dataType="UInt16"/>
+                <Field name="forwardLookingSonarFileCount" dataType="UInt16"/>
+                <Field name="emergencyReasonMask" dataType="UInt16"/>
+                <Field name="modeMask" dataType="UInt16"/>
+                <Field name="reserveRf" dataType="UInt8" length="2"/>
+                <Field name="preLaunchCheck" dataType="UInt16"/>
+                <Field name="rfConfMode" dataType="UInt8"/>
+                <Field name="rfConfPower" dataType="UInt8"/>
+                <Field name="edmBatteryPercent" dataType="UInt8"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8"/>
+                <Field name="statusCode" dataType="UInt8"/>
+<Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>

@@ -805,7 +805,16 @@ XSD 1.0에 복잡한 산술/형제 비교 제약을 억지로 넣지 않는다.
 
 ## Issue 13. RF-2 ACK / RF_CMD_COMPLETE / Body
 
-**Status: PARTIALLY RESOLVED / simultaneity TBD**
+**Status: PHYSICAL LAYOUT RESOLVED / command-specific simultaneity TBD**
+
+RF-2는 모든 Reply에서 동일한 고정 80-byte 물리 구조를 유지한다. Semantic에서 사용하지 않는 Body 필드도 Binding에는 CDM 없이 남겨 실제 byte offset을 보존한다.
+
+- Header: 14 bytes
+- Fixed Body: 62 bytes
+- Tail: 4 bytes
+- Total: 80 bytes
+
+`AuvPlatformRfBinding.xml`과 `AuvRfCommBinding.xml`의 모든 `AuvRf2Telegram` Reply는 동일 필드 순서와 80-byte 크기를 갖도록 정규화하였다. 수신 checksum은 생성값이 아니라 wire Field로 표현한다.
 
 원문 의미:
 - `RF_CMD_COMPLETE`는 RF통신장치에 보낸 명령이 완료되었음을 알리는 bit이다.
