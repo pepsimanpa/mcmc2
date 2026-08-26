@@ -34,3 +34,4 @@ jobs:
           git rm .github/workflows/finalize-auv-rf2-format.yml
           git commit -m 'Finalize AUV RF-2 reply formatting'
           git push origin HEAD:feature/auv-declarative-binding-cleanup
+# trigger
