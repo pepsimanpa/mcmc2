@@ -1,0 +1,34 @@
+name: Inventory AUV RF2 Replies
+on:
+  push:
+    branches: [feature/auv-declarative-binding-cleanup]
+    paths: ['.github/workflows/inventory-auv-rf2-replies.yml']
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-declarative-binding-cleanup
+      - name: Inventory RF-2 reply blocks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          for path in ['ProtocolXml/AUV/AuvPlatformRfBinding.xml','ProtocolXml/AUV/AuvRfCommBinding.xml']:
+              s=Path(path).read_text(encoding='utf-8')
+              print('\n###',path)
+              for m in re.finditer(r'<Reply semantic_id="([^"]+)"[^>]*>([\s\S]*?)</Reply>',s):
+                  rid,body=m.group(1),m.group(2)
+                  if 'messageType="AuvRf2Telegram"' not in body: continue
+                  print('\nREPLY',rid)
+                  for c in re.findall(r'<!--[\s\S]*?-->',body):
+                      t=' '.join(c[4:-3].split())
+                      print(' COMMENT:',t)
+                  for line in body.splitlines():
+                      t=line.strip()
+                      if t.startswith(('<Field ','<FixedField ','<DerivedField ','<PackedField ')):
+                          print(' ',t)
+          PY
