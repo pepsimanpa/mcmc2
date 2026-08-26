@@ -1,0 +1,147 @@
+name: Apply AUV Confirmed Cleanup
+on:
+  push:
+    branches: [feature/auv-declarative-binding-cleanup]
+    paths: ['.github/workflows/apply-auv-confirmed-cleanup.yml']
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-declarative-binding-cleanup
+          fetch-depth: 0
+      - name: Apply confirmed AUV Semantic Binding cleanup
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          sem=Path('ProtocolXml/AUV/AuvPlatformSemantic.xml')
+          bind=Path('ProtocolXml/AUV/AuvPlatformRfBinding.xml')
+          spec=Path('ProtocolXml/AUV/AuvSpecification.xml')
+          doc=Path('ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md')
+
+          # 1) MissionPlan.OperationMode: logical Semantic values only.
+          s=sem.read_text(encoding='utf-8')
+          old='''                <QuantityProfile cdm="MissionPlan.OperationMode">\n                    <!-- 물리 코드 영역은 1~8이며 현재 확정 운용모드는 1=광역탐색모드, 2=정밀탐색모드다. 3~8은 TBD이므로 현재 선택 범위에서 제외한다. -->\n                    <Range min="1" max="2"/>\n                    <Resolution>1</Resolution>\n                </QuantityProfile>'''
+          new='''                <ValueSetProfile cdm="MissionPlan.OperationMode">\n                    <Values>\n                        <Value name="광역탐색" cdm="MissionPlan.OperationMode.WideAreaSearch"/>\n                        <Value name="정밀탐색" cdm="MissionPlan.OperationMode.PrecisionSearch"/>\n                    </Values>\n                </ValueSetProfile>'''
+          if old not in s:
+              raise SystemExit('OperationMode Semantic block not found')
+          s=s.replace(old,new,1)
+          sem.write_text(s,encoding='utf-8',newline='')
+
+          # 2) RF Binding confirmed declarative mappings and CDM alignment.
+          s=bind.read_text(encoding='utf-8')
+          old='''            <!-- 현재 유효값: 1=광역탐색모드, 2=정밀탐색모드. 3~8은 추후 결정이므로 송신하지 않는다. -->\n            <Field name="missionMode" cdm="MissionPlan.OperationMode"/>'''
+          new='''            <!-- 현재 운용 선택은 광역탐색/정밀탐색이며 raw 1/2 매핑은 Binding에서만 정의한다. 3~8은 TBD이다. -->\n            <Field name="missionMode" cdm="MissionPlan.OperationMode" dataType="UInt8">\n                <ValueMap>\n                    <Map cdm="MissionPlan.OperationMode.WideAreaSearch" value="1"/>\n                    <Map cdm="MissionPlan.OperationMode.PrecisionSearch" value="2"/>\n                </ValueMap>\n            </Field>'''
+          if old not in s:
+              raise SystemExit('missionMode Binding block not found')
+          s=s.replace(old,new,1)
+
+          # Semantic/Binding CDM keys already decided in Semantic.
+          s=s.replace('cdm="Navigation.Alignment.Status"','cdm="Navigation.Integrated.Alignment.Status"')
+          s=s.replace('cdm="RecordedData.AUV.FileCount"','cdm="RecordedData.Platform.FileCount"')
+          s=s.replace('cdm="Equipment.Flash.Brightness"','cdm="Equipment.Light.Brightness"')
+          s=s.replace('cdm="RecordedData.Transfer.FileFirst" converter="UInt16LE"','cdm="RecordedData.FileRange.First" dataType="UInt16"')
+          s=s.replace('cdm="RecordedData.Transfer.FileFinal" converter="UInt16LE"','cdm="RecordedData.FileRange.Final" dataType="UInt16"')
+
+          # Direct data types for the CDM-aligned fields.
+          s=s.replace('<Field name="alignmentStatus" cdm="Navigation.Integrated.Alignment.Status"/>',
+                      '<Field name="alignmentStatus" cdm="Navigation.Integrated.Alignment.Status" dataType="UInt8"/>')
+          s=s.replace('<Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" converter="UInt16LE"/>',
+                      '<Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" dataType="UInt16"/>')
+          s=s.replace('<Field name="brightness" cdm="Equipment.Light.Brightness"/>',
+                      '<Field name="brightness" cdm="Equipment.Light.Brightness" dataType="UInt8"/>')
+
+          # requestData DATA TYPE is a declarative 8-bit independent selection mask.
+          old='<DerivedField name="dataType" sourceField="RecordedData.Transfer.DataType" converter="PackDataTypeBits"/>'
+          new='''<PackedField name="dataType" width="8">\n                <BitMember name="AUV" cdm="RecordedData.Selection.Platform" sourceField="RecordedData.Selection.Platform" offset="0"/>\n                <BitMember name="SSS" cdm="RecordedData.Selection.SideScanSonar" sourceField="RecordedData.Selection.SideScanSonar" offset="1"/>\n                <BitMember name="OC" cdm="RecordedData.Selection.OpticalCamera" sourceField="RecordedData.Selection.OpticalCamera" offset="2"/>\n                <BitMember name="AC" cdm="RecordedData.Selection.AcousticCamera" sourceField="RecordedData.Selection.AcousticCamera" offset="3"/>\n                <BitMember name="FLS" cdm="RecordedData.Selection.ForwardLookingSonar" sourceField="RecordedData.Selection.ForwardLookingSonar" offset="4"/>\n            </PackedField>'''
+          if old not in s:
+              raise SystemExit('requestData dataType block not found')
+          s=s.replace(old,new,1)
+
+          # requestData is a Control request only. RF-3 is continuous SensorProduct data, not a Reply.
+          cstart=s.index('<ControlBinding semantic_id="requestData">')
+          cend=s.index('</ControlBinding>',cstart)+len('</ControlBinding>')
+          block=s[cstart:cend]
+          block2,n=re.subn(r'\n\s*<Reply semantic_id="requestDataReply"[\s\S]*?</Reply>','',block,count=1)
+          if n!=1:
+              raise SystemExit(f'requestDataReply removal count={n}')
+          s=s[:cstart]+block2+s[cend:]
+
+          # RF-3 continuous file frames are classified as SensorProducts by DATA ACK type bits.
+          if '<SensorProducts semantic_id="sensorProduct">' not in s:
+              products='''\n    <SensorProducts semantic_id="sensorProduct">\n        <!-- RF-3는 requestData의 Reply가 아니라 파일 크기만큼 연속 수신되는 SensorProduct 프레임이다. -->\n        <ProductBinding semantic_id="auvData">\n            <TCPChannel messageType="AuvRf3Telegram"/>\n            <MatchField name="dataAck" mask="0x00000800" value="0x00000800"/>\n        </ProductBinding>\n        <ProductBinding semantic_id="sideScanSonarData">\n            <TCPChannel messageType="AuvRf3Telegram"/>\n            <MatchField name="dataAck" mask="0x00001000" value="0x00001000"/>\n        </ProductBinding>\n        <ProductBinding semantic_id="opticalCameraData">\n            <TCPChannel messageType="AuvRf3Telegram"/>\n            <MatchField name="dataAck" mask="0x00002000" value="0x00002000"/>\n        </ProductBinding>\n        <ProductBinding semantic_id="acousticCameraData">\n            <TCPChannel messageType="AuvRf3Telegram"/>\n            <MatchField name="dataAck" mask="0x00004000" value="0x00004000"/>\n        </ProductBinding>\n        <ProductBinding semantic_id="forwardLookingSonarData">\n            <TCPChannel messageType="AuvRf3Telegram"/>\n            <MatchField name="dataAck" mask="0x00008000" value="0x00008000"/>\n        </ProductBinding>\n    </SensorProducts>\n'''
+              s=s.replace('\n</PlatformBinding>',products+'</PlatformBinding>',1)
+          bind.write_text(s,encoding='utf-8',newline='')
+
+          # 3) AUV inherits little-endian wire encoding at Specification level, as current Binding already assumes.
+          s=spec.read_text(encoding='utf-8')
+          if '<DataEncoding ' not in s:
+              marker='''    </Identification>\n'''
+              if marker not in s: raise SystemExit('Identification end not found')
+              s=s.replace(marker,marker+'    <DataEncoding byteOrder="little"/>\n',1)
+          spec.write_text(s,encoding='utf-8',newline='')
+
+          # 4) Keep the unified design record synchronized with the explicit project decisions.
+          s=doc.read_text(encoding='utf-8')
+          s=s.replace('''- `MISSION_START`는 이미 전송된 임무를 시작하는 기능으로 INFORMATION3를 사용한다.\n- 원문 설명: INFORMATION1/2는 초반 RF 설정, 암호키 설정 또는 임무계획 시 사용하고 대부분 INFORMATION3를 사용한다.''',
+                      '''- `MISSION_START`는 이미 전송된 임무를 시작하는 기능으로 **프로젝트 설계 결정상 INFORMATION3를 사용한다.**\n- 첨부 `auv origin.csv`의 COMMAND 표에는 `MISSION_START=INFO2`로 기재되어 있으나, 본 설계에서는 협의된 운용 의미를 우선하여 INFORMATION3로 유지한다.''')
+          old='''따라서 현재 HMI/Semantic 선택 범위는 `1~2`를 유지한다.\n`3~8`을 유효 운용 입력으로 노출하지 않는다.'''
+          new='''Semantic에는 raw 범위 `1~2`를 노출하지 않고 다음 논리 선택값만 정의한다.\n- 광역탐색\n- 정밀탐색\n\nBinding `ValueMap`에서만 다음 raw code를 선언한다.\n- 광역탐색 → `1`\n- 정밀탐색 → `2`\n\n`3~8`은 TBD이므로 현재 Semantic 선택값 및 Binding ValueMap에서 제외한다.'''
+          if old not in s: raise SystemExit('Issue 7 text not found')
+          s=s.replace(old,new,1)
+          s=s.replace('3. RF-3 ProductBinding 구조 확인\n','')
+          s=s.replace('4. RF_CONF_MODE/PWR PackedField 정합성 확인\n','3. RF_CONF_MODE/PWR PackedField 정합성 확인\n')
+          s=s.replace('5. Result ↔ BitMember CDM 연결 정합성 확인\n','4. Result ↔ BitMember CDM 연결 정합성 확인\n')
+          s=s.replace('6. RF-2 ACK/RF_CMD_COMPLETE/Body 동시 유효성 원문 추가 확인\n','5. RF-2 ACK/RF_CMD_COMPLETE/Body 동시 유효성 원문 추가 확인\n')
+          doc.write_text(s,encoding='utf-8',newline='')
+          PY
+          git diff --check
+      - name: Validate XML and confirmed invariants
+        run: |
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re
+
+          pairs=[
+            ('ProtocolXml/AUV/AuvPlatformSemantic.xml','ProtocolXml/XSD/CommonSpecSchema.xsd'),
+            ('ProtocolXml/AUV/AuvPlatformRfBinding.xml','ProtocolXml/XSD/CommonBindingSchema.xsd'),
+            ('ProtocolXml/AUV/AuvPlatformUcdBinding.xml','ProtocolXml/XSD/CommonBindingSchema.xsd'),
+            ('ProtocolXml/AUV/AuvRfCommSemantic.xml','ProtocolXml/XSD/CommonSpecSchema.xsd'),
+            ('ProtocolXml/AUV/AuvRfCommBinding.xml','ProtocolXml/XSD/CommonBindingSchema.xsd'),
+            ('ProtocolXml/AUV/AuvSpecification.xml','ProtocolXml/XSD/VehicleSpecificationSchema.xsd'),
+          ]
+          for xml,xsd in pairs:
+              etree.XMLSchema(etree.parse(xsd)).assertValid(etree.parse(xml))
+              print('XSD PASS',xml)
+
+          sem=Path('ProtocolXml/AUV/AuvPlatformSemantic.xml').read_text(encoding='utf-8')
+          bind=Path('ProtocolXml/AUV/AuvPlatformRfBinding.xml').read_text(encoding='utf-8')
+          spec=Path('ProtocolXml/AUV/AuvSpecification.xml').read_text(encoding='utf-8')
+          assert 'bindRef="requestDataReply"' not in sem
+          assert 'semantic_id="requestDataReply"' not in bind
+          assert '<SensorProducts semantic_id="sensorProduct">' in bind
+          assert bind.count('messageType="AuvRf3Telegram"') == 5
+          assert 'TargetAuvToInformation3' in bind[bind.index('<ControlBinding semantic_id="startMission">'):]
+          assert '<ValueSetProfile cdm="MissionPlan.OperationMode">' in sem
+          assert 'MissionPlan.OperationMode.WideAreaSearch' in sem and 'MissionPlan.OperationMode.PrecisionSearch' in sem
+          assert '<Map cdm="MissionPlan.OperationMode.WideAreaSearch" value="1"/>' in bind
+          assert '<Map cdm="MissionPlan.OperationMode.PrecisionSearch" value="2"/>' in bind
+          assert '<DataEncoding byteOrder="little"/>' in spec
+          for old in ['Navigation.Alignment.Status','RecordedData.AUV.FileCount','Equipment.Flash.Brightness','RecordedData.Transfer.FileFirst','RecordedData.Transfer.FileFinal','PackDataTypeBits']:
+              assert old not in bind, old
+          print('CONFIRMED INVARIANTS PASS')
+          PY
+      - name: Commit cleanup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/AUV/AuvPlatformSemantic.xml ProtocolXml/AUV/AuvPlatformRfBinding.xml ProtocolXml/AUV/AuvSpecification.xml ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md
+          git commit -m 'Align confirmed AUV semantic binding decisions'
+          git push origin HEAD:feature/auv-declarative-binding-cleanup
