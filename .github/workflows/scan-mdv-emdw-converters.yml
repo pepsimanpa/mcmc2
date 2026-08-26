@@ -1,0 +1,27 @@
+name: Scan MDV EMDW Converter Usage
+
+on:
+  push:
+    branches: [feature/auv-reply-bit-binding]
+    paths: ['.github/workflows/scan-mdv-emdw-converters.yml']
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-reply-bit-binding
+      - name: List converter identifiers
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          for path in ['ProtocolXml/MDV/MdvTcpBinding.xml','ProtocolXml/EMDW/EmdwTcpBinding.xml']:
+              text=Path(path).read_text(encoding='utf-8')
+              vals=re.findall(r'converter="([^"]+)"', text)
+              print(path)
+              print('count=',len(vals))
+              for v in sorted(set(vals)):
+                  print('  ',v,'x',vals.count(v))
+          PY
