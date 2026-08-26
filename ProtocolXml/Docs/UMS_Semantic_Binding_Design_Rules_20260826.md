@@ -847,8 +847,10 @@ AUV RF Binding의 다음 계산성 converter를 선언형/책임분리 구조로
   - Binding은 준비된 `MissionPlan.WaypointCount`를 `UInt8`로 기록한다.
 - `ByteSumModulo65536LE` 제거
   - RF-1 checksum 계산식 자체는 ICD 규칙을 유지한다: COUNT부터 INFORMATION 마지막 byte까지 unsigned byte 합의 modulo 65536.
-  - checksum 계산은 RF framing 단계 책임이며 Binding은 준비된 `System.Frame.Checksum`을 `UInt16`로 기록한다.
-  - RF-2 수신 checksum은 이미 일반 wire `Field UInt16`으로 표현한다.
+  - UCD checksum 계산식도 기존 ICD 규칙을 유지한다: UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지를 계산 범위로 사용한다.
+  - 송신 checksum 생성과 수신 checksum 검증은 OM/실행 계층 책임이며 Binding은 계산/검증을 수행하지 않는다.
+  - RF-1/UCD-1 Binding은 준비된 `System.Frame.Checksum`을 `UInt16`로 기록한다.
+  - RF-2/UCD-2 수신 checksum은 일반 wire `Field UInt16`으로 표현한다.
 
 공통 XSD에는 의미 enum의 `ValueMap`과 구분하여, 준비된 scalar source 값에서 wire 값으로의 선언형 매핑을 위한 `SourceValueMap`을 추가한다. 계산 함수명이나 특정 구현 함수는 Binding에 두지 않는다.
 

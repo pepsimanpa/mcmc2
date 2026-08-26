@@ -10,8 +10,10 @@
     확정 사항
     - UCD 구간은 RS422로 연동하며 RS422Channel의 messageType은 물리 Telegram 형식을 나타낸다.
     - UCD Telegram에는 별도 infoCode가 없으므로 RS422Channel에 infoCode를 사용하지 않는다.
-    - checksum은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지를 UInt16LE로 저장한다.
-    - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지 계산한다.
+    - checksum 계산식은 RF와 동일하게 범위 내 각 Byte 합을 65536으로 나눈 나머지이며 UInt16 little-endian으로 저장한다.
+    - UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지를 계산 범위로 사용한다.
+    - checksum 생성과 수신 checksum 검증은 OM/실행 계층 책임이며 Binding은 계산/검증을 수행하지 않는다.
+    - UCD-1 Binding은 OM/실행 계층이 준비한 System.Frame.Checksum을 UInt16으로 기록하고, UCD-2 Binding은 수신된 checksum을 일반 UInt16 Field로 표현한다.
     - PackedField의 offset=0은 little-endian 정규화 후 LSB(bit0)를 의미한다.
     - PackedField의 expectedValue는 개발자 확인용 최종 packed 값을 보존한다.
     - AUV_CHECK_RESULT_L 점검 bit는 원문 근거에 따라 0=PASS, 1=FAIL로 해석한다.
@@ -42,8 +44,8 @@
             <FixedField name="reserve2" value="0" dataType="UInt8"/>
             <FixedField name="returnLatitude" value="0" dataType="Float32"/>
             <FixedField name="returnLongitude" value="0" dataType="Float32"/>
-            <!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CommandThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
 
             <Reply semantic_id="requestAuvCheckReply" required="true">
                 <RS422Channel messageType="AuvUcd2Telegram"/>
@@ -77,8 +79,8 @@
                     <BitMember name="GPS" offset="6"/>
                     <BitMember name="RF_UCD" offset="7"/>
                 </PackedField>
-                <!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. -->
-                <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->
+                <Field name="checksum" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
 
@@ -99,8 +101,8 @@
             <FixedField name="reserve2" value="0" dataType="UInt8"/>
             <Field name="returnLatitude" cdm="Autonomy.EmergencyReturn.Position.Latitude" inputUnit="rad" outputUnit="rad" dataType="Float32"/>
             <Field name="returnLongitude" cdm="Autonomy.EmergencyReturn.Position.Longitude" inputUnit="rad" outputUnit="rad" dataType="Float32"/>
-            <!-- UCD-1 bytes 14..15: CHECKSUM. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CommandThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <!-- UCD-1 bytes 14..15: CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
 
             <Reply semantic_id="emergencyReturnReply" required="true">
                 <RS422Channel messageType="AuvUcd2Telegram"/>
@@ -134,8 +136,8 @@
                     <BitMember name="GPS" offset="6"/>
                     <BitMember name="RF_UCD" offset="7"/>
                 </PackedField>
-                <!-- UCD-2 bytes 14..15: CHECKSUM. -->
-                <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- UCD-2 bytes 14..15: CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->
+                <Field name="checksum" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
 
@@ -156,8 +158,8 @@
             <FixedField name="reserve2" value="0" dataType="UInt8"/>
             <FixedField name="returnLatitude" value="0" dataType="Float32"/>
             <FixedField name="returnLongitude" value="0" dataType="Float32"/>
-            <!-- UCD-1 bytes 14..15: CHECKSUM. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CommandThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <!-- UCD-1 bytes 14..15: CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->
+            <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
 
             <Reply semantic_id="deleteAllRecordsReply" required="true">
                 <RS422Channel messageType="AuvUcd2Telegram"/>
@@ -192,8 +194,8 @@
                     <BitMember name="GPS" offset="6"/>
                     <BitMember name="RF_UCD" offset="7"/>
                 </PackedField>
-                <!-- UCD-2 bytes 14..15: CHECKSUM. -->
-                <DerivedField name="checksum" sourceField="System.Frame.AckThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <!-- UCD-2 bytes 14..15: CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->
+                <Field name="checksum" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
     </Controls>
