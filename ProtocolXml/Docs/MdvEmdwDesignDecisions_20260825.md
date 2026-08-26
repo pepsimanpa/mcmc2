@@ -1,10 +1,11 @@
 # MDV / EMDW Semantic & Binding Design Decisions
 
 - Date: 2026-08-25
+- Last implementation update: 2026-08-26
 - Branch: `feature/auv-reply-bit-binding`
 - Sources: `rov_mdv.csv`, `rov_emdw.csv`, `rov_common.csv`
 - Common rules: `ProtocolXml/Docs/SemanticBindingRules_20260818.md`
-- Status: Source-backed working baseline
+- Status: Source-backed implemented baseline
 
 본 문서는 MDV/EMDW 원본 ICD를 재검토하여 확정한 Semantic/Binding 설계결정을 기록한다. 새로운 직접 원문 근거가 없는 한 동일 이슈를 반복 재해석하지 않는다.
 
@@ -28,13 +29,13 @@ EMDW 처리 명령: 처리 취소 / 처리 준비 / 처리 실행
 
 ## 2. 공통 제어응답 처리결과와 사유
 
-**Status: RESOLVED**
+**Status: RESOLVED / APPLIED**
 
 `T_MDV_CTRL_RESP`, `T_EMDW_CTRL_RESP`의 `result`는 원 ICD 기준 성공/실패이다.
 
 Semantic Reply는 처리결과와 사유를 논리 상태로 제공한다. 실제 `0=성공`, `1=실패` 및 reasonCode 숫자값은 Binding에서 변환한다.
 
-기존 Binding 주석의 `result=0은 요청 검증 완료 및 명령 수락` 표현은 원문보다 강한 해석이므로 사용하지 않는다.
+기존 Binding 주석의 `result=0은 요청 검증 완료 및 명령 수락` 표현은 원문보다 강한 해석이므로 제거하였다.
 
 MDV reasonCode 의미:
 - 없음
@@ -53,17 +54,21 @@ Control 응답 성공은 전체 임무 수행 완료와 동일하지 않다. 임
 
 ## 3. MissionPlan 선택형 Parameter
 
-**Status: RESOLVED**
+**Status: RESOLVED / APPLIED**
 
 ### Waypoint Action
 Semantic 선택 의미: 통과 / 대기
 
 wire code: `0=통과`, `1=대기`
 
+Binding converter: `MissionWaypointActionToCode`
+
 ### Mission Type
 Semantic 선택 의미: 이동 / 탐색 / 식별
 
 wire code: `0=이동`, `1=탐색`, `2=식별`
+
+Binding converter: `MissionTypeToCode`
 
 ## 4. 마지막 Waypoint 규칙
 
@@ -75,7 +80,7 @@ Waypoint 목록이 존재할 때 Validator/OM은 마지막 Waypoint Action이 �
 
 ## 5. Emergency Stop Reason
 
-**Status: RESOLVED**
+**Status: RESOLVED / APPLIED**
 
 Semantic 선택 의미와 wire code:
 - `0` 운용자 명령
@@ -84,7 +89,7 @@ Semantic 선택 의미와 wire code:
 - `3` 장애 발생
 - `4` 기타
 
-Semantic에는 의미를 노출하고 실제 숫자값은 Binding에서 변환한다.
+Semantic에는 의미를 노출하고 실제 숫자값은 Binding의 `EmergencyStopReasonToCode`로 변환한다.
 
 ## 6. Platform Status Reason Code
 
@@ -102,7 +107,7 @@ MDV와 EMDW 원 ICD는 동일한 의미 구조를 사용한다.
 
 ## 7. Current Waypoint Index
 
-**Status: RESOLVED**
+**Status: RESOLVED / BINDING APPLIED**
 
 정상 경유점 인덱스 범위:
 - `0~65534`
@@ -111,7 +116,9 @@ MDV와 EMDW 원 ICD는 동일한 의미 구조를 사용한다.
 특수 wire 값:
 - `0xFFFF` = 현재 추종 경유점 없음
 
-Semantic 정상 Quantity 범위에는 65535를 포함하지 않는다. `0xFFFF`는 Binding/Adapter에서 `현재 추종 경유점 없음` 상태로 해석한다.
+Semantic 정상 Quantity 범위에는 65535를 포함하지 않는다. Binding은 `UInt16LECurrentWaypointIndexOrNone`을 사용해 `0xFFFF`를 `현재 추종 경유점 없음`으로 해석한다.
+
+Semantic에서 이 `None` 상태를 Quantity 미제공/null로 둘지 별도 availability 상태로 표현할지는 후속 모델링 항목이다. `65535`를 정상 Semantic Quantity 값으로 재도입하지 않는다.
 
 ## 8. setTargetInformation
 
@@ -139,9 +146,11 @@ Semantic Target을 별도로 강제하지 않는다.
 그러나 **자체 송신 Heartbeat를 Semantic Monitor 대상으로 정의하는 것이 장기 구조상 적절한지는 아직 확정하지 않는다.**
 현재 MDV/EMDW의 `transmitHeartbeat` / `receiveHeartbeat` 구조는 당장 유지하고, 향후 Monitor 방향성 또는 통신관리 전용 모델을 검토한다.
 
+송신 Heartbeat의 Header Reserved는 공통 zero-fill 규칙에 따라 `FixedField value="0"`으로 반영하였다.
+
 ## 10. Reserved / Unused Field
 
-**Status: RESOLVED BY COMMON RULE**
+**Status: RESOLVED BY COMMON RULE / APPLIED WHERE MODIFIED**
 
 송신 시 미사용/Reserved Field는 프로젝트 공통 규칙에 따라 0으로 설정한다.
 원 ICD가 별도 값을 직접 지정하면 원문을 우선한다.
@@ -154,13 +163,15 @@ Semantic Target을 별도로 강제하지 않는다.
 
 ## 12. Binding Converter Mapping
 
-**Status: MAPPING RESOLVED / MINIMAL BINDING PATCH PENDING**
-
-아래 converter 식별자와 매핑은 확정안이다. 현재 Binding XML은 불필요한 대량 포맷 변경을 피하기 위해 기존 형식으로 복원했으며, 실제 converter 속성 추가는 **원본 서식/주석을 유지하는 최소 diff 방식으로 반영**한다.
+**Status: RESOLVED / APPLIED / VERIFIED**
 
 ### `CommandResultCodeToState`
 - raw `0` → 성공 (`Command.Result.Success`)
 - raw `1` → 실패 (`Command.Result.Failure`)
+
+적용 수량:
+- MDV Reply 9개
+- EMDW Reply 12개
 
 ### `UInt16LEToMdvCommandReasonState`
 little-endian uint16 decode 후:
@@ -172,6 +183,8 @@ little-endian uint16 decode 후:
 - `5` MDV 미연동
 - `6` 운용상태 비정상
 - `7` 기타 오류
+
+MDV Reply 9개에 적용하였다.
 
 ### `UInt16LEToEmdwCommandReasonState`
 little-endian uint16 decode 후:
@@ -185,14 +198,20 @@ little-endian uint16 decode 후:
 - `7` 처리(Disposal)조건 불충족
 - `8` 기타 오류
 
+EMDW Reply 12개에 적용하였다.
+
 ### `MissionWaypointActionToCode`
 - 통과 → `0`
 - 대기 → `1`
+
+MDV/EMDW `transferMissionPlan`의 Waypoint Action에 적용하였다.
 
 ### `MissionTypeToCode`
 - 이동 → `0`
 - 탐색 → `1`
 - 식별 → `2`
+
+MDV/EMDW `transferMissionPlan`에 적용하였다.
 
 ### `EmergencyStopReasonToCode`
 - 운용자 명령 → `0`
@@ -201,29 +220,36 @@ little-endian uint16 decode 후:
 - 장애 발생 → `3`
 - 기타 → `4`
 
+MDV/EMDW의 두 비상정지 Control에 적용하였다.
+
 ### `UInt16LECurrentWaypointIndexOrNone`
 - raw `0~65534` → 동일 0-based 현재 Waypoint index
 - raw `0xFFFF` → 현재 추종 경유점 없음
 
+MDV/EMDW Mission Progress Binding에 적용하였다.
+
 ## 13. 구현/검증 상태
 
-반영 완료:
+**Binding patch commit:** `1772faf5feed15f8e796c8f5bcf0008ca8b38625`
+
+반영 및 확인 완료:
 - `ValueSetProfile` XSD 추가
 - `ValueSetResult` XSD 추가
 - MDV/EMDW Reply Result 의미 추가
-- Mission Type / Waypoint Action / Emergency Stop Reason 의미형 Parameter 적용
+- MDV Reply 9개 / EMDW Reply 12개 result/reason converter 연결
+- 기존 `result=0=명령 수락` 과해석 주석 제거
+- Mission Type / Waypoint Action / Emergency Stop Reason 의미형 Parameter 및 Binding converter 연결
 - MDV statusCode 의미 보강
-- currentWaypointIndex 정상 범위 `0~65534` 적용
-- Heartbeat Semantic 방향 문제를 TBD로 명시
-
-최소 Binding patch 대기:
-- 위 raw-code converter 연결
-- `currentWaypointIndex` raw `0xFFFF` sentinel converter 연결
+- currentWaypointIndex 정상 범위 `0~65534` 및 sentinel converter 연결
 - 송신 Heartbeat Header Reserved zero-fill
-- 기존 `result=0=명령 수락` 과해석 주석 수정
+- Heartbeat Semantic 방향 문제 TBD 유지
+- 패치 후 MDV/EMDW Binding XML parse 성공
+- 변경 대상이 MDV/EMDW Binding 두 파일뿐인지 diff 검증 성공
 
 별도 후속 구현/검증:
-- converter의 Adapter 실제 구현 여부 확인
+- converter 식별자에 대응하는 Adapter 실제 변환 구현/등록 여부 확인
+- `currentWaypointIndex`의 Semantic `None` 표현 방식 결정
 - 마지막 Waypoint Action Validator/OM 구현
 - 전체 시스템 CDM audit
+- 기존 Monitor `ValueSetSpec`의 raw 숫자값을 Binding으로 이전할지 공통 XSD 차원에서 검토
 - Heartbeat Semantic 방향 모델은 별도 결정 전까지 구조 변경 금지
