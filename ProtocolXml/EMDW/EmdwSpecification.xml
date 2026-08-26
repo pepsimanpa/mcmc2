@@ -9,6 +9,7 @@
         <ID>MCM-EMDW-001</ID>
         <Name>EMDW</Name>
     </Identification>
+    <DataEncoding byteOrder="little"/>
     <Platform>
         <!--
             Platform.EMDW는 공통 의미 데이터 CDM이 아니라 EMDW Profile을 가리키는 잠정 참조 표현이다.

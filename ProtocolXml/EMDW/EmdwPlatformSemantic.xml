@@ -1,50 +1,650 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!--
-EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
-원작자의 Semantic 의도(운용자가 인식하는 기능/상태 중심)와 기존 EMDW 실제 TCP Binding을 결합한다.
-
-재정의 원칙
-- missionCtrlCmd, operationMode, emergencyStopType, disposalCmd 물리 enum을 독립 Semantic 기능으로 분리한다.
-- 실제 선택값은 Binding FixedField/Converter에서 결정하고 HMI Parameter로 노출하지 않는다.
-- Monitor는 Link/Health/OperationMode/Mission/Guidance/Disposal 의미 단위로 구분한다.
-- emdwId는 상태 자체가 아니라 대상 식별/상관관계 정보이므로 Monitor Semantic 항목에서 제외한다.
-- setTargetInformation의 Semantic Target 문제는 사용자 결정에 따라 이번 수정에서는 보류한다.
-- T_HEARTBEAT의 양방향 송수신 의미는 원 ICD에 확인되나 송신 정보를 Monitor로 표현하는 구조가 적절한지는 별도 TBD로 유지한다.
-- 복합 운용 Precondition은 근거가 확정된 뒤 별도로 반영한다.
-- 제어응답의 처리결과/사유는 Semantic 논리 상태로 노출하고 실제 0/1 및 reasonCode 숫자값은 Binding에서 매핑한다.
-- MissionPlan 마지막 경유점 Action은 원 ICD 규칙에 따라 반드시 대기 상태여야 하며 별도 Validator/OM에서 검증한다.
--->
+<?xml version='1.0' encoding='utf-8'?>
 <PlatformSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
     <ConstantSpecs id="constant">
-        <TextConstantSpec id="productName" name="제품명" cdm="Product.Name"><Value>EMDW Platform Interface</Value></TextConstantSpec>
-        <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description"><Value>Transport-independent EMDW control, mission and monitoring semantic specification</Value></TextConstantSpec>
+        <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
+            <Value>EMDW Platform Interface</Value>
+        </TextConstantSpec>
+        <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
+            <Value>Transport-independent EMDW control, mission and monitoring semantic specification</Value>
+        </TextConstantSpec>
     </ConstantSpecs>
-
     <MonitorSpecs id="monitor">
-        <GroupSpec id="positionInfo" name="EMDW 위치정보" cdm="Navigation.Position"><QuantitySpec id="emdwDepth" name="EMDW 심도" cdm="Navigation.Depth"><Unit>cm</Unit><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="emdwHeading" name="EMDW 헤딩" cdm="Navigation.Heading"><Unit>deg</Unit><Range min="0" max="359.9"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="emdwLatitude" name="EMDW 위도" cdm="Navigation.Position.Latitude"><Unit>deg</Unit><Range min="-90" max="90"/><Resolution>0.0000001</Resolution></QuantitySpec><QuantitySpec id="emdwLongitude" name="EMDW 경도" cdm="Navigation.Position.Longitude"><Unit>deg</Unit><Range min="-180" max="180"/><Resolution>0.0000001</Resolution></QuantitySpec><QuantitySpec id="speed" name="EMDW 속력" cdm="Motion.Speed"><Unit>knot</Unit><Range min="0" max="100"/><Resolution>0.1</Resolution></QuantitySpec></GroupSpec>
-        <GroupSpec id="communicationStatus" name="EMDW 통신 연동 상태" cdm="Communication.Link"><ValueSetSpec id="consoleLinkStatus" name="휴대용 관제 터미널 연동 상태" cdm="Communication.Link.Console.Status"><Values><Value cdm="Communication.Link.State.Disconnected">0</Value><Value cdm="Communication.Link.State.Connected">1</Value><Value cdm="Communication.Link.State.Unstable">2</Value></Values></ValueSetSpec><ValueSetSpec id="emdwLinkStatus" name="EMDW 연동 상태" cdm="Communication.Link.Platform.Status"><Values><Value cdm="Communication.Link.State.Disconnected">0</Value><Value cdm="Communication.Link.State.Connected">1</Value><Value cdm="Communication.Link.State.Unstable">2</Value></Values></ValueSetSpec></GroupSpec>
-        <GroupSpec id="healthStatus" name="EMDW 건전성 상태" cdm="Health"><ValueSetSpec id="consoleHealthStatus" name="휴대용 관제 터미널 운용 상태" cdm="Health.Console.Status"><Values><Value cdm="Health.State.Normal">0</Value><Value cdm="Health.State.Warning">1</Value><Value cdm="Health.State.Abnormal">2</Value></Values></ValueSetSpec><ValueSetSpec id="emdwHealthStatus" name="EMDW 운용 상태" cdm="Health.Platform.Status"><Values><Value cdm="Health.State.Normal">0</Value><Value cdm="Health.State.Warning">1</Value><Value cdm="Health.State.Abnormal">2</Value></Values></ValueSetSpec><ValueSetSpec id="statusCode" name="상태 코드" cdm="Platform.Status.ReasonCode"><Values><Value cdm="Platform.Status.Reason.None">0</Value><Value cdm="Platform.Status.Reason.ConsoleFault">1</Value><Value cdm="Platform.Status.Reason.PlatformDisconnected">2</Value><Value cdm="Platform.Status.Reason.PlatformFault">3</Value><Value cdm="Platform.Status.Reason.GuidanceFault">4</Value><Value cdm="Platform.Status.Reason.Other">5</Value></Values></ValueSetSpec></GroupSpec>
-        <GroupSpec id="operationModeStatus" name="EMDW 현재 운용모드" cdm="Platform.OperationMode"><ValueSetSpec id="operationMode" name="EMDW 운용모드" cdm="Platform.OperationMode"><Values><Value cdm="Platform.OperationMode.TerminalControl">0</Value><Value cdm="Platform.OperationMode.IntegratedControl">1</Value></Values></ValueSetSpec></GroupSpec>
-        <GroupSpec id="missionExecutionStatus" name="EMDW 임무 수행 상태" cdm="Mission.Execution"><ValueSetSpec id="missionState" name="임무 수행 상태" cdm="Mission.Execution.State"><Values><Value cdm="Mission.Execution.State.None">0</Value><Value cdm="Mission.Execution.State.PlanReceived">1</Value><Value cdm="Mission.Execution.State.Executing">2</Value><Value cdm="Mission.Execution.State.Paused">3</Value><Value cdm="Mission.Execution.State.Completed">4</Value><Value cdm="Mission.Execution.State.Stopped">5</Value><Value cdm="Mission.Execution.State.Abnormal">6</Value></Values></ValueSetSpec><QuantitySpec id="missionId" name="임무 식별번호" cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantitySpec><BooleanSpec id="currentWaypointAvailable" name="현재 추종 경유점 존재 여부" cdm="MissionPlan.CurrentWaypoint.Available"/><QuantitySpec id="currentWaypointIndex" name="현재 경유점 인덱스" cdm="MissionPlan.CurrentWaypointIndex"><Range min="0" max="65534"/><Resolution>1</Resolution></QuantitySpec><!-- currentWaypointAvailable=false일 때 currentWaypointIndex는 의미값 없음. raw 0xFFFF 매핑은 Binding에서 처리한다. --><QuantitySpec id="waypointCount" name="전체 경유점 개수" cdm="MissionPlan.WaypointCount"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec></GroupSpec>
-        <GroupSpec id="guidanceStatusInfo" name="EMDW 유도 상태" cdm="Autonomy.Guidance"><ValueSetSpec id="guidanceStatus" name="유도 상태" cdm="Autonomy.Guidance.Status"><Values><Value cdm="Autonomy.Guidance.State.Normal">0</Value><Value cdm="Autonomy.Guidance.State.MissionNotStarted">1</Value><Value cdm="Autonomy.Guidance.State.MissionPaused">2</Value><Value cdm="Autonomy.Guidance.State.MissionCompleted">3</Value><Value cdm="Autonomy.Guidance.State.Fault">4</Value></Values></ValueSetSpec><QuantitySpec id="distanceToWaypoint" name="목표 경유점까지 거리" cdm="Autonomy.Guidance.DistanceToWaypoint"><Unit>m</Unit><Range min="0"/></QuantitySpec><QuantitySpec id="targetHeading" name="목표 헤딩" cdm="Autonomy.Guidance.TargetHeading"><Unit>deg</Unit><Range min="0" max="359.9"/></QuantitySpec><QuantitySpec id="targetPitch" name="목표 피치" cdm="Autonomy.Guidance.TargetPitch"><Unit>deg</Unit><Range min="-90" max="90"/></QuantitySpec></GroupSpec>
-        <GroupSpec id="disposalStatusInfo" name="EMDW 처리 상태" cdm="Mission.Disposal.Status"><ValueSetSpec id="disposalState" name="처리 상태" cdm="Mission.Disposal.State"><Values><Value cdm="Mission.Disposal.State.Standby">0</Value><Value cdm="Mission.Disposal.State.Preparing">1</Value><Value cdm="Mission.Disposal.State.Executing">2</Value><Value cdm="Mission.Disposal.State.Completed">3</Value><Value cdm="Mission.Disposal.State.Canceled">4</Value><Value cdm="Mission.Disposal.State.Failed">5</Value></Values></ValueSetSpec><QuantitySpec id="missionId" name="임무 식별번호" cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="targetId" name="처리 대상 식별번호" cdm="Mission.Target.Identifier"><Range min="0" max="65534"/><Resolution>1</Resolution></QuantitySpec></GroupSpec>
-        <GroupSpec id="transmitHeartbeat" name="EMDW 하트비트 송신" cdm="Communication.Heartbeat"><QuantitySpec id="sourceDeviceId" name="송신장비 ID" cdm="Communication.Endpoint.Source.Identifier"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="destinationDeviceId" name="수신장비 ID" cdm="Communication.Endpoint.Destination.Identifier"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="heartbeatCount" name="하트비트 카운트" cdm="Communication.Heartbeat.Sequence"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantitySpec></GroupSpec>
-        <GroupSpec id="receiveHeartbeat" name="EMDW 하트비트 수신" cdm="Communication.Heartbeat"><QuantitySpec id="sourceDeviceId" name="송신장비 ID" cdm="Communication.Endpoint.Source.Identifier"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="destinationDeviceId" name="수신장비 ID" cdm="Communication.Endpoint.Destination.Identifier"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="heartbeatCount" name="하트비트 카운트" cdm="Communication.Heartbeat.Sequence"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantitySpec></GroupSpec>
+        <GroupSpec id="positionInfo" name="EMDW 위치정보" cdm="Navigation.Position">
+            <QuantitySpec id="emdwDepth" name="EMDW 심도" cdm="Navigation.Depth">
+                <Unit>cm</Unit>
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="emdwHeading" name="EMDW 헤딩" cdm="Navigation.Heading">
+                <Unit>deg</Unit>
+                <Range min="0" max="359.9" />
+                <Resolution>0.1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="emdwLatitude" name="EMDW 위도" cdm="Navigation.Position.Latitude">
+                <Unit>deg</Unit>
+                <Range min="-90" max="90" />
+                <Resolution>0.0000001</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="emdwLongitude" name="EMDW 경도" cdm="Navigation.Position.Longitude">
+                <Unit>deg</Unit>
+                <Range min="-180" max="180" />
+                <Resolution>0.0000001</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="speed" name="EMDW 속력" cdm="Motion.Speed">
+                <Unit>knot</Unit>
+                <Range min="0" max="100" />
+                <Resolution>0.1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+        <GroupSpec id="communicationStatus" name="EMDW 통신 연동 상태" cdm="Communication.Link">
+            <ValueSetSpec id="consoleLinkStatus" name="휴대용 관제 터미널 연동 상태" cdm="Communication.Link.Console.Status">
+                <Values>
+                    <Value cdm="Communication.Link.State.Disconnected" name="Disconnected" />
+                    <Value cdm="Communication.Link.State.Connected" name="Connected" />
+                    <Value cdm="Communication.Link.State.Unstable" name="Unstable" />
+                </Values>
+            </ValueSetSpec>
+            <ValueSetSpec id="emdwLinkStatus" name="EMDW 연동 상태" cdm="Communication.Link.Platform.Status">
+                <Values>
+                    <Value cdm="Communication.Link.State.Disconnected" name="Disconnected" />
+                    <Value cdm="Communication.Link.State.Connected" name="Connected" />
+                    <Value cdm="Communication.Link.State.Unstable" name="Unstable" />
+                </Values>
+            </ValueSetSpec>
+        </GroupSpec>
+        <GroupSpec id="healthStatus" name="EMDW 건전성 상태" cdm="Health">
+            <ValueSetSpec id="consoleHealthStatus" name="휴대용 관제 터미널 운용 상태" cdm="Health.Console.Status">
+                <Values>
+                    <Value cdm="Health.State.Normal" name="Normal" />
+                    <Value cdm="Health.State.Warning" name="Warning" />
+                    <Value cdm="Health.State.Abnormal" name="Abnormal" />
+                </Values>
+            </ValueSetSpec>
+            <ValueSetSpec id="emdwHealthStatus" name="EMDW 운용 상태" cdm="Health.Platform.Status">
+                <Values>
+                    <Value cdm="Health.State.Normal" name="Normal" />
+                    <Value cdm="Health.State.Warning" name="Warning" />
+                    <Value cdm="Health.State.Abnormal" name="Abnormal" />
+                </Values>
+            </ValueSetSpec>
+            <ValueSetSpec id="statusCode" name="상태 코드" cdm="Platform.Status.ReasonCode">
+                <Values>
+                    <Value cdm="Platform.Status.Reason.None" name="None" />
+                    <Value cdm="Platform.Status.Reason.ConsoleFault" name="ConsoleFault" />
+                    <Value cdm="Platform.Status.Reason.PlatformDisconnected" name="PlatformDisconnected" />
+                    <Value cdm="Platform.Status.Reason.PlatformFault" name="PlatformFault" />
+                    <Value cdm="Platform.Status.Reason.GuidanceFault" name="GuidanceFault" />
+                    <Value cdm="Platform.Status.Reason.Other" name="Other" />
+                </Values>
+            </ValueSetSpec>
+        </GroupSpec>
+        <GroupSpec id="operationModeStatus" name="EMDW 현재 운용모드" cdm="Platform.OperationMode">
+            <ValueSetSpec id="operationMode" name="EMDW 운용모드" cdm="Platform.OperationMode">
+                <Values>
+                    <Value cdm="Platform.OperationMode.TerminalControl" name="TerminalControl" />
+                    <Value cdm="Platform.OperationMode.IntegratedControl" name="IntegratedControl" />
+                </Values>
+            </ValueSetSpec>
+        </GroupSpec>
+        <GroupSpec id="missionExecutionStatus" name="EMDW 임무 수행 상태" cdm="Mission.Execution">
+            <ValueSetSpec id="missionState" name="임무 수행 상태" cdm="Mission.Execution.State">
+                <Values>
+                    <Value cdm="Mission.Execution.State.None" name="None" />
+                    <Value cdm="Mission.Execution.State.PlanReceived" name="PlanReceived" />
+                    <Value cdm="Mission.Execution.State.Executing" name="Executing" />
+                    <Value cdm="Mission.Execution.State.Paused" name="Paused" />
+                    <Value cdm="Mission.Execution.State.Completed" name="Completed" />
+                    <Value cdm="Mission.Execution.State.Stopped" name="Stopped" />
+                    <Value cdm="Mission.Execution.State.Abnormal" name="Abnormal" />
+                </Values>
+            </ValueSetSpec>
+            <QuantitySpec id="missionId" name="임무 식별번호" cdm="Mission.Identifier">
+                <Range min="0" max="4294967295" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <BooleanSpec id="currentWaypointAvailable" name="현재 추종 경유점 존재 여부" cdm="MissionPlan.CurrentWaypoint.Available" />
+            <QuantitySpec id="currentWaypointIndex" name="현재 경유점 인덱스" cdm="MissionPlan.CurrentWaypointIndex">
+                <Range min="0" max="65534" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="waypointCount" name="전체 경유점 개수" cdm="MissionPlan.WaypointCount">
+                <Range min="0" max="65535" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+        <GroupSpec id="guidanceStatusInfo" name="EMDW 유도 상태" cdm="Autonomy.Guidance">
+            <ValueSetSpec id="guidanceStatus" name="유도 상태" cdm="Autonomy.Guidance.Status">
+                <Values>
+                    <Value cdm="Autonomy.Guidance.State.Normal" name="Normal" />
+                    <Value cdm="Autonomy.Guidance.State.MissionNotStarted" name="MissionNotStarted" />
+                    <Value cdm="Autonomy.Guidance.State.MissionPaused" name="MissionPaused" />
+                    <Value cdm="Autonomy.Guidance.State.MissionCompleted" name="MissionCompleted" />
+                    <Value cdm="Autonomy.Guidance.State.Fault" name="Fault" />
+                </Values>
+            </ValueSetSpec>
+            <QuantitySpec id="distanceToWaypoint" name="목표 경유점까지 거리" cdm="Autonomy.Guidance.DistanceToWaypoint">
+                <Unit>m</Unit>
+                <Range min="0" />
+            </QuantitySpec>
+            <QuantitySpec id="targetHeading" name="목표 헤딩" cdm="Autonomy.Guidance.TargetHeading">
+                <Unit>deg</Unit>
+                <Range min="0" max="359.9" />
+            </QuantitySpec>
+            <QuantitySpec id="targetPitch" name="목표 피치" cdm="Autonomy.Guidance.TargetPitch">
+                <Unit>deg</Unit>
+                <Range min="-90" max="90" />
+            </QuantitySpec>
+        </GroupSpec>
+        <GroupSpec id="disposalStatusInfo" name="EMDW 처리 상태" cdm="Mission.Disposal.Status">
+            <ValueSetSpec id="disposalState" name="처리 상태" cdm="Mission.Disposal.State">
+                <Values>
+                    <Value cdm="Mission.Disposal.State.Standby" name="Standby" />
+                    <Value cdm="Mission.Disposal.State.Preparing" name="Preparing" />
+                    <Value cdm="Mission.Disposal.State.Executing" name="Executing" />
+                    <Value cdm="Mission.Disposal.State.Completed" name="Completed" />
+                    <Value cdm="Mission.Disposal.State.Canceled" name="Canceled" />
+                    <Value cdm="Mission.Disposal.State.Failed" name="Failed" />
+                </Values>
+            </ValueSetSpec>
+            <QuantitySpec id="missionId" name="임무 식별번호" cdm="Mission.Identifier">
+                <Range min="0" max="4294967295" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="targetId" name="처리 대상 식별번호" cdm="Mission.Target.Identifier">
+                <Range min="0" max="65534" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+        <GroupSpec id="transmitHeartbeat" name="EMDW 하트비트 송신" cdm="Communication.Heartbeat">
+            <QuantitySpec id="sourceDeviceId" name="송신장비 ID" cdm="Communication.Endpoint.Source.Identifier">
+                <Range min="0" max="65535" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="destinationDeviceId" name="수신장비 ID" cdm="Communication.Endpoint.Destination.Identifier">
+                <Range min="0" max="65535" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="heartbeatCount" name="하트비트 카운트" cdm="Communication.Heartbeat.Sequence">
+                <Range min="0" max="4294967295" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+        <GroupSpec id="receiveHeartbeat" name="EMDW 하트비트 수신" cdm="Communication.Heartbeat">
+            <QuantitySpec id="sourceDeviceId" name="송신장비 ID" cdm="Communication.Endpoint.Source.Identifier">
+                <Range min="0" max="65535" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="destinationDeviceId" name="수신장비 ID" cdm="Communication.Endpoint.Destination.Identifier">
+                <Range min="0" max="65535" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="heartbeatCount" name="하트비트 카운트" cdm="Communication.Heartbeat.Sequence">
+                <Range min="0" max="4294967295" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
     </MonitorSpecs>
-
     <ControlSpecs id="control">
-        <ControlSpec id="stopMission" name="EMDW 임무 정지" cdm="Control.Mission.Stop"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="startMission" name="EMDW 임무 시작" cdm="Control.Mission.Start"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="pauseMission" name="EMDW 임무 일시정지" cdm="Control.Mission.Pause"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="resumeMission" name="EMDW 임무 재개" cdm="Control.Mission.Resume"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="setTerminalControlMode" name="EMDW 관제터미널모드 설정" cdm="Control.Platform.OperationMode.TerminalControl"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Control.Platform.OperationMode.TerminalControl.Response" bindRef="setTerminalControlModeReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="setIntegratedControlMode" name="EMDW 통합통제모드 설정" cdm="Control.Platform.OperationMode.IntegratedControl"><Target cdm="Platform.Identifier.Numeric"/><Reply cdm="Control.Platform.OperationMode.IntegratedControl.Response" bindRef="setIntegratedControlModeReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="transferMissionPlan" name="EMDW 임무계획 전송" cdm="Request.MissionPlan.Transfer"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile><CollectionProfile cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="20"><ElementProfile cdm="MissionPlan.Waypoint"><QuantityProfile cdm="MissionPlan.Waypoint.Latitude"><Unit>deg</Unit><Range min="-90" max="90"/><Resolution>0.0000001</Resolution></QuantityProfile><QuantityProfile cdm="MissionPlan.Waypoint.Longitude"><Unit>deg</Unit><Range min="-180" max="180"/><Resolution>0.0000001</Resolution></QuantityProfile><QuantityProfile cdm="MissionPlan.Waypoint.Speed"><Unit>knot</Unit><Range min="0" max="100"/><Resolution>0.1</Resolution></QuantityProfile><QuantityProfile cdm="MissionPlan.Waypoint.Depth"><Unit>cm</Unit><Resolution>1</Resolution></QuantityProfile><ValueSetProfile cdm="MissionPlan.Waypoint.Action"><Values><Value name="통과" cdm="MissionPlan.Waypoint.Action.PassThrough"/><Value name="대기" cdm="MissionPlan.Waypoint.Action.Wait"/></Values></ValueSetProfile></ElementProfile></CollectionProfile><ValueSetProfile cdm="Mission.Type"><Values><Value name="이동" cdm="Mission.Type.Move"/><Value name="탐색" cdm="Mission.Type.Search"/><Value name="식별" cdm="Mission.Type.Identify"/></Values></ValueSetProfile></Parameters><Reply cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="immediateEmergencyStop" name="EMDW 즉시 비상정지" cdm="Control.Platform.EmergencyStop.Immediate"><Target cdm="Platform.Identifier.Numeric"/><Parameters><ValueSetProfile cdm="Platform.EmergencyStop.Reason"><Values><Value name="운용자 명령" cdm="Platform.EmergencyStop.Reason.OperatorCommand"/><Value name="체계 판단" cdm="Platform.EmergencyStop.Reason.SystemDecision"/><Value name="통신 이상" cdm="Platform.EmergencyStop.Reason.CommunicationFailure"/><Value name="장애 발생" cdm="Platform.EmergencyStop.Reason.Fault"/><Value name="기타" cdm="Platform.EmergencyStop.Reason.Other"/></Values></ValueSetProfile></Parameters><Reply cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="emergencyStopAndStandby" name="EMDW 임무중지 후 대기" cdm="Control.Platform.EmergencyStop.StopAndStandby"><Target cdm="Platform.Identifier.Numeric"/><Parameters><ValueSetProfile cdm="Platform.EmergencyStop.Reason"><Values><Value name="운용자 명령" cdm="Platform.EmergencyStop.Reason.OperatorCommand"/><Value name="체계 판단" cdm="Platform.EmergencyStop.Reason.SystemDecision"/><Value name="통신 이상" cdm="Platform.EmergencyStop.Reason.CommunicationFailure"/><Value name="장애 발생" cdm="Platform.EmergencyStop.Reason.Fault"/><Value name="기타" cdm="Platform.EmergencyStop.Reason.Other"/></Values></ValueSetProfile></Parameters><Reply cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="setTargetInformation" name="EMDW 표적정보 설정" cdm="Control.Mission.TargetInformation"><Parameters><QuantityProfile cdm="Mission.Target.Identifier"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile><QuantityProfile cdm="Mission.Target.Bearing"><Unit>deg</Unit><Range min="0" max="359.9"/><Resolution>0.1</Resolution></QuantityProfile><QuantityProfile cdm="Mission.Target.Range"><Unit>m</Unit><Range min="0" max="1999.9"/><Resolution>0.1</Resolution></QuantityProfile><QuantityProfile cdm="Mission.Target.Depth"><Unit>cm</Unit><Resolution>1</Resolution></QuantityProfile><QuantityProfile cdm="Mission.Target.Position.Latitude"><Unit>deg</Unit><Range min="-90" max="90"/><Resolution>0.0000001</Resolution></QuantityProfile><QuantityProfile cdm="Mission.Target.Position.Longitude"><Unit>deg</Unit><Range min="-180" max="180"/><Resolution>0.0000001</Resolution></QuantityProfile></Parameters></ControlSpec>
-        <ControlSpec id="cancelDisposal" name="EMDW 처리 취소" cdm="Control.Mission.Disposal.Cancel"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile><QuantityProfile cdm="Mission.Target.Identifier"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Disposal.Cancel.Response" bindRef="cancelDisposalReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="prepareDisposal" name="EMDW 처리 준비" cdm="Control.Mission.Disposal.Prepare"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile><QuantityProfile cdm="Mission.Target.Identifier"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Disposal.Prepare.Response" bindRef="prepareDisposalReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
-        <ControlSpec id="executeDisposal" name="EMDW 처리 실행" cdm="Control.Mission.Disposal.Execute"><Target cdm="Platform.Identifier.Numeric"/><Parameters><QuantityProfile cdm="Mission.Identifier"><Range min="0" max="4294967295"/><Resolution>1</Resolution></QuantityProfile><QuantityProfile cdm="Mission.Target.Identifier"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile></Parameters><Reply cdm="Control.Mission.Disposal.Execute.Response" bindRef="executeDisposalReply" required="true"><Results><ValueSetResult name="처리 결과" cdm="Command.Result"><Values><Value name="성공" cdm="Command.Result.Success"/><Value name="실패" cdm="Command.Result.Failure"/></Values></ValueSetResult><ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode"><Values><Value name="없음" cdm="Command.Result.Reason.None"/><Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest"/><Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan"/><Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable"/><Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch"/><Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected"/><Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState"/><Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet"/><Value name="기타 오류" cdm="Command.Result.Reason.Other"/></Values></ValueSetResult></Results></Reply></ControlSpec>
+        <ControlSpec id="stopMission" name="EMDW 임무 정지" cdm="Control.Mission.Stop">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="startMission" name="EMDW 임무 시작" cdm="Control.Mission.Start">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="pauseMission" name="EMDW 임무 일시정지" cdm="Control.Mission.Pause">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="resumeMission" name="EMDW 임무 재개" cdm="Control.Mission.Resume">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="setTerminalControlMode" name="EMDW 관제터미널모드 설정" cdm="Control.Platform.OperationMode.TerminalControl">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Reply cdm="Control.Platform.OperationMode.TerminalControl.Response" bindRef="setTerminalControlModeReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="setIntegratedControlMode" name="EMDW 통합통제모드 설정" cdm="Control.Platform.OperationMode.IntegratedControl">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Reply cdm="Control.Platform.OperationMode.IntegratedControl.Response" bindRef="setIntegratedControlModeReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="transferMissionPlan" name="EMDW 임무계획 전송" cdm="Request.MissionPlan.Transfer">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+                <CollectionProfile cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="20">
+                    <ElementProfile cdm="MissionPlan.Waypoint">
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Latitude">
+                            <Unit>deg</Unit>
+                            <Range min="-90" max="90" />
+                            <Resolution>0.0000001</Resolution>
+                        </QuantityProfile>
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Longitude">
+                            <Unit>deg</Unit>
+                            <Range min="-180" max="180" />
+                            <Resolution>0.0000001</Resolution>
+                        </QuantityProfile>
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Speed">
+                            <Unit>knot</Unit>
+                            <Range min="0" max="100" />
+                            <Resolution>0.1</Resolution>
+                        </QuantityProfile>
+                        <QuantityProfile cdm="MissionPlan.Waypoint.Depth">
+                            <Unit>cm</Unit>
+                            <Resolution>1</Resolution>
+                        </QuantityProfile>
+                        <ValueSetProfile cdm="MissionPlan.Waypoint.Action">
+                            <Values>
+                                <Value name="통과" cdm="MissionPlan.Waypoint.Action.PassThrough" />
+                                <Value name="대기" cdm="MissionPlan.Waypoint.Action.Wait" />
+                            </Values>
+                        </ValueSetProfile>
+                    </ElementProfile>
+                </CollectionProfile>
+                <ValueSetProfile cdm="Mission.Type">
+                    <Values>
+                        <Value name="이동" cdm="Mission.Type.Move" />
+                        <Value name="탐색" cdm="Mission.Type.Search" />
+                        <Value name="식별" cdm="Mission.Type.Identify" />
+                    </Values>
+                </ValueSetProfile>
+            </Parameters>
+            <Reply cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="immediateEmergencyStop" name="EMDW 즉시 비상정지" cdm="Control.Platform.EmergencyStop.Immediate">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <ValueSetProfile cdm="Platform.EmergencyStop.Reason">
+                    <Values>
+                        <Value name="운용자 명령" cdm="Platform.EmergencyStop.Reason.OperatorCommand" />
+                        <Value name="체계 판단" cdm="Platform.EmergencyStop.Reason.SystemDecision" />
+                        <Value name="통신 이상" cdm="Platform.EmergencyStop.Reason.CommunicationFailure" />
+                        <Value name="장애 발생" cdm="Platform.EmergencyStop.Reason.Fault" />
+                        <Value name="기타" cdm="Platform.EmergencyStop.Reason.Other" />
+                    </Values>
+                </ValueSetProfile>
+            </Parameters>
+            <Reply cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="emergencyStopAndStandby" name="EMDW 임무중지 후 대기" cdm="Control.Platform.EmergencyStop.StopAndStandby">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <ValueSetProfile cdm="Platform.EmergencyStop.Reason">
+                    <Values>
+                        <Value name="운용자 명령" cdm="Platform.EmergencyStop.Reason.OperatorCommand" />
+                        <Value name="체계 판단" cdm="Platform.EmergencyStop.Reason.SystemDecision" />
+                        <Value name="통신 이상" cdm="Platform.EmergencyStop.Reason.CommunicationFailure" />
+                        <Value name="장애 발생" cdm="Platform.EmergencyStop.Reason.Fault" />
+                        <Value name="기타" cdm="Platform.EmergencyStop.Reason.Other" />
+                    </Values>
+                </ValueSetProfile>
+            </Parameters>
+            <Reply cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="setTargetInformation" name="EMDW 표적정보 설정" cdm="Control.Mission.TargetInformation">
+            <Parameters>
+                <QuantityProfile cdm="Mission.Target.Identifier">
+                    <Range min="0" max="65535" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Bearing">
+                    <Unit>deg</Unit>
+                    <Range min="0" max="359.9" />
+                    <Resolution>0.1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Range">
+                    <Unit>m</Unit>
+                    <Range min="0" max="1999.9" />
+                    <Resolution>0.1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Depth">
+                    <Unit>cm</Unit>
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Position.Latitude">
+                    <Unit>deg</Unit>
+                    <Range min="-90" max="90" />
+                    <Resolution>0.0000001</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Position.Longitude">
+                    <Unit>deg</Unit>
+                    <Range min="-180" max="180" />
+                    <Resolution>0.0000001</Resolution>
+                </QuantityProfile>
+            </Parameters>
+        </ControlSpec>
+        <ControlSpec id="cancelDisposal" name="EMDW 처리 취소" cdm="Control.Mission.Disposal.Cancel">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Identifier">
+                    <Range min="0" max="65535" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Control.Mission.Disposal.Cancel.Response" bindRef="cancelDisposalReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="prepareDisposal" name="EMDW 처리 준비" cdm="Control.Mission.Disposal.Prepare">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Identifier">
+                    <Range min="0" max="65535" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Control.Mission.Disposal.Prepare.Response" bindRef="prepareDisposalReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
+        <ControlSpec id="executeDisposal" name="EMDW 처리 실행" cdm="Control.Mission.Disposal.Execute">
+            <Target cdm="Platform.Identifier.Numeric" />
+            <Parameters>
+                <QuantityProfile cdm="Mission.Identifier">
+                    <Range min="0" max="4294967295" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+                <QuantityProfile cdm="Mission.Target.Identifier">
+                    <Range min="0" max="65535" />
+                    <Resolution>1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Reply cdm="Control.Mission.Disposal.Execute.Response" bindRef="executeDisposalReply" required="true">
+                <Results>
+                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                        <Values>
+                            <Value name="성공" cdm="Command.Result.Success" />
+                            <Value name="실패" cdm="Command.Result.Failure" />
+                        </Values>
+                    </ValueSetResult>
+                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                        <Values>
+                            <Value name="없음" cdm="Command.Result.Reason.None" />
+                            <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
+                            <Value name="임무계획 오류" cdm="Command.Result.Reason.InvalidMissionPlan" />
+                            <Value name="모드전환 불가" cdm="Command.Result.Reason.ModeChangeUnavailable" />
+                            <Value name="모드 불일치" cdm="Command.Result.Reason.ModeMismatch" />
+                            <Value name="EMDW 미연동" cdm="Command.Result.Reason.PlatformDisconnected" />
+                            <Value name="운용상태 비정상" cdm="Command.Result.Reason.AbnormalOperationState" />
+                            <Value name="처리(Disposal)조건 불충족" cdm="Command.Result.Reason.DisposalConditionNotMet" />
+                            <Value name="기타 오류" cdm="Command.Result.Reason.Other" />
+                        </Values>
+                    </ValueSetResult>
+                </Results>
+            </Reply>
+        </ControlSpec>
     </ControlSpecs>
 </PlatformSpec>

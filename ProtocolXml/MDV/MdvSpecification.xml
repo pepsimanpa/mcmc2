@@ -11,6 +11,7 @@
         <ID>MCM-MDV-001</ID>
         <Name>MDV</Name>
     </Identification>
+    <DataEncoding byteOrder="little"/>
     <Platform>
         <!--
             Platform.MDV는 공통 의미 데이터 CDM이 아니라 MDV Profile을 가리키는 잠정 참조 표현이다.

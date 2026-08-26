@@ -10,12 +10,18 @@
     <xs:complexType name="VehicleSpecType">
         <xs:all>
             <xs:element name="Identification" type="IdentificationType" minOccurs="1" />
+            <xs:element name="DataEncoding" type="DataEncodingType" minOccurs="0" />
             <xs:element name="Sensors" type="Sensors" minOccurs="0" maxOccurs="1" />
             <xs:element name="Platform" type="Platform" minOccurs="0" maxOccurs="1" />
             <xs:element name="Payloads" type="Payload" minOccurs="0" maxOccurs="1" />
             <xs:element name="Comms" type="Comms" minOccurs="0" maxOccurs="1" />
         </xs:all>
     </xs:complexType>
+
+    <xs:simpleType name="VehicleByteOrderType">
+        <xs:restriction base="xs:string"><xs:enumeration value="little"/><xs:enumeration value="big"/></xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="DataEncodingType"><xs:attribute name="byteOrder" type="VehicleByteOrderType" use="required"/></xs:complexType>
 
     <xs:complexType name="IdentificationType">
         <xs:all>
