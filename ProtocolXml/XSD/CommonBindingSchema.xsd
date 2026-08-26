@@ -74,7 +74,16 @@
         </xs:choice>
     </xs:group>
 
+    <!-- 하나의 물리 Field가 복수의 논리 의미를 포함할 때 DerivedSemantic으로 파생한다. -->
+    <xs:complexType name="DerivedSemanticType">
+        <xs:attribute name="cdm" type="xs:string" use="required"/>
+        <xs:attribute name="converter" type="xs:string" use="required"/>
+    </xs:complexType>
+
     <xs:complexType name="FieldType">
+        <xs:sequence>
+            <xs:element name="DerivedSemantic" type="DerivedSemanticType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="cdm" type="xs:string"/>
         <xs:attribute name="inputUnit" type="xs:string"/>

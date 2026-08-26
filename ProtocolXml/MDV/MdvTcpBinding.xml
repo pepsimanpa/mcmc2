@@ -233,7 +233,10 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
             <Field name="missionState" cdm="Mission.Execution.State"/>
             <Field name="guidanceStatus"/>
             <Field name="missionId" cdm="Mission.Identifier" converter="UInt32LE"/>
-            <Field name="currentWaypointIndex" cdm="MissionPlan.CurrentWaypointIndex" converter="UInt16LECurrentWaypointIndexOrNone"/>
+            <Field name="currentWaypointIndex" converter="UInt16LE">
+                <DerivedSemantic cdm="MissionPlan.CurrentWaypoint.Available" converter="WaypointIndexToAvailable"/>
+                <DerivedSemantic cdm="MissionPlan.CurrentWaypointIndex" converter="WaypointIndexToIndexWhenAvailable"/>
+            </Field>
             <Field name="waypointCount" cdm="MissionPlan.WaypointCount" converter="UInt16LE"/>
             <Field name="distanceToWaypoint" converter="Float32LE"/>
             <Field name="targetHeading" converter="Float32LE"/>
