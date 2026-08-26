@@ -45,6 +45,7 @@ Binding에서 정의하는 항목:
 - 상수, 자동 생성값, 시스템 유도값
 - byte order, bit packing, converter
 - Reply의 실제 Telegram 및 결과 Field/Bit
+- 하나의 물리 Field가 sentinel/state code 등으로 복수의 논리 의미를 포함하면 `Field` 하위 `DerivedSemantic`으로 여러 Semantic CDM을 파생한다. 이때 wire Field 자체를 중복 선언하지 않는다.
 - expectedValue / expectedMask 등 수신 식별 조건
 
 ## 4. Control / Reply / Monitor
