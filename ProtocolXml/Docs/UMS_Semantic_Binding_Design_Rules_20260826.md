@@ -506,9 +506,19 @@ Semantic 방향 모델은 TBD.
 - 설계 이유
 - 특수값 설명
 - 송수신 주의사항
-- TBD
+- Adapter/OM 검증 조건
+- TBD / 미확정 원문 사항
 
-따라서 자동 수정 과정에서 기존 주석을 임의 삭제하지 않는다.
+따라서 **Semantic / Binding / Specification XML 수정·리팩터링 시 기존의 유효한 주석은 원칙적으로 보존한다.**
+
+주석 처리 기준:
+- 현재 설계와 의미가 동일한 주석: 그대로 유지
+- XML 구조만 변경된 주석: 삭제하지 않고 현재 구조(`dataType / scale / ValueMap / Sentinel` 등)에 맞춰 문구 갱신
+- 원 ICD의 미확정 사항, 패킷 구조, 검증 조건, 설계 근거를 설명하는 주석: 반드시 유지
+- 폐기된 설계(`converter`, `generator`, `sourceMember`, 과거 DerivedSemantic 방식 등)를 전제로 하는 주석: 현재 확정 구조에 맞게 수정하거나 더 이상 유효하지 않을 때만 제거
+- 원문보다 강한 추론이나 폐기된 해석을 담은 주석: 그대로 복원하지 않음
+
+주석 삭제는 기능 변경의 부수효과로 허용하지 않으며, 삭제가 필요한 경우 현재 규칙 또는 직접 원문과 충돌하는지 먼저 확인한다.
 
 ### 14.2 기본 작업 방식
 
@@ -546,17 +556,21 @@ parser = ET.XMLParser(
 
 다만 이 방식도 attribute/indentation formatting을 변경할 수 있으므로 **최소 텍스트 패치가 우선**이다.
 
-### 14.4 현재 MDV / EMDW 주석 복구 필요
+### 14.4 MDV / EMDW 주석 복구 상태
 
-2026-08-26 선언형 Binding 리팩터링 과정에서 `ElementTree` 전체 재직렬화로 MDV / EMDW XML의 기존 주석 일부가 유실되었다.
+2026-08-26 선언형 Binding 리팩터링 과정에서 `ElementTree` 전체 재직렬화로 MDV / EMDW XML의 기존 주석 일부가 유실되었으나, 이는 의도된 설계 변경이 아니므로 리팩터링 직전 XML을 기준으로 복구하였다.
 
-이는 의도된 설계 변경이 아니며 **복구 대상**이다.
+**Status: RESOLVED / RESTORED**
 
-복구 원칙:
-- 리팩터링 직전 XML의 주석을 기준으로 한다.
-- 현재 `dataType / scale / ValueMap / Sentinel / converter=0` 구조는 유지한다.
-- 기존 주석만 현재 대응 메시지/필드 위치에 복원한다.
-- 이미 의미가 변경되어 잘못된 과거 주석은 그대로 복원하지 않고 현재 확정 규칙에 맞게 수정한다.
+복구 결과:
+- `MdvPlatformSemantic.xml`: 2개
+- `MdvTcpBinding.xml`: 75개
+- `EmdwPlatformSemantic.xml`: 2개
+- `EmdwTcpBinding.xml`: 82개
+- 총 161개 주석 복구
+- 복구 commit: `b65b55d` (`Restore valid MDV EMDW XML comments`)
+
+복구 시 현재 `dataType / scale / ValueMap / Sentinel / converter=0` 구조는 유지하였다. 현재 설계와 충돌하는 과거 converter/DerivedSemantic 기반 표현이나 원문보다 강한 과거 해석은 그대로 되살리지 않고 현재 확정 규칙에 맞게 갱신하였다.
 
 ---
 
@@ -589,7 +603,6 @@ parser = ET.XMLParser(
 
 ## 16. 현재 남은 주요 TBD / 후속작업
 
-- MDV / EMDW 리팩터링 이전 주석 복구
 - Heartbeat 자체 송신을 Semantic Monitor로 유지할지 여부
 - 마지막 Waypoint Action Validator 실제 OM 구현 확인
 - 전체 시스템 CDM audit
