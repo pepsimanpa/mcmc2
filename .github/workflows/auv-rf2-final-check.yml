@@ -1,0 +1,42 @@
+name: AUV RF2 Final Check
+on:
+  push:
+    branches:
+      - feature/auv-declarative-binding-cleanup
+permissions:
+  contents: write
+jobs:
+  final-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-declarative-binding-cleanup
+          fetch-depth: 0
+      - name: Finalize formatting and validate RF2
+        run: |
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re
+          files=['ProtocolXml/AUV/AuvPlatformRfBinding.xml','ProtocolXml/AUV/AuvRfCommBinding.xml']
+          schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          for f in files:
+              p=Path(f); s=p.read_text(encoding='utf-8')
+              s=s.replace('\n<Field name="checksum" dataType="UInt16"/>','\n                <Field name="checksum" dataType="UInt16"/>')
+              p.write_text(s,encoding='utf-8',newline='')
+              schema.assertValid(etree.parse(f))
+              if '\n<Field name="checksum" dataType="UInt16"/>' in s:
+                  raise SystemExit('unindented checksum remains '+f)
+              print('XSD/FORMAT PASS',f)
+          PY
+          git diff --check
+      - name: Commit final formatting and remove temporary workflows
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/AUV/AuvPlatformRfBinding.xml ProtocolXml/AUV/AuvRfCommBinding.xml
+          git rm -f .github/workflows/auv-rf2-final-check.yml .github/workflows/finalize-auv-rf2-format.yml
+          git commit -m 'Finalize AUV RF-2 formatting cleanup'
+          git push origin HEAD:feature/auv-declarative-binding-cleanup
