@@ -71,7 +71,6 @@ jobs:
                   e=text.find('</PackedField>',m.end())
                   if e<0: raise SystemExit('unterminated PackedField '+name)
                   return start,e+len('</PackedField>')
-              # Non-self-closing scalar with children (ValueMap/Sentinel) if ever present.
               tagname=re.match(r'<(Field|FixedField|DerivedField)',tag).group(1)
               e=text.find(f'</{tagname}>',m.end())
               if e<0: raise SystemExit('unterminated '+tagname+' '+name)
@@ -84,7 +83,6 @@ jobs:
           def indent_block(x,spaces=16):
               pad=' '*spaces
               lines=x.strip().splitlines()
-              # normalize only leading indentation of transplanted element, not inner relative indentation
               if not lines:return ''
               nonempty=[len(l)-len(l.lstrip()) for l in lines if l.strip()]
               base=min(nonempty) if nonempty else 0
@@ -98,10 +96,8 @@ jobs:
               prefix=body[:acksp[1]]
               middle=body[acksp[1]:chksp[0]]
               suffix=body[chksp[0]:]
-              # Preserve every existing body comment, but discard old partial/body placeholder fields.
               comments=re.findall(r'<!--[\s\S]*?-->',middle)
               old={name:get_elem(middle,name) for name,_ in canonical}
-              # Received checksum is a physical field, not a generated TX value.
               suffix=re.sub(r'<DerivedField name="checksum"[^>]*/>', '<Field name="checksum" dataType="UInt16"/>', suffix, count=1)
               out=[]
               if comments:
@@ -129,7 +125,6 @@ jobs:
           python - <<'PY'
           from lxml import etree
           from pathlib import Path
-          import re
           NS='http://lignex1.com/mcmc2/umsSchema'; q=lambda n:f'{{{NS}}}{n}'
           SZ={'UInt8':1,'Int8':1,'UInt16':2,'Int16':2,'UInt32':4,'Int32':4,'UInt64':8,'Int64':8,'Float32':4,'Float64':8}
           files=['ProtocolXml/AUV/AuvPlatformRfBinding.xml','ProtocolXml/AUV/AuvRfCommBinding.xml']
@@ -154,8 +149,7 @@ jobs:
                   if total!=80: raise SystemExit(f'{r.get("semantic_id")} size={total}')
                   print('RF2 PASS',r.get('semantic_id'),'80 bytes')
           for path in files:
-              s=Path(path).read_text(encoding='utf-8')
-              if 'informationBody' in s: raise SystemExit('informationBody remains '+path)
+              if 'informationBody' in Path(path).read_text(encoding='utf-8'): raise SystemExit('informationBody remains '+path)
           PY
       - name: Update unified design record
         run: |
@@ -177,3 +171,4 @@ jobs:
           git add ProtocolXml/AUV/AuvPlatformRfBinding.xml ProtocolXml/AUV/AuvRfCommBinding.xml ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md
           git commit -m 'Normalize AUV RF-2 physical reply layout'
           git push origin HEAD:feature/auv-declarative-binding-cleanup
+# trigger
