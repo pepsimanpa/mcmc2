@@ -3,9 +3,6 @@
            targetNamespace="http://lignex1.com/mcmc2/umsSchema"
            xmlns="http://lignex1.com/mcmc2/umsSchema"
            elementFormDefault="qualified">
-    <!-- AUV Reply 내장 Binding 확장 스키마 / 생성일시: 2026-08-04 11:51:54 KST -->
-    <!-- 프로토콜 일반화 확장: ControlBinding/MonitorBinding 및 DDS/TCP/UDP/RS422 Channel 추가 / 2026-08-06 -->
-    <!-- packed bit-field 확장: PackedField/BitMember 추가 / 2026-08-14 -->
 
     <xs:element name="SensorBinding" type="BindingCompositionType"/>
     <xs:element name="PlatformBinding" type="BindingCompositionType"/>
@@ -36,7 +33,6 @@
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
     </xs:complexType>
 
-    <!-- 센서 산출물 Binding: Semantic SensorProductSpecs의 ProductStreamSpec과 실제 전송 Channel을 연결 -->
     <xs:complexType name="SensorProductsType">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:element name="ProductBinding" type="ProductBindingType"/>
@@ -44,13 +40,11 @@
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
     </xs:complexType>
 
-    <!-- 기존 DDS 전용 Binding XML 하위 호환용 Channel -->
     <xs:complexType name="ChannelType">
         <xs:attribute name="topicName" type="xs:string" use="required"/>
         <xs:attribute name="typeName" type="xs:string" use="required"/>
     </xs:complexType>
 
-    <!-- 신규 프로토콜별 Channel -->
     <xs:complexType name="DDSChannelType">
         <xs:attribute name="topicName" type="xs:string" use="required"/>
         <xs:attribute name="typeName" type="xs:string" use="required"/>
@@ -61,7 +55,6 @@
         <xs:attribute name="messageType" type="xs:string" use="required"/>
     </xs:complexType>
 
-    <!-- RTP는 스트림 방식만 식별하며 IP/Port 등 통신 설정은 Binding 명세 범위에서 제외 -->
     <xs:complexType name="RTPChannelType"/>
 
     <xs:group name="ProtocolChannelChoice">
@@ -74,18 +67,75 @@
         </xs:choice>
     </xs:group>
 
-    <!-- 하나의 물리 Field가 복수의 논리 의미를 포함할 때 DerivedSemantic으로 파생한다. -->
+    <!-- Declarative wire representation. New Binding XML should prefer these over converter identifiers. -->
+    <xs:simpleType name="WireDataType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="UInt8"/>
+            <xs:enumeration value="Int8"/>
+            <xs:enumeration value="UInt16"/>
+            <xs:enumeration value="Int16"/>
+            <xs:enumeration value="UInt32"/>
+            <xs:enumeration value="Int32"/>
+            <xs:enumeration value="UInt64"/>
+            <xs:enumeration value="Int64"/>
+            <xs:enumeration value="Float32"/>
+            <xs:enumeration value="Float64"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ValueMapEntryType">
+        <xs:attribute name="cdm" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="ValueMapType">
+        <xs:sequence>
+            <xs:element name="Map" type="ValueMapEntryType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SemanticSetType">
+        <xs:attribute name="cdm" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SemanticBindType">
+        <xs:attribute name="cdm" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SentinelType">
+        <xs:sequence>
+            <xs:element name="Set" type="SemanticSetType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="NormalBindingType">
+        <xs:sequence>
+            <xs:element name="Set" type="SemanticSetType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="Bind" type="SemanticBindType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Legacy extension point retained only so existing AUV/USV XML remains valid during migration. -->
     <xs:complexType name="DerivedSemanticType">
         <xs:attribute name="cdm" type="xs:string" use="required"/>
-        <xs:attribute name="converter" type="xs:string" use="required"/>
+        <xs:attribute name="converter" type="xs:string" use="optional"/>
     </xs:complexType>
 
     <xs:complexType name="FieldType">
         <xs:sequence>
+            <xs:element name="ValueMap" type="ValueMapType" minOccurs="0"/>
+            <xs:element name="Sentinel" type="SentinelType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="Normal" type="NormalBindingType" minOccurs="0"/>
             <xs:element name="DerivedSemantic" type="DerivedSemanticType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="cdm" type="xs:string"/>
+        <xs:attribute name="dataType" type="WireDataType"/>
+        <xs:attribute name="scale" type="xs:decimal"/>
+        <xs:attribute name="length" type="xs:positiveInteger"/>
+        <xs:attribute name="format" type="xs:string"/>
         <xs:attribute name="inputUnit" type="xs:string"/>
         <xs:attribute name="outputUnit" type="xs:string"/>
         <xs:attribute name="converter" type="xs:string"/>
@@ -95,26 +145,27 @@
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="cdm" type="xs:string"/>
         <xs:attribute name="value" type="xs:string" use="required"/>
+        <xs:attribute name="dataType" type="WireDataType"/>
+        <xs:attribute name="length" type="xs:positiveInteger"/>
+        <xs:attribute name="format" type="xs:string"/>
         <xs:attribute name="converter" type="xs:string"/>
     </xs:complexType>
 
+    <!-- OM prepares sourceField values. Binding only maps prepared values to wire representation. -->
     <xs:complexType name="DerivedFieldType">
+        <xs:sequence>
+            <xs:element name="ValueMap" type="ValueMapType" minOccurs="0"/>
+        </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="cdm" type="xs:string"/>
-        <xs:attribute name="sourceField" type="xs:string"/>
+        <xs:attribute name="sourceField" type="xs:string" use="required"/>
+        <xs:attribute name="dataType" type="WireDataType"/>
+        <xs:attribute name="scale" type="xs:decimal"/>
+        <xs:attribute name="length" type="xs:positiveInteger"/>
+        <xs:attribute name="format" type="xs:string"/>
         <xs:attribute name="converter" type="xs:string"/>
     </xs:complexType>
 
-    <!--
-        PackedField bit numbering convention
-        - wire bytes are first normalized according to byteOrder.
-        - offset=0 is the LSB of the normalized integer.
-        - transmit: defaultValue is the base value and fixedValue/sourceField members overlay their bit slices.
-        - receive: fixedValue on a BitMember constrains only that slice; unspecified bits are don't-care.
-        - sourceField/cdm members provide semantic packing/unpacking hooks. Exact enum/one-hot conversions may still use converter.
-        - expectedValue preserves the developer-visible packed hexadecimal/reference value. Without expectedMask it is an exact whole-word assertion/reference.
-        - expectedMask limits expectedValue comparison to significant receive bits, e.g. expectedValue=0x2000 expectedMask=0x2000 checks RF_CMD_COMPLETE(bit13) without requiring all other bits to be zero.
-    -->
     <xs:simpleType name="ByteOrderType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="little"/>
@@ -123,6 +174,9 @@
     </xs:simpleType>
 
     <xs:complexType name="BitMemberType">
+        <xs:sequence>
+            <xs:element name="ValueMap" type="ValueMapType" minOccurs="0"/>
+        </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="cdm" type="xs:string"/>
         <xs:attribute name="sourceField" type="xs:string"/>
@@ -139,7 +193,8 @@
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="cdm" type="xs:string"/>
         <xs:attribute name="width" type="xs:positiveInteger" use="required"/>
-        <xs:attribute name="byteOrder" type="ByteOrderType" default="little"/>
+        <!-- byteOrder is legacy override; new files inherit system/specification DataEncoding. -->
+        <xs:attribute name="byteOrder" type="ByteOrderType"/>
         <xs:attribute name="defaultValue" type="xs:string" default="0"/>
         <xs:attribute name="expectedValue" type="xs:string"/>
         <xs:attribute name="expectedMask" type="xs:string"/>
@@ -192,13 +247,10 @@
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
     </xs:complexType>
 
-    <!-- 기존 DDS 전용 Binding 타입: 기존 XML 검증 호환을 위해 유지 -->
     <xs:complexType name="MonitorBindingDDSType">
         <xs:sequence>
             <xs:element name="Channel" type="ChannelType"/>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:group ref="BindingFieldChoice"/>
-            </xs:choice>
+            <xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice>
         </xs:sequence>
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
     </xs:complexType>
@@ -206,9 +258,7 @@
     <xs:complexType name="ReplyBindingType">
         <xs:sequence>
             <xs:element name="Channel" type="ChannelType"/>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:group ref="BindingFieldChoice"/>
-            </xs:choice>
+            <xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice>
         </xs:sequence>
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
         <xs:attribute name="required" type="xs:boolean"/>
@@ -218,21 +268,16 @@
     <xs:complexType name="ControlBindingDDSType">
         <xs:sequence>
             <xs:element name="Channel" type="ChannelType"/>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:group ref="BindingFieldChoice"/>
-            </xs:choice>
+            <xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice>
             <xs:element name="Reply" type="ReplyBindingType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
     </xs:complexType>
 
-    <!-- 신규 프로토콜 독립 Binding 타입 -->
     <xs:complexType name="MonitorBindingType">
         <xs:sequence>
             <xs:group ref="ProtocolChannelChoice"/>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:group ref="BindingFieldChoice"/>
-            </xs:choice>
+            <xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice>
         </xs:sequence>
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
     </xs:complexType>
@@ -240,9 +285,7 @@
     <xs:complexType name="ProtocolReplyBindingType">
         <xs:sequence>
             <xs:group ref="ProtocolChannelChoice"/>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:group ref="BindingFieldChoice"/>
-            </xs:choice>
+            <xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice>
         </xs:sequence>
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
         <xs:attribute name="required" type="xs:boolean"/>
@@ -252,9 +295,7 @@
     <xs:complexType name="ControlBindingType">
         <xs:sequence>
             <xs:group ref="ProtocolChannelChoice"/>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:group ref="BindingFieldChoice"/>
-            </xs:choice>
+            <xs:choice minOccurs="0" maxOccurs="unbounded"><xs:group ref="BindingFieldChoice"/></xs:choice>
             <xs:element name="Reply" type="ProtocolReplyBindingType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="semantic_id" type="xs:string" use="required"/>
