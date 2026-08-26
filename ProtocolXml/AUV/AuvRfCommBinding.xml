@@ -35,45 +35,61 @@
         <ControlBinding semantic_id="configureRf">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER: START(4), INFO_NUM(1), COUNT(4), COMMAND(4), reverse ACK(2). -->
-            <FixedField name="startByte" value="0x7E7E7E7E"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
-            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x82000000">
+            <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
+            <PackedField name="command" width="32" expectedValue="0x82000000">
                 <BitMember name="RF_CONFIG" offset="25" fixedValue="1"/>
                 <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
             </PackedField>
-            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" dataType="UInt16"/>
             <!--
                 RF-1 bytes 15..39 INFORMATION1:
                 RESERVE(2), RF_CONF_MODE(1: 운용모드/Time Slot/UHF·L-Band 채널),
                 RF_CONF_PWR(1: UHF/L-Band 출력), EDM_BATTERY(1), CH_SCAN(6), PER(2),
                 STAT_code(1), RESERVE(11).
             -->
-            <FixedField name="reserveInformation1" value="0"/>
-            <DerivedField name="rfConfMode"
-                          sourceField="Communication.RF.Configuration.OperationMode,Communication.RF.Configuration.TimeSlot,Communication.RF.Configuration.UHF.Channel,Communication.RF.Configuration.LBand.Channel"
-                          converter="PackRfConfMode"/>
-            <DerivedField name="rfConfPower"
-                          sourceField="Communication.RF.Configuration.UHF.Power,Communication.RF.Configuration.LBand.Power"
-                          converter="PackRfConfPower"/>
-            <FixedField name="edmBattery" value="0"/>
-            <FixedField name="channelScan" value="0"/>
-            <FixedField name="packetErrorRate" value="0"/>
-            <FixedField name="statusCode" value="0"/>
-            <FixedField name="reserveInformation1Tail" value="0"/>
+            <FixedField name="reserveInformation1" value="0" dataType="UInt8" length="2"/>
+            <PackedField name="rfConfMode" width="8">
+                <BitMember name="operationMode" cdm="Communication.RF.Configuration.OperationMode" offset="0" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.OperationMode.OneToOne" value="1"/><Map cdm="Communication.RF.Configuration.OperationMode.OneToTwo" value="2"/></ValueMap>
+                </BitMember>
+                <BitMember name="timeSlot" cdm="Communication.RF.Configuration.TimeSlot" offset="2" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.TimeSlot.Two" value="1"/><Map cdm="Communication.RF.Configuration.TimeSlot.Four" value="2"/></ValueMap>
+                </BitMember>
+                <BitMember name="uhfChannel" cdm="Communication.RF.Configuration.UHF.Channel" offset="4" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel3" value="3"/></ValueMap>
+                </BitMember>
+                <BitMember name="lBandChannel" cdm="Communication.RF.Configuration.LBand.Channel" offset="6" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel3" value="3"/></ValueMap>
+                </BitMember>
+            </PackedField>
+            <PackedField name="rfConfPower" width="8">
+                <BitMember name="uhfPower" cdm="Communication.RF.Configuration.UHF.Power" offset="0" width="3">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Power.High" value="4"/></ValueMap>
+                </BitMember>
+                <BitMember name="lBandPower" cdm="Communication.RF.Configuration.LBand.Power" offset="4" width="3">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Power.High" value="4"/></ValueMap>
+                </BitMember>
+            </PackedField>
+            <FixedField name="edmBattery" value="0" dataType="UInt8"/>
+            <FixedField name="channelScan" value="0" dataType="UInt8" length="6"/>
+            <FixedField name="packetErrorRate" value="0" dataType="UInt8" length="2"/>
+            <FixedField name="statusCode" value="0" dataType="UInt8"/>
+            <FixedField name="reserveInformation1Tail" value="0" dataType="UInt8" length="11"/>
             <!-- RF-1 bytes 40..43 TAIL: CHECKSUM(2), STOP(2)=0x8181. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-            <FixedField name="stopByte" value="0x8181"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="configureRfReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER: START(4), COUNT(4), COMMAND(2), ACK(4). -->
-                <FixedField name="startByte" value="0x7E7E7E7E"/>
-                <Field name="count" converter="UInt32LE"/>
-                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+                <Field name="count" dataType="UInt32"/>
+                <PackedField name="completionCommand" width="16" expectedValue="0x2000" expectedMask="0x2000">
                     <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
                 </PackedField>
-                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x82000000">
+                <PackedField name="ack" width="32" expectedValue="0x82000000">
                     <BitMember name="RF_CONFIG" offset="25" fixedValue="1"/>
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
@@ -81,11 +97,31 @@
                     RF-2 bytes 14..75는 모든 응답에서 같은 62-byte Body이다.
                     이 Reply는 bytes 64..65 RF_CONF_MODE/RF_CONF_PWR echo만 Semantic 결과로 소비한다.
                 -->
-                <Field name="rfConfMode" converter="UnpackRfConfMode"/>
-                <Field name="rfConfPower" converter="UnpackRfConfPower"/>
+                <PackedField name="rfConfMode" width="8">
+                <BitMember name="operationMode" cdm="Communication.RF.Configuration.OperationMode" offset="0" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.OperationMode.OneToOne" value="1"/><Map cdm="Communication.RF.Configuration.OperationMode.OneToTwo" value="2"/></ValueMap>
+                </BitMember>
+                <BitMember name="timeSlot" cdm="Communication.RF.Configuration.TimeSlot" offset="2" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.TimeSlot.Two" value="1"/><Map cdm="Communication.RF.Configuration.TimeSlot.Four" value="2"/></ValueMap>
+                </BitMember>
+                <BitMember name="uhfChannel" cdm="Communication.RF.Configuration.UHF.Channel" offset="4" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel3" value="3"/></ValueMap>
+                </BitMember>
+                <BitMember name="lBandChannel" cdm="Communication.RF.Configuration.LBand.Channel" offset="6" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel3" value="3"/></ValueMap>
+                </BitMember>
+            </PackedField>
+                <PackedField name="rfConfPower" width="8">
+                <BitMember name="uhfPower" cdm="Communication.RF.Configuration.UHF.Power" offset="0" width="3">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Power.High" value="4"/></ValueMap>
+                </BitMember>
+                <BitMember name="lBandPower" cdm="Communication.RF.Configuration.LBand.Power" offset="4" width="3">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Power.High" value="4"/></ValueMap>
+                </BitMember>
+            </PackedField>
                 <!-- RF-2 bytes 76..79 TAIL: CHECKSUM(2), STOP(2). -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-                <FixedField name="stopByte" value="0x8181"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
 
@@ -97,52 +133,52 @@
         <ControlBinding semantic_id="scanRfChannels">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER. -->
-            <FixedField name="startByte" value="0x7E7E7E7E"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
-            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x84000000">
+            <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
+            <PackedField name="command" width="32" expectedValue="0x84000000">
                 <BitMember name="RF_CH_SCAN" offset="26" fixedValue="1"/>
                 <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
             </PackedField>
-            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" dataType="UInt16"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. 스캔 요청에서 각 Body 입력값의 유효 규칙은 명시되지 않음. -->
-            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="reserveInformation1" value="0" dataType="UInt8" length="2"/>
             <FixedField name="rfConfMode" value="0"/>
             <FixedField name="rfConfPower" value="0"/>
-            <FixedField name="edmBattery" value="0"/>
-            <FixedField name="channelScan" value="0"/>
-            <FixedField name="packetErrorRate" value="0"/>
-            <FixedField name="statusCode" value="0"/>
-            <FixedField name="reserveInformation1Tail" value="0"/>
+            <FixedField name="edmBattery" value="0" dataType="UInt8"/>
+            <FixedField name="channelScan" value="0" dataType="UInt8" length="6"/>
+            <FixedField name="packetErrorRate" value="0" dataType="UInt8" length="2"/>
+            <FixedField name="statusCode" value="0" dataType="UInt8"/>
+            <FixedField name="reserveInformation1Tail" value="0" dataType="UInt8" length="11"/>
             <!-- RF-1 bytes 40..43 TAIL. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-            <FixedField name="stopByte" value="0x8181"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="scanRfChannelsReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
-                <FixedField name="startByte" value="0x7E7E7E7E"/>
-                <Field name="count" converter="UInt32LE"/>
-                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+                <Field name="count" dataType="UInt32"/>
+                <PackedField name="completionCommand" width="16" expectedValue="0x2000" expectedMask="0x2000">
                     <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
                 </PackedField>
-                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x84000000">
+                <PackedField name="ack" width="32" expectedValue="0x84000000">
                     <BitMember name="RF_CH_SCAN" offset="26" fixedValue="1"/>
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
                 <!-- RF-2 bytes 67..72 CH_SCAN: UHF ch1~3, L-Band ch1~3 수신감도(dB), 각 1 byte. -->
-                <Field name="uhfChannel1SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
-                <Field name="uhfChannel2SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
-                <Field name="uhfChannel3SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel"/>
-                <Field name="lBandChannel1SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel"/>
-                <Field name="lBandChannel2SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel"/>
-                <Field name="lBandChannel3SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel"/>
                 <!-- RF-2 bytes 73..74 PER: UHF PER, L-Band PER, 각 1 byte(0~100%). -->
-                <Field name="uhfPacketErrorRate" cdm="Communication.RF.UHF.PacketErrorRate"/>
-                <Field name="lBandPacketErrorRate" cdm="Communication.RF.LBand.PacketErrorRate"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8" cdm="Communication.RF.UHF.PacketErrorRate"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8" cdm="Communication.RF.LBand.PacketErrorRate"/>
                 <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-                <FixedField name="stopByte" value="0x8181"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
 
@@ -154,59 +190,79 @@
         <ControlBinding semantic_id="requestRfStatus">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER. -->
-            <FixedField name="startByte" value="0x7E7E7E7E"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
-            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x81000000">
+            <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
+            <PackedField name="command" width="32" expectedValue="0x81000000">
                 <BitMember name="RF_STATUS" offset="24" fixedValue="1"/>
                 <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
             </PackedField>
-            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" dataType="UInt16"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. 상태 요청에서 송신 Body 값의 사용 규칙은 명시되지 않음. -->
-            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="reserveInformation1" value="0" dataType="UInt8" length="2"/>
             <FixedField name="rfConfMode" value="0"/>
             <FixedField name="rfConfPower" value="0"/>
-            <FixedField name="edmBattery" value="0"/>
-            <FixedField name="channelScan" value="0"/>
-            <FixedField name="packetErrorRate" value="0"/>
-            <FixedField name="statusCode" value="0"/>
-            <FixedField name="reserveInformation1Tail" value="0"/>
+            <FixedField name="edmBattery" value="0" dataType="UInt8"/>
+            <FixedField name="channelScan" value="0" dataType="UInt8" length="6"/>
+            <FixedField name="packetErrorRate" value="0" dataType="UInt8" length="2"/>
+            <FixedField name="statusCode" value="0" dataType="UInt8"/>
+            <FixedField name="reserveInformation1Tail" value="0" dataType="UInt8" length="11"/>
             <!-- RF-1 bytes 40..43 TAIL. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-            <FixedField name="stopByte" value="0x8181"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="requestRfStatusReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
-                <FixedField name="startByte" value="0x7E7E7E7E"/>
-                <Field name="count" converter="UInt32LE"/>
-                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+                <Field name="count" dataType="UInt32"/>
+                <PackedField name="completionCommand" width="16" expectedValue="0x2000" expectedMask="0x2000">
                     <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
                 </PackedField>
-                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x81000000">
+                <PackedField name="ack" width="32" expectedValue="0x81000000">
                     <BitMember name="RF_STATUS" offset="24" fixedValue="1"/>
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
                 <!-- RF-2 bytes 64..66: RF_CONF_MODE, RF_CONF_PWR, EDM_BATTERY(0~100). -->
-                <Field name="rfConfMode" converter="UnpackRfConfMode"/>
-                <Field name="rfConfPower" converter="UnpackRfConfPower"/>
-                <Field name="edmBatteryPercent" cdm="Equipment.RF.EncryptionModule.Battery.RemainingPercent"/>
+                <PackedField name="rfConfMode" width="8">
+                <BitMember name="operationMode" cdm="Communication.RF.Configuration.OperationMode" offset="0" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.OperationMode.OneToOne" value="1"/><Map cdm="Communication.RF.Configuration.OperationMode.OneToTwo" value="2"/></ValueMap>
+                </BitMember>
+                <BitMember name="timeSlot" cdm="Communication.RF.Configuration.TimeSlot" offset="2" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.TimeSlot.Two" value="1"/><Map cdm="Communication.RF.Configuration.TimeSlot.Four" value="2"/></ValueMap>
+                </BitMember>
+                <BitMember name="uhfChannel" cdm="Communication.RF.Configuration.UHF.Channel" offset="4" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Channel.Channel3" value="3"/></ValueMap>
+                </BitMember>
+                <BitMember name="lBandChannel" cdm="Communication.RF.Configuration.LBand.Channel" offset="6" width="2">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel1" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel2" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Channel.Channel3" value="3"/></ValueMap>
+                </BitMember>
+            </PackedField>
+                <PackedField name="rfConfPower" width="8">
+                <BitMember name="uhfPower" cdm="Communication.RF.Configuration.UHF.Power" offset="0" width="3">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.UHF.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.UHF.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.UHF.Power.High" value="4"/></ValueMap>
+                </BitMember>
+                <BitMember name="lBandPower" cdm="Communication.RF.Configuration.LBand.Power" offset="4" width="3">
+                    <ValueMap><Map cdm="Communication.RF.Configuration.LBand.Power.Off" value="1"/><Map cdm="Communication.RF.Configuration.LBand.Power.Low" value="2"/><Map cdm="Communication.RF.Configuration.LBand.Power.High" value="4"/></ValueMap>
+                </BitMember>
+            </PackedField>
+                <Field name="edmBatteryPercent" dataType="UInt8" cdm="Equipment.RF.EncryptionModule.Battery.RemainingPercent"/>
                 <!-- RF-2 bytes 67..72: CH_SCAN 6개 수신감도. -->
-                <Field name="uhfChannel1SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
-                <Field name="uhfChannel2SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
-                <Field name="uhfChannel3SignalDb" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel"/>
-                <Field name="lBandChannel1SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel"/>
-                <Field name="lBandChannel2SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel"/>
-                <Field name="lBandChannel3SignalDb" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel"/>
+                <Field name="uhfChannel1SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel"/>
+                <Field name="uhfChannel2SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel2.ReceivedSignalLevel"/>
+                <Field name="uhfChannel3SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.UHF.Channel3.ReceivedSignalLevel"/>
+                <Field name="lBandChannel1SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel1.ReceivedSignalLevel"/>
+                <Field name="lBandChannel2SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel2.ReceivedSignalLevel"/>
+                <Field name="lBandChannel3SignalDb" dataType="Int8" cdm="Communication.RF.ChannelScan.LBand.Channel3.ReceivedSignalLevel"/>
                 <!-- RF-2 bytes 73..74: UHF/L-Band PER. -->
-                <Field name="uhfPacketErrorRate" cdm="Communication.RF.UHF.PacketErrorRate"/>
-                <Field name="lBandPacketErrorRate" cdm="Communication.RF.LBand.PacketErrorRate"/>
+                <Field name="uhfPacketErrorRate" dataType="UInt8" cdm="Communication.RF.UHF.PacketErrorRate"/>
+                <Field name="lBandPacketErrorRate" dataType="UInt8" cdm="Communication.RF.LBand.PacketErrorRate"/>
                 <!--
                     RF-2 byte 75 STAT_code bit 그룹.
                     bit0~4는 각 반 상태(0=정상, 1=비정상), bit5=DATA_LOCK, bit6=SYNC_LOCK, bit7=reserved.
                     DATA_LOCK/SYNC_LOCK은 flag 자체만 표현하며 정상/비정상 의미를 추가하지 않는다.
                 -->
-                <PackedField name="statusCode" width="8" byteOrder="little">
+                <PackedField name="statusCode" width="8">
                     <BitMember name="RFM_L_BAND" offset="0"/>
                     <BitMember name="RFM_UHF" offset="1"/>
                     <BitMember name="EDM" offset="2"/>
@@ -217,8 +273,8 @@
                     <BitMember name="reserved7" offset="7"/>
                 </PackedField>
                 <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-                <FixedField name="stopByte" value="0x8181"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
 
@@ -230,36 +286,36 @@
         <ControlBinding semantic_id="requestPreLaunchCheck">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER. -->
-            <FixedField name="startByte" value="0x7E7E7E7E"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
-            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x80010000">
+            <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
+            <PackedField name="command" width="32" expectedValue="0x80010000">
                 <BitMember name="PLC_Req" offset="16" fixedValue="1"/>
                 <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
             </PackedField>
-            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" dataType="UInt16"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. 점검 요청에서 Body 입력값의 유효 규칙은 명시되지 않음. -->
-            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="reserveInformation1" value="0" dataType="UInt8" length="2"/>
             <FixedField name="rfConfMode" value="0"/>
             <FixedField name="rfConfPower" value="0"/>
-            <FixedField name="edmBattery" value="0"/>
-            <FixedField name="channelScan" value="0"/>
-            <FixedField name="packetErrorRate" value="0"/>
-            <FixedField name="statusCode" value="0"/>
-            <FixedField name="reserveInformation1Tail" value="0"/>
+            <FixedField name="edmBattery" value="0" dataType="UInt8"/>
+            <FixedField name="channelScan" value="0" dataType="UInt8" length="6"/>
+            <FixedField name="packetErrorRate" value="0" dataType="UInt8" length="2"/>
+            <FixedField name="statusCode" value="0" dataType="UInt8"/>
+            <FixedField name="reserveInformation1Tail" value="0" dataType="UInt8" length="11"/>
             <!-- RF-1 bytes 40..43 TAIL. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-            <FixedField name="stopByte" value="0x8181"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="requestPreLaunchCheckReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
-                <FixedField name="startByte" value="0x7E7E7E7E"/>
-                <Field name="count" converter="UInt32LE"/>
-                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x2000" expectedMask="0x2000">
+                <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+                <Field name="count" dataType="UInt32"/>
+                <PackedField name="completionCommand" width="16" expectedValue="0x2000" expectedMask="0x2000">
                     <BitMember name="RF_CMD_COMPLETE" offset="13" fixedValue="1"/>
                 </PackedField>
-                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x80010000">
+                <PackedField name="ack" width="32" expectedValue="0x80010000">
                     <BitMember name="PLC_Req" offset="16" fixedValue="1"/>
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
@@ -269,7 +325,7 @@
                     bit4 L-Band, bit5 UHF, bit6 모뎀 및 제어반, bit7 MCU, bit8~15 reserved.
                     원문 표 자체에는 0/1 결과 의미가 직접 기재되지 않았으나 AUV_CHECK_RESULT 계열과 동일한 자체점검 규칙(0=PASS, 1=FAIL)을 적용한다.
                 -->
-                <PackedField name="preLaunchCheck" width="16" byteOrder="little">
+                <PackedField name="preLaunchCheck" width="16">
                     <BitMember name="reserved0" offset="0"/>
                     <BitMember name="reserved1" offset="1"/>
                     <BitMember name="EncryptionUnit" offset="2"/>
@@ -288,8 +344,8 @@
                     <BitMember name="reserved15" offset="15"/>
                 </PackedField>
                 <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-                <FixedField name="stopByte" value="0x8181"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
 
@@ -301,26 +357,26 @@
         <ControlBinding semantic_id="toggleRfGain">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER. RF_GAIN의 INFO 종류는 원문에 없어 INFO1로 잠정 매핑한다. -->
-            <FixedField name="startByte" value="0x7E7E7E7E"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
-            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x88000000">
+            <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
+            <PackedField name="command" width="32" expectedValue="0x88000000">
                 <BitMember name="RF_GAIN" offset="27" fixedValue="1"/>
                 <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
             </PackedField>
-            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" dataType="UInt16"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. Gain 값/방향을 전달하는 전용 필드는 존재하지 않는다. -->
-            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="reserveInformation1" value="0" dataType="UInt8" length="2"/>
             <FixedField name="rfConfMode" value="0"/>
             <FixedField name="rfConfPower" value="0"/>
-            <FixedField name="edmBattery" value="0"/>
-            <FixedField name="channelScan" value="0"/>
-            <FixedField name="packetErrorRate" value="0"/>
-            <FixedField name="statusCode" value="0"/>
-            <FixedField name="reserveInformation1Tail" value="0"/>
+            <FixedField name="edmBattery" value="0" dataType="UInt8"/>
+            <FixedField name="channelScan" value="0" dataType="UInt8" length="6"/>
+            <FixedField name="packetErrorRate" value="0" dataType="UInt8" length="2"/>
+            <FixedField name="statusCode" value="0" dataType="UInt8"/>
+            <FixedField name="reserveInformation1Tail" value="0" dataType="UInt8" length="11"/>
             <!-- RF-1 bytes 40..43 TAIL. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-            <FixedField name="stopByte" value="0x8181"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             <!--
                 Reply 없음.
                 RF_GAIN 전용 상태/결과가 없고 RF_CMD_COMPLETE와 이 명령의 관계도 확인되지 않았다.
@@ -336,44 +392,44 @@
         <ControlBinding semantic_id="applyRfEncryptionKey">
             <TCPChannel messageType="AuvRf1Telegram"/>
             <!-- RF-1 bytes 0..14 HEADER. KEY_CMD의 INFO 종류는 원문에 없어 INFO1로 잠정 매핑한다. -->
-            <FixedField name="startByte" value="0x7E7E7E7E"/>
-            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" converter="TargetAuvToInformation1"/>
-            <DerivedField name="count" sourceField="System.Generated.Sequence" converter="IncrementingUInt32LE"/>
-            <PackedField name="command" width="32" byteOrder="little" expectedValue="0x90000000">
+            <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+            <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8" converter="TargetAuvToInformation1"/>
+            <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
+            <PackedField name="command" width="32" expectedValue="0x90000000">
                 <BitMember name="KEY_CMD" offset="28" fixedValue="1"/>
                 <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
             </PackedField>
-            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" converter="UInt16LE"/>
+            <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" dataType="UInt16"/>
             <!-- RF-1 bytes 15..39 INFORMATION1. 사전 주입 키 자체를 싣는 필드는 존재하지 않는다. -->
-            <FixedField name="reserveInformation1" value="0"/>
+            <FixedField name="reserveInformation1" value="0" dataType="UInt8" length="2"/>
             <FixedField name="rfConfMode" value="0"/>
             <FixedField name="rfConfPower" value="0"/>
-            <FixedField name="edmBattery" value="0"/>
-            <FixedField name="channelScan" value="0"/>
-            <FixedField name="packetErrorRate" value="0"/>
-            <FixedField name="statusCode" value="0"/>
-            <FixedField name="reserveInformation1Tail" value="0"/>
+            <FixedField name="edmBattery" value="0" dataType="UInt8"/>
+            <FixedField name="channelScan" value="0" dataType="UInt8" length="6"/>
+            <FixedField name="packetErrorRate" value="0" dataType="UInt8" length="2"/>
+            <FixedField name="statusCode" value="0" dataType="UInt8"/>
+            <FixedField name="reserveInformation1Tail" value="0" dataType="UInt8" length="11"/>
             <!-- RF-1 bytes 40..43 TAIL. -->
-            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-            <FixedField name="stopByte" value="0x8181"/>
+            <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+            <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
             <Reply semantic_id="applyRfEncryptionKeyReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
-                <FixedField name="startByte" value="0x7E7E7E7E"/>
-                <Field name="count" converter="UInt32LE"/>
-                <PackedField name="completionCommand" width="16" byteOrder="little" expectedValue="0x1000" expectedMask="0x1000">
+                <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
+                <Field name="count" dataType="UInt32"/>
+                <PackedField name="completionCommand" width="16" expectedValue="0x1000" expectedMask="0x1000">
                     <BitMember name="KEY_COMPLETE" offset="12" fixedValue="1"/>
                 </PackedField>
-                <PackedField name="ack" width="32" byteOrder="little" expectedValue="0x90000000">
+                <PackedField name="ack" width="32" expectedValue="0x90000000">
                     <BitMember name="KEY_CMD" offset="28" fixedValue="1"/>
                     <BitMember name="RF_EXEC" offset="31" fixedValue="1"/>
                 </PackedField>
                 <!-- RF-2 bytes 14..75 고정 Body에는 키 적용 전용 결과 필드가 없어 raw 그룹으로만 보존한다. -->
                 <Field name="informationBody"/>
                 <!-- RF-2 bytes 76..79 TAIL. -->
-                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
-                <FixedField name="stopByte" value="0x8181"/>
+                <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" dataType="UInt16" converter="ByteSumModulo65536LE"/>
+                <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
     </Controls>
