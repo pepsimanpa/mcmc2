@@ -5,6 +5,7 @@
         <ID>MCM-AUV-001</ID>
         <Name>AUV</Name>
     </Identification>
+    <DataEncoding byteOrder="little"/>
     <Platform>
         <!--
             CDM 분류상 Platform.AUV는 의미 데이터 CDM이 아니라 AUV Profile 참조이다.

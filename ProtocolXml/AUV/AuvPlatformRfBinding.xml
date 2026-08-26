@@ -221,8 +221,13 @@
                 Waypoint 좌표 영역, RESERVE, ALIGN_INTERVAL, Custom1/2.
             -->
             <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
-            <!-- 현재 유효값: 1=광역탐색모드, 2=정밀탐색모드. 3~8은 추후 결정이므로 송신하지 않는다. -->
-            <Field name="missionMode" cdm="MissionPlan.OperationMode"/>
+            <!-- 현재 운용 선택은 광역탐색/정밀탐색이며 raw 1/2 매핑은 Binding에서만 정의한다. 3~8은 TBD이다. -->
+            <Field name="missionMode" cdm="MissionPlan.OperationMode" dataType="UInt8">
+                <ValueMap>
+                    <Map cdm="MissionPlan.OperationMode.WideAreaSearch" value="1"/>
+                    <Map cdm="MissionPlan.OperationMode.PrecisionSearch" value="2"/>
+                </ValueMap>
+            </Field>
             <Field name="velocity" cdm="MissionPlan.Speed"/>
             <Field name="depth" cdm="MissionPlan.Depth"/>
             <DerivedField name="waypointCount" cdm="MissionPlan.WaypointCount" sourceField="waypoints" converter="ArrayLengthUInt8"/>
@@ -353,10 +358,10 @@
                 <Field name="gpsLatitude" cdm="Navigation.GNSS.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
                 <Field name="gpsLongitude" cdm="Navigation.GNSS.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
                 <Field name="waypointCount" cdm="MissionPlan.WaypointCount"/>
-                <Field name="alignmentStatus" cdm="Navigation.Alignment.Status"/>
+                <Field name="alignmentStatus" cdm="Navigation.Integrated.Alignment.Status" dataType="UInt8"/>
                 <Field name="integratedNavigationLatitude" cdm="Navigation.Integrated.Position.Latitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
                 <Field name="integratedNavigationLongitude" cdm="Navigation.Integrated.Position.Longitude" inputUnit="rad" outputUnit="rad" converter="Float32LE"/>
-                <Field name="auvDataFileCount" cdm="RecordedData.AUV.FileCount" converter="UInt16LE"/>
+                <Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" dataType="UInt16"/>
                 <Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" converter="UInt16LE"/>
                 <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/>
                 <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/>
@@ -518,7 +523,7 @@
                     <BitMember name="File_List_Req" offset="6" fixedValue="1"/>
                     <BitMember name="RF_SEND" offset="30" fixedValue="1"/>
                 </PackedField>
-                <Field name="auvDataFileCount" cdm="RecordedData.AUV.FileCount" converter="UInt16LE"/>
+                <Field name="auvDataFileCount" cdm="RecordedData.Platform.FileCount" dataType="UInt16"/>
                 <Field name="sideScanSonarFileCount" cdm="RecordedData.SideScanSonar.FileCount" converter="UInt16LE"/>
                 <Field name="opticalCameraFileCount" cdm="RecordedData.OpticalCamera.FileCount" converter="UInt16LE"/>
                 <Field name="acousticCameraFileCount" cdm="RecordedData.AcousticCamera.FileCount" converter="UInt16LE"/>
@@ -542,23 +547,21 @@
             <Field name="auvId" cdm="Platform.Identifier.Numeric"/>
             <FixedField name="remoteSpeed" value="0"/>
             <FixedField name="remoteDirection" value="0"/>
-            <DerivedField name="dataType" sourceField="RecordedData.Transfer.DataType" converter="PackDataTypeBits"/>
-            <Field name="fileFirst" cdm="RecordedData.Transfer.FileFirst" converter="UInt16LE"/>
-            <Field name="fileFinal" cdm="RecordedData.Transfer.FileFinal" converter="UInt16LE"/>
+            <PackedField name="dataType" width="8">
+                <BitMember name="AUV" cdm="RecordedData.Selection.Platform" sourceField="RecordedData.Selection.Platform" offset="0"/>
+                <BitMember name="SSS" cdm="RecordedData.Selection.SideScanSonar" sourceField="RecordedData.Selection.SideScanSonar" offset="1"/>
+                <BitMember name="OC" cdm="RecordedData.Selection.OpticalCamera" sourceField="RecordedData.Selection.OpticalCamera" offset="2"/>
+                <BitMember name="AC" cdm="RecordedData.Selection.AcousticCamera" sourceField="RecordedData.Selection.AcousticCamera" offset="3"/>
+                <BitMember name="FLS" cdm="RecordedData.Selection.ForwardLookingSonar" sourceField="RecordedData.Selection.ForwardLookingSonar" offset="4"/>
+            </PackedField>
+            <Field name="fileFirst" cdm="RecordedData.FileRange.First" dataType="UInt16"/>
+            <Field name="fileFinal" cdm="RecordedData.FileRange.Final" dataType="UInt16"/>
             <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
             <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
             <FixedField name="brightness" value="0"/>
             <FixedField name="reserveInformation3" value="0"/>
             <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
             <FixedField name="stopByte" value="0x8181"/>
-            <Reply semantic_id="requestDataReply" required="true">
-                <TCPChannel messageType="AuvRf3Telegram"/>
-                <!-- RF-3 framing/data fields are distinct from RF-2 command ACK. -->
-                <Field name="dataAck" converter="UInt16LEBitMask"/>
-                <Field name="dataLength" converter="UInt32LE"/>
-                <Field name="dataPayload"/>
-                <DerivedField name="checksum" sourceField="System.Frame.DataAckThroughPayload" converter="ByteSumModulo65536LE"/>
-            </Reply>
         </ControlBinding>
 
         <!-- Binding: stopMission / MISSION_STOP(bit8)|RF_SEND=0x40000100. -->
@@ -700,7 +703,7 @@
             <FixedField name="fileFinal" value="0" converter="UInt16LE"/>
             <FixedField name="emergencyLatitude" value="0" converter="Float32LE"/>
             <FixedField name="emergencyLongitude" value="0" converter="Float32LE"/>
-            <Field name="brightness" cdm="Equipment.Flash.Brightness"/>
+            <Field name="brightness" cdm="Equipment.Light.Brightness" dataType="UInt8"/>
             <FixedField name="reserveInformation3" value="0"/>
             <DerivedField name="checksum" sourceField="System.Frame.CountThroughInformation" converter="ByteSumModulo65536LE"/>
             <FixedField name="stopByte" value="0x8181"/>
@@ -721,4 +724,27 @@
             </Reply>
         </ControlBinding>
     </Controls>
+    <SensorProducts semantic_id="sensorProduct">
+        <!-- RF-3는 requestData의 Reply가 아니라 파일 크기만큼 연속 수신되는 SensorProduct 프레임이다. -->
+        <ProductBinding semantic_id="auvData">
+            <TCPChannel messageType="AuvRf3Telegram"/>
+            <MatchField name="dataAck" mask="0x00000800" value="0x00000800"/>
+        </ProductBinding>
+        <ProductBinding semantic_id="sideScanSonarData">
+            <TCPChannel messageType="AuvRf3Telegram"/>
+            <MatchField name="dataAck" mask="0x00001000" value="0x00001000"/>
+        </ProductBinding>
+        <ProductBinding semantic_id="opticalCameraData">
+            <TCPChannel messageType="AuvRf3Telegram"/>
+            <MatchField name="dataAck" mask="0x00002000" value="0x00002000"/>
+        </ProductBinding>
+        <ProductBinding semantic_id="acousticCameraData">
+            <TCPChannel messageType="AuvRf3Telegram"/>
+            <MatchField name="dataAck" mask="0x00004000" value="0x00004000"/>
+        </ProductBinding>
+        <ProductBinding semantic_id="forwardLookingSonarData">
+            <TCPChannel messageType="AuvRf3Telegram"/>
+            <MatchField name="dataAck" mask="0x00008000" value="0x00008000"/>
+        </ProductBinding>
+    </SensorProducts>
 </PlatformBinding>

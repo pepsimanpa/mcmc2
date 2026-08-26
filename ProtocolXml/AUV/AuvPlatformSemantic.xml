@@ -138,11 +138,12 @@
         <ControlSpec id="transferMissionPlan" name="AUV 임무계획 전송" cdm="Request.MissionPlan.Transfer">
             <Target cdm="Platform.Identifier.Numeric"/>
             <Parameters>
-                <QuantityProfile cdm="MissionPlan.OperationMode">
-                    <!-- 물리 코드 영역은 1~8이며 현재 확정 운용모드는 1=광역탐색모드, 2=정밀탐색모드다. 3~8은 TBD이므로 현재 선택 범위에서 제외한다. -->
-                    <Range min="1" max="2"/>
-                    <Resolution>1</Resolution>
-                </QuantityProfile>
+                <ValueSetProfile cdm="MissionPlan.OperationMode">
+                    <Values>
+                        <Value name="광역탐색" cdm="MissionPlan.OperationMode.WideAreaSearch"/>
+                        <Value name="정밀탐색" cdm="MissionPlan.OperationMode.PrecisionSearch"/>
+                    </Values>
+                </ValueSetProfile>
                 <QuantityProfile cdm="MissionPlan.Speed">
                     <Unit>kts</Unit>
                     <Range min="0" max="7"/>

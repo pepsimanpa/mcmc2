@@ -617,8 +617,8 @@ parser = ET.XMLParser(
 **Status: RESOLVED**
 
 - `MISSION_TRANS`는 실제 임무계획 전송이므로 INFORMATION2를 사용한다.
-- `MISSION_START`는 이미 전송된 임무를 시작하는 기능으로 INFORMATION3를 사용한다.
-- 원문 설명: INFORMATION1/2는 초반 RF 설정, 암호키 설정 또는 임무계획 시 사용하고 대부분 INFORMATION3를 사용한다.
+- `MISSION_START`는 이미 전송된 임무를 시작하는 기능으로 **프로젝트 설계 결정상 INFORMATION3를 사용한다.**
+- 첨부 `auv origin.csv`의 COMMAND 표에는 `MISSION_START=INFO2`로 기재되어 있으나, 본 설계에서는 협의된 운용 의미를 우선하여 INFORMATION3로 유지한다.
 - `startMission`에 별도 MissionPlan Parameter를 만들지 않는다.
 - 과거 Semantic 주석 중 MISSION_START가 INFORMATION2라고 되어 있는 표현은 수정 대상이다.
 
@@ -715,8 +715,15 @@ AUV Semantic/Binding 내부 문자열 일치만으로 CDM을 확정하지 않는
 - `2 = 정밀탐색모드`
 - `3~8 = TBD`
 
-따라서 현재 HMI/Semantic 선택 범위는 `1~2`를 유지한다.
-`3~8`을 유효 운용 입력으로 노출하지 않는다.
+Semantic에는 raw 범위 `1~2`를 노출하지 않고 다음 논리 선택값만 정의한다.
+- 광역탐색
+- 정밀탐색
+
+Binding `ValueMap`에서만 다음 raw code를 선언한다.
+- 광역탐색 → `1`
+- 정밀탐색 → `2`
+
+`3~8`은 TBD이므로 현재 Semantic 선택값 및 Binding ValueMap에서 제외한다.
 
 ## Issue 8. Semantic Result ↔ Binding BitMember 연결
 
@@ -884,10 +891,9 @@ ACK + RF_CMD_COMPLETE + Body 결과가 항상 동일 RF-2 Telegram에서 동시�
 
 1. Issue 6 전체 CDM 정합성 확인
 2. 위 결정에 따른 Semantic/Binding/XSD 정합성 유지
-3. RF-3 ProductBinding 구조 확인
-4. RF_CONF_MODE/PWR PackedField 정합성 확인
-5. Result ↔ BitMember CDM 연결 정합성 확인
-6. RF-2 ACK/RF_CMD_COMPLETE/Body 동시 유효성 원문 추가 확인
+3. RF_CONF_MODE/PWR PackedField 정합성 확인
+4. Result ↔ BitMember CDM 연결 정합성 확인
+5. RF-2 ACK/RF_CMD_COMPLETE/Body 동시 유효성 원문 추가 확인
 
 
 ---
