@@ -808,7 +808,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                     <Field name="depth" cdm="MissionPlan.Waypoint.Depth" dataType="UInt16" />
                     <Field name="action" cdm="MissionPlan.Waypoint.Action" dataType="UInt8">
                         <ValueMap>
-                            <Map cdm="MissionPlan.Waypoint.Action.Pass" value="0" />
+                            <Map cdm="MissionPlan.Waypoint.Action.PassThrough" value="0" />
                             <Map cdm="MissionPlan.Waypoint.Action.Wait" value="1" />
                         </ValueMap>
                     </Field>
@@ -819,7 +819,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <ValueMap>
                     <Map cdm="Mission.Type.Move" value="0" />
                     <Map cdm="Mission.Type.Search" value="1" />
-                    <Map cdm="Mission.Type.Identification" value="2" />
+                    <Map cdm="Mission.Type.Identify" value="2" />
                 </ValueMap>
             </Field>
             <FixedField name="reserved" value="0" dataType="UInt8" length="3" />
@@ -864,7 +864,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                         <Map cdm="Command.Result.Reason.Other" value="7" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" dataType="UInt8" length="3" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
             </Reply>
