@@ -21,7 +21,7 @@
             <Field name="emdwLatitude" cdm="Navigation.Position.Latitude" dataType="Int32" scale="10000000" />
             <Field name="emdwLongitude" cdm="Navigation.Position.Longitude" dataType="Int32" scale="10000000" />
             <Field name="speed" cdm="Motion.Speed" dataType="UInt16" scale="10" />
-            <Field name="reserved" />
+            <Field name="reserved" dataType="UInt8" length="2" />
             <Field name="tail" dataType="UInt32" />
         </MonitorBinding>
         <MonitorBinding semantic_id="communicationStatus">
@@ -54,11 +54,11 @@
                     <Map cdm="Communication.Link.State.Unstable" value="2" />
                 </ValueMap>
             </Field>
-            <Field name="consoleHealthStatus" />
-            <Field name="emdwHealthStatus" />
-            <Field name="operationMode" />
+            <Field name="consoleHealthStatus" dataType="UInt8" />
+            <Field name="emdwHealthStatus" dataType="UInt8" />
+            <Field name="operationMode" dataType="UInt8" />
             <Field name="statusCode" dataType="UInt16" />
-            <Field name="reserved" />
+            <Field name="reserved" dataType="UInt8" length="3" />
             <Field name="tail" dataType="UInt32" />
         </MonitorBinding>
         <MonitorBinding semantic_id="healthStatus">
@@ -77,8 +77,8 @@
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
             <Field name="emdwId" dataType="UInt16" />
-            <Field name="consoleLinkStatus" />
-            <Field name="emdwLinkStatus" />
+            <Field name="consoleLinkStatus" dataType="UInt8" />
+            <Field name="emdwLinkStatus" dataType="UInt8" />
             <Field name="consoleHealthStatus" cdm="Health.Console.Status" dataType="UInt8">
                 <ValueMap>
                     <Map cdm="Health.State.Normal" value="0" />
@@ -93,7 +93,7 @@
                     <Map cdm="Health.State.Abnormal" value="2" />
                 </ValueMap>
             </Field>
-            <Field name="operationMode" />
+            <Field name="operationMode" dataType="UInt8" />
             <Field name="statusCode" cdm="Platform.Status.ReasonCode" dataType="UInt16">
                 <ValueMap>
                     <Map cdm="Platform.Status.Reason.None" value="0" />
@@ -104,7 +104,7 @@
                     <Map cdm="Platform.Status.Reason.Other" value="5" />
                 </ValueMap>
             </Field>
-            <Field name="reserved" />
+            <Field name="reserved" dataType="UInt8" length="3" />
             <Field name="tail" dataType="UInt32" />
         </MonitorBinding>
         <MonitorBinding semantic_id="operationModeStatus">
@@ -123,10 +123,10 @@
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
             <Field name="emdwId" dataType="UInt16" />
-            <Field name="consoleLinkStatus" />
-            <Field name="emdwLinkStatus" />
-            <Field name="consoleHealthStatus" />
-            <Field name="emdwHealthStatus" />
+            <Field name="consoleLinkStatus" dataType="UInt8" />
+            <Field name="emdwLinkStatus" dataType="UInt8" />
+            <Field name="consoleHealthStatus" dataType="UInt8" />
+            <Field name="emdwHealthStatus" dataType="UInt8" />
             <Field name="operationMode" cdm="Platform.OperationMode" dataType="UInt8">
                 <ValueMap>
                     <Map cdm="Platform.OperationMode.TerminalControl" value="0" />
@@ -134,7 +134,7 @@
                 </ValueMap>
             </Field>
             <Field name="statusCode" dataType="UInt16" />
-            <Field name="reserved" />
+            <Field name="reserved" dataType="UInt8" length="3" />
             <Field name="tail" dataType="UInt32" />
         </MonitorBinding>
         <MonitorBinding semantic_id="missionExecutionStatus">
@@ -164,7 +164,7 @@
                     <Map cdm="Mission.Execution.State.Abnormal" value="6" />
                 </ValueMap>
             </Field>
-            <Field name="guidanceStatus" />
+            <Field name="guidanceStatus" dataType="UInt8" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <Field name="currentWaypointIndex" dataType="UInt16">
                 <Sentinel value="0xFFFF">
@@ -197,7 +197,7 @@
             <Field name="systemTimeMillisecond" dataType="UInt16" />
             <Field name="headerReserved" dataType="UInt8" />
             <Field name="emdwId" dataType="UInt16" />
-            <Field name="missionState" />
+            <Field name="missionState" dataType="UInt8" />
             <Field name="guidanceStatus" cdm="Autonomy.Guidance.Status" dataType="UInt8">
                 <ValueMap>
                     <Map cdm="Autonomy.Guidance.State.Normal" value="0" />
@@ -243,7 +243,7 @@
             </Field>
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <Field name="targetId" cdm="Mission.Target.Identifier" dataType="UInt16" />
-            <Field name="reserved" />
+            <Field name="reserved" dataType="UInt8" length="3" />
             <Field name="tail" dataType="UInt32" />
         </MonitorBinding>
         <MonitorBinding semantic_id="transmitHeartbeat">
@@ -307,7 +307,7 @@
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="missionCtrlCmd" value="0" dataType="UInt8" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="stopMissionReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -346,7 +346,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -369,7 +369,7 @@
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="missionCtrlCmd" value="1" dataType="UInt8" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="startMissionReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -408,7 +408,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -431,7 +431,7 @@
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="missionCtrlCmd" value="2" dataType="UInt8" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="pauseMissionReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -470,7 +470,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -493,7 +493,7 @@
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="missionCtrlCmd" value="3" dataType="UInt8" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="resumeMissionReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -532,7 +532,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -554,7 +554,7 @@
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="operationMode" value="0" dataType="UInt8" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="setTerminalControlModeReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -593,7 +593,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -615,7 +615,7 @@
             <DerivedField name="commandId" cdm="Command.Identifier.UUID" sourceField="System.Generated.CommandIdentifier" dataType="UInt8" length="16" format="uuid" />
             <Field name="emdwId" cdm="Platform.Identifier.Numeric" dataType="UInt16" />
             <FixedField name="operationMode" value="1" dataType="UInt8" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="setIntegratedControlModeReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -654,7 +654,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -689,7 +689,7 @@
                             <Map cdm="MissionPlan.Waypoint.Action.Wait" value="1" />
                         </ValueMap>
                     </Field>
-                    <FixedField name="reserved" value="0" />
+                    <FixedField name="reserved" value="0" dataType="UInt8" length="3" />
                 </Element>
             </ArrayField>
             <Field name="missionType" cdm="Mission.Type" dataType="UInt8">
@@ -699,7 +699,7 @@
                     <Map cdm="Mission.Type.Identification" value="2" />
                 </ValueMap>
             </Field>
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="3" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="transferMissionPlanReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -738,7 +738,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="3" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -807,7 +807,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -876,7 +876,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="5" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -923,7 +923,7 @@
             <FixedField name="disposalCmd" value="0" dataType="UInt8" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <Field name="targetId" cdm="Mission.Target.Identifier" dataType="UInt16" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="3" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="cancelDisposalReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -962,7 +962,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="3" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -986,7 +986,7 @@
             <FixedField name="disposalCmd" value="1" dataType="UInt8" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <Field name="targetId" cdm="Mission.Target.Identifier" dataType="UInt16" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="3" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="prepareDisposalReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -1025,7 +1025,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="3" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
@@ -1049,7 +1049,7 @@
             <FixedField name="disposalCmd" value="2" dataType="UInt8" />
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <Field name="targetId" cdm="Mission.Target.Identifier" dataType="UInt16" />
-            <FixedField name="reserved" value="0" />
+            <FixedField name="reserved" value="0" dataType="UInt8" length="3" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
             <Reply semantic_id="executeDisposalReply" required="true">
                 <TCPChannel infoCode="4301" messageType="T_EMDW_CTRL_RESP" />
@@ -1088,7 +1088,7 @@
                         <Map cdm="Command.Result.Reason.Other" value="8" />
                     </ValueMap>
                 </Field>
-                <Field name="reserved" />
+                <Field name="reserved" dataType="UInt8" length="3" />
                 <Field name="tail" dataType="UInt32" />
             </Reply>
         </ControlBinding>
