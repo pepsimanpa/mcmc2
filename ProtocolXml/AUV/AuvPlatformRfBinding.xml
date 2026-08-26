@@ -41,15 +41,10 @@
             <!-- RF-1 bytes 0..14 HEADER: START(4), INFO_NUM(1), COUNT(4), COMMAND(4), reverse ACK(2). -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000001">
@@ -234,7 +229,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -249,15 +244,10 @@
             <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 2 또는 5. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="2"/>
-
                     <Map sourceValue="2" value="5"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000002">
@@ -351,7 +341,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -365,15 +355,10 @@
             <!-- RF-1 bytes 0..14 HEADER. INFO_NUM은 대상 AUV에 따라 3 또는 6. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000004">
@@ -443,7 +428,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -453,15 +438,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000008">
@@ -565,7 +545,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -575,15 +555,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000010">
@@ -650,7 +625,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -660,15 +635,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000020">
@@ -735,7 +705,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -745,15 +715,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000040">
@@ -820,7 +785,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -830,15 +795,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000080">
@@ -871,15 +831,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000100">
@@ -946,7 +901,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -956,15 +911,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000200">
@@ -1031,7 +981,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -1041,15 +991,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40000400">
@@ -1116,7 +1061,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -1126,15 +1071,10 @@
             <TCPChannel messageType="AuvRf1Telegram"/>
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="3"/>
-
                     <Map sourceValue="2" value="6"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x40008000">
@@ -1201,7 +1141,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>

@@ -37,15 +37,10 @@
             <!-- RF-1 bytes 0..14 HEADER: START(4), INFO_NUM(1), COUNT(4), COMMAND(4), reverse ACK(2). -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="1"/>
-
                     <Map sourceValue="2" value="4"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x82000000">
@@ -164,7 +159,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -179,15 +174,10 @@
             <!-- RF-1 bytes 0..14 HEADER. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="1"/>
-
                     <Map sourceValue="2" value="4"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x84000000">
@@ -259,7 +249,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8" cdm="Communication.RF.UHF.PacketErrorRate"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8" cdm="Communication.RF.LBand.PacketErrorRate"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -274,15 +264,10 @@
             <!-- RF-1 bytes 0..14 HEADER. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="1"/>
-
                     <Map sourceValue="2" value="4"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x81000000">
@@ -389,7 +374,7 @@
                                     <BitMember name="SYNC_LOCK" offset="6"/>
                                     <BitMember name="reserved7" offset="7"/>
                                 </PackedField>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -404,15 +389,10 @@
             <!-- RF-1 bytes 0..14 HEADER. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="1"/>
-
                     <Map sourceValue="2" value="4"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x80010000">
@@ -505,7 +485,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
@@ -520,15 +500,10 @@
             <!-- RF-1 bytes 0..14 HEADER. RF_GAIN의 INFO 종류는 원문에 없어 INFO1로 잠정 매핑한다. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="1"/>
-
                     <Map sourceValue="2" value="4"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x88000000">
@@ -565,15 +540,10 @@
             <!-- RF-1 bytes 0..14 HEADER. KEY_CMD의 INFO 종류는 원문에 없어 INFO1로 잠정 매핑한다. -->
             <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
             <DerivedField name="informationNumber" sourceField="Platform.Identifier.Numeric" dataType="UInt8">
-
                 <SourceValueMap>
-
                     <Map sourceValue="1" value="1"/>
-
                     <Map sourceValue="2" value="4"/>
-
                 </SourceValueMap>
-
             </DerivedField>
             <DerivedField name="count" sourceField="System.Generated.Sequence" dataType="UInt32"/>
             <PackedField name="command" width="32" expectedValue="0x90000000">
@@ -644,7 +614,7 @@
                 <Field name="uhfPacketErrorRate" dataType="UInt8"/>
                 <Field name="lBandPacketErrorRate" dataType="UInt8"/>
                 <Field name="statusCode" dataType="UInt8"/>
-<Field name="checksum" dataType="UInt16"/>
+                <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
             </Reply>
         </ControlBinding>
