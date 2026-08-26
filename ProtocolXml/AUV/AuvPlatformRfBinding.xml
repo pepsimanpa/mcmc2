@@ -368,7 +368,7 @@
             <DerivedField name="reverseCompletionAck" sourceField="System.Communication.LastReceivedCompletionCommand" dataType="UInt16"/>
             <!-- RF-1 bytes 15..39 INFORMATION3. RC_SPEED와 signed RC_DIRECTION(-15~15)을 사용한다. -->
             <Field name="auvId" cdm="Platform.Identifier.Numeric" dataType="UInt8"/>
-            <Field name="remoteSpeed" cdm="Platform.Motion.Speed"/>
+            <Field name="remoteSpeed" cdm="Platform.Motion.Speed" dataType="UInt8"/>
             <Field name="remoteDirection" cdm="Platform.Motion.Direction" dataType="Int8"/>
             <FixedField name="dataType" value="0" dataType="UInt8"/>
             <FixedField name="fileFirst" value="0" dataType="UInt16"/>

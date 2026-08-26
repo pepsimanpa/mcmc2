@@ -854,6 +854,15 @@ AUV RF Binding의 다음 계산성 converter를 선언형/책임분리 구조로
 
 공통 XSD에는 의미 enum의 `ValueMap`과 구분하여, 준비된 scalar source 값에서 wire 값으로의 선언형 매핑을 위한 `SourceValueMap`을 추가한다. 계산 함수명이나 특정 구현 함수는 Binding에 두지 않는다.
 
+## Issue 15. AUV Semantic-Binding 비-CDM 정합성 정리
+
+**Status: PARTIAL / CDM DEFERRED**
+
+- 이번 단계에서는 CDM 명칭/체계와 개별 bit CDM을 새로 확정하지 않는다.
+- 원문에서 자료형이 확정된 `RC_SPEED`, RF INFO1의 `RF_CONF_MODE/RF_CONF_PWR` 누락 `dataType`만 보강한다.
+- RF 상태 응답의 운용모드/Time Slot/채널/출력은 이미 확정된 논리 선택 집합이므로 `ValueSetResult`로 표현을 통일한다.
+- AUV 상세 점검, UCD 요약 점검, EOR, MODE, RF Pre-Launch, STAT_code의 개별 Result↔BitMember CDM 연결은 최종 CDM 감사 때 처리한다.
+- UCD-2의 IMU_LAT/IMU_LONG은 물리 필드로 유지하되 `emergencyReturnReply`의 Semantic 결과 채택 여부는 응답 의미/CDM 재검토 시 확정한다.
 ## 확정된 별도 bit 규칙
 
 ### COMMAND

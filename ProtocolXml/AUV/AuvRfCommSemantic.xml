@@ -135,12 +135,12 @@
             <Target cdm="Platform.Identifier.Numeric"/>
             <Reply cdm="Request.Communication.RF.Status.Response" bindRef="requestRfStatusReply" required="true">
                 <Results>
-                    <Result name="RF 운용모드" cdm="Communication.RF.Configuration.OperationMode"/>
-                    <Result name="RF Time Slot" cdm="Communication.RF.Configuration.TimeSlot"/>
-                    <Result name="UHF 채널" cdm="Communication.RF.Configuration.UHF.Channel"/>
-                    <Result name="L-Band 채널" cdm="Communication.RF.Configuration.LBand.Channel"/>
-                    <Result name="UHF 출력" cdm="Communication.RF.Configuration.UHF.Power"/>
-                    <Result name="L-Band 출력" cdm="Communication.RF.Configuration.LBand.Power"/>
+                    <ValueSetResult name="RF 운용모드" cdm="Communication.RF.Configuration.OperationMode"><Values><Value name="1:1" cdm="Communication.RF.Configuration.OperationMode.OneToOne"/><Value name="1:2" cdm="Communication.RF.Configuration.OperationMode.OneToTwo"/></Values></ValueSetResult>
+                    <ValueSetResult name="RF Time Slot" cdm="Communication.RF.Configuration.TimeSlot"><Values><Value name="Time Slot 2" cdm="Communication.RF.Configuration.TimeSlot.Two"/><Value name="Time Slot 4" cdm="Communication.RF.Configuration.TimeSlot.Four"/></Values></ValueSetResult>
+                    <ValueSetResult name="UHF 채널" cdm="Communication.RF.Configuration.UHF.Channel"><Values><Value name="UHF CH 1" cdm="Communication.RF.Configuration.UHF.Channel.Channel1"/><Value name="UHF CH 2" cdm="Communication.RF.Configuration.UHF.Channel.Channel2"/><Value name="UHF CH 3" cdm="Communication.RF.Configuration.UHF.Channel.Channel3"/></Values></ValueSetResult>
+                    <ValueSetResult name="L-Band 채널" cdm="Communication.RF.Configuration.LBand.Channel"><Values><Value name="L-Band CH 1" cdm="Communication.RF.Configuration.LBand.Channel.Channel1"/><Value name="L-Band CH 2" cdm="Communication.RF.Configuration.LBand.Channel.Channel2"/><Value name="L-Band CH 3" cdm="Communication.RF.Configuration.LBand.Channel.Channel3"/></Values></ValueSetResult>
+                    <ValueSetResult name="UHF 출력" cdm="Communication.RF.Configuration.UHF.Power"><Values><Value name="OFF" cdm="Communication.RF.Configuration.UHF.Power.Off"/><Value name="LOW" cdm="Communication.RF.Configuration.UHF.Power.Low"/><Value name="HIGH" cdm="Communication.RF.Configuration.UHF.Power.High"/></Values></ValueSetResult>
+                    <ValueSetResult name="L-Band 출력" cdm="Communication.RF.Configuration.LBand.Power"><Values><Value name="OFF" cdm="Communication.RF.Configuration.LBand.Power.Off"/><Value name="LOW" cdm="Communication.RF.Configuration.LBand.Power.Low"/><Value name="HIGH" cdm="Communication.RF.Configuration.LBand.Power.High"/></Values></ValueSetResult>
                     <QuantityResult name="암호화반 코인셀 배터리" cdm="Equipment.RF.EncryptionModule.Battery.RemainingPercent">
                         <Unit>%</Unit>
                         <Range min="0" max="100"/>
