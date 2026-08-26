@@ -1,7 +1,8 @@
 # UMS Semantic / Binding / Specification 통합 설계 규칙
 
 - 기준일: 2026-08-26
-- Scope: MCMC2 전체 UMS(AUV / MDV / EMDW / USV 및 이후 추가 UMS)
+- Scope: MCMC2 전체 UMS(AUV / MDV / EMDW / USV 및 이후 추가 UMS)의 Semantic / Binding / Specification 설계
+- Out of Scope: OM 실행 알고리즘, Validator 코드, 런타임 구현 및 실제 소프트웨어 구현 검증
 - Status: Working baseline / common rule set
 - 적용 우선순위: 새로운 직접 원문 근거가 없는 한 본 문서를 전체 UMS에 동일하게 적용한다.
 
@@ -56,7 +57,7 @@ Semantic에 정의하지 않는다.
 
 운용관리 내부 상태나 시스템이 자동 생성하는 값은 HMI 입력 Parameter로 만들지 않는다.
 
-### 2.2 OM / 실행 로직
+### 2.2 OM / 실행 로직과의 책임 경계
 
 OM은 **값 생성, 상태 판단, 업무 규칙 검증**을 담당한다.
 
@@ -69,6 +70,9 @@ OM은 **값 생성, 상태 판단, 업무 규칙 검증**을 담당한다.
 - 필요한 내부 상태 생성
 
 Binding이 OM 실행 알고리즘을 대신하지 않는다.
+
+본 설계의 범위는 **OM이 어떤 값을 준비해야 하는지, 어떤 운용 제약을 실행 계층에서 검증해야 하는지에 대한 책임 경계를 정의하는 것까지**다.
+OM 내부 알고리즘, Validator 코드 작성, 구현 방식 및 실제 구현 여부 확인은 본 Semantic / Binding 설계 범위에 포함하지 않는다.
 
 ### 2.3 Binding
 
@@ -187,7 +191,7 @@ Semantic 의미와 wire code의 대응 관계는 Binding에서 직접 선언한�
     <ValueMap>
         <Map cdm="Mission.Type.Move" value="0"/>
         <Map cdm="Mission.Type.Search" value="1"/>
-        <Map cdm="Mission.Type.Identification" value="2"/>
+        <Map cdm="Mission.Type.Identify" value="2"/>
     </ValueMap>
 </Field>
 ```
@@ -367,9 +371,10 @@ MDV / EMDW의 Field audit 기준:
 
 ---
 
-## 10. Validator / OM 규칙
+## 10. 운용 제약과 실행 계층 책임 경계
 
-XSD가 표현하기 부적절한 상호조건은 Validator/OM에서 검사한다.
+XSD 또는 Binding이 표현하기 부적절한 상호조건은 Semantic / Binding에서 임의로 보정하거나 실행하지 않는다.
+본 문서에는 **실행 계층에서 검증되어야 하는 운용 제약 자체만 설계 요구사항으로 기록**하며, 실제 Validator/OM 구현은 범위 밖으로 둔다.
 
 대표 확정 사례:
 
@@ -379,10 +384,12 @@ MDV / EMDW 원 ICD에 **마지막 경로점은 대기(1)로 설정**이 직접 �
 
 Semantic은 Waypoint Action 의미를 `통과 / 대기`로 제공하고, Binding은 `0 / 1` ValueMap을 정의한다.
 
-실제 임무계획 전송 전에 OM Validator가 다음을 확인한다.
+운용 제약은 다음과 같다.
 
 - Waypoint 목록이 존재하는 경우 마지막 Waypoint Action == `대기`
-- 오류라면 Binding이 임의로 `대기`로 수정하지 않고 임무계획 오류로 처리
+- Binding은 이를 임의로 `대기`로 수정하거나 강제하지 않는다.
+- 실제 실행 계층은 이 제약을 만족하지 않는 임무계획을 정상 전송 대상으로 취급해서는 안 된다.
+- 단, 이를 검사하는 Validator/OM의 실제 코드와 구현 여부는 본 설계 범위에서 검토하지 않는다.
 
 ---
 
@@ -604,7 +611,6 @@ parser = ET.XMLParser(
 ## 16. 현재 남은 주요 TBD / 후속작업
 
 - Heartbeat 자체 송신을 Semantic Monitor로 유지할지 여부
-- 마지막 Waypoint Action Validator 실제 OM 구현 확인
 - 전체 시스템 CDM audit
 - AUV / USV를 동일 선언형 Binding 규칙으로 마이그레이션할지 단계별 검토
 - 공통 XSD의 legacy `converter` 속성 최종 제거 시점 결정
