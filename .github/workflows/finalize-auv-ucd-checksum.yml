@@ -1,3 +1,4 @@
+# one-shot trigger
 name: Finalize AUV UCD Checksum Binding
 
 on:
@@ -50,7 +51,6 @@ jobs:
               raise SystemExit('UCD checksum header comment marker not found')
           s = s.replace(old_header, new_header, 1)
 
-          # Keep existing inline comments and add responsibility wording without changing comment count.
           s = s.replace('<!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. -->',
                         '<!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->')
           s = s.replace('<!-- UCD-1 bytes 14..15: CHECKSUM. -->',
@@ -93,7 +93,6 @@ jobs:
               schema.assertValid(etree.parse(f))
               print('PASS XSD', f)
 
-          # Whole AUV converter audit.
           auv_text = ''.join(p.read_text(encoding='utf-8') for p in Path('ProtocolXml/AUV').glob('*Binding.xml'))
           if 'converter=' in auv_text:
               names = re.findall(r'converter="([^"]+)"', auv_text)
