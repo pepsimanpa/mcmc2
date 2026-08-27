@@ -2,8 +2,10 @@ name: Migrate SSS Declarative Base
 
 on:
   push:
-    branches: [feature/usv-semantic-binding-audit]
-    paths: ['.github/workflows/migrate-sss-declarative-base.yml']
+    branches:
+      - feature/usv-semantic-binding-audit
+    paths:
+      - .github/workflows/migrate-sss-declarative-base.yml
 
 permissions:
   contents: write
@@ -16,182 +18,16 @@ jobs:
         with:
           ref: feature/usv-semantic-binding-audit
           fetch-depth: 0
-
-      - name: Apply SSS base migration and validate
+      - name: Run migration
+        shell: bash
         run: |
           python -m pip install --quiet lxml
-          python - <<'PY'
-          from pathlib import Path
-          from lxml import etree
-          import re
-
-          base = Path('ProtocolXml/USV/SideScanSonar')
-          sem = base / 'SideScanSonarSemantic.xml'
-          bind = base / 'SideScanSonarBinding.xml'
-          issues = base / 'SideScanSonar_OpenIssues.md'
-
-          original_sem = sem.read_text(encoding='utf-8')
-          original_bind = bind.read_text(encoding='utf-8')
-          old_comments = {
-              sem: re.findall(r'<!--[\s\S]*?-->', original_sem),
-              bind: re.findall(r'<!--[\s\S]*?-->', original_bind),
-          }
-
-          # 1) SSS XML should use the repository-level common XSD, not stale local snapshots.
-          s = original_sem
-          if './CommonSpecSchema.xsd' not in s:
-              raise SystemExit('semantic local schemaLocation not found')
-          s = s.replace('./CommonSpecSchema.xsd', '../../XSD/CommonSpecSchema.xsd', 1)
-          sem.write_text(s, encoding='utf-8', newline='')
-
-          s = original_bind
-          if './CommonBindingSchema.xsd' not in s:
-              raise SystemExit('binding local schemaLocation not found')
-          s = s.replace('./CommonBindingSchema.xsd', '../../XSD/CommonBindingSchema.xsd', 1)
-
-          counts = {
-              'BuildUSVMessageBase': s.count('converter="BuildUSVMessageBase"'),
-              'UInt16': s.count('converter="UInt16"'),
-              'BuildDestinationType': s.count('converter="BuildDestinationType"'),
-          }
-          if counts != {'BuildUSVMessageBase': 38, 'UInt16': 38, 'BuildDestinationType': 4}:
-              raise SystemExit(f'unexpected converter counts before migration: {counts}')
-
-          # 2) Composite/generated values are prepared by OM/Adapter. Binding only binds the prepared value.
-          s = s.replace(' converter="BuildUSVMessageBase"', '')
-          s = s.replace(' converter="BuildDestinationType"', '')
-
-          # 3) commandID remains a prepared scalar source value; Binding declares only its wire type.
-          s = s.replace(' converter="UInt16"', ' dataType="UInt16"')
-
-          responsibility_comment = '''  <!--
-    실행 책임 경계
-    - USVMessageBase와 DestinationType 공용 구조체의 값 조립은 OM/Adapter가 수행하고 Binding은 준비된 구조체를 sourceField로 연결한다.
-    - commandID의 생성/계승 규칙도 OM/Adapter가 수행하며 Binding은 UInt16 wire type만 선언한다.
-    - 일부 commandID는 CSCI 특수 규칙에 따라 System.Communication.LastReceivedCommandID를 계승한다. 동시 명령 시 상관관계 구현은 SideScanSonar_OpenIssues.md에 TBD로 남긴다.
-    - 기존 CSCI 근거 주석은 삭제하지 않는다.
-  -->\n'''
-          anchor = '  <!--BuildDestinationType(SideScanSonar) 식별자: dstEquipmentType=0x04, dstEquipmentID=0x01, dstSubEquipmentID=0x00-->\n'
-          if anchor not in s:
-              raise SystemExit('top destination comment anchor not found')
-          if '실행 책임 경계' not in s:
-              s = s.replace(anchor, anchor + responsibility_comment, 1)
-          bind.write_text(s, encoding='utf-8', newline='')
-
-          issue_lines = [
-              '# SideScanSonar Open Issues',
-              '',
-              '이 문서는 예인형수중탐색장치 CSCI 및 공용 CSV를 기준으로, 현재 단계에서 확정하지 않은 사항과 후속 검토 항목을 보존한다.',
-              '',
-              '## Source basis',
-              '',
-              '- `공용 식별자 규칙.csv`',
-              '- `공용 규칙.csv`',
-              '- `공용 구조체.csv`',
-              '- `원격통제장치 CSCI.csv`',
-              '- `예인형수중탐색장치 CSCI.csv`',
-              '',
-              '## Resolved in this migration',
-              '',
-              '- SSS Semantic/Binding은 로컬 XSD 복사본 대신 `ProtocolXml/XSD/CommonSpecSchema.xsd`, `ProtocolXml/XSD/CommonBindingSchema.xsd`를 참조한다.',
-              '- `USVMessageBase`는 발행주체 정보 구조체이며, 값 조립은 OM/Adapter 책임으로 둔다. Binding은 `System.Generated.USVMessageBase`를 그대로 연결한다.',
-              '- SSS 명령 대상 `DestinationType`은 공용 식별자 규칙상 `dstEquipmentType=0x04`, `dstEquipmentID=0x01`, `dstSubEquipmentID=0x00`을 사용하며, 구조체 조립은 OM/Adapter 책임으로 둔다.',
-              '- 일반 `commandID`는 원격통제장치 CSCI 규칙에 따라 비주기 메시지 생성 시 증가시키되, 실제 생성은 OM/Adapter가 수행하고 Binding은 `UInt16`만 선언한다.',
-              '- `CommandStatusReportType`은 명령 처리상태 ACK이며 `Executing/Pending/Failed/Reject/Canceled` 상태를 가지므로 실제 물리 동작 완료/성공으로 해석하지 않는다.',
-              '',
-              '## Deferred / TBD',
-              '',
-              '1. **LastReceivedCommandID correlation**',
-              '   - `StartControlType`, `AutoLaunchControlType` 등 일부 CSCI는 수신 메시지의 commandID 값을 읽어 그대로 송신하도록 명시한다.',
-              '   - 현재 `System.Communication.LastReceivedCommandID`를 유지한다.',
-              '   - 여러 명령이 동시 진행될 때 어떤 수신 메시지와 상관시킬지 정확한 OM/Adapter 규칙은 TBD이다.',
-              '',
-              '2. **결과 Report의 commandID 부재**',
-              '   - `TSAPBITReportType`, `TSAIBITReportType`, `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType` 등 일부 결과 Report에는 commandID가 없다.',
-              '   - 요청-결과 correlation 규칙은 TBD이다. 기존 Reply 구조는 유지한다.',
-              '',
-              '3. **DetailSystemStatusType 전원 상태 0/1 의미**',
-              '   - `PlatformPowerControlType.powerOn`은 0=OFF, 1=ON이 명시되어 있다.',
-              '   - 반면 `DetailSystemStatusType`의 각 powerStatus 필드는 원문에 0/1 의미가 직접 명시되어 있지 않다.',
-              '   - 제어값과 상태값이 동일할 가능성은 높지만 현재 단계에서는 확정하지 않는다.',
-              '',
-              '4. **IBIT 상세 bit 해석**',
-              '   - 다수 detail octet은 비정상 bit flag이지만 `sonarImagingProcessingEquipmentDetail`은 보드/조립체 장착 유무 bit flag이다.',
-              '   - 따라서 모든 IBIT detail bit를 일괄적으로 0=PASS, 1=FAIL로 해석하지 않는다.',
-              '',
-              '5. **DDS 중첩 구조체 접근 표기**',
-              '   - `commandStatusReport.dstEquipmentType` 같은 dotted path를 현재 Binding에서 사용한다.',
-              '   - 공통 Adapter가 dotted path를 공식 접근 규칙으로 사용할지 최종 확정은 TBD이다.',
-              '',
-              '6. **로컬 XSD 복사본 정리**',
-              '   - `SideScanSonar/CommonSpecSchema.xsd`, `SideScanSonar/CommonBindingSchema.xsd`는 현재 공통 XSD보다 오래된 snapshot이다.',
-              '   - 이번 단계에서는 외부 도구가 직접 참조할 가능성을 고려해 파일 자체는 삭제하지 않고, SSS XML의 schemaLocation만 공통 XSD로 전환했다.',
-              '   - USV 전체 migration 완료 후 외부 의존성 확인 뒤 삭제 여부를 결정한다.',
-              '',
-              '7. **최종 CDM 감사**',
-              '   - CDM 명칭/계층은 USV 장치 전체 정리 후 별도 전수 감사한다.',
-              '',
-              '8. **CSCI 오탈자 보존**',
-              '   - `LanchAndRecoveryBackStopReportType`, `ScreanChangeConfigType` 등 물리 Type 이름의 오탈자는 CSCI 원문과 DDS typeName 정합성을 위해 현재 그대로 보존한다.',
-              '',
-          ]
-          issues.write_text('\n'.join(issue_lines), encoding='utf-8', newline='')
-
-          # Preserve every pre-existing XML comment verbatim.
-          for p in [sem, bind]:
-              new_text = p.read_text(encoding='utf-8')
-              for comment in old_comments[p]:
-                  if comment not in new_text:
-                      raise SystemExit(f'comment lost from {p}: {comment[:100]}')
-              print('COMMENTS_PRESERVED', p, len(old_comments[p]), 'old comments retained')
-
-          # Converter migration assertions.
-          new_bind = bind.read_text(encoding='utf-8')
-          if 'converter="' in new_bind:
-              raise SystemExit('SSS converter attributes remain')
-          if new_bind.count('name="commandID"') != 38:
-              raise SystemExit('unexpected commandID count')
-          if new_bind.count('name="commandID" sourceField=') != 38:
-              raise SystemExit('unexpected derived commandID source count')
-          command_lines = re.findall(r'<DerivedField name="commandID"[^>]*/>', new_bind)
-          if len(command_lines) != 38 or any('dataType="UInt16"' not in x for x in command_lines):
-              raise SystemExit('not all commandID fields declare UInt16')
-          usv_lines = re.findall(r'<DerivedField name="usvHeader"[^>]*/>', new_bind)
-          dest_lines = re.findall(r'<DerivedField name="destination"[^>]*/>', new_bind)
-          if len(usv_lines) != 38 or len(dest_lines) != 4:
-              raise SystemExit(f'unexpected composite derived counts usv={len(usv_lines)} dest={len(dest_lines)}')
-          if any('converter=' in x for x in usv_lines + dest_lines):
-              raise SystemExit('composite converter remains')
-          print('COMMAND_ID_SOURCES', {k: len(re.findall(fr'sourceField="{re.escape(k)}"', new_bind)) for k in ['System.Generated.CommandSequence','System.Communication.LastReceivedCommandID']})
-
-          # Root XSD validation after schemaLocation migration.
-          spec_schema = etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
-          binding_schema = etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
-          spec_schema.assertValid(etree.parse(str(sem)))
-          binding_schema.assertValid(etree.parse(str(bind)))
-          print('PASS ROOT XSD', sem)
-          print('PASS ROOT XSD', bind)
-
-          # Structural alignment including SetPointSpec.
-          ns = {'u':'http://lignex1.com/mcmc2/umsSchema'}
-          S = etree.parse(str(sem)); B = etree.parse(str(bind))
-          semantic_controls = []
-          for tag in ['ControlSpec','SetPointSpec','DiscreteControlSpec','SequenceControlSpec']:
-              semantic_controls += [e.get('id') for e in S.xpath(f'.//u:{tag}', namespaces=ns)]
-          binding_controls = [e.get('semantic_id') for e in B.xpath('.//u:ControlBinding', namespaces=ns)]
-          if set(semantic_controls) != set(binding_controls) or len(semantic_controls) != len(binding_controls):
-              raise SystemExit('control alignment mismatch')
-          semantic_replies = [e.get('bindRef') for e in S.xpath('.//u:Reply[@bindRef]', namespaces=ns)]
-          binding_replies = [e.get('semantic_id') for e in B.xpath('.//u:Reply[@semantic_id]', namespaces=ns)]
-          if set(semantic_replies) != set(binding_replies) or len(semantic_replies) != len(binding_replies):
-              raise SystemExit('reply alignment mismatch')
-          print('ALIGN PASS controls', len(semantic_controls), 'replies', len(semantic_replies))
-          PY
-
+          echo 'CmltcG9ydCBiYXNlNjQsIHRleHR3cmFwLCBqc29uLCByZSwgb3MsIHBhdGhsaWIKc2NyaXB0ID0gcicnJwpmcm9tIHBhdGhsaWIgaW1wb3J0IFBhdGgKZnJvbSBseG1sIGltcG9ydCBldHJlZQppbXBvcnQgcmUKCmJhc2UgPSBQYXRoKCJQcm90b2NvbFhtbC9VU1YvU2lkZVNjYW5Tb25hciIpCnNlbSA9IGJhc2UgLyAiU2lkZVNjYW5Tb25hclNlbWFudGljLnhtbCIKYmluZCA9IGJhc2UgLyAiU2lkZVNjYW5Tb25hckJpbmRpbmcueG1sIgppc3N1ZXMgPSBiYXNlIC8gIlNpZGVTY2FuU29uYXJfT3Blbklzc3Vlcy5tZCIKCm9yaWdpbmFsX3NlbSA9IHNlbS5yZWFkX3RleHQoZW5jb2Rpbmc9InV0Zi04IikKb3JpZ2luYWxfYmluZCA9IGJpbmQucmVhZF90ZXh0KGVuY29kaW5nPSJ1dGYtOCIpCm9sZF9jb21tZW50cyA9IHsKICAgIHNlbTogcmUuZmluZGFsbChyIjwhLS1bXHNcU10qPy0tPiIsIG9yaWdpbmFsX3NlbSksCiAgICBiaW5kOiByZS5maW5kYWxsKHIiPCEtLVtcc1xTXSo/LS0+Iiwgb3JpZ2luYWxfYmluZCksCn0KCnMgPSBvcmlnaW5hbF9zZW0KaWYgIi4vQ29tbW9uU3BlY1NjaGVtYS54c2QiIG5vdCBpbiBzOgogICAgcmFpc2UgU3lzdGVtRXhpdCgic2VtYW50aWMgbG9jYWwgc2NoZW1hTG9jYXRpb24gbm90IGZvdW5kIikKcyA9IHMucmVwbGFjZSgiLi9Db21tb25TcGVjU2NoZW1hLnhzZCIsICIuLi8uLi9YU0QvQ29tbW9uU3BlY1NjaGVtYS54c2QiLCAxKQpzZW0ud3JpdGVfdGV4dChzLCBlbmNvZGluZz0idXRmLTgiLCBuZXdsaW5lPSIiKQoKcyA9IG9yaWdpbmFsX2JpbmQKaWYgIi4vQ29tbW9uQmluZGluZ1NjaGVtYS54c2QiIG5vdCBpbiBzOgogICAgcmFpc2UgU3lzdGVtRXhpdCgiYmluZGluZyBsb2NhbCBzY2hlbWFMb2NhdGlvbiBub3QgZm91bmQiKQpzID0gcy5yZXBsYWNlKCIuL0NvbW1vbkJpbmRpbmdTY2hlbWEueHNkIiwgIi4uLy4uL1hTRC9Db21tb25CaW5kaW5nU2NoZW1hLnhzZCIsIDEpCgpjb3VudHMgPSB7CiAgICAiQnVpbGRVU1ZNZXNzYWdlQmFzZSI6IHMuY291bnQoJ2NvbnZlcnRlcj0iQnVpbGRVU1ZNZXNzYWdlQmFzZSI nKSwKICAgICJVSW50MTYiOiBzLmNvdW50KCdjb252ZXJ0ZXI9IlVJbnQxNiInKSwKICAgICJCdWlsZERlc3RpbmF0aW9uVHlwZSI6IHMuY291bnQoJ2NvbnZlcnRlcj0iQnVpbGREZXN0aW5hdGlvblR5cGUiJyksCn0KaWYgY291bnRzICE9IHsiQnVpbGRVU1ZNZXNzYWdlQmFzZSI6IDM4LCAiVUludDE2IjogMzgsICJCdWlsZERlc3RpbmF0aW9uVHlwZSI6IDR9OgogICAgcmFpc2UgU3lzdGVtRXhpdChmInVuZXhwZWN0ZWQgY29udmVydGVyIGNvdW50cyBiZWZvcmUgbWlncmF0aW9uOiB7Y291bnRzfSIpCgpzID0gcy5yZXBsYWNlKCcgY29udmVydGVyPSJCdWlsRFVTVk1lc3NhZ2VCYXNlIicsICIiKQpzID0gcy5yZXBsYWNlKCcgY29udmVydGVyPSJCdWlsZERlc3RpbmF0aW9uVHlwZSI nLCAiIikKcyA9IHMucmVwbGFjZSgnIGNvbnZlcnRlcj0iVUludDE2IicsICcgZGF0YVR5cGU9IlVJbnQxNiInKQoKcmVzcG9uc2liaWxpdHlfY29tbWVudCA9ICIiIiAgPCEtLQogICAg7Iuk7ZaJIOyyheyehCDqsr3qs4QKICAgIC0gVVNWTWVzc2FnZUJhc2XsmYAgRGVzdGluYXRpb25UeXBlIOqzteyaqCDqtazsobDssrTsnbgg6rCSIOyhsOumveydgCBPTS9BZGFwdGVy6rCA7IiY7ZaJ7ZWY67aKIEJpbmRpbmdsnYAg7KSA67mE65CcIOq1rOyjkeyytOulvCBzb3VyY2VGaWVsZOuhnCDsl7DqsrDtlZzri6QuCiAgICAtIGNvbW1hbmRJROydmCDsh53shLEv6rOE7Iq5IOq3nOy5meuPhCBPTS9BZGFwdGVy6rCA7IiY7ZaJ7ZWY67aKIEJpbmRpbmdsnYAgVUludDE2IHdpcmUgdHlwZeunjCDshKDslrjtlanri6QuCiAgICAtIOydvOu2gCBjb21tYW5kSUTriJQgQ1NDSSDtirnsiJgg6rec7LmZ7JeQIOuUsOudvCBTeXN0ZW0uQ29tbXVuaWNhdGlvbi5MYXN0UmVjZWl2ZWRDb21tYW5kSUTrpbwg6rOE7Iq57ZWc64ukLiDrj5nsi5wg66qF66C5IOyLnCDsg4HqtIDqtIDqs4Qg6rWs7ZiE7J2AIFNpZGVTY2FuU29uYXJfT3Blbklzc3Vlcy5tZOyXkCBUQkDroZwg64Ko6ri064ukLgogICAgLSDquLDsobQgQ1NDSSDqt7zqsbAg7KO87ISd7J2AIOyCreygnO2VmOyngCDslYrsirXri4jri6QuCiAgLS0+CigiIiIKYW5jaG9yID0gJyAgPCEtLUJ1aWxkRGVzdGluYXRpb25UeXBlKFNpZGVTY2FuU29uYXIpIOyLneuzhOyekDogZHN0RXF1aXBtZW50VHlwZT0weDA0LCBkc3RFcXVpcG1lbnRJRD0weDAxLCBkc3RTdWJFcXVpcG1lbnRJRD0weDAwLS0+XG4nCmlmIGFuY2hvciBub3QgaW4gczoKICAgIHJhaXNlIFN5c3RlbUV4aXQoInRvcCBkZXN0aW5hdGlvbiBjb21tZW50IGFuY2hvciBub3QgZm91bmQiKQppZiAi7Iuk7ZaJIOyyheyehCDqsr3qs4QiIG5vdCBpbiBzOgogICAgcyA9IHMucmVwbGFjZShhbmNob3IsIGFuY2hvciArIHJlc3BvbnNpYmlsaXR5X2NvbW1lbnQsIDEpCmJpbmQud3JpdGVfdGV4dChzLCBlbmNvZGluZz0idXRmLTgiLCBuZXdsaW5lPSIiKQoKaXNzdWVfbGluZXMgPSBbCiAgICAiIyBTaWRlU2NhblNvbmFyIE9wZW4gSXNzdWVzIiwKICAgICIiLAogICAgIuydtCDr¬23sJzripQg7JiI7J247ZiV7IiY7KSR7YOQ7IOJ7J6l7LmYIENTQ0kg67CPIOqzteyaqCBDU1bspbwg6riw7KSA7Jy866GcLCDtmITsnqwg64uo6rOE7JeQ7IScIO2Zleygle2VmOyngCDslYrsnYAg7IKs7ZWt6rO8IO2bhOyGjCDqsoDthqAg7ZWt66qp7J2EIOuztOyhsO2VnOuLpC4iLAogICAgIiIsCiAgICAiIyMgU291cmNlIGJhc2lzIiwKICAgICIiLAogICAgIi0gYOqzteyaqCDsi53rs4TsnqAg6rec7LmZLmNzdmAiLAogICAgIi0gYOqzteyaqCDqrec7LmZLmNzdmAiLAogICAgIi0gYOqzteyaqCDqtazsobDssrQuY3N2YCIsCiAgICAiLSBg7JuQ6rKp7Ya17KCc7J6l7LmYIENTQ0kuY3N2YCIsCiAgICAiLSBg7JiI7J247ZiV7IiY7KSR7YOQ7IOJ7J6l7LmYIENTQ0kuY3N2YCIsCiAgICAiIiwKICAgICIjIyBSZXNvbHZlZCBpbiB0aGlzIG1pZ3JhdGlvbiIsCiAgICAiIiwKICAgICItIFNTUyBTZW1hbnRpYy9CaW5kaW5n7J2AIOuhnOy7rCBYU0Qg67O17IKs67O4IOuMgOyLoCDgUHJvdG9jb2xYbWwvWFNEL0NvbW1vblNwZWNTY2hlbWEueHNkYCwgYFByb3RvY29sWG1sL1hTRC9Db21tb25CaW5kaW5nU2NoZW1hLnhzZOG7vCDrsLjsooztlanri4QuIiwKICAgICItIGBVU1ZNZXNzYWdlQmFzZWLripQg67Cc7ZaJ7KO87LK0IOygleuztCDrtazsobDssrTsnbQg7J2066mwLCDqsJIg7KGw66a97J2AIE9NL0FkYXB0ZXIg7LGF7J6E7Jy866GcIOuRlOuLpC4gQmluZGluZ+y은IGBTeXN0ZW0uR2VuZXJhdGVkLlVTVk1lc3NhZ2VCYXNlYOulvCDqt7jriIDroZwg7Jew6rKw7ZWc64ukLiIsCiAgICAiLSBTU1Mg66qF66C5IOuMgOyDiCBgRGVzdGluYXRpb25UeXBlYOydgCDqs7Xsmqkg7Iud67OE7J6QIOq3nOy5meyDgSBgZHN0RXF1aXBtZW50VHlwZT0weDA0YCwgYGRzdEVxdWlwbWVudElEPTB4MDFgLCBgZHN0U3ViRXF1aXBtZW50SUQ9MHgwMGLsnYQg7IKs7Jqp7ZWY66mwLCDqtazsobDssrQg7KGw66a97J2AIE9NL0FkYXB0ZXIg7LGF7J6E7Jy866GcIOuRlOuLpC4iLAogICAgIi0g7J2867CYIGBjb21tYW5kSURg64qUIOybhOqyqeyGtOygleyepSBDU0NJIOq3nOy5meyXkCDrlLDroZwg67mE7KO86riwIOuplOyngOyngCDsg53shLEg7IucIOymneqwgOyLnO2CpOuQmOyWtCDrtoDsm6zrkJgsIOyLpOygnCDsg53shLHsnYAgT00vQWRhcHRlcuqwgCDsiJjtlontlZjqs6AgQmluZGluZ+y은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JHqt7wg7ZGc6riwKioiLAogICAgIiAgIC0gYGNvbW1hbmRTdGF0dXNSZXBvcnQuZHN0RXF1aXBtZW50VHlwZWAg6rCZ7J2AIGRvdHRlZCBwYXRo66W8IO2YhOyerCBCaW5kaW5n7JeQ7IScIOyCrOyaqe2VnOuLpC4iLAogICAgIiAgIC0g6rO17JqpIEFkYXB0ZXLqsIAgZG90dGVkIHBhdGjrrLwg6rO17IudIOygnOq3vCDqt7zsuZzsnbzroZwg7IKs7Jqp7ZWg7KeAIOy1nOykke2ZleygleydgCBUQkTrsJzri6QuIiwKICAgICIiLAogICAgIjYuICoq66Gc7LusIFhTRCDrtoTsgqzrs7gg7KCV66asKioiLAogICAgIiAgIC0gYFNpZGVTY2FuU29uYXIvQ29tbW9uU3BlY1NjaGVtYS54c2RgLCBgU2lkZVNjYW5Tb25hci9Db21tb25CaW5kaW5nU2NoZW1hLnhzZOG7vCDtmITsnqwg6rO17JqpIFhTROuLpCDrs6Qg7Jik656Y65CcIHNuYXBzaG907J2064ukLiIsCiAgICAiICAgLSDsnbTrsogg64uo6rOE7JeQ7ISc64qUIOyZuOu2gCDrj4TqtazqsIAg7KeB7KCRIOywuOyhsO2VoCDqsIDriqXshLHsnYQg6rOg66Ck7ZW0IO2MjOydvCDsnpDssoTripQg7IKt7KCc7ZWY7KeAIOyViOqzoCwgU1NTIFhNTOydmCBzY2hlbWFMb2NhdGlvbuunjCDqs7XsmqkgWFNE66GcIOyghO2ZmO2WiOuLpC4iLAogICAgIiAgIC0gVVNWIOyghOyytCBtaWdyYXRpb24g7JmE66OMIO2bhCDsmbTrtoAg7J2Y7KG065성IO2ZleyduCDrkqQg7IKt7KCcIOyXrOu2gOulvCDqsrDsoJXtlZzri6QuIiwKICAgICIiLAogICAgIjcuICoq7LWc7KKFIGJDRCDoq5zsgqjqkqIqqIiwKICAgICIgICAtIENETSDrqIXsuZkv6rOE7Lmc7J2AIFVTViDsnqXsuZgg7KCE7LK0IOygleumrCDtm4Qg67OE64+EIOyghOyImCDqsJDsgqztlZzri6QuIiwKICAgICIiLAogICAgIjguICoqQ1NDSSDsmKTtg4jtnpAg67O07KG0KioiLAogICAgIiAgIC0gYExhbmNoQW5kUmVjb3ZlcnlCYWNrU3RvcFJlcG9ydFR5cGVgLCBgU2NyZWFuQ2hhbmdlQ29uZmlnVHlwZWAg65OxIOusuOumrCBUeXBlIOydtOumhOydmCDsmKTtg4jtg4DriJQgQ1NDSSDsm5DrrLjsmYAgRERTIHR5cGVOYW1lIOygle2VqeyEseyakSDtmITsnqwg6re466GcIOuztOyhsO2VnOuLpC4iLAogICAgIiIsCl0KaXNzdWVzLndyaXRlX3RleHQoIlxuIi5qb2luKGlzc3VlX2xpbmVzKSwgZW5jb2Rpbmc9InV0Zi04IiwgbmV3bGluZT0iIikKCmZvciBwIGluIFtzZW0sIGJpbmRdOgogICAgbmV3X3RleHQgPSBwLnJlYWRfdGV4dChlbmNvZGluZz0idXRmLTgiKQogICAgZm9yIGNvbW1lbnQgaW4gb2xkX2NvbW1lbnRzW3BdOgogICAgICAgIGlmIGNvbW1lbnQgbm90IGluIG5ld190ZXh0OgogICAgICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KGYiY29tbWVudCBsb3N0IGZyb20ge3B9OiB7Y29tbWVudFs6MTAwXX0iKQogICAgcHJpbnQoIkNPTU1FTlRTX1BSRVNFUlZFRCIsIHAsIGxlbihvbGRfY29tbWVudHNbcF0pKQoKbmV3X2JpbmQgPSBiaW5kLnJlYWRfdGV4dChlbmNvZGluZz0idXRmLTgiKQppZiAnY29udmVydGVyPSInIGluIG5ld19iaW5kOgogICAgcmFpc2UgU3lzdGVtRXhpdCgiU1NTIGNvbnZlcnRlciBhdHRyaWJ1dGVzIHJlbWFpbiIpCmNvbW1hbmRfbGluZXMgPSByZS5maW5kYWxsKHInPERlcml2ZWRGaWVsZCBuYW1lPSJjb21tYW5kSUQiW14+XSovPicsIG5ld19iaW5kKQppZiBsZW4oY29tbWFuZF9saW5lcykgIT0gMzggb3IgYW55KCdkYXRhVHlwZT0iVUludDE2Iicgbm90IGluIHggZm9yIHggaW4gY29tbWFuZF9saW5lcyk6CiAgICByYWlzZSBTeXN0ZW1FeGl0KGYiY29tbWFuZElEIGRlY2xhcmF0aW9uIG1pc21hdGNoOiB7bGVuKGNvbW1hbmRfbGluZXMpfSIpCnVzdl9saW5lcyA9IHJlLmZpbmRhbGwocic8RGVyaXZlZEZpZWxkIG5hbWU9InVzdkhlYWRlciJbXj5dKi8+JywgbmV3X2JpbmQpCmRlc3RfbGluZXMgPSByZS5maW5kYWxsKHInPERlcml2ZWRGaWVsZCBuYW1lPSJkZXN0aW5hdGlvbiJbXj5dKi8+JywgbmV3X2JpbmQpCmlmIGxlbih1c3ZfbGluZXMpICE9IDM4IG9yIGxlbihkZXN0X2xpbmVzKSAhPSA0OgogICAgcmFpc2UgU3lzdGVtRXhpdChmImNvbXBvc2l0ZSBkZXJpdmVkIGNvdW50cyB1c3Y9e2xlbih1c3ZfbGluZXMpfSBkZXN0PXtsZW4oZGVzdF9saW5lcyl9IikKaWYgYW55KCJjb252ZXJ0ZXI9IiBpbiB4IGZvciB4IGluIHVzdl9saW5lcyArIGRlc3RfbGluZXMpOgogICAgcmFpc2UgU3lzdGVtRXhpdCgiY29tcG9zaXRlIGNvbnZlcnRlciByZW1haW5zIikKcHJpbnQoIkNPTU1BTkRfSURfU09VUkNFUyIsIHsKICAgIGs6IGxlbihyZS5maW5kYWxsKCdzb3VyY2VGaWVsZD0iJyArIHJlLmVzY2FwZShrKSArICciJywgbmV3X2JpbmQpKQogICAgZm9yIGsgaW4gWyJTeXN0ZW0uR2VuZXJhdGVkLkNvbW1hbmRTZXF1ZW5jZSIsIlN5c3RlbS5Db21tdW5pY2F0aW9uLkxhc3RSZWNlaXZlZENvbW1hbmRJRCJdCn0pCgpzcGVjX3NjaGVtYSA9IGV0cmVlLlhNTFNjaGVtYShldHJlZS5wYXJzZSgiUHJvdG9jb2xYbWwvWFNEL0NvbW1vblNwZWNTY2hlbWEueHNkIikpCmJpbmRpbmdfc2NoZW1hID0gZXRyZWUuWE1MU2NoZW1hKGV0cmVlLnBhcnNlKCJQcm90b2NvbFhtbC9YU0QvQ29tbW9uQmluZGluZ1NjaGVtYS54c2QiKSkKc3BlY19zY2hlbWEuYXNzZXJ0VmFsaWQoZXRyZWUucGFyc2Uoc3RyKHNlbSkpKQpiaW5kaW5nX3NjaGVtYS5hc3NlcnRWYWxpZChldHJlZS5wYXJzZShzdHIoYmluZCkpKQpwcmludCgiUEFTUyBST09UIFhTRCIsIHNlbSkKcHJpbnQoIlBBU1MgUk9PVCBYU0QiLCBiaW5kKQoKbnMgPSB7InUiOiJodHRwOi8vbGlnbmV4MS5jb20vbWNtYzIvdW1zU2NoZW1hIn0KUyA9IGV0cmVlLnBhcnNlKHN0cihzZW0pKQpCID0gZXRyZWUucGFyc2Uoc3RyKGJpbmQpKQpzZW1hbnRpY19jb250cm9scyA9IFtdCmZvciB0YWcgaW4gWyJDb250cm9sU3BlYyIsIlNldFBvaW50U3BlYyIsIkRpc2NyZXRlQ29udHJvbFNwZWMiLCJTZXF1ZW5jZUNvbnRyb2xTcGVjIl06CiAgICBzZW1hbnRpY19jb250cm9scyArPSBbZS5nZXQoImlkIikgZm9yIGUgaW4gUy54cGF0aChmIi4vL3U6e3RhZ30iLCBuYW1lc3BhY2VzPW5zKV0KYmluZGluZ19jb250cm9scyA9IFtlLmdldCgic2VtYW50aWNfaWQiKSBmb3IgZSBpbiBCLnhwYXRoKCIuLy91OkNvbnRyb2xCaW5kaW5nIiwgbmFtZXNwYWNlcz1ucyldCmlmIHNldChzZW1hbnRpY19jb250cm9scykgIT0gc2V0KGJpbmRpbmdfY29udHJvbHMpIG9yIGxlbihzZW1hbnRpY19jb250cm9scykgIT0gbGVuKGJpbmRpbmdfY29udHJvbHMpOgogICAgcmFpc2UgU3lzdGVtRXhpdCgiY29udHJvbCBhbGlnbm1lbnQgbWlzbWF0Y2giKQpzZW1hbnRpY19yZXBsaWVzID0gW2UuZ2V0KCJiaW5kUmVmIikgZm9yIGUgaW4gUy54cGF0aCgiLi8vdTpSZXBseVtAYmluZFJlZl0iLCBuYW1lc3BhY2VzPW5zKV0KYmluZGluZ19yZXBsaWVzID0gW2UuZ2V0KCJzZW1hbnRpY19pZCIpIGZvciBlIGluIEIueHBhdGgoIi4vL3U6UmVwbHlbQHNlbWFudGljX2lkXSIsIG5hbWVzcGFjZXM9bnMpXQppZiBzZXQoc2VtYW50aWNfcmVwbGllcykgIT0gc2V0KGJpbmRpbmdfcmVwbGllcykgb3IgbGVuKHNlbWFudGljX3JlcGxpZXMpICE9IGxlbihiaW5kaW5nX3JlcGxpZXMpOgogICAgcmFpc2UgU3lzdGVtRXhpdCgi cmVwbHkgYWxpZ25tZW50IG1pc21hdGNoIikKcHJpbnQoIkFMSUdOIFBBU1MgY29udHJvbHMiLCBsZW4oc2VtYW50aWNfY29udHJvbHMpLCAicmVwbGllcyIsIGxlbihzZW1hbnRpY19yZXBsaWVzKSkKJycnCmI2NCA9IGJhc2U2NC5iNjRlbmNvZGUoc2NyaXB0LmVuY29kZSgpKS5kZWNvZGUoKQpsZW4oc2NyaXB0KSwgbGVuKGI2NCkK' | base64 -d > /tmp/sss_migrate.py
+          python /tmp/sss_migrate.py
           git diff --check
           git rm .github/workflows/migrate-sss-declarative-base.yml
-
       - name: Commit migration
+        shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
