@@ -1,0 +1,191 @@
+name: Migrate SSS Enum ValueMaps
+
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/migrate-sss-enum-valuemaps.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+          fetch-depth: 0
+
+      - name: Migrate source-confirmed enum values
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re
+
+          base = Path('ProtocolXml/USV/SideScanSonar')
+          sem = base / 'SideScanSonarSemantic.xml'
+          bind = base / 'SideScanSonarBinding.xml'
+          issues = base / 'SideScanSonar_OpenIssues.md'
+          s = sem.read_text(encoding='utf-8')
+          b = bind.read_text(encoding='utf-8')
+          old_sem_comments = re.findall(r'<!--[\s\S]*?-->', s)
+          old_bind_comments = re.findall(r'<!--[\s\S]*?-->', b)
+
+          # Semantic monitor enums whose logical CDMs already exist in the current design.
+          value_sets = {
+            'operationalMode': [
+              ('Auto','Mode.Auto','0'), ('Standby','Mode.Standby','1'),
+              ('ManualLaunch','Mode.ManualLaunch','2'), ('ManualRecovery','Mode.ManualRecovery','3'),
+              ('ManualDeploy','Mode.ManualDeploy','4'), ('EmergencyStop','Mode.EmergencyStop','5'),
+              ('CableSeparation','Mode.CableSeparation','6')],
+            'sssPulseType': [('ContinuousWave','Ping.PulseType.ContinuousWave','0'), ('Chirp','Ping.PulseType.Chirp','1')],
+            'gfPulseType': [('ContinuousWave','Ping.PulseType.ContinuousWave','0'), ('Chirp','Ping.PulseType.Chirp','1')],
+            'sssTvgMode': [('Off','Setting.TVG.Off','0'), ('On','Setting.TVG.On','1')],
+            'gfTvgMode': [('Off','Setting.TVG.Off','0'), ('On','Setting.TVG.On','1')],
+            'operationStatus': [
+              ('Standby','LaunchRecovery.State.Standby','0'), ('Launching','LaunchRecovery.State.Launching','1'),
+              ('Launched','LaunchRecovery.State.Launched','2'), ('Operating','LaunchRecovery.State.Operating','3'),
+              ('Recovering','LaunchRecovery.State.Recovering','4'), ('Recovered','LaunchRecovery.State.Recovered','5'),
+              ('EmergencyStop','LaunchRecovery.State.EmergencyStop','6')],
+            'usblMode': [('Stop','LaunchRecovery.State.Stop','0'), ('Launch','LaunchRecovery.State.Launch','1'), ('Recovery','LaunchRecovery.State.Recovery','2')],
+            'winchMotorBrakeStatus': [('Released','Brake.Released','0'), ('Locked','Brake.Locked','1')],
+            'slideMotorBrakeStatus': [('Released','Brake.Released','0'), ('Locked','Brake.Locked','1')],
+            'ultraShortBaseLineMotorBrakeStatus': [('Released','Brake.Released','0'), ('Locked','Brake.Locked','1')],
+            'launchLimitSwitchStatus': [('NotDetected','LimitSwitch.NotDetected','0'), ('Detected','LimitSwitch.Detected','1')],
+            'recoveryLimitSwitchStatus': [('NotDetected','LimitSwitch.NotDetected','0'), ('Detected','LimitSwitch.Detected','1')],
+          }
+
+          def replace_value_set(text, elem, spec_id, vals):
+              pat = re.compile(r'(<'+elem+r'\b[^>]*\bid="'+re.escape(spec_id)+r'"[^>]*>\s*<Values>)([\s\S]*?)(</Values>\s*</'+elem+r'>)')
+              m = pat.search(text)
+              if not m:
+                  raise SystemExit(f'{elem} {spec_id} not found')
+              old_body = m.group(2)
+              old_codes = re.findall(r'<Value\b[^>]*>([^<]+)</Value>', old_body)
+              expected = [v[2] for v in vals]
+              if old_codes != expected:
+                  raise SystemExit(f'{spec_id} raw values changed: {old_codes} != {expected}')
+              indent_match = re.search(r'\n(\s*)<Value', old_body)
+              indent = indent_match.group(1) if indent_match else '          '
+              new_body = ''.join('\n'+indent+f'<Value name="{name}" cdm="{cdm}"/>' for name,cdm,_ in vals) + '\n' + indent[:-2]
+              return text[:m.start(2)] + new_body + text[m.end(2):]
+
+          for spec_id, vals in value_sets.items():
+              s = replace_value_set(s, 'ValueSetSpec', spec_id, vals)
+
+          # Common CBIT operational state code is logical state in Semantic, wire code in Binding.
+          health_ids = ['towedSonarAssembly','launchAndRecovery','towedSonarArray','sonarSignalProcessor','sonarImageProcessor','hullMountedSonar']
+          health_vals = [('Normal','OperationalState.Normal','0'), ('Degraded','OperationalState.Degraded','1'), ('Unavailable','OperationalState.Unavailable','2'), ('NoResponse','OperationalState.NoResponse','3')]
+          for spec_id in health_ids:
+              s = replace_value_set(s, 'HealthStatusSetSpec', spec_id, health_vals)
+
+          # Control-side enums with source-confirmed code meanings and already-existing logical CDMs.
+          old_power = '''        <QuantityProfile cdm="PowerSupplyState">\n          <Range min="0" max="1"/>\n          <Resolution>1</Resolution>\n        </QuantityProfile>'''
+          new_power = '''        <ValueSetProfile cdm="PowerSupplyState">\n          <Values>\n            <Value name="Off" cdm="PowerSupplyState.Off"/>\n            <Value name="On" cdm="PowerSupplyState.On"/>\n          </Values>\n        </ValueSetProfile>'''
+          if s.count(old_power) != 1:
+              raise SystemExit(f'powerOn semantic profile count={s.count(old_power)}')
+          s = s.replace(old_power, new_power, 1)
+
+          old_pulse = '''        <QuantityProfile cdm="Ping.PulseType">\n          <Range min="0" max="1"/>\n          <Resolution>1</Resolution>\n        </QuantityProfile>'''
+          new_pulse = '''        <ValueSetProfile cdm="Ping.PulseType">\n          <Values>\n            <Value name="ContinuousWave" cdm="Ping.PulseType.ContinuousWave"/>\n            <Value name="Chirp" cdm="Ping.PulseType.Chirp"/>\n          </Values>\n        </ValueSetProfile>'''
+          if s.count(old_pulse) != 1:
+              raise SystemExit(f'control PulseType semantic profile count={s.count(old_pulse)}')
+          s = s.replace(old_pulse, new_pulse, 1)
+
+          sem.write_text(s, encoding='utf-8', newline='')
+
+          # Binding ValueMaps. Each listed monitor field occurs exactly once in its monitor binding.
+          field_maps = {
+            'operationalModeTSA': value_sets['operationalMode'],
+            'sssPulseType': value_sets['sssPulseType'],
+            'gfPulseType': value_sets['gfPulseType'],
+            'sssTvgMode': value_sets['sssTvgMode'],
+            'gfTvgMode': value_sets['gfTvgMode'],
+            'operationStatus': value_sets['operationStatus'],
+            'ultraShortBaseLineMode': value_sets['usblMode'],
+            'winchMotorBrakeStatus': value_sets['winchMotorBrakeStatus'],
+            'slideMotorBrakeStatus': value_sets['slideMotorBrakeStatus'],
+            'ultraShortBaseLineMotorBrakeStatus': value_sets['ultraShortBaseLineMotorBrakeStatus'],
+            'launchLimitSwitchStatus': value_sets['launchLimitSwitchStatus'],
+            'recoveryLimitSwitchStatus': value_sets['recoveryLimitSwitchStatus'],
+            'towedSonarAssemblyTotalCBIT': health_vals,
+            'launchAndRecoveryTotalCBIT': health_vals,
+            'towedSonarArrayTotalCBIT': health_vals,
+            'sonarSignalProcessingEquipmentTotalCBIT': health_vals,
+            'sonarImagingProcessingEquipmentTotalCBIT': health_vals,
+            'hullMountedSonarTotalCBIT': health_vals,
+          }
+
+          def add_map_to_field(text, field_name, vals, expected_count=1):
+              pat = re.compile(r'(?m)^(\s*)<Field name="'+re.escape(field_name)+r'"([^>]*)/>$')
+              matches = list(pat.finditer(text))
+              if len(matches) != expected_count:
+                  raise SystemExit(f'{field_name} count={len(matches)} expected={expected_count}')
+              # replace from end to preserve indices when expected_count > 1
+              for m in reversed(matches):
+                  indent, attrs = m.group(1), m.group(2)
+                  maps = '\n'.join(indent+'    '+f'<Map cdm="{cdm}" value="{raw}"/>' for _,cdm,raw in vals)
+                  repl = f'{indent}<Field name="{field_name}"{attrs}>\n{indent}  <ValueMap>\n{maps}\n{indent}  </ValueMap>\n{indent}</Field>'
+                  text = text[:m.start()] + repl + text[m.end():]
+              return text
+
+          for field_name, vals in field_maps.items():
+              b = add_map_to_field(b, field_name, vals)
+
+          # Control StatusConfigType pulseType: 0=CW, 1=Chirp.
+          b = add_map_to_field(b, 'pulseType', value_sets['sssPulseType'])
+          # PlatformPowerControlType powerOn: 0=OFF, 1=ON (explicit in CSCI).
+          b = add_map_to_field(b, 'powerOn', [('Off','PowerSupplyState.Off','0'), ('On','PowerSupplyState.On','1')])
+
+          bind.write_text(b, encoding='utf-8', newline='')
+
+          # Preserve all previous comments exactly.
+          if re.findall(r'<!--[\s\S]*?-->', s) != old_sem_comments:
+              raise SystemExit('Semantic comments changed/lost')
+          if re.findall(r'<!--[\s\S]*?-->', b) != old_bind_comments:
+              raise SystemExit('Binding comments changed/lost')
+
+          # Validate both XML files against repository common XSD.
+          etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd')).assertValid(etree.parse(str(sem)))
+          etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd')).assertValid(etree.parse(str(bind)))
+
+          # Only the five deliberately deferred power monitor ValueSetSpecs may retain numeric text values.
+          S = etree.parse(str(sem))
+          ns={'u':'http://lignex1.com/mcmc2/umsSchema'}
+          numeric=[]
+          for e in S.xpath('.//u:ValueSetSpec', namespaces=ns):
+              vals=e.xpath('./u:Values/u:Value',namespaces=ns)
+              texts=[(v.text or '').strip() for v in vals]
+              if texts and all(x.isdigit() for x in texts):
+                  numeric.append(e.get('id'))
+          allowed = {'towedSonarArrayPowerStatus','ultraShortBaseLinePowerStatus','winchPowerStatus','recoveryUnitPowerStatus','cameraPowerStatus'}
+          if set(numeric) != allowed:
+              raise SystemExit(f'unexpected remaining numeric ValueSetSpec: {numeric}')
+
+          B=etree.parse(str(bind))
+          maps=B.xpath('.//u:ValueMap',namespaces=ns)
+          print('VALUE_MAP_COUNT',len(maps))
+          print('REMAINING_NUMERIC_VALUESETS',numeric)
+          print('COMMENTS',len(old_sem_comments),len(old_bind_comments))
+
+          marker='## Enum / ValueMap migration'
+          doc=issues.read_text(encoding='utf-8')
+          if marker not in doc:
+              doc += '''\n\n## Enum / ValueMap migration\n\n- Semantic의 논리 상태에서 raw 숫자 코드를 제거하고 실제 DDS 값은 Binding `ValueMap`으로 이동한다.\n- 이번 단계에서 확정 반영한 항목: 운용모드, SSS/GF PulseType, SSS/GF TVG, 진회수 운용상태, USBL 모드, 윈치/슬라이드/USBL Brake, 진수/회수 Limit Switch, CBIT 4상태, 제어 `powerOn`, 제어 `pulseType`.\n- `DetailSystemStatusType`의 5개 powerStatus는 0/1 의미가 원문에서 직접 확인되지 않아 Semantic raw 0/1을 임시 유지한다. 최종 확인 후 ValueMap으로 이동한다.\n- `SideScanSonar.SonarType`, `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`, `SideScanSonar.Subsystem(targetDevice)`은 물리 코드 범위는 있으나 최종 논리 값/CDM을 다시 확인한 뒤 이동한다.\n- 최종 CDM 명칭 감사 전에는 기존 CDM을 우선 재사용하며 새 CDM 생성을 최소화한다.\n'''
+              issues.write_text(doc,encoding='utf-8',newline='')
+          PY
+          git diff --check
+          git rm .github/workflows/migrate-sss-enum-valuemaps.yml
+
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Move confirmed SSS enum codes into Binding ValueMaps'
+          git push origin HEAD:feature/usv-semantic-binding-audit
