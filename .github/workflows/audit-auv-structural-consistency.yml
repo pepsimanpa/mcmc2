@@ -1,0 +1,208 @@
+name: Audit AUV Structural Consistency
+
+on:
+  push:
+    branches: [feature/auv-declarative-binding-cleanup]
+    paths: ['.github/workflows/audit-auv-structural-consistency.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auv-declarative-binding-cleanup
+          fetch-depth: 0
+
+      - name: Audit AUV control reply command ack and info structure
+        run: |
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re
+
+          NS='http://lignex1.com/mcmc2/umsSchema'
+          ns={'u':NS}
+          base=Path('ProtocolXml/AUV')
+          psem=base/'AuvPlatformSemantic.xml'
+          prf=base/'AuvPlatformRfBinding.xml'
+          pucd=base/'AuvPlatformUcdBinding.xml'
+          csem=base/'AuvRfCommSemantic.xml'
+          crf=base/'AuvRfCommBinding.xml'
+          spec=base/'AuvSpecification.xml'
+          doc=Path('ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md')
+
+          def root(p): return etree.parse(str(p)).getroot()
+          PS, PR, PU, CS, CR = map(root,[psem,prf,pucd,csem,crf])
+
+          # XSD validity first.
+          ss=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          bs=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          vs=etree.XMLSchema(etree.parse('ProtocolXml/XSD/VehicleSpecificationSchema.xsd'))
+          for p in [psem,csem]: ss.assertValid(etree.parse(str(p)))
+          for p in [prf,pucd,crf]: bs.assertValid(etree.parse(str(p)))
+          vs.assertValid(etree.parse(str(spec)))
+          print('PASS XSD: AUV semantic/binding/specification')
+
+          # Semantic controls and Binding controls.
+          def controls_sem(r):
+              return {e.get('id'):e for e in r.xpath('.//u:ControlSpec',namespaces=ns)}
+          def controls_bind(r):
+              return {e.get('semantic_id'):e for e in r.xpath('.//u:ControlBinding',namespaces=ns)}
+          ps=controls_sem(PS); pr=controls_bind(PR); pu=controls_bind(PU)
+          cs=controls_sem(CS); cr=controls_bind(CR)
+
+          expected_platform = {
+              'requestAuvCheck','transferMissionPlan','controlAuvLocally','requestAuvStatus',
+              'startMission','emergencyReturn','requestFileList','requestData','stopMission',
+              'deleteAllRecords','enterMaintenanceMode','setFlashBrightness'
+          }
+          expected_comm = {
+              'configureRf','scanRfChannels','requestRfStatus','requestPreLaunchCheck',
+              'toggleRfGain','applyRfEncryptionKey'
+          }
+          assert set(ps)==expected_platform, (set(ps),expected_platform)
+          assert set(pr)==expected_platform, (set(pr),expected_platform)
+          assert set(cs)==expected_comm, (set(cs),expected_comm)
+          assert set(cr)==expected_comm, (set(cr),expected_comm)
+          assert set(pu)=={'requestAuvCheck','emergencyReturn','deleteAllRecords'}, set(pu)
+          print('PASS controls: platform 12/RF binding 12/UCD subset 3/comm 6')
+
+          # Every semantic Reply bindRef must be realized as Reply semantic_id by at least one relevant binding.
+          def reply_ids(bindroots):
+              out=set()
+              for br in bindroots:
+                  out |= {e.get('semantic_id') for e in br.xpath('.//u:Reply',namespaces=ns)}
+              return out
+          platform_reply_ids=reply_ids([PR,PU])
+          comm_reply_ids=reply_ids([CR])
+          for cid,e in ps.items():
+              reps=e.xpath('./u:Reply',namespaces=ns)
+              for rep in reps:
+                  ref=rep.get('bindRef')
+                  assert ref in platform_reply_ids, (cid,ref,platform_reply_ids)
+              if cid=='requestData': assert not reps
+          for cid,e in cs.items():
+              reps=e.xpath('./u:Reply',namespaces=ns)
+              for rep in reps:
+                  ref=rep.get('bindRef')
+                  assert ref in comm_reply_ids, (cid,ref,comm_reply_ids)
+              if cid=='toggleRfGain': assert not reps
+          print('PASS Reply bindRef/semantic_id realization')
+
+          # RF command contract. Info class is 1/2/3; maps are AUV1/AUV2 values.
+          p_contract={
+              'requestAuvCheck':(0,0x40000001,3,(3,6)),
+              'transferMissionPlan':(1,0x40000002,2,(2,5)),
+              'controlAuvLocally':(2,0x40000004,3,(3,6)),
+              'requestAuvStatus':(3,0x40000008,3,(3,6)),
+              # Project decision intentionally overrides origin CSV INFO2 row: MISSION_START uses INFO3.
+              'startMission':(4,0x40000010,3,(3,6)),
+              'emergencyReturn':(5,0x40000020,3,(3,6)),
+              'requestFileList':(6,0x40000040,3,(3,6)),
+              'requestData':(7,0x40000080,3,(3,6)),
+              'stopMission':(8,0x40000100,3,(3,6)),
+              'deleteAllRecords':(9,0x40000200,3,(3,6)),
+              'enterMaintenanceMode':(10,0x40000400,3,(3,6)),
+              'setFlashBrightness':(15,0x40008000,3,(3,6)),
+          }
+          c_contract={
+              'requestPreLaunchCheck':(16,0x80010000,(1,4)),
+              'requestRfStatus':(24,0x81000000,(1,4)),
+              'configureRf':(25,0x82000000,(1,4)),
+              'scanRfChannels':(26,0x84000000,(1,4)),
+              # INFO1 for RF_GAIN/KEY_CMD is provisional because origin description is '-'.
+              'toggleRfGain':(27,0x88000000,(1,4)),
+              'applyRfEncryptionKey':(28,0x90000000,(1,4)),
+          }
+
+          def audit_rf_control(e, bit, value, infomap, sendbit):
+              ch=e.xpath('./u:TCPChannel',namespaces=ns); assert len(ch)==1
+              assert ch[0].get('messageType')=='AuvRf1Telegram'
+              info=e.xpath('./u:DerivedField[@name="informationNumber"]',namespaces=ns); assert len(info)==1
+              maps=info[0].xpath('./u:SourceValueMap/u:Map',namespaces=ns)
+              got={int(m.get('sourceValue')):int(m.get('value')) for m in maps}
+              assert got=={1:infomap[0],2:infomap[1]}, (e.get('semantic_id'),got,infomap)
+              cmd=e.xpath('./u:PackedField[@name="command"]',namespaces=ns); assert len(cmd)==1
+              assert int(cmd[0].get('expectedValue'),16)==value
+              bits={(b.get('name'),int(b.get('offset'))) for b in cmd[0].xpath('./u:BitMember',namespaces=ns)}
+              assert any(off==bit for _,off in bits), (e.get('semantic_id'),bits,bit)
+              assert any(off==sendbit for _,off in bits), (e.get('semantic_id'),bits,sendbit)
+              # If a reply exists, RF-2 ACK must equal the full original RF-1 command word.
+              reps=e.xpath('./u:Reply',namespaces=ns)
+              if reps:
+                  assert reps[0].xpath('./u:TCPChannel[@messageType="AuvRf2Telegram"]',namespaces=ns)
+                  ack=reps[0].xpath('./u:PackedField[@name="ack"]',namespaces=ns); assert len(ack)==1
+                  assert int(ack[0].get('expectedValue'),16)==value, (e.get('semantic_id'),ack[0].get('expectedValue'),hex(value))
+
+          for cid,(bit,val,info,imap) in p_contract.items():
+              audit_rf_control(pr[cid],bit,val,imap,30)
+          for cid,(bit,val,imap) in c_contract.items():
+              audit_rf_control(cr[cid],bit,val,imap,31)
+          print('PASS RF COMMAND/ACK/INFO_NUM: platform 12 + RF device 6')
+
+          # requestData must be request-only in Controls, RF-3 must be SensorProduct classification.
+          assert not pr['requestData'].xpath('./u:Reply',namespaces=ns)
+          products=PR.xpath('.//u:SensorProducts/u:ProductBinding',namespaces=ns)
+          expected_masks={
+              'auvData':'0x00000800','sideScanSonarData':'0x00001000','opticalCameraData':'0x00002000',
+              'acousticCameraData':'0x00004000','forwardLookingSonarData':'0x00008000'
+          }
+          assert len(products)==5
+          for p in products:
+              sid=p.get('semantic_id'); assert sid in expected_masks
+              ch=p.xpath('./u:TCPChannel',namespaces=ns); assert len(ch)==1 and ch[0].get('messageType')=='AuvRf3Telegram'
+              mf=p.xpath('./u:MatchField[@name="dataAck"]',namespaces=ns); assert len(mf)==1
+              assert mf[0].get('mask')==expected_masks[sid] and mf[0].get('value')==expected_masks[sid]
+          print('PASS RF-3 SensorProduct 5-way classification; no requestData Reply')
+
+          # UCD fixed command/ACK contract.
+          u_contract={'requestAuvCheck':(0,0x0001),'emergencyReturn':(5,0x0020),'deleteAllRecords':(9,0x0200)}
+          for cid,(bit,val) in u_contract.items():
+              e=pu[cid]
+              ch=e.xpath('./u:RS422Channel',namespaces=ns); assert len(ch)==1 and ch[0].get('messageType')=='AuvUcd1Telegram'
+              cmd=e.xpath('./u:PackedField[@name="command"]',namespaces=ns); assert len(cmd)==1
+              assert int(cmd[0].get('expectedValue'),16)==val
+              offs=[int(b.get('offset')) for b in cmd[0].xpath('./u:BitMember',namespaces=ns) if b.get('fixedValue')=='1']
+              assert bit in offs
+              reps=e.xpath('./u:Reply',namespaces=ns); assert len(reps)==1
+              rch=reps[0].xpath('./u:RS422Channel',namespaces=ns); assert len(rch)==1 and rch[0].get('messageType')=='AuvUcd2Telegram'
+              ack=reps[0].xpath('./u:PackedField[@name="ack"]',namespaces=ns); assert len(ack)==1
+              assert int(ack[0].get('expectedValue'),16)==val
+          print('PASS UCD COMMAND/ACK: 3 controls')
+
+          # Specification references all current AUV parts and files exist.
+          SP=root(spec)
+          s_paths=[e.text for e in SP.xpath('.//u:SemanticPath',namespaces=ns)]
+          b_paths=[e.text for e in SP.xpath('.//u:BindingPath',namespaces=ns)]
+          assert set(s_paths)=={'AuvPlatformSemantic.xml','AuvRfCommSemantic.xml'}
+          assert set(b_paths)=={'AuvPlatformRfBinding.xml','AuvPlatformUcdBinding.xml','AuvRfCommBinding.xml'}
+          for x in s_paths+b_paths: assert (base/x).exists(), x
+          de=SP.xpath('./u:DataEncoding',namespaces=ns); assert len(de)==1 and de[0].get('byteOrder')=='little'
+          print('PASS AuvSpecification references + little endian')
+
+          # Keep explicitly unresolved topics visible instead of silently normalizing them.
+          d=doc.read_text(encoding='utf-8')
+          if '## Issue 16. AUV Control/Reply/Binding 구조 정합성 감사' not in d:
+              section='''\n## Issue 16. AUV Control/Reply/Binding 구조 정합성 감사\n\n**Status: PASS / known TBD preserved**\n\n- Platform Semantic Control 12개와 Platform RF ControlBinding 12개의 `id/semantic_id`가 1:1 일치한다.\n- UCD는 원 ICD에서 정의된 `requestAuvCheck`, `emergencyReturn`, `deleteAllRecords` 3개 ControlBinding만 동일 Platform Semantic을 재사용한다.\n- RF 통신장치 Semantic Control 6개와 RF Comm ControlBinding 6개가 1:1 일치한다.\n- Semantic `Reply.bindRef`는 실제 Binding `Reply.semantic_id`로 모두 해소된다. `requestData`와 `toggleRfGain`은 합의대로 Reply가 없다.\n- RF-1 COMMAND의 주 기능 bit와 `RF_SEND(bit30)` / `RF_EXEC(bit31)`, expectedValue, RF-2 ACK expectedValue가 현재 확정표와 일치한다.\n- INFO_NUM은 Platform.Identifier.Numeric=1/2 기준 INFO1=`1/4`, INFO2=`2/5`, INFO3=`3/6`으로 일치한다.\n- `MISSION_START`는 origin CSV의 INFO2 표기와 달리 프로젝트 확정값 INFO3를 유지한다.\n- RF-3는 requestData Control Reply가 아니라 5종 SensorProduct로 유지하며 dataAck bit11~15 mask가 일치한다.\n- UCD-1 COMMAND와 UCD-2 ACK는 `AUV_CHECK_Req_L(bit0)=0x0001`, `EMER_RETURN(bit5)=0x0020`, `Record_Del(bit9)=0x0200`으로 일치한다.\n- `AuvSpecification.xml`은 Platform Semantic, RF/UCD Binding, RF Comm Semantic/Binding을 모두 참조하고 little-endian DataEncoding을 갖는다.\n\n다음 사항은 오류로 보정하지 않고 기존 TBD를 유지한다.\n- RF-2 ACK + RF_CMD_COMPLETE + Body 결과가 항상 한 Telegram에서 동시에 유효한지 여부.\n- RF_GAIN / KEY_CMD의 INFORMATION 종류는 원문에 기재가 없어 INFO1 잠정 매핑.\n- 원 ICD의 RF-1/RF-2 전송 표현과 현재 TCPChannel adapter 추상화의 관계.\n- RF-1/RF-2/RF-3 COUNT 간 상관관계.\n- INFO2 Waypoint 영역의 992-byte 표기와 최대 100개 좌표 산술 불일치.\n'''
+              anchor='## 확정된 별도 bit 규칙\n'
+              assert anchor in d
+              d=d.replace(anchor,section+'\n'+anchor,1)
+              doc.write_text(d,encoding='utf-8',newline='')
+          print('RECORDED Issue 16; ambiguous items preserved')
+          PY
+
+          git diff --check
+          git rm .github/workflows/audit-auv-structural-consistency.yml
+
+      - name: Commit audit record
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Record AUV structural consistency audit'
+          git push origin HEAD:feature/auv-declarative-binding-cleanup
