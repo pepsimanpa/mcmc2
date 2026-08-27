@@ -1,30 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+               xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonBindingSchema.xsd">
   <!--
     전자광학장치 영상처리 CSC Binding.
-    공용 식별자 규칙: SurfaceDetection=0x03, EoSystemProcessor=0x06. 별도 세부 장비를 지정하지 않는 공용 Control의 dstSubEquipmentID는 0x00으로 적용한다.
+    공용 식별자 규칙: SurfaceDetection=0x03, EoSystemProcessor=0x06. 별도 세부 장비 ID 없음 → System.Target.ElectroOpticalProcessor는 0x03/0x06/0x00 DestinationType을 준비한다.
     원천 파일명은 '전자광학추적장치 CSCI.csv'이나 CSV 내부 Source/Destination 명칭을 기준으로 한다.
+    공용 struct 내부 필드는 Adapter의 dotted-path 접근 규칙을 사용하고, 생성 header/destination/commandID는 OM/Adapter가 준비한다.
   -->
   <Monitors semantic_id="monitor">
     <MonitorBinding semantic_id="imageAnalysisResult">
       <DDSChannel topicName="RUSV::SA::CIPE::ImageObjectDetection2DSeqReportType" typeName="ImageObjectDetection2DSeqReportType"/>
       <Field name="usvHeader"/>
-      <Field name="imageWidth" cdm="Vision.Image.Width"/>
-      <Field name="imageHeight" cdm="Vision.Image.Height"/>
-      <Field name="imageObjectDetectionCnt" cdm="Vision.ObjectDetection2D.Count"/>
+      <Field name="imageWidth" cdm="Vision.Image.Width" dataType="UInt16"/>
+      <Field name="imageHeight" cdm="Vision.Image.Height" dataType="UInt16"/>
+      <Field name="imageObjectDetectionCnt" cdm="Vision.ObjectDetection2D.Count" dataType="UInt8"/>
       <ArrayField name="imageObjectDetection2DSeq" cdm="Vision.ObjectDetection2D.List" minOccurs="0" maxOccurs="255">
         <Element name="imageObjectDetection2D" cdm="Vision.ObjectDetection2D.Item">
-          <Field name="classID" cdm="Vision.ObjectDetection2D.Class"/>
-          <Field name="confidence" cdm="Vision.ObjectDetection2D.Confidence"/>
-          <Field name="bbox2D.topLeftX" cdm="Vision.ObjectDetection2D.BBox.TopLeftX"/>
-          <Field name="bbox2D.topLeftY" cdm="Vision.ObjectDetection2D.BBox.TopLeftY"/>
-          <Field name="bbox2D.bottomRightX" cdm="Vision.ObjectDetection2D.BBox.BottomRightX"/>
-          <Field name="bbox2D.bottomRightY" cdm="Vision.ObjectDetection2D.BBox.BottomRightY"/>
-          <Field name="bbox2D.bboxWidth" cdm="Vision.ObjectDetection2D.BBox.Width"/>
-          <Field name="bbox2D.bboxHeight" cdm="Vision.ObjectDetection2D.BBox.Height"/>
-          <Field name="relativeAngle" cdm="Vision.ObjectDetection2D.RelativeAngle"/>
+          <Field name="classID" cdm="Vision.ObjectDetection2D.Class" dataType="UInt8">
+            <ValueMap>
+              <Map cdm="Contact.Class.PatrolVessel" value="0"/>
+              <Map cdm="Contact.Class.NorthKoreanCargoShip" value="1"/>
+              <Map cdm="Contact.Class.FlagOfConvenienceShip" value="2"/>
+              <Map cdm="Contact.Class.Warship" value="3"/>
+              <Map cdm="Contact.Class.FishingShip" value="4"/>
+              <Map cdm="Contact.Class.CargoShip" value="5"/>
+              <Map cdm="Contact.Class.Ferry" value="6"/>
+              <Map cdm="Contact.Class.UnidentifiedShip" value="7"/>
+            </ValueMap>
+          </Field>
+          <Field name="confidence" cdm="Vision.ObjectDetection2D.Confidence" dataType="UInt8"/>
+          <Field name="bbox2D.topLeftX" cdm="Vision.ObjectDetection2D.BBox.TopLeftX" dataType="UInt16"/>
+          <Field name="bbox2D.topLeftY" cdm="Vision.ObjectDetection2D.BBox.TopLeftY" dataType="UInt16"/>
+          <Field name="bbox2D.bottomRightX" cdm="Vision.ObjectDetection2D.BBox.BottomRightX" dataType="UInt16"/>
+          <Field name="bbox2D.bottomRightY" cdm="Vision.ObjectDetection2D.BBox.BottomRightY" dataType="UInt16"/>
+          <Field name="bbox2D.bboxWidth" cdm="Vision.ObjectDetection2D.BBox.Width" dataType="UInt16"/>
+          <Field name="bbox2D.bboxHeight" cdm="Vision.ObjectDetection2D.BBox.Height" dataType="UInt16"/>
+          <Field name="relativeAngle" cdm="Vision.ObjectDetection2D.RelativeAngle" dataType="Float32"/>
         </Element>
       </ArrayField>
     </MonitorBinding>
@@ -32,108 +44,136 @@
     <MonitorBinding semantic_id="cipeCbitStatus">
       <DDSChannel topicName="RUSV::SO::CIPE::CIPECBITReportType" typeName="CIPECBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="cipeCBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
-      <Field name="cipeCBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
+      <Field name="cipeCBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Health.CIPE.EOIR.Connected" value="40"/>
+          <Map cdm="Health.CIPE.EOIR.Disconnected" value="43"/>
+        </ValueMap>
+      </Field>
+      <Field name="cipeCBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
+        </ValueMap>
+      </Field>
     </MonitorBinding>
   </Monitors>
 
   <Controls semantic_id="control">
     <ControlBinding semantic_id="startIntegration">
       <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x06"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="destination" sourceField="System.Target.ElectroOpticalProcessor"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Reply semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
 
     <ControlBinding semantic_id="restartSystem">
       <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x06"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="destination" sourceField="System.Target.ElectroOpticalProcessor"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Reply semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
 
     <ControlBinding semantic_id="requestIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x06"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="destination" sourceField="System.Target.ElectroOpticalProcessor"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Reply semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestIbitResult">
+      <Reply semantic_id="requestIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::CIPE::CIPEIBITReportType" typeName="CIPEIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
-        <Field name="cipeIBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
+        <Field name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="Health.CIPE.EOIR.Connected" value="40"/>
+            <Map cdm="Health.CIPE.EOIR.Disconnected" value="43"/>
+          </ValueMap>
+        </Field>
+        <Field name="cipeIBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="Health.Normal" value="0"/>
+            <Map cdm="Health.Degraded" value="1"/>
+            <Map cdm="Health.Unavailable" value="2"/>
+            <Map cdm="Health.NoResponse" value="3"/>
+          </ValueMap>
+        </Field>
         <!-- ProcessorIBIT 원문: cpuTemperature double/℃/20~100, cpuLoad double/%/0~100. -->
-        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature"/>
-        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.CIPE.Processor.CpuLoad"/>
+        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature" dataType="Float64"/>
+        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.CIPE.Processor.CpuLoad" dataType="Float64"/>
       </Reply>
     </ControlBinding>
 
     <ControlBinding semantic_id="requestPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x06"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="destination" sourceField="System.Target.ElectroOpticalProcessor"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Reply semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestPbitResult">
+      <Reply semantic_id="requestPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::CIPE::CIPEPBITReportType" typeName="CIPEPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
-        <Field name="cipePBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
+        <Field name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="Health.CIPE.EOIR.Connected" value="40"/>
+            <Map cdm="Health.CIPE.EOIR.Disconnected" value="43"/>
+          </ValueMap>
+        </Field>
+        <Field name="cipePBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="Health.Normal" value="0"/>
+            <Map cdm="Health.Degraded" value="1"/>
+            <Map cdm="Health.Unavailable" value="2"/>
+            <Map cdm="Health.NoResponse" value="3"/>
+          </ValueMap>
+        </Field>
       </Reply>
     </ControlBinding>
 
     <ControlBinding semantic_id="saveImage">
       <DDSChannel topicName="RUSV::C2::RCU::EOIRImageSaveControlType" typeName="EOIRImageSaveControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <!-- 0=no change, 1=전자광학장치 이미지 저장. Semantic saveImage는 실제 동작값 1만 노출한다. -->
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <!-- 0=no change, 1=전자광학장치 이미지 저장. source IDL type은 boolean이나 CommonBindingSchema WireDataType에 Boolean이 없어 dataType은 임의 UInt8로 치환하지 않는다. -->
       <FixedField name="controlImageSave" value="1"/>
       <Reply semantic_id="saveImageAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
   </Controls>
