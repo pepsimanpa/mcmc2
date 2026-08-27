@@ -429,7 +429,7 @@
                                     RF-2 bytes 62..63 Pre_Launch-Check 2-byte 결과 그룹.
                                     표의 윗행을 bit0으로 적용: bit0/1 reserved, bit2 암호화반, bit3 전원반,
                                     bit4 L-Band, bit5 UHF, bit6 모뎀 및 제어반, bit7 MCU, bit8~15 reserved.
-                                    원문 표 자체에는 0/1 결과 의미가 직접 기재되지 않았으나 AUV_CHECK_RESULT 계열과 동일한 자체점검 규칙(0=PASS, 1=FAIL)을 적용한다.
+                                    원문 표 자체에는 0/1 결과 의미가 직접 기재되지 않았으나 프로젝트 확정 규칙으로 자체점검 계열은 0=PASS, 1=FAIL을 적용한다.
                                 -->
                 <!-- RF-2 bytes 76..79 TAIL. -->
                 <!-- RF-2 fixed Body 62 bytes. Unused fields remain Binding-only so every Reply preserves the physical byte offsets. -->

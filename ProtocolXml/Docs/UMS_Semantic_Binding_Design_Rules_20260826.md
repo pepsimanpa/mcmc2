@@ -863,6 +863,9 @@ AUV RF Binding의 다음 계산성 converter를 선언형/책임분리 구조로
 - RF 상태 응답의 운용모드/Time Slot/채널/출력은 이미 확정된 논리 선택 집합이므로 `ValueSetResult`로 표현을 통일한다.
 - AUV 상세 점검, UCD 요약 점검, EOR, MODE, RF Pre-Launch, STAT_code의 개별 Result↔BitMember CDM 연결은 최종 CDM 감사 때 처리한다.
 - UCD-2의 IMU_LAT/IMU_LONG은 물리 필드로 유지하되 `emergencyReturnReply`의 Semantic 결과 채택 여부는 응답 의미/CDM 재검토 시 확정한다.
+- 프로젝트 bit 해석 규칙을 확정한다: 점검 계열은 `0=PASS, 1=FAIL`, 이상/이벤트 계열은 `0=정상·미발생, 1=이상·발생`, MODE/LOCK 등 상태 flag는 `0=비활성, 1=활성`으로 해석한다.
+- RF Pre-Launch Check 6개 항목도 위 점검 규칙에 따라 `0=PASS, 1=FAIL`로 확정한다.
+- STAT_code bit0~4는 `0=정상, 1=비정상`; DATA_LOCK/SYNC_LOCK은 정상/비정상 판정이 아니라 `0=비활성, 1=활성` flag로 유지한다.
 ## 확정된 별도 bit 규칙
 
 ### COMMAND
