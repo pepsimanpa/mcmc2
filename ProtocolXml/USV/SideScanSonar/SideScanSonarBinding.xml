@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonBindingSchema.xsd">
   <!--SideScanSonar 재정의본: Semantic 행위 분리, 실제 RUSV DDS Topic/Type 및 Reply 유지-->
   <!--BuildDestinationType(SideScanSonar) 식별자: dstEquipmentType=0x04, dstEquipmentID=0x01, dstSubEquipmentID=0x00-->
   <Monitors semantic_id="monitor">
@@ -88,10 +88,10 @@
   <Controls semantic_id="control">
     <ControlBinding semantic_id="startIntegration">
       <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <!-- DestinationType = 0x04(수중탐지) / 0x01(음탐기전산처리장치) / 0x00(세부장비 미사용) -->
-      <DerivedField name="destination" sourceField="System.Target.SideScanSonar" converter="BuildDestinationType"/>
+      <DerivedField name="destination" sourceField="System.Target.SideScanSonar"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
@@ -104,10 +104,10 @@
     </ControlBinding>
     <ControlBinding semantic_id="restartSystem">
       <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <!-- DestinationType = 0x04(수중탐지) / 0x01(음탐기전산처리장치) / 0x00(세부장비 미사용) -->
-      <DerivedField name="destination" sourceField="System.Target.SideScanSonar" converter="BuildDestinationType"/>
+      <DerivedField name="destination" sourceField="System.Target.SideScanSonar"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
@@ -121,10 +121,10 @@
     <ControlBinding semantic_id="requestIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <!-- 예인형수중탐색장치 대상 DestinationType은 시스템이 채운다. -->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <!-- DestinationType = 0x04(수중탐지) / 0x01(음탐기전산처리장치) / 0x00(세부장비 미사용) -->
-      <DerivedField name="destination" sourceField="System.Target.SideScanSonar" converter="BuildDestinationType"/>
+      <DerivedField name="destination" sourceField="System.Target.SideScanSonar"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
@@ -205,10 +205,10 @@
     <ControlBinding semantic_id="requestPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <!-- 예인형수중탐색장치 대상 DestinationType은 시스템이 채운다. -->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <!-- DestinationType = 0x04(수중탐지) / 0x01(음탐기전산처리장치) / 0x00(세부장비 미사용) -->
-      <DerivedField name="destination" sourceField="System.Target.SideScanSonar" converter="BuildDestinationType"/>
+      <DerivedField name="destination" sourceField="System.Target.SideScanSonar"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
@@ -232,8 +232,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="stopSlideBackStop">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryBackStopCommandType" typeName="LaunchAndRecoveryBackStopCommandType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopSlideBackStopAck" required="true">
@@ -253,8 +253,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="engageSlideBackStop">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryBackStopCommandType" typeName="LaunchAndRecoveryBackStopCommandType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="engageSlideBackStopAck" required="true">
@@ -274,8 +274,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="returnSlideBackStop">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryBackStopCommandType" typeName="LaunchAndRecoveryBackStopCommandType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="2"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="returnSlideBackStopAck" required="true">
@@ -295,8 +295,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="setCommunicationLevel">
       <DDSChannel topicName="RUSV::C2::RCU::CommunicationLevelCommandType" typeName="CommunicationLevelCommandType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="videoQualityType" cdm="Communication.MCS.Level"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setCommunicationLevelAck" required="true">
@@ -317,8 +317,8 @@
     <ControlBinding semantic_id="configureOperatingParameters">
       <DDSChannel topicName="RUSV::C2::RCU::StatusConfigType" typeName="StatusConfigType"/>
       <!-- frequency/range 및 SW Gain 하위 필드의 조건부 유효성은 CSCI 비고를 따른다. 현재 XSD는 파라미터 간 조건식을 직접 표현하지 않는다. -->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="sonarType" cdm="SideScanSonar.SonarType"/>
       <Field name="frequency" cdm="Ping.CarrierFrequency"/>
       <Field name="range" cdm="Coverage.Range"/>
@@ -349,9 +349,9 @@
     <ControlBinding semantic_id="start">
       <DDSChannel topicName="RUSV::C2::RCU::StartControlType" typeName="StartControlType"/>
       <!-- sonarType=0은 예인형. 예인형↔선체부착형 전환 시 먼저 정지 명령이 필요하다는 CSCI 운용 주의사항이 있다. -->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
-      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" converter="UInt16"/>
+      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
       <Field name="sonarType" cdm="SideScanSonar.SonarType"/>
       <FixedField name="start" cdm="Command.Execution" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -367,9 +367,9 @@
     <ControlBinding semantic_id="stop">
       <DDSChannel topicName="RUSV::C2::RCU::StartControlType" typeName="StartControlType"/>
       <!-- sonarType=0은 예인형. 예인형↔선체부착형 전환 시 먼저 정지 명령이 필요하다는 CSCI 운용 주의사항이 있다. -->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
-      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" converter="UInt16"/>
+      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
       <Field name="sonarType" cdm="SideScanSonar.SonarType"/>
       <FixedField name="start" cdm="Command.Execution" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -384,8 +384,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="powerOnOff">
       <DDSChannel topicName="RUSV::C2::RCU::PlatformPowerControlType" typeName="PlatformPowerControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="targetDevice" cdm="SideScanSonar.Subsystem"/>
       <Field name="powerOn" cdm="PowerSupplyState"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -400,8 +400,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="setAutoMode">
       <DDSChannel topicName="RUSV::C2::RCU::TSAModeControlType" typeName="TSAModeControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="mode" cdm="Mode.Command" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setAutoModeAck" required="true">
@@ -415,8 +415,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="setManualMode">
       <DDSChannel topicName="RUSV::C2::RCU::TSAModeControlType" typeName="TSAModeControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="mode" cdm="Mode.Command" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setManualModeAck" required="true">
@@ -430,9 +430,9 @@
     </ControlBinding>
     <ControlBinding semantic_id="stopTowfish">
       <DDSChannel topicName="RUSV::C2::RCU::AutoLaunchControlType" typeName="AutoLaunchControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
-      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" converter="UInt16"/>
+      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
       <FixedField name="launch" cdm="LaunchRecovery.Command" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopTowfishAck" required="true">
@@ -452,9 +452,9 @@
     </ControlBinding>
     <ControlBinding semantic_id="launchTowfish">
       <DDSChannel topicName="RUSV::C2::RCU::AutoLaunchControlType" typeName="AutoLaunchControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
-      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" converter="UInt16"/>
+      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
       <FixedField name="launch" cdm="LaunchRecovery.Command" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="launchTowfishAck" required="true">
@@ -474,9 +474,9 @@
     </ControlBinding>
     <ControlBinding semantic_id="recoveryTowfish">
       <DDSChannel topicName="RUSV::C2::RCU::AutoLaunchControlType" typeName="AutoLaunchControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
-      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" converter="UInt16"/>
+      <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
       <FixedField name="launch" cdm="LaunchRecovery.Command" value="2"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="recoveryTowfishAck" required="true">
@@ -496,8 +496,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="emergencyStop">
       <DDSChannel topicName="RUSV::C2::RCU::EmergencyStopControlType" typeName="EmergencyStopControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="emergencyStop" cdm="EmergencyStop.Command" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="emergencyStopAck" required="true">
@@ -511,8 +511,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="cancelEmergencyStop">
       <DDSChannel topicName="RUSV::C2::RCU::EmergencyStopControlType" typeName="EmergencyStopControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="emergencyStop" cdm="EmergencyStop.Command" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="cancelEmergencyStopAck" required="true">
@@ -526,8 +526,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="setTowingCableLength">
       <DDSChannel topicName="RUSV::C2::RCU::CableLengthControlType" typeName="CableLengthControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="lengthCommandWinch" cdm="LaunchRecovery.Cable.TargetLength"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setTowingCableLengthAck" required="true">
@@ -541,8 +541,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="setTowfishDepth">
       <DDSChannel topicName="RUSV::C2::RCU::TargetLengthConfigType" typeName="TargetLengthConfigType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="targetDepth" cdm="Position.TargetDepth"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setTowfishDepthAck" required="true">
@@ -557,8 +557,8 @@
     <ControlBinding semantic_id="changeScreenRealTimeMode">
       <DDSChannel topicName="RUSV::C2::RCU::ScreanChangeConfigType" typeName="ScreanChangeConfigType"/>
       <!-- CSCI의 물리 Type명 ScreanChangeConfigType 오탈자를 그대로 보존한다. -->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="screenChangeMode" cdm="Display.Mode" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="changeScreenRealTimeModeAck" required="true">
@@ -573,8 +573,8 @@
     <ControlBinding semantic_id="changeScreenMergeMode">
       <DDSChannel topicName="RUSV::C2::RCU::ScreanChangeConfigType" typeName="ScreanChangeConfigType"/>
       <!-- CSCI의 물리 Type명 ScreanChangeConfigType 오탈자를 그대로 보존한다. -->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="screenChangeMode" cdm="Display.Mode" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="changeScreenMergeModeAck" required="true">
@@ -588,8 +588,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="stopUsblMotion">
       <DDSChannel topicName="RUSV::C2::RCU::ManualUSBLMotorControlType" typeName="ManualUSBLMotorControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed"/>
       <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -604,8 +604,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="launchUsbl">
       <DDSChannel topicName="RUSV::C2::RCU::ManualUSBLMotorControlType" typeName="ManualUSBLMotorControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed"/>
       <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -620,8 +620,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="recoveryUsbl">
       <DDSChannel topicName="RUSV::C2::RCU::ManualUSBLMotorControlType" typeName="ManualUSBLMotorControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed"/>
       <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="2"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -636,8 +636,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="returnUsblOrigin">
       <DDSChannel topicName="RUSV::C2::RCU::ManualUSBLMotorControlType" typeName="ManualUSBLMotorControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed"/>
       <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="3"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -652,8 +652,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="startUsbl">
       <DDSChannel topicName="RUSV::C2::RCU::USBLStartControlType" typeName="USBLStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="start" cdm="Command.Execution" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="startUsblAck" required="true">
@@ -667,8 +667,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="stopUsbl">
       <DDSChannel topicName="RUSV::C2::RCU::USBLStartControlType" typeName="USBLStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="start" cdm="Command.Execution" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopUsblAck" required="true">
@@ -682,8 +682,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="stopSlide">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoverySlideStartControlType" typeName="LaunchAndRecoverySlideStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position"/>
       <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -698,8 +698,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="moveSlide">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoverySlideStartControlType" typeName="LaunchAndRecoverySlideStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position"/>
       <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -714,8 +714,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="returnSlideWithTowfish">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoverySlideStartControlType" typeName="LaunchAndRecoverySlideStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position"/>
       <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="2"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -730,8 +730,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="returnSlideWithoutTowfish">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoverySlideStartControlType" typeName="LaunchAndRecoverySlideStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position"/>
       <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="3"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -746,8 +746,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="stopWinch">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryWinchStartControlType" typeName="LaunchAndRecoveryWinchStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength"/>
       <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -762,8 +762,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="deployWinch">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryWinchStartControlType" typeName="LaunchAndRecoveryWinchStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength"/>
       <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -778,8 +778,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="recoveryWinch">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryWinchStartControlType" typeName="LaunchAndRecoveryWinchStartControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength"/>
       <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="2"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
@@ -794,8 +794,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="separateCable">
       <DDSChannel topicName="RUSV::C2::RCU::CableSeparationCommandType" typeName="CableSeparationCommandType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="separation" cdm="LaunchRecovery.Cable.Separation" value="1"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="separateCableAck" required="true">
@@ -809,8 +809,8 @@
     </ControlBinding>
     <ControlBinding semantic_id="cancelCableSeparation">
       <DDSChannel topicName="RUSV::C2::RCU::CableSeparationCommandType" typeName="CableSeparationCommandType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <FixedField name="separation" cdm="LaunchRecovery.Cable.Separation" value="0"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="cancelCableSeparationAck" required="true">

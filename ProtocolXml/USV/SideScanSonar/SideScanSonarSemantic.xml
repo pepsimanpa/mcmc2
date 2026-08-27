@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd">
   <!--SideScanSonar 재정의본: 기능 중심 Semantic + 실제 IDD 기반 Binding/Reply 구조-->
   <ConstantSpecs id="constant">
     <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
