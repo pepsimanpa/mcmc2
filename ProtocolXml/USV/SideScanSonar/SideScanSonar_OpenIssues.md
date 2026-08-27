@@ -80,3 +80,13 @@
 - 5개 `DetailSystemStatusType` powerStatus는 원문에서 0/1 의미가 직접 확인되지 않아 raw 0/1을 임시 유지한다.
 - `SideScanSonar.SonarType`, `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`, `SideScanSonar.Subsystem(targetDevice)`은 최종 논리 값/CDM 재확인 후 이동한다.
 - 최종 CDM 감사 전에는 기존 CDM을 재사용하고 새 CDM 생성을 최소화한다.
+
+
+## Reply semantic result contract
+
+- PBIT와 IBIT은 각각 하나의 점검 결과 DDS 메시지이며, Semantic에서도 각각 `requestPbitResult`, `requestIbitResult` 한 개의 Reply를 유지한다. 메시지 내부 결과 필드는 하나의 `GroupResult` 아래 표현한다.
+- 38개 `CommandStatusReportType` ACK는 라우팅/상관관계 필드가 아니라 `commandStatusReport.status`만 Semantic Result로 노출한다. `dstEquipmentType`, `dstEquipmentID`, `commandID`는 Binding/Adapter 메타데이터로 유지한다.
+- `CommandStatusReport.status`의 원문 값(Executing/Pending/Failed/Reject/Canceled)은 확정되어 있으나, 세부 상태 CDM 명칭은 최종 CDM 감사까지 새로 만들지 않는다. 따라서 현재 Semantic은 `Control.Response.Status` 결과 존재만 선언한다.
+- `TSAPBITReportType`, `TSAIBITReportType` 내부 필드는 현재 Binding에 이미 존재하는 CDM을 그대로 Semantic Result에 재사용하며, Total 상태코드 및 IBIT detail bit의 raw 의미는 추가 추론하지 않는다.
+- `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType`도 하나의 결과 Report Reply를 유지하고 실제 payload 필드를 Semantic Result로 노출한다. raw 0/1/2 등의 의미 매핑은 원문 재확인 전까지 보류한다.
+- commandID가 없는 결과 Report의 요청-결과 correlation 방식은 기존 TBD를 유지한다.
