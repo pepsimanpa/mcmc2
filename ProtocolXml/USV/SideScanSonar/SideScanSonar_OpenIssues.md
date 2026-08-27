@@ -71,3 +71,12 @@
 - `USVMessageBase`, `DestinationType` 등 composite 구조체에는 primitive `dataType`을 억지로 부여하지 않는다.
 - 동일 이름이라도 메시지별 타입이 달라질 수 있는 필드는 DDS `typeName` 문맥으로 재확인한다. 특히 원신호의 `pulseType`과 제어 `StatusConfigType.pulseType`처럼 이름 재사용이 있는 경우 현재 Binding에 실제 사용되는 메시지 정의를 우선한다.
 - `boolean`, 배열, 문자열/char, 사용자 정의 구조체처럼 현재 `WireDataType`으로 직접 표현하기 애매한 항목은 후속 검토로 남긴다.
+
+
+## Enum / ValueMap migration
+
+- Semantic 논리 상태의 raw 숫자 코드를 제거하고 실제 DDS 코드는 Binding `ValueMap`으로 이동한다.
+- 반영: 운용모드, SSS/GF PulseType, SSS/GF TVG, 진회수 상태, USBL 모드, 3개 Brake, 2개 Limit Switch, CBIT 4상태, 제어 `powerOn`, 제어 `pulseType`.
+- 5개 `DetailSystemStatusType` powerStatus는 원문에서 0/1 의미가 직접 확인되지 않아 raw 0/1을 임시 유지한다.
+- `SideScanSonar.SonarType`, `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`, `SideScanSonar.Subsystem(targetDevice)`은 최종 논리 값/CDM 재확인 후 이동한다.
+- 최종 CDM 감사 전에는 기존 CDM을 재사용하고 새 CDM 생성을 최소화한다.

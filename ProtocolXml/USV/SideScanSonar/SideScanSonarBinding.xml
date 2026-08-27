@@ -6,28 +6,58 @@
     <MonitorBinding semantic_id="mode">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="operationalModeTSA" cdm="Mode.Operation" dataType="UInt8"/>
+      <Field name="operationalModeTSA" cdm="Mode.Operation" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Mode.Auto" value="0"/>
+          <Map cdm="Mode.Standby" value="1"/>
+          <Map cdm="Mode.ManualLaunch" value="2"/>
+          <Map cdm="Mode.ManualRecovery" value="3"/>
+          <Map cdm="Mode.ManualDeploy" value="4"/>
+          <Map cdm="Mode.EmergencyStop" value="5"/>
+          <Map cdm="Mode.CableSeparation" value="6"/>
+        </ValueMap>
+      </Field>
     </MonitorBinding>
     <MonitorBinding semantic_id="pingSetting">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
       <Field name="transducerFreq" cdm="Ping.CarrierFrequency" dataType="UInt16"/>
       <Field name="sssPulseWidth" cdm="Ping.SideScanSonar.PulseWidth" dataType="UInt16"/>
-      <Field name="sssPulseType" cdm="Ping.SideScanSonar.PulseType" dataType="UInt16"/>
+      <Field name="sssPulseType" cdm="Ping.SideScanSonar.PulseType" dataType="UInt16">
+        <ValueMap>
+          <Map cdm="Ping.PulseType.ContinuousWave" value="0"/>
+          <Map cdm="Ping.PulseType.Chirp" value="1"/>
+        </ValueMap>
+      </Field>
       <Field name="gfPulseWidth" cdm="Ping.GapFiller.PulseWidth" dataType="UInt16"/>
-      <Field name="gfPulseType" cdm="Ping.GapFiller.PulseType" dataType="UInt16"/>
+      <Field name="gfPulseType" cdm="Ping.GapFiller.PulseType" dataType="UInt16">
+        <ValueMap>
+          <Map cdm="Ping.PulseType.ContinuousWave" value="0"/>
+          <Map cdm="Ping.PulseType.Chirp" value="1"/>
+        </ValueMap>
+      </Field>
     </MonitorBinding>
     <MonitorBinding semantic_id="settingValues">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
       <Field name="sssRange" cdm="Setting.SideScanSonar.DetectionRange" dataType="UInt16"/>
       <Field name="sssGain" cdm="Setting.SideScanSonar.Gain" dataType="UInt8"/>
-      <Field name="sssTvgMode" cdm="Setting.SideScanSonar.TVG.Mode" dataType="UInt8"/>
+      <Field name="sssTvgMode" cdm="Setting.SideScanSonar.TVG.Mode" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Setting.TVG.Off" value="0"/>
+          <Map cdm="Setting.TVG.On" value="1"/>
+        </ValueMap>
+      </Field>
       <Field name="sssTvgDistCoeff" cdm="Setting.SideScanSonar.TVG.DistanceCoefficient" dataType="UInt16"/>
       <Field name="sssTvgAttenCoeff" cdm="Setting.SideScanSonar.TVG.AttenuationCoefficient" dataType="UInt16"/>
       <Field name="gfRange" cdm="Setting.GapFiller.DetectionRange" dataType="UInt16"/>
       <Field name="gfGain" cdm="Setting.GapFiller.Gain" dataType="UInt8"/>
-      <Field name="gfTvgMode" cdm="Setting.GapFiller.TVG.Mode" dataType="UInt8"/>
+      <Field name="gfTvgMode" cdm="Setting.GapFiller.TVG.Mode" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Setting.TVG.Off" value="0"/>
+          <Map cdm="Setting.TVG.On" value="1"/>
+        </ValueMap>
+      </Field>
       <Field name="gfTvgDistCoeff" cdm="Setting.GapFiller.TVG.DistanceCoefficient" dataType="UInt16"/>
       <Field name="gfTvgAttenCoeff" cdm="Setting.GapFiller.TVG.AttenuationCoefficient" dataType="UInt16"/>
     </MonitorBinding>
@@ -49,11 +79,42 @@
     <MonitorBinding semantic_id="launchRecoveryState">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="operationStatus" cdm="LaunchRecovery.Status.Operation" dataType="UInt8"/>
-      <Field name="ultraShortBaseLineMode" cdm="LaunchRecovery.USBL.Mode" dataType="UInt8"/>
-      <Field name="winchMotorBrakeStatus" cdm="LaunchRecovery.Winch.Brake" dataType="UInt8"/>
-      <Field name="slideMotorBrakeStatus" cdm="LaunchRecovery.Slide.Brake" dataType="UInt8"/>
-      <Field name="ultraShortBaseLineMotorBrakeStatus" cdm="LaunchRecovery.USBL.Brake" dataType="UInt8"/>
+      <Field name="operationStatus" cdm="LaunchRecovery.Status.Operation" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="LaunchRecovery.State.Standby" value="0"/>
+          <Map cdm="LaunchRecovery.State.Launching" value="1"/>
+          <Map cdm="LaunchRecovery.State.Launched" value="2"/>
+          <Map cdm="LaunchRecovery.State.Operating" value="3"/>
+          <Map cdm="LaunchRecovery.State.Recovering" value="4"/>
+          <Map cdm="LaunchRecovery.State.Recovered" value="5"/>
+          <Map cdm="LaunchRecovery.State.EmergencyStop" value="6"/>
+        </ValueMap>
+      </Field>
+      <Field name="ultraShortBaseLineMode" cdm="LaunchRecovery.USBL.Mode" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="LaunchRecovery.State.Stop" value="0"/>
+          <Map cdm="LaunchRecovery.State.Launch" value="1"/>
+          <Map cdm="LaunchRecovery.State.Recovery" value="2"/>
+        </ValueMap>
+      </Field>
+      <Field name="winchMotorBrakeStatus" cdm="LaunchRecovery.Winch.Brake" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Brake.Released" value="0"/>
+          <Map cdm="Brake.Locked" value="1"/>
+        </ValueMap>
+      </Field>
+      <Field name="slideMotorBrakeStatus" cdm="LaunchRecovery.Slide.Brake" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Brake.Released" value="0"/>
+          <Map cdm="Brake.Locked" value="1"/>
+        </ValueMap>
+      </Field>
+      <Field name="ultraShortBaseLineMotorBrakeStatus" cdm="LaunchRecovery.USBL.Brake" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Brake.Released" value="0"/>
+          <Map cdm="Brake.Locked" value="1"/>
+        </ValueMap>
+      </Field>
       <Field name="cableDeployLength" cdm="LaunchRecovery.Cable.Length" dataType="Float32"/>
       <Field name="cableDeploySpeed" cdm="LaunchRecovery.Cable.Speed" dataType="Float32"/>
       <Field name="slidePosition" cdm="LaunchRecovery.Slide.Position" dataType="Float32"/>
@@ -62,8 +123,18 @@
       <Field name="recoveryUnitCurrent" cdm="LaunchRecovery.Slide.Current" dataType="Float32"/>
       <Field name="ultraShortBaseLineVerticalCurrent" cdm="LaunchRecovery.USBL.Current" dataType="Float32"/>
       <Field name="cableTension" cdm="LaunchRecovery.Cable.Tension" dataType="Float32"/>
-      <Field name="launchLimitSwitchStatus" cdm="LaunchRecovery.LimitSwitch.Launch" dataType="UInt8"/>
-      <Field name="recoveryLimitSwitchStatus" cdm="LaunchRecovery.LimitSwitch.Recovery" dataType="UInt8"/>
+      <Field name="launchLimitSwitchStatus" cdm="LaunchRecovery.LimitSwitch.Launch" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="LimitSwitch.NotDetected" value="0"/>
+          <Map cdm="LimitSwitch.Detected" value="1"/>
+        </ValueMap>
+      </Field>
+      <Field name="recoveryLimitSwitchStatus" cdm="LaunchRecovery.LimitSwitch.Recovery" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="LimitSwitch.NotDetected" value="0"/>
+          <Map cdm="LimitSwitch.Detected" value="1"/>
+        </ValueMap>
+      </Field>
     </MonitorBinding>
     <MonitorBinding semantic_id="powerState">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
@@ -77,12 +148,54 @@
     <MonitorBinding semantic_id="subsystemHealthStatus">
       <DDSChannel topicName="RUSV::SO::TSA::TSACBITReportType" typeName="TSACBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="towedSonarAssemblyTotalCBIT" cdm="CBIT.TowfishAssembly" dataType="UInt8"/>
-      <Field name="launchAndRecoveryTotalCBIT" cdm="CBIT.LaunchRecoveryAssembly" dataType="UInt8"/>
-      <Field name="towedSonarArrayTotalCBIT" cdm="CBIT.TransducerArray" dataType="UInt8"/>
-      <Field name="sonarSignalProcessingEquipmentTotalCBIT" cdm="CBIT.SignalProcessor" dataType="UInt8"/>
-      <Field name="sonarImagingProcessingEquipmentTotalCBIT" cdm="CBIT.ImageProcessor" dataType="UInt8"/>
-      <Field name="hullMountedSonarTotalCBIT" cdm="CBIT.HullMountedSonar" dataType="UInt8"/>
+      <Field name="towedSonarAssemblyTotalCBIT" cdm="CBIT.TowfishAssembly" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="OperationalState.Normal" value="0"/>
+          <Map cdm="OperationalState.Degraded" value="1"/>
+          <Map cdm="OperationalState.Unavailable" value="2"/>
+          <Map cdm="OperationalState.NoResponse" value="3"/>
+        </ValueMap>
+      </Field>
+      <Field name="launchAndRecoveryTotalCBIT" cdm="CBIT.LaunchRecoveryAssembly" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="OperationalState.Normal" value="0"/>
+          <Map cdm="OperationalState.Degraded" value="1"/>
+          <Map cdm="OperationalState.Unavailable" value="2"/>
+          <Map cdm="OperationalState.NoResponse" value="3"/>
+        </ValueMap>
+      </Field>
+      <Field name="towedSonarArrayTotalCBIT" cdm="CBIT.TransducerArray" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="OperationalState.Normal" value="0"/>
+          <Map cdm="OperationalState.Degraded" value="1"/>
+          <Map cdm="OperationalState.Unavailable" value="2"/>
+          <Map cdm="OperationalState.NoResponse" value="3"/>
+        </ValueMap>
+      </Field>
+      <Field name="sonarSignalProcessingEquipmentTotalCBIT" cdm="CBIT.SignalProcessor" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="OperationalState.Normal" value="0"/>
+          <Map cdm="OperationalState.Degraded" value="1"/>
+          <Map cdm="OperationalState.Unavailable" value="2"/>
+          <Map cdm="OperationalState.NoResponse" value="3"/>
+        </ValueMap>
+      </Field>
+      <Field name="sonarImagingProcessingEquipmentTotalCBIT" cdm="CBIT.ImageProcessor" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="OperationalState.Normal" value="0"/>
+          <Map cdm="OperationalState.Degraded" value="1"/>
+          <Map cdm="OperationalState.Unavailable" value="2"/>
+          <Map cdm="OperationalState.NoResponse" value="3"/>
+        </ValueMap>
+      </Field>
+      <Field name="hullMountedSonarTotalCBIT" cdm="CBIT.HullMountedSonar" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="OperationalState.Normal" value="0"/>
+          <Map cdm="OperationalState.Degraded" value="1"/>
+          <Map cdm="OperationalState.Unavailable" value="2"/>
+          <Map cdm="OperationalState.NoResponse" value="3"/>
+        </ValueMap>
+      </Field>
     </MonitorBinding>
   </Monitors>
   <Controls semantic_id="control">
@@ -327,7 +440,12 @@
       <Field name="tvgDistCoeff" cdm="ReceiveProcessing.TVG.DistanceCoefficient" dataType="UInt16"/>
       <Field name="tvgAttenCoeff" cdm="ReceiveProcessing.TVG.AttenuationCoefficient" dataType="UInt16"/>
       <Field name="pulseWidth" cdm="Ping.PulseWidth" dataType="UInt16"/>
-      <Field name="pulseType" cdm="Ping.PulseType" dataType="UInt8"/>
+      <Field name="pulseType" cdm="Ping.PulseType" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Ping.PulseType.ContinuousWave" value="0"/>
+          <Map cdm="Ping.PulseType.Chirp" value="1"/>
+        </ValueMap>
+      </Field>
       <Field name="swGainMode" cdm="ReceiveProcessing.SoftwareGain.Mode" dataType="UInt8"/>
       <Field name="autoGain" cdm="ReceiveProcessing.SoftwareGain.Auto" dataType="UInt8"/>
       <Field name="tvgA" cdm="ReceiveProcessing.SoftwareGain.TVGA" dataType="UInt8"/>
@@ -387,7 +505,12 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <Field name="targetDevice" cdm="SideScanSonar.Subsystem" dataType="UInt8"/>
-      <Field name="powerOn" cdm="PowerSupplyState" dataType="UInt8"/>
+      <Field name="powerOn" cdm="PowerSupplyState" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="PowerSupplyState.Off" value="0"/>
+          <Map cdm="PowerSupplyState.On" value="1"/>
+        </ValueMap>
+      </Field>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="powerOnOffAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>

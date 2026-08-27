@@ -13,13 +13,13 @@
     <GroupSpec id="mode" name="예인형수중탐색장치 운용 모드" cdm="Mode">
       <ValueSetSpec id="operationalMode" name="운용 모드" cdm="Mode.Operation">
         <Values>
-          <Value cdm="Mode.Auto">0</Value>
-          <Value cdm="Mode.Standby">1</Value>
-          <Value cdm="Mode.ManualLaunch">2</Value>
-          <Value cdm="Mode.ManualRecovery">3</Value>
-          <Value cdm="Mode.ManualDeploy">4</Value>
-          <Value cdm="Mode.EmergencyStop">5</Value>
-          <Value cdm="Mode.CableSeparation">6</Value>
+          <Value name="Auto" cdm="Mode.Auto"/>
+          <Value name="Standby" cdm="Mode.Standby"/>
+          <Value name="ManualLaunch" cdm="Mode.ManualLaunch"/>
+          <Value name="ManualRecovery" cdm="Mode.ManualRecovery"/>
+          <Value name="ManualDeploy" cdm="Mode.ManualDeploy"/>
+          <Value name="EmergencyStop" cdm="Mode.EmergencyStop"/>
+          <Value name="CableSeparation" cdm="Mode.CableSeparation"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -38,8 +38,8 @@
       </QuantitySpec>
       <ValueSetSpec id="sssPulseType" name="SSS Pulse Type" cdm="Ping.SideScanSonar.PulseType">
         <Values>
-          <Value cdm="Ping.PulseType.ContinuousWave">0</Value>
-          <Value cdm="Ping.PulseType.Chirp">1</Value>
+          <Value name="ContinuousWave" cdm="Ping.PulseType.ContinuousWave"/>
+          <Value name="Chirp" cdm="Ping.PulseType.Chirp"/>
         </Values>
       </ValueSetSpec>
       <QuantitySpec id="gfPulseWidth" name="GapFiller Pulse Width" cdm="Ping.GapFiller.PulseWidth">
@@ -49,8 +49,8 @@
       </QuantitySpec>
       <ValueSetSpec id="gfPulseType" name="GapFiller Pulse Type" cdm="Ping.GapFiller.PulseType">
         <Values>
-          <Value cdm="Ping.PulseType.ContinuousWave">0</Value>
-          <Value cdm="Ping.PulseType.Chirp">1</Value>
+          <Value name="ContinuousWave" cdm="Ping.PulseType.ContinuousWave"/>
+          <Value name="Chirp" cdm="Ping.PulseType.Chirp"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -67,8 +67,8 @@
       </QuantitySpec>
       <ValueSetSpec id="sssTvgMode" name="SSS TVG On/Off" cdm="Setting.SideScanSonar.TVG.Mode">
         <Values>
-          <Value cdm="Setting.TVG.Off">0</Value>
-          <Value cdm="Setting.TVG.On">1</Value>
+          <Value name="Off" cdm="Setting.TVG.Off"/>
+          <Value name="On" cdm="Setting.TVG.On"/>
         </Values>
       </ValueSetSpec>
       <QuantitySpec id="sssTvgDistCoeff" name="SSS 거리감쇄계수" cdm="Setting.SideScanSonar.TVG.DistanceCoefficient">
@@ -91,8 +91,8 @@
       </QuantitySpec>
       <ValueSetSpec id="gfTvgMode" name="GapFiller TVG On/Off" cdm="Setting.GapFiller.TVG.Mode">
         <Values>
-          <Value cdm="Setting.TVG.Off">0</Value>
-          <Value cdm="Setting.TVG.On">1</Value>
+          <Value name="Off" cdm="Setting.TVG.Off"/>
+          <Value name="On" cdm="Setting.TVG.On"/>
         </Values>
       </ValueSetSpec>
       <QuantitySpec id="gfTvgDistCoeff" name="GapFiller 거리감쇄계수" cdm="Setting.GapFiller.TVG.DistanceCoefficient">
@@ -136,38 +136,38 @@
     <GroupSpec id="launchRecoveryState" name="진회수장치 상태" cdm="LaunchRecovery.Status">
       <ValueSetSpec id="operationStatus" name="진회수 운용 상태" cdm="LaunchRecovery.Status.Operation">
         <Values>
-          <Value cdm="LaunchRecovery.State.Standby">0</Value>
-          <Value cdm="LaunchRecovery.State.Launching">1</Value>
-          <Value cdm="LaunchRecovery.State.Launched">2</Value>
-          <Value cdm="LaunchRecovery.State.Operating">3</Value>
-          <Value cdm="LaunchRecovery.State.Recovering">4</Value>
-          <Value cdm="LaunchRecovery.State.Recovered">5</Value>
-          <Value cdm="LaunchRecovery.State.EmergencyStop">6</Value>
+          <Value name="Standby" cdm="LaunchRecovery.State.Standby"/>
+          <Value name="Launching" cdm="LaunchRecovery.State.Launching"/>
+          <Value name="Launched" cdm="LaunchRecovery.State.Launched"/>
+          <Value name="Operating" cdm="LaunchRecovery.State.Operating"/>
+          <Value name="Recovering" cdm="LaunchRecovery.State.Recovering"/>
+          <Value name="Recovered" cdm="LaunchRecovery.State.Recovered"/>
+          <Value name="EmergencyStop" cdm="LaunchRecovery.State.EmergencyStop"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="usblMode" name="USBL 모드" cdm="LaunchRecovery.USBL.Mode">
         <Values>
-          <Value cdm="LaunchRecovery.State.Stop">0</Value>
-          <Value cdm="LaunchRecovery.State.Launch">1</Value>
-          <Value cdm="LaunchRecovery.State.Recovery">2</Value>
+          <Value name="Stop" cdm="LaunchRecovery.State.Stop"/>
+          <Value name="Launch" cdm="LaunchRecovery.State.Launch"/>
+          <Value name="Recovery" cdm="LaunchRecovery.State.Recovery"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="winchMotorBrakeStatus" name="윈치모터 브레이크 상태" cdm="LaunchRecovery.Winch.Brake">
         <Values>
-          <Value cdm="Brake.Released">0</Value>
-          <Value cdm="Brake.Locked">1</Value>
+          <Value name="Released" cdm="Brake.Released"/>
+          <Value name="Locked" cdm="Brake.Locked"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="slideMotorBrakeStatus" name="슬라이드 모터 브레이크 상태" cdm="LaunchRecovery.Slide.Brake">
         <Values>
-          <Value cdm="Brake.Released">0</Value>
-          <Value cdm="Brake.Locked">1</Value>
+          <Value name="Released" cdm="Brake.Released"/>
+          <Value name="Locked" cdm="Brake.Locked"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="ultraShortBaseLineMotorBrakeStatus" name="USBL 액추에이터 상태" cdm="LaunchRecovery.USBL.Brake">
         <Values>
-          <Value cdm="Brake.Released">0</Value>
-          <Value cdm="Brake.Locked">1</Value>
+          <Value name="Released" cdm="Brake.Released"/>
+          <Value name="Locked" cdm="Brake.Locked"/>
         </Values>
       </ValueSetSpec>
       <QuantitySpec id="cableDeployLength" name="케이블 조출 길이" cdm="LaunchRecovery.Cable.Length">
@@ -196,14 +196,14 @@
       </QuantitySpec>
       <ValueSetSpec id="launchLimitSwitchStatus" name="진수 한계스위치" cdm="LaunchRecovery.LimitSwitch.Launch">
         <Values>
-          <Value cdm="LimitSwitch.NotDetected">0</Value>
-          <Value cdm="LimitSwitch.Detected">1</Value>
+          <Value name="NotDetected" cdm="LimitSwitch.NotDetected"/>
+          <Value name="Detected" cdm="LimitSwitch.Detected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="recoveryLimitSwitchStatus" name="회수 한계스위치" cdm="LaunchRecovery.LimitSwitch.Recovery">
         <Values>
-          <Value cdm="LimitSwitch.NotDetected">0</Value>
-          <Value cdm="LimitSwitch.Detected">1</Value>
+          <Value name="NotDetected" cdm="LimitSwitch.NotDetected"/>
+          <Value name="Detected" cdm="LimitSwitch.Detected"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -242,60 +242,60 @@
     <GroupSpec id="subsystemHealthStatus" name="구성품 정상 작동 여부" cdm="CBIT">
       <HealthStatusSetSpec id="towedSonarAssembly" name="예인형수중탐색장치 정상 작동 여부" cdm="CBIT.TowfishAssembly">
         <Values>
-          <Value cdm="OperationalState.Normal">0</Value>
-          <Value cdm="OperationalState.Degraded">1</Value>
-          <Value cdm="OperationalState.Unavailable">2</Value>
-          <Value cdm="OperationalState.NoResponse">3</Value>
+          <Value name="Normal" cdm="OperationalState.Normal"/>
+          <Value name="Degraded" cdm="OperationalState.Degraded"/>
+          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
+          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="TowfishAssembly"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="launchAndRecovery" name="진회수장치 정상 작동 여부" cdm="CBIT.LaunchRecoveryAssembly">
         <Values>
-          <Value cdm="OperationalState.Normal">0</Value>
-          <Value cdm="OperationalState.Degraded">1</Value>
-          <Value cdm="OperationalState.Unavailable">2</Value>
-          <Value cdm="OperationalState.NoResponse">3</Value>
+          <Value name="Normal" cdm="OperationalState.Normal"/>
+          <Value name="Degraded" cdm="OperationalState.Degraded"/>
+          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
+          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="LaunchRecoveryAssembly"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="towedSonarArray" name="예인형음탐기 정상 작동 여부" cdm="CBIT.TransducerArray">
         <Values>
-          <Value cdm="OperationalState.Normal">0</Value>
-          <Value cdm="OperationalState.Degraded">1</Value>
-          <Value cdm="OperationalState.Unavailable">2</Value>
-          <Value cdm="OperationalState.NoResponse">3</Value>
+          <Value name="Normal" cdm="OperationalState.Normal"/>
+          <Value name="Degraded" cdm="OperationalState.Degraded"/>
+          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
+          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="TransducerArray"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="sonarSignalProcessor" name="음탐기신호처리장치 정상 작동 여부" cdm="CBIT.SignalProcessor">
         <Values>
-          <Value cdm="OperationalState.Normal">0</Value>
-          <Value cdm="OperationalState.Degraded">1</Value>
-          <Value cdm="OperationalState.Unavailable">2</Value>
-          <Value cdm="OperationalState.NoResponse">3</Value>
+          <Value name="Normal" cdm="OperationalState.Normal"/>
+          <Value name="Degraded" cdm="OperationalState.Degraded"/>
+          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
+          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="SignalProcessor"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="sonarImageProcessor" name="음탐기영상처리장치 정상 작동 여부" cdm="CBIT.ImageProcessor">
         <Values>
-          <Value cdm="OperationalState.Normal">0</Value>
-          <Value cdm="OperationalState.Degraded">1</Value>
-          <Value cdm="OperationalState.Unavailable">2</Value>
-          <Value cdm="OperationalState.NoResponse">3</Value>
+          <Value name="Normal" cdm="OperationalState.Normal"/>
+          <Value name="Degraded" cdm="OperationalState.Degraded"/>
+          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
+          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="ImageProcessor"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="hullMountedSonar" name="선체부착형음탐기 정상 작동 여부" cdm="CBIT.HullMountedSonar">
         <Values>
-          <Value cdm="OperationalState.Normal">0</Value>
-          <Value cdm="OperationalState.Degraded">1</Value>
-          <Value cdm="OperationalState.Unavailable">2</Value>
-          <Value cdm="OperationalState.NoResponse">3</Value>
+          <Value name="Normal" cdm="OperationalState.Normal"/>
+          <Value name="Degraded" cdm="OperationalState.Degraded"/>
+          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
+          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="HullMountedSonar"/>
@@ -380,10 +380,12 @@
           <Range min="0" max="1000"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="Ping.PulseType">
-          <Range min="0" max="1"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="Ping.PulseType">
+          <Values>
+            <Value name="ContinuousWave" cdm="Ping.PulseType.ContinuousWave"/>
+            <Value name="Chirp" cdm="Ping.PulseType.Chirp"/>
+          </Values>
+        </ValueSetProfile>
         <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Mode">
           <Range min="0" max="2"/>
           <Resolution>1</Resolution>
@@ -450,10 +452,12 @@
           <Range min="1" max="5"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="PowerSupplyState">
-          <Range min="0" max="1"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="PowerSupplyState">
+          <Values>
+            <Value name="Off" cdm="PowerSupplyState.Off"/>
+            <Value name="On" cdm="PowerSupplyState.On"/>
+          </Values>
+        </ValueSetProfile>
       </Parameters>
       <Reply bindRef="powerOnOffAck" cdm="Control.CommandStatus.Response" required="true"/>
     </ControlSpec>
