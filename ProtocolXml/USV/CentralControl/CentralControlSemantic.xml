@@ -202,9 +202,9 @@
         </ControlSpec>
 
         <!--
-            Preset 의미값은 확정되어 있으나 실제 octet의 Bit 7~6 wire packing 규칙은 미확정이다.
+            Preset 의미값과 물리 위치를 분리한다.
             topology: 고송신/저송신, mission: 탐지/소나/무장/중계.
-            Semantic에서는 의미 선택만 노출하고 bit packing은 Binding/Adapter에서 해결한다.
+            각 1-byte 물리 필드의 Bit 7~6 매핑은 Binding의 PackedField/BitMember로 선언한다.
         -->
         <ControlSpec id="configureWirelessPreset" name="무선통신 Preset 설정" cdm="Control.Communication.WirelessPreset">
             <Parameters>

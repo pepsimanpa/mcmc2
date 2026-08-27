@@ -3,19 +3,19 @@
     원격통제장치(RCU) ↔ 중앙통제장치(MCE) DDS Binding.
 
     원칙
-    - Channel의 topicName/typeName은 CSCI CSV의 DDS 정의를 그대로 사용한다.
-    - usvHeader, commandID, DestinationType 및 의미가 확정되지 않은 공용 struct 내부 값은 BindingOnly로 두고 CDM을 부여하지 않는다.
-    - commandID는 원통 CSV 규칙(비주기 메시지 생성마다 +1, 0~65535)에 따라 런타임/Adapter가 생성한다. HMI 입력이 아니다.
+    - DDS topicName/typeName은 CSCI의 물리 정의를 그대로 사용한다.
+    - 송신 usvHeader/commandID와 일반 중앙통제 destination은 OM/runtime가 준비하며 Binding은 DerivedField로 연결한다.
+    - 일반 중앙통제 destination은 공용 식별자 규칙의 0x06/0x01/0x00을 사용한다.
+    - 공용 struct 내부 필드는 프로젝트 Adapter 규칙에 따라 dotted path로 접근한다.
     - CommandStatusReportType은 비주기 명령 처리상태 ACK이며 물리 동작 완료/성공을 의미하지 않는다.
     - PBIT/IBIT는 CommandStatusReport ACK와 별개로 전용 결과 Reply를 가진다.
+    - 변환 로직을 converter로 구현하지 않고 ValueMap/PackedField 등 선언형 Binding을 사용한다.
 
-    주요 TBD
-    - DestinationType의 중앙통제 대상 3-byte 식별값 생성 규칙
-    - AuthorityControl.destination 의미
-    - 일반 DDS struct 중첩 필드 접근 표기(dotted path 사용 여부)
-    - WirelessCommsPreset Bit 7~6 packing 규칙
-    - VHF rxChannel 범위/단위
-    - PBIT 1 Hz 표기 및 PBIT/IBIT 결과 commandID 부재에 따른 상관관계
+    중앙통제 고유 TBD
+    - AuthorityControl.destination의 통제권 업무 의미
+    - VHF rxChannel 범위/단위/채널표
+    - MCEPBITReportType 1 Hz 표기와 PBIT/IBIT 결과 commandID 부재에 따른 상관관계
+    - operationalStaus 원문 철자, voiceRxControl 설명 불일치, HeartBeat 일부 enum raw code
     상세는 CentralControl_OpenIssues.md 참조.
 -->
 <PayloadBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
