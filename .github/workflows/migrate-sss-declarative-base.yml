@@ -1,0 +1,200 @@
+name: Migrate SSS Declarative Base
+
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/migrate-sss-declarative-base.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+          fetch-depth: 0
+
+      - name: Apply SSS base migration and validate
+        run: |
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re
+
+          base = Path('ProtocolXml/USV/SideScanSonar')
+          sem = base / 'SideScanSonarSemantic.xml'
+          bind = base / 'SideScanSonarBinding.xml'
+          issues = base / 'SideScanSonar_OpenIssues.md'
+
+          original_sem = sem.read_text(encoding='utf-8')
+          original_bind = bind.read_text(encoding='utf-8')
+          old_comments = {
+              sem: re.findall(r'<!--[\s\S]*?-->', original_sem),
+              bind: re.findall(r'<!--[\s\S]*?-->', original_bind),
+          }
+
+          # 1) SSS XML should use the repository-level common XSD, not stale local snapshots.
+          s = original_sem
+          if './CommonSpecSchema.xsd' not in s:
+              raise SystemExit('semantic local schemaLocation not found')
+          s = s.replace('./CommonSpecSchema.xsd', '../../XSD/CommonSpecSchema.xsd', 1)
+          sem.write_text(s, encoding='utf-8', newline='')
+
+          s = original_bind
+          if './CommonBindingSchema.xsd' not in s:
+              raise SystemExit('binding local schemaLocation not found')
+          s = s.replace('./CommonBindingSchema.xsd', '../../XSD/CommonBindingSchema.xsd', 1)
+
+          counts = {
+              'BuildUSVMessageBase': s.count('converter="BuildUSVMessageBase"'),
+              'UInt16': s.count('converter="UInt16"'),
+              'BuildDestinationType': s.count('converter="BuildDestinationType"'),
+          }
+          if counts != {'BuildUSVMessageBase': 38, 'UInt16': 38, 'BuildDestinationType': 4}:
+              raise SystemExit(f'unexpected converter counts before migration: {counts}')
+
+          # 2) Composite/generated values are prepared by OM/Adapter. Binding only binds the prepared value.
+          s = s.replace(' converter="BuildUSVMessageBase"', '')
+          s = s.replace(' converter="BuildDestinationType"', '')
+
+          # 3) commandID remains a prepared scalar source value; Binding declares only its wire type.
+          s = s.replace(' converter="UInt16"', ' dataType="UInt16"')
+
+          responsibility_comment = '''  <!--
+    실행 책임 경계
+    - USVMessageBase와 DestinationType 공용 구조체의 값 조립은 OM/Adapter가 수행하고 Binding은 준비된 구조체를 sourceField로 연결한다.
+    - commandID의 생성/계승 규칙도 OM/Adapter가 수행하며 Binding은 UInt16 wire type만 선언한다.
+    - 일부 commandID는 CSCI 특수 규칙에 따라 System.Communication.LastReceivedCommandID를 계승한다. 동시 명령 시 상관관계 구현은 SideScanSonar_OpenIssues.md에 TBD로 남긴다.
+    - 기존 CSCI 근거 주석은 삭제하지 않는다.
+  -->\n'''
+          anchor = '  <!--BuildDestinationType(SideScanSonar) 식별자: dstEquipmentType=0x04, dstEquipmentID=0x01, dstSubEquipmentID=0x00-->\n'
+          if anchor not in s:
+              raise SystemExit('top destination comment anchor not found')
+          if '실행 책임 경계' not in s:
+              s = s.replace(anchor, anchor + responsibility_comment, 1)
+          bind.write_text(s, encoding='utf-8', newline='')
+
+          issue_lines = [
+              '# SideScanSonar Open Issues',
+              '',
+              '이 문서는 예인형수중탐색장치 CSCI 및 공용 CSV를 기준으로, 현재 단계에서 확정하지 않은 사항과 후속 검토 항목을 보존한다.',
+              '',
+              '## Source basis',
+              '',
+              '- `공용 식별자 규칙.csv`',
+              '- `공용 규칙.csv`',
+              '- `공용 구조체.csv`',
+              '- `원격통제장치 CSCI.csv`',
+              '- `예인형수중탐색장치 CSCI.csv`',
+              '',
+              '## Resolved in this migration',
+              '',
+              '- SSS Semantic/Binding은 로컬 XSD 복사본 대신 `ProtocolXml/XSD/CommonSpecSchema.xsd`, `ProtocolXml/XSD/CommonBindingSchema.xsd`를 참조한다.',
+              '- `USVMessageBase`는 발행주체 정보 구조체이며, 값 조립은 OM/Adapter 책임으로 둔다. Binding은 `System.Generated.USVMessageBase`를 그대로 연결한다.',
+              '- SSS 명령 대상 `DestinationType`은 공용 식별자 규칙상 `dstEquipmentType=0x04`, `dstEquipmentID=0x01`, `dstSubEquipmentID=0x00`을 사용하며, 구조체 조립은 OM/Adapter 책임으로 둔다.',
+              '- 일반 `commandID`는 원격통제장치 CSCI 규칙에 따라 비주기 메시지 생성 시 증가시키되, 실제 생성은 OM/Adapter가 수행하고 Binding은 `UInt16`만 선언한다.',
+              '- `CommandStatusReportType`은 명령 처리상태 ACK이며 `Executing/Pending/Failed/Reject/Canceled` 상태를 가지므로 실제 물리 동작 완료/성공으로 해석하지 않는다.',
+              '',
+              '## Deferred / TBD',
+              '',
+              '1. **LastReceivedCommandID correlation**',
+              '   - `StartControlType`, `AutoLaunchControlType` 등 일부 CSCI는 수신 메시지의 commandID 값을 읽어 그대로 송신하도록 명시한다.',
+              '   - 현재 `System.Communication.LastReceivedCommandID`를 유지한다.',
+              '   - 여러 명령이 동시 진행될 때 어떤 수신 메시지와 상관시킬지 정확한 OM/Adapter 규칙은 TBD이다.',
+              '',
+              '2. **결과 Report의 commandID 부재**',
+              '   - `TSAPBITReportType`, `TSAIBITReportType`, `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType` 등 일부 결과 Report에는 commandID가 없다.',
+              '   - 요청-결과 correlation 규칙은 TBD이다. 기존 Reply 구조는 유지한다.',
+              '',
+              '3. **DetailSystemStatusType 전원 상태 0/1 의미**',
+              '   - `PlatformPowerControlType.powerOn`은 0=OFF, 1=ON이 명시되어 있다.',
+              '   - 반면 `DetailSystemStatusType`의 각 powerStatus 필드는 원문에 0/1 의미가 직접 명시되어 있지 않다.',
+              '   - 제어값과 상태값이 동일할 가능성은 높지만 현재 단계에서는 확정하지 않는다.',
+              '',
+              '4. **IBIT 상세 bit 해석**',
+              '   - 다수 detail octet은 비정상 bit flag이지만 `sonarImagingProcessingEquipmentDetail`은 보드/조립체 장착 유무 bit flag이다.',
+              '   - 따라서 모든 IBIT detail bit를 일괄적으로 0=PASS, 1=FAIL로 해석하지 않는다.',
+              '',
+              '5. **DDS 중첩 구조체 접근 표기**',
+              '   - `commandStatusReport.dstEquipmentType` 같은 dotted path를 현재 Binding에서 사용한다.',
+              '   - 공통 Adapter가 dotted path를 공식 접근 규칙으로 사용할지 최종 확정은 TBD이다.',
+              '',
+              '6. **로컬 XSD 복사본 정리**',
+              '   - `SideScanSonar/CommonSpecSchema.xsd`, `SideScanSonar/CommonBindingSchema.xsd`는 현재 공통 XSD보다 오래된 snapshot이다.',
+              '   - 이번 단계에서는 외부 도구가 직접 참조할 가능성을 고려해 파일 자체는 삭제하지 않고, SSS XML의 schemaLocation만 공통 XSD로 전환했다.',
+              '   - USV 전체 migration 완료 후 외부 의존성 확인 뒤 삭제 여부를 결정한다.',
+              '',
+              '7. **최종 CDM 감사**',
+              '   - CDM 명칭/계층은 USV 장치 전체 정리 후 별도 전수 감사한다.',
+              '',
+              '8. **CSCI 오탈자 보존**',
+              '   - `LanchAndRecoveryBackStopReportType`, `ScreanChangeConfigType` 등 물리 Type 이름의 오탈자는 CSCI 원문과 DDS typeName 정합성을 위해 현재 그대로 보존한다.',
+              '',
+          ]
+          issues.write_text('\n'.join(issue_lines), encoding='utf-8', newline='')
+
+          # Preserve every pre-existing XML comment verbatim.
+          for p in [sem, bind]:
+              new_text = p.read_text(encoding='utf-8')
+              for comment in old_comments[p]:
+                  if comment not in new_text:
+                      raise SystemExit(f'comment lost from {p}: {comment[:100]}')
+              print('COMMENTS_PRESERVED', p, len(old_comments[p]), 'old comments retained')
+
+          # Converter migration assertions.
+          new_bind = bind.read_text(encoding='utf-8')
+          if 'converter="' in new_bind:
+              raise SystemExit('SSS converter attributes remain')
+          if new_bind.count('name="commandID"') != 38:
+              raise SystemExit('unexpected commandID count')
+          if new_bind.count('name="commandID" sourceField=') != 38:
+              raise SystemExit('unexpected derived commandID source count')
+          command_lines = re.findall(r'<DerivedField name="commandID"[^>]*/>', new_bind)
+          if len(command_lines) != 38 or any('dataType="UInt16"' not in x for x in command_lines):
+              raise SystemExit('not all commandID fields declare UInt16')
+          usv_lines = re.findall(r'<DerivedField name="usvHeader"[^>]*/>', new_bind)
+          dest_lines = re.findall(r'<DerivedField name="destination"[^>]*/>', new_bind)
+          if len(usv_lines) != 38 or len(dest_lines) != 4:
+              raise SystemExit(f'unexpected composite derived counts usv={len(usv_lines)} dest={len(dest_lines)}')
+          if any('converter=' in x for x in usv_lines + dest_lines):
+              raise SystemExit('composite converter remains')
+          print('COMMAND_ID_SOURCES', {k: len(re.findall(fr'sourceField="{re.escape(k)}"', new_bind)) for k in ['System.Generated.CommandSequence','System.Communication.LastReceivedCommandID']})
+
+          # Root XSD validation after schemaLocation migration.
+          spec_schema = etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          binding_schema = etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          spec_schema.assertValid(etree.parse(str(sem)))
+          binding_schema.assertValid(etree.parse(str(bind)))
+          print('PASS ROOT XSD', sem)
+          print('PASS ROOT XSD', bind)
+
+          # Structural alignment including SetPointSpec.
+          ns = {'u':'http://lignex1.com/mcmc2/umsSchema'}
+          S = etree.parse(str(sem)); B = etree.parse(str(bind))
+          semantic_controls = []
+          for tag in ['ControlSpec','SetPointSpec','DiscreteControlSpec','SequenceControlSpec']:
+              semantic_controls += [e.get('id') for e in S.xpath(f'.//u:{tag}', namespaces=ns)]
+          binding_controls = [e.get('semantic_id') for e in B.xpath('.//u:ControlBinding', namespaces=ns)]
+          if set(semantic_controls) != set(binding_controls) or len(semantic_controls) != len(binding_controls):
+              raise SystemExit('control alignment mismatch')
+          semantic_replies = [e.get('bindRef') for e in S.xpath('.//u:Reply[@bindRef]', namespaces=ns)]
+          binding_replies = [e.get('semantic_id') for e in B.xpath('.//u:Reply[@semantic_id]', namespaces=ns)]
+          if set(semantic_replies) != set(binding_replies) or len(semantic_replies) != len(binding_replies):
+              raise SystemExit('reply alignment mismatch')
+          print('ALIGN PASS controls', len(semantic_controls), 'replies', len(semantic_replies))
+          PY
+
+          git diff --check
+          git rm .github/workflows/migrate-sss-declarative-base.yml
+
+      - name: Commit migration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Migrate SSS binding base to declarative rules'
+          git push origin HEAD:feature/usv-semantic-binding-audit
