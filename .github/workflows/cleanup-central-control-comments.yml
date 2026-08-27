@@ -1,0 +1,59 @@
+name: Clean CentralControl Comments
+
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/cleanup-central-control-comments.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+          fetch-depth: 0
+      - name: Remove stale resolved TBD wording and validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          sfile=Path('ProtocolXml/USV/CentralControl/CentralControlSemantic.xml')
+          bfile=Path('ProtocolXml/USV/CentralControl/CentralControlBinding.xml')
+          s=sfile.read_text(encoding='utf-8'); b=bfile.read_text(encoding='utf-8')
+          old='''        <!--\n            Preset 의미값은 확정되어 있으나 실제 octet의 Bit 7~6 wire packing 규칙은 미확정이다.\n            topology: 고송신/저송신, mission: 탐지/소나/무장/중계.\n            Semantic에서는 의미 선택만 노출하고 bit packing은 Binding/Adapter에서 해결한다.\n        -->'''
+          new='''        <!--\n            Preset 의미값과 물리 위치를 분리한다.\n            topology: 고송신/저송신, mission: 탐지/소나/무장/중계.\n            각 1-byte 물리 필드의 Bit 7~6 매핑은 Binding의 PackedField/BitMember로 선언한다.\n        -->'''
+          if s.count(old)!=1: raise SystemExit('semantic preset stale comment anchor')
+          s=s.replace(old,new,1)
+          old='''    원칙\n    - Channel의 topicName/typeName은 CSCI CSV의 DDS 정의를 그대로 사용한다.\n    - usvHeader, commandID, DestinationType 및 의미가 확정되지 않은 공용 struct 내부 값은 BindingOnly로 두고 CDM을 부여하지 않는다.\n    - commandID는 원통 CSV 규칙(비주기 메시지 생성마다 +1, 0~65535)에 따라 런타임/Adapter가 생성한다. HMI 입력이 아니다.\n    - CommandStatusReportType은 비주기 명령 처리상태 ACK이며 물리 동작 완료/성공을 의미하지 않는다.\n    - PBIT/IBIT는 CommandStatusReport ACK와 별개로 전용 결과 Reply를 가진다.\n\n    주요 TBD\n    - DestinationType의 중앙통제 대상 3-byte 식별값 생성 규칙\n    - AuthorityControl.destination 의미\n    - 일반 DDS struct 중첩 필드 접근 표기(dotted path 사용 여부)\n    - WirelessCommsPreset Bit 7~6 packing 규칙\n    - VHF rxChannel 범위/단위\n    - PBIT 1 Hz 표기 및 PBIT/IBIT 결과 commandID 부재에 따른 상관관계\n    상세는 CentralControl_OpenIssues.md 참조.'''
+          new='''    원칙\n    - DDS topicName/typeName은 CSCI의 물리 정의를 그대로 사용한다.\n    - 송신 usvHeader/commandID와 일반 중앙통제 destination은 OM/runtime가 준비하며 Binding은 DerivedField로 연결한다.\n    - 일반 중앙통제 destination은 공용 식별자 규칙의 0x06/0x01/0x00을 사용한다.\n    - 공용 struct 내부 필드는 프로젝트 Adapter 규칙에 따라 dotted path로 접근한다.\n    - CommandStatusReportType은 비주기 명령 처리상태 ACK이며 물리 동작 완료/성공을 의미하지 않는다.\n    - PBIT/IBIT는 CommandStatusReport ACK와 별개로 전용 결과 Reply를 가진다.\n    - 변환 로직을 converter로 구현하지 않고 ValueMap/PackedField 등 선언형 Binding을 사용한다.\n\n    중앙통제 고유 TBD\n    - AuthorityControl.destination의 통제권 업무 의미\n    - VHF rxChannel 범위/단위/채널표\n    - MCEPBITReportType 1 Hz 표기와 PBIT/IBIT 결과 commandID 부재에 따른 상관관계\n    - operationalStaus 원문 철자, voiceRxControl 설명 불일치, HeartBeat 일부 enum raw code\n    상세는 CentralControl_OpenIssues.md 참조.'''
+          if b.count(old)!=1: raise SystemExit('binding top stale comment anchor')
+          b=b.replace(old,new,1)
+          stale=['DestinationType의 중앙통제 대상 3-byte 식별값 생성 규칙','일반 DDS struct 중첩 필드 접근 표기(dotted path 사용 여부)','WirelessCommsPreset Bit 7~6 packing 규칙','실제 shift/packing converter는 TBD','dotted path를 잠정 사용']
+          for x in stale:
+              if x in s or x in b: raise SystemExit('stale resolved wording remains: '+x)
+          sfile.write_text(s,encoding='utf-8',newline=''); bfile.write_text(b,encoding='utf-8',newline='')
+          etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd')).assertValid(etree.parse(str(sfile)))
+          etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd')).assertValid(etree.parse(str(bfile)))
+          print('REMAINING_SEMANTIC_TBD_LINES')
+          for i,line in enumerate(s.splitlines(),1):
+              if 'TBD' in line or '미확정' in line or '잠정' in line: print(i,line.strip())
+          print('REMAINING_BINDING_TBD_LINES')
+          for i,line in enumerate(b.splitlines(),1):
+              if 'TBD' in line or '미확정' in line or '잠정' in line: print(i,line.strip())
+          PY
+          git diff --check
+          git rm .github/workflows/cleanup-central-control-comments.yml
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Clean resolved CentralControl TBD comments'
+          git push origin HEAD:feature/usv-semantic-binding-audit
