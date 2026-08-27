@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd">
   <!--센서융합 정보처리장치 Semantic: 센서융합 정보처리 CSC + 원격통제장치 CSCI + 공용 구조체/식별자 규칙 기반-->
-  <!--범위는 원격통제장치 CSCI ↔ 센서융합 정보처리 CSC 직접 연동에 한정하며 타 장비 간 연동은 제외한다.-->
+  <!--범위는 원격통제장치 CSCI ↔ 센서융합 정보처리 CSC 직접 연동에 한정하며 타 장비 간 연동은 제외한다. 물리 raw enum/type/commandID/destination은 Binding 책임으로 둔다.-->
   <ConstantSpecs id="constant">
     <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
       <Value>SensorFusionProcessor</Value>
@@ -24,14 +24,14 @@
           </QuantitySpec>
           <ValueSetSpec id="sensorFusionContactIdentifier" name="센서융합 클래스 식별" cdm="Contact.Fusion.Classification">
             <Values>
-              <Value cdm="Contact.Fusion.Classification.Unclassified">0</Value>
-              <Value cdm="Contact.Fusion.Classification.Vessel">1</Value>
+              <Value name="Unclassified" cdm="Contact.Fusion.Classification.Unclassified"/>
+              <Value name="Vessel" cdm="Contact.Fusion.Classification.Vessel"/>
             </Values>
           </ValueSetSpec>
           <ValueSetSpec id="sensorFusionContactAttribute" name="센서융합 접촉물 속성" cdm="Contact.Fusion.MotionAttribute">
             <Values>
-              <Value cdm="Contact.Fusion.MotionAttribute.Static">0</Value>
-              <Value cdm="Contact.Fusion.MotionAttribute.Dynamic">1</Value>
+              <Value name="Static" cdm="Contact.Fusion.MotionAttribute.Static"/>
+              <Value name="Dynamic" cdm="Contact.Fusion.MotionAttribute.Dynamic"/>
             </Values>
           </ValueSetSpec>
           <QuantitySpec id="latitude" name="위도" cdm="Contact.Fusion.Position.Latitude">
@@ -50,18 +50,15 @@
             <Unit>m</Unit>
             <Range min="0" max="12000"/>
           </QuantitySpec>
-          <!--방위/침로 계열은 원본 공용 구조체의 rad 단위를 그대로 유지한다.-->
+          <!--방위/침로 계열은 원본 공용 구조체의 rad 단위를 유지한다. Range가 π 기호로 정의된 항목은 XSD decimal에 임의 근사값을 넣지 않고 원문 범위를 주석으로 보존한다: relativeAzimuth=-π~π, trueAzimuth/relativeHeading/cog=0~2π, elevationAngle=-π/2~π/2.-->
           <QuantitySpec id="relativeAzimuth" name="상대 방위각" cdm="Contact.Fusion.Bearing.RelativeAzimuth">
             <Unit>rad</Unit>
-            <Range min="-3.141592653589793" max="3.141592653589793"/>
           </QuantitySpec>
           <QuantitySpec id="trueAzimuth" name="절대 방위각" cdm="Contact.Fusion.Bearing.TrueAzimuth">
             <Unit>rad</Unit>
-            <Range min="0" max="6.283185307179586"/>
           </QuantitySpec>
           <QuantitySpec id="elevationAngle" name="고각" cdm="Contact.Fusion.Bearing.Elevation">
             <Unit>rad</Unit>
-            <Range min="-1.570796326794897" max="1.570796326794897"/>
           </QuantitySpec>
           <QuantitySpec id="relativeSpeed" name="상대 속력" cdm="Contact.Fusion.Motion.RelativeSpeed">
             <Unit>m/s</Unit>
@@ -69,11 +66,9 @@
           </QuantitySpec>
           <QuantitySpec id="relativeHeading" name="상대 선수각" cdm="Contact.Fusion.Motion.RelativeHeading">
             <Unit>rad</Unit>
-            <Range min="0" max="6.283185307179586"/>
           </QuantitySpec>
           <QuantitySpec id="cog" name="절대 침로(COG)" cdm="Contact.Fusion.Motion.COG">
             <Unit>rad</Unit>
-            <Range min="0" max="6.283185307179586"/>
           </QuantitySpec>
           <QuantitySpec id="sog" name="속력(SOG)" cdm="Contact.Fusion.Motion.SOG">
             <Unit>m/s</Unit>
@@ -170,25 +165,25 @@
     </GroupSpec>
 
     <GroupSpec id="cipeCbitStatus" name="센서융합 처리카드 CBIT 상태" cdm="Health.CBIT.CIPE">
-      <!--공용 CIPECBITReport의 동일 상태 정의를 사용한다. cipeOperationalStatus는 센서 종류와 연동 여부를 하나의 enum 값으로 표현하므로 분리하지 않고 원본 의미를 유지한다.-->
+      <!--공용 CIPECBITReport의 동일 상태 정의를 사용한다. 하나의 octet이 센서 종류/연동상태 조합을 표현하며 실제 다중 센서 보고 방식은 OpenIssues에 남긴다.-->
       <ValueSetSpec id="cipeOperationalStatus" name="센서 연동 상태" cdm="Health.CIPE.EquipmentLink">
         <Values>
-          <Value cdm="Health.CIPE.Radar.Connected">10</Value>
-          <Value cdm="Health.CIPE.Radar.Disconnected">13</Value>
-          <Value cdm="Health.CIPE.Lidar.Connected">20</Value>
-          <Value cdm="Health.CIPE.Lidar.Disconnected">23</Value>
-          <Value cdm="Health.CIPE.NearContact.Connected">30</Value>
-          <Value cdm="Health.CIPE.NearContact.Disconnected">33</Value>
-          <Value cdm="Health.CIPE.EOIR.Connected">40</Value>
-          <Value cdm="Health.CIPE.EOIR.Disconnected">43</Value>
+          <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/>
+          <Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
+          <Value name="LidarConnected" cdm="Health.CIPE.Lidar.Connected"/>
+          <Value name="LidarDisconnected" cdm="Health.CIPE.Lidar.Disconnected"/>
+          <Value name="NearContactConnected" cdm="Health.CIPE.NearContact.Connected"/>
+          <Value name="NearContactDisconnected" cdm="Health.CIPE.NearContact.Disconnected"/>
+          <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
+          <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="operationalStatus" name="처리카드 정상 작동 여부" cdm="Health.CIPE.OperationalStatus">
         <Values>
-          <Value cdm="Health.Normal">0</Value>
-          <Value cdm="Health.Degraded">1</Value>
-          <Value cdm="Health.Unavailable">2</Value>
-          <Value cdm="Health.NoResponse">3</Value>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -196,22 +191,92 @@
 
   <ControlSpecs id="control">
     <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
     <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
     <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response"/>
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
+        <Results>
+          <GroupResult name="cipeIbit" cdm="Health.IBIT.SensorFusion">
+            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+              <Values>
+                <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/>
+                <Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
+                <Value name="LidarConnected" cdm="Health.CIPE.Lidar.Connected"/>
+                <Value name="LidarDisconnected" cdm="Health.CIPE.Lidar.Disconnected"/>
+                <Value name="NearContactConnected" cdm="Health.CIPE.NearContact.Connected"/>
+                <Value name="NearContactDisconnected" cdm="Health.CIPE.NearContact.Disconnected"/>
+                <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
+                <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
+              </Values>
+            </ValueSetResult>
+            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+              <Values>
+                <Value name="Normal" cdm="Health.Normal"/>
+                <Value name="Degraded" cdm="Health.Degraded"/>
+                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                <Value name="NoResponse" cdm="Health.NoResponse"/>
+              </Values>
+            </ValueSetResult>
+            <QuantityResult name="cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature">
+              <Unit>degC</Unit>
+              <Range min="20" max="100"/>
+            </QuantityResult>
+            <QuantityResult name="cpuLoad" cdm="Health.CIPE.Processor.CpuLoad">
+              <Unit>percent</Unit>
+              <Range min="0" max="100"/>
+            </QuantityResult>
+          </GroupResult>
+        </Results>
+      </Reply>
     </ControlSpec>
     <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response"/>
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
+        <Results>
+          <GroupResult name="cipePbit" cdm="Health.PBIT.SensorFusion">
+            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+              <Values>
+                <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/>
+                <Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
+                <Value name="LidarConnected" cdm="Health.CIPE.Lidar.Connected"/>
+                <Value name="LidarDisconnected" cdm="Health.CIPE.Lidar.Disconnected"/>
+                <Value name="NearContactConnected" cdm="Health.CIPE.NearContact.Connected"/>
+                <Value name="NearContactDisconnected" cdm="Health.CIPE.NearContact.Disconnected"/>
+                <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
+                <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
+              </Values>
+            </ValueSetResult>
+            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+              <Values>
+                <Value name="Normal" cdm="Health.Normal"/>
+                <Value name="Degraded" cdm="Health.Degraded"/>
+                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                <Value name="NoResponse" cdm="Health.NoResponse"/>
+              </Values>
+            </ValueSetResult>
+          </GroupResult>
+        </Results>
+      </Reply>
     </ControlSpec>
   </ControlSpecs>
 </SensorSpec>
