@@ -866,6 +866,29 @@ AUV RF Binding의 다음 계산성 converter를 선언형/책임분리 구조로
 - 프로젝트 bit 해석 규칙을 확정한다: 점검 계열은 `0=PASS, 1=FAIL`, 이상/이벤트 계열은 `0=정상·미발생, 1=이상·발생`, MODE/LOCK 등 상태 flag는 `0=비활성, 1=활성`으로 해석한다.
 - RF Pre-Launch Check 6개 항목도 위 점검 규칙에 따라 `0=PASS, 1=FAIL`로 확정한다.
 - STAT_code bit0~4는 `0=정상, 1=비정상`; DATA_LOCK/SYNC_LOCK은 정상/비정상 판정이 아니라 `0=비활성, 1=활성` flag로 유지한다.
+
+## Issue 16. AUV Control/Reply/Binding 구조 정합성 감사
+
+**Status: PASS / known TBD preserved**
+
+- Platform Semantic Control 12개와 Platform RF ControlBinding 12개의 `id/semantic_id`가 1:1 일치한다.
+- UCD는 원 ICD에서 정의된 `requestAuvCheck`, `emergencyReturn`, `deleteAllRecords` 3개 ControlBinding만 동일 Platform Semantic을 재사용한다.
+- RF 통신장치 Semantic Control 6개와 RF Comm ControlBinding 6개가 1:1 일치한다.
+- Semantic `Reply.bindRef`는 실제 Binding `Reply.semantic_id`로 모두 해소된다. `requestData`와 `toggleRfGain`은 합의대로 Reply가 없다.
+- RF-1 COMMAND의 주 기능 bit와 `RF_SEND(bit30)` / `RF_EXEC(bit31)`, expectedValue, RF-2 ACK expectedValue가 현재 확정표와 일치한다.
+- INFO_NUM은 Platform.Identifier.Numeric=1/2 기준 INFO1=`1/4`, INFO2=`2/5`, INFO3=`3/6`으로 일치한다.
+- `MISSION_START`는 origin CSV의 INFO2 표기와 달리 프로젝트 확정값 INFO3를 유지한다.
+- RF-3는 requestData Control Reply가 아니라 5종 SensorProduct로 유지하며 dataAck bit11~15 mask가 일치한다.
+- UCD-1 COMMAND와 UCD-2 ACK는 `AUV_CHECK_Req_L(bit0)=0x0001`, `EMER_RETURN(bit5)=0x0020`, `Record_Del(bit9)=0x0200`으로 일치한다.
+- `AuvSpecification.xml`은 Platform Semantic, RF/UCD Binding, RF Comm Semantic/Binding을 모두 참조하고 little-endian DataEncoding을 갖는다.
+
+다음 사항은 오류로 보정하지 않고 기존 TBD를 유지한다.
+- RF-2 ACK + RF_CMD_COMPLETE + Body 결과가 항상 한 Telegram에서 동시에 유효한지 여부.
+- RF_GAIN / KEY_CMD의 INFORMATION 종류는 원문에 기재가 없어 INFO1 잠정 매핑.
+- 원 ICD의 RF-1/RF-2 전송 표현과 현재 TCPChannel adapter 추상화의 관계.
+- RF-1/RF-2/RF-3 COUNT 간 상관관계.
+- INFO2 Waypoint 영역의 992-byte 표기와 최대 100개 좌표 산술 불일치.
+
 ## 확정된 별도 bit 규칙
 
 ### COMMAND
