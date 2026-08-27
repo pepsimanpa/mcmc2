@@ -71,46 +71,46 @@
             </QuantitySpec>
             <ValueSetSpec id="autonomousMissionMode" name="자율운항 임무모드" cdm="Autonomy.Mission.Mode">
                 <Values>
-                    <Value>WaypointNavigation</Value>
-                    <Value>TargetPointHold</Value>
-                    <Value>TargetTracking</Value>
-                    <Value>PointAndGo</Value>
-                    <Value>AutomaticNavigation</Value>
-                    <Value>SurfaceISR</Value>
-                    <Value>UnderwaterISR</Value>
-                    <Value>AutomaticDocking</Value>
+                    <Value name="WaypointNavigation" cdm="Autonomy.Mission.Mode.WaypointNavigation"/>
+                    <Value name="TargetPointHold" cdm="Autonomy.Mission.Mode.TargetPointHold"/>
+                    <Value name="TargetTracking" cdm="Autonomy.Mission.Mode.TargetTracking"/>
+                    <Value name="PointAndGo" cdm="Autonomy.Mission.Mode.PointAndGo"/>
+                    <Value name="AutomaticNavigation" cdm="Autonomy.Mission.Mode.AutomaticNavigation"/>
+                    <Value name="SurfaceISR" cdm="Autonomy.Mission.Mode.SurfaceISR"/>
+                    <Value name="UnderwaterISR" cdm="Autonomy.Mission.Mode.UnderwaterISR"/>
+                    <Value name="AutomaticDocking" cdm="Autonomy.Mission.Mode.AutomaticDocking"/>
                 </Values>
             </ValueSetSpec>
             <ValueSetSpec id="eoirOperationMode" name="전자광학장치 운용모드" cdm="Sensor.EOIR.OperationMode">
                 <Values>
-                    <Value>Standby</Value>
-                    <Value>ManualTracking</Value>
-                    <Value>AutomaticTracking</Value>
-                    <Value>RadarSlave</Value>
-                    <Value>BowPointing</Value>
-                    <Value>SwingGuard</Value>
-                    <Value>RCWSLinked</Value>
-                    <Value>StowProtect</Value>
-                    <Value>BuiltInTest</Value>
+                    <Value name="Standby" cdm="Sensor.EOIR.OperationMode.Standby"/>
+                    <Value name="ManualTracking" cdm="Sensor.EOIR.OperationMode.ManualTracking"/>
+                    <Value name="AutomaticTracking" cdm="Sensor.EOIR.OperationMode.AutomaticTracking"/>
+                    <Value name="RadarSlave" cdm="Sensor.EOIR.OperationMode.RadarSlave"/>
+                    <Value name="BowPointing" cdm="Sensor.EOIR.OperationMode.BowPointing"/>
+                    <Value name="SwingGuard" cdm="Sensor.EOIR.OperationMode.SwingGuard"/>
+                    <Value name="RCWSLinked" cdm="Sensor.EOIR.OperationMode.RCWSLinked"/>
+                    <Value name="StowProtect" cdm="Sensor.EOIR.OperationMode.StowProtect"/>
+                    <Value name="BuiltInTest" cdm="Sensor.EOIR.OperationMode.BuiltInTest"/>
                 </Values>
             </ValueSetSpec>
             <ValueSetSpec id="towedSonarOperationMode" name="예인형수중탐색장치 운용모드" cdm="Sensor.TowedSonar.OperationMode">
                 <Values>
-                    <Value>Automatic</Value>
-                    <Value>Standby</Value>
-                    <Value>ManualLaunch</Value>
-                    <Value>ManualRecovery</Value>
-                    <Value>ManualPayOut</Value>
-                    <Value>EmergencyStop</Value>
-                    <Value>CableRelease</Value>
+                    <Value name="Automatic" cdm="Sensor.TowedSonar.OperationMode.Automatic"/>
+                    <Value name="Standby" cdm="Sensor.TowedSonar.OperationMode.Standby"/>
+                    <Value name="ManualLaunch" cdm="Sensor.TowedSonar.OperationMode.ManualLaunch"/>
+                    <Value name="ManualRecovery" cdm="Sensor.TowedSonar.OperationMode.ManualRecovery"/>
+                    <Value name="ManualPayOut" cdm="Sensor.TowedSonar.OperationMode.ManualPayOut"/>
+                    <Value name="EmergencyStop" cdm="Sensor.TowedSonar.OperationMode.EmergencyStop"/>
+                    <Value name="CableRelease" cdm="Sensor.TowedSonar.OperationMode.CableRelease"/>
                 </Values>
             </ValueSetSpec>
             <ValueSetSpec id="rcwsOperationMode" name="원격사격통제장치 운용모드" cdm="Weapon.RCWS.OperationMode">
                 <Values>
-                    <Value>Safe</Value>
-                    <Value>Fire</Value>
-                    <Value>Feed</Value>
-                    <Value>Protect</Value>
+                    <Value name="Safe" cdm="Weapon.RCWS.OperationMode.Safe"/>
+                    <Value name="Fire" cdm="Weapon.RCWS.OperationMode.Fire"/>
+                    <Value name="Feed" cdm="Weapon.RCWS.OperationMode.Feed"/>
+                    <Value name="Protect" cdm="Weapon.RCWS.OperationMode.Protect"/>
                 </Values>
             </ValueSetSpec>
         </GroupSpec>
@@ -186,7 +186,7 @@
             <Reply cdm="Request.Health.IBIT.Response" bindRef="requestIbitResultReply" required="true">
                 <Results>
                     <GroupResult name="mceIbit" cdm="Health.IBIT.CentralControl">
-                        <ValueSetResult name="operationalStaus" cdm="Health.OperationalStatus">
+                        <ValueSetResult name="operationalStatus" cdm="Health.OperationalStatus">
                             <Values>
                                 <Value name="Normal" cdm="OperationalState.Normal"/>
                                 <Value name="Degraded" cdm="OperationalState.Degraded"/>
@@ -194,8 +194,14 @@
                                 <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
                             </Values>
                         </ValueSetResult>
-                        <QuantityResult name="cpuTemperature" cdm="Health.Processor.CPU.Temperature"><Unit>degC</Unit></QuantityResult>
-                        <QuantityResult name="cpuLoad" cdm="Health.Processor.CPU.Load"><Unit>percent</Unit></QuantityResult>
+                        <QuantityResult name="cpuTemperature" cdm="Health.Processor.CPU.Temperature">
+                            <Unit>degC</Unit>
+                            <Range min="20" max="100"/>
+                        </QuantityResult>
+                        <QuantityResult name="cpuLoad" cdm="Health.Processor.CPU.Load">
+                            <Unit>percent</Unit>
+                            <Range min="0" max="100"/>
+                        </QuantityResult>
                     </GroupResult>
                 </Results>
             </Reply>
@@ -291,7 +297,7 @@
         <!--
             AuthorityControl.command 0~4를 기능별로 분리한다.
             commandTarget은 command=0(통제권 전환 대기)에서만 의미 있는 운용자 입력으로 노출한다.
-            AuthorityControl.destination의 정확한 업무 의미는 미확정이며 HMI 입력으로 노출하지 않는다.
+            AuthorityControl.destination의 정확한 명령별 값 결정 규칙은 미확정이며 HMI 입력으로 노출하지 않는다.
         -->
         <ControlSpec id="prepareAuthorityTransfer" name="통제권 전환 대기" cdm="Control.Authority.Transfer.Prepare">
             <Parameters>
@@ -388,7 +394,7 @@
             </Reply>
         </ControlSpec>
 
-        <!-- voiceRxControl은 필드 설명이 '음성수신명령'이지만 CSV 비고는 1='송신'으로 적혀 있다. Semantic은 수신 활성/중지 의미로만 노출하고 용어 오기는 추후 확인한다. -->
+        <!-- voiceRxControl은 필드명/설명이 '음성수신명령'이지만 CSV 비고는 raw 1을 '송신'으로 적고 있어 논리 의미를 확정하지 않는다. -->
         <ControlSpec id="configureVoiceCommunication" name="음성 송수신 제어" cdm="Control.Communication.Voice">
             <Parameters>
                 <ValueSetProfile cdm="Communication.Voice.AlarmTransmit">

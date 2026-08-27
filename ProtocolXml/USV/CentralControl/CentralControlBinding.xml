@@ -12,10 +12,10 @@
     - 변환 로직을 converter로 구현하지 않고 ValueMap/PackedField 등 선언형 Binding을 사용한다.
 
     중앙통제 고유 TBD
-    - AuthorityControl.destination의 통제권 업무 의미
+    - AuthorityControl.destination의 명령별 실제 DestinationType 값 결정 규칙 및 commandTarget 비사용 시 초기화 규칙
     - VHF rxChannel 범위/단위/채널표
     - MCEPBITReportType 1 Hz 표기와 PBIT/IBIT 결과 commandID 부재에 따른 상관관계
-    - operationalStaus 원문 철자, voiceRxControl 설명 불일치, HeartBeat 일부 enum raw code
+    - operationalStaus 실제 IDL 철자, voiceRxControl 설명 불일치
     상세는 CentralControl_OpenIssues.md 참조.
 -->
 <PayloadBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
@@ -44,16 +44,56 @@
                     <Map cdm="Platform.OperationMode.EmergencyAction" value="7"/>
                 </ValueMap>
             </Field>
-            <Field name="latitude" cdm="Navigation.Position.Latitude"/>
-            <Field name="longitude" cdm="Navigation.Position.Longitude"/>
-            <Field name="course" cdm="Navigation.Course"/>
-            <Field name="groundSpeed" cdm="Motion.GroundSpeed"/>
-            <Field name="roll" cdm="Attitude.Roll"/>
-            <Field name="pitch" cdm="Attitude.Pitch"/>
-            <Field name="missionModeAC" cdm="Autonomy.Mission.Mode"/>
-            <Field name="operationalModeEOIR" cdm="Sensor.EOIR.OperationMode"/>
-            <Field name="operationalModeTSA" cdm="Sensor.TowedSonar.OperationMode"/>
-            <Field name="operationalModeRCWS" cdm="Weapon.RCWS.OperationMode"/>
+            <Field name="latitude" cdm="Navigation.Position.Latitude" dataType="Float64"/>
+            <Field name="longitude" cdm="Navigation.Position.Longitude" dataType="Float64"/>
+            <Field name="course" cdm="Navigation.Course" dataType="Float64"/>
+            <Field name="groundSpeed" cdm="Motion.GroundSpeed" dataType="Float64"/>
+            <Field name="roll" cdm="Attitude.Roll" dataType="Float64"/>
+            <Field name="pitch" cdm="Attitude.Pitch" dataType="Float64"/>
+            <Field name="missionModeAC" cdm="Autonomy.Mission.Mode" dataType="UInt8">
+                <ValueMap>
+                    <Map cdm="Autonomy.Mission.Mode.WaypointNavigation" value="1"/>
+                    <Map cdm="Autonomy.Mission.Mode.TargetPointHold" value="2"/>
+                    <Map cdm="Autonomy.Mission.Mode.TargetTracking" value="3"/>
+                    <Map cdm="Autonomy.Mission.Mode.PointAndGo" value="4"/>
+                    <Map cdm="Autonomy.Mission.Mode.AutomaticNavigation" value="5"/>
+                    <Map cdm="Autonomy.Mission.Mode.SurfaceISR" value="6"/>
+                    <Map cdm="Autonomy.Mission.Mode.UnderwaterISR" value="7"/>
+                    <Map cdm="Autonomy.Mission.Mode.AutomaticDocking" value="8"/>
+                </ValueMap>
+            </Field>
+            <Field name="operationalModeEOIR" cdm="Sensor.EOIR.OperationMode" dataType="UInt8">
+                <ValueMap>
+                    <Map cdm="Sensor.EOIR.OperationMode.Standby" value="0"/>
+                    <Map cdm="Sensor.EOIR.OperationMode.ManualTracking" value="1"/>
+                    <Map cdm="Sensor.EOIR.OperationMode.AutomaticTracking" value="2"/>
+                    <Map cdm="Sensor.EOIR.OperationMode.RadarSlave" value="3"/>
+                    <Map cdm="Sensor.EOIR.OperationMode.BowPointing" value="4"/>
+                    <Map cdm="Sensor.EOIR.OperationMode.SwingGuard" value="5"/>
+                    <Map cdm="Sensor.EOIR.OperationMode.RCWSLinked" value="6"/>
+                    <Map cdm="Sensor.EOIR.OperationMode.StowProtect" value="7"/>
+                    <Map cdm="Sensor.EOIR.OperationMode.BuiltInTest" value="8"/>
+                </ValueMap>
+            </Field>
+            <Field name="operationalModeTSA" cdm="Sensor.TowedSonar.OperationMode" dataType="UInt8">
+                <ValueMap>
+                    <Map cdm="Sensor.TowedSonar.OperationMode.Automatic" value="0"/>
+                    <Map cdm="Sensor.TowedSonar.OperationMode.Standby" value="1"/>
+                    <Map cdm="Sensor.TowedSonar.OperationMode.ManualLaunch" value="2"/>
+                    <Map cdm="Sensor.TowedSonar.OperationMode.ManualRecovery" value="3"/>
+                    <Map cdm="Sensor.TowedSonar.OperationMode.ManualPayOut" value="4"/>
+                    <Map cdm="Sensor.TowedSonar.OperationMode.EmergencyStop" value="5"/>
+                    <Map cdm="Sensor.TowedSonar.OperationMode.CableRelease" value="6"/>
+                </ValueMap>
+            </Field>
+            <Field name="operationalModeRCWS" cdm="Weapon.RCWS.OperationMode" dataType="UInt8">
+                <ValueMap>
+                    <Map cdm="Weapon.RCWS.OperationMode.Safe" value="0"/>
+                    <Map cdm="Weapon.RCWS.OperationMode.Fire" value="1"/>
+                    <Map cdm="Weapon.RCWS.OperationMode.Feed" value="2"/>
+                    <Map cdm="Weapon.RCWS.OperationMode.Protect" value="3"/>
+                </ValueMap>
+            </Field>
         </MonitorBinding>
 
         <MonitorBinding semantic_id="centralControlHealth">
@@ -148,11 +188,11 @@
                 <Field name="usvHeader"/>
                 <Field name="operationalStatus" cdm="Health.OperationalStatus" dataType="UInt8">
                     <ValueMap>
-                    <Map cdm="OperationalState.Normal" value="0"/>
-                    <Map cdm="OperationalState.Degraded" value="1"/>
-                    <Map cdm="OperationalState.Unavailable" value="2"/>
-                    <Map cdm="OperationalState.NoResponse" value="3"/>
-                </ValueMap>
+                        <Map cdm="OperationalState.Normal" value="0"/>
+                        <Map cdm="OperationalState.Degraded" value="1"/>
+                        <Map cdm="OperationalState.Unavailable" value="2"/>
+                        <Map cdm="OperationalState.NoResponse" value="3"/>
+                    </ValueMap>
                 </Field>
             </Reply>
         </ControlBinding>
@@ -179,14 +219,14 @@
             <Reply semantic_id="requestIbitResultReply" required="true">
                 <DDSChannel topicName="RUSV::SO::MCE::MCEIBITReportType" typeName="MCEIBITReportType"/>
                 <Field name="usvHeader"/>
-                <!-- 중앙통제 CSV 원문 철자 operationalStaus는 실제 IDL 확인 전까지 보존한다. -->
+                <!-- 중앙통제 CSV 원문 철자 operationalStaus는 실제 IDL 확인 전까지 보존한다. Semantic 논리명은 operationalStatus를 사용한다. -->
                 <Field name="operationalStaus" cdm="Health.OperationalStatus" dataType="UInt8">
                     <ValueMap>
-                    <Map cdm="OperationalState.Normal" value="0"/>
-                    <Map cdm="OperationalState.Degraded" value="1"/>
-                    <Map cdm="OperationalState.Unavailable" value="2"/>
-                    <Map cdm="OperationalState.NoResponse" value="3"/>
-                </ValueMap>
+                        <Map cdm="OperationalState.Normal" value="0"/>
+                        <Map cdm="OperationalState.Degraded" value="1"/>
+                        <Map cdm="OperationalState.Unavailable" value="2"/>
+                        <Map cdm="OperationalState.NoResponse" value="3"/>
+                    </ValueMap>
                 </Field>
                 <!-- 공용 ProcessorIBIT(16B): cpuTemperature double 8B + cpuLoad double 8B. -->
                 <Field name="mceProcessorIBIT.cpuTemperature" cdm="Health.Processor.CPU.Temperature" dataType="Float64"/>
@@ -401,7 +441,7 @@
             <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
             <!-- 프로젝트 공통 Adapter 규칙에 따라 AuthorityControl 중첩 필드는 dotted path로 접근한다. -->
             <FixedField name="authorityControlStatus.command" value="0" dataType="UInt8"/>
-            <!-- command=0일 때 commandTarget: 0 고정형, 1 이동형, 2 출입항보조, 255 기타. -->
+            <!-- command=0일 때 commandTarget: 0 고정형, 1 이동형, 2 출입항보조. 255=이외의 경우이나 비사용 시 255 강제 규칙은 원문에 없다. -->
             <Field name="authorityControlStatus.commandTarget" cdm="Control.Authority.TargetControlStation" dataType="UInt8">
                 <ValueMap>
                     <Map cdm="Control.Authority.TargetControlStation.FixedRemoteControl" value="0"/>
@@ -409,7 +449,7 @@
                     <Map cdm="Control.Authority.TargetControlStation.PortAssistControl" value="2"/>
                 </ValueMap>
             </Field>
-            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않아 HMI 입력/CDM으로 승격하지 않는다. -->
+            <!-- TBD: AuthorityControl.destination은 DestinationType임이 확정되지만 명령별 실제 값 결정 규칙은 확인되지 않았다. -->
             <Field name="authorityControlStatus.destination"/>
             <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
             <Reply semantic_id="prepareAuthorityTransferCommandStatusReply" required="true">
@@ -428,9 +468,9 @@
             <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
             <!-- 프로젝트 공통 Adapter 규칙에 따라 AuthorityControl 중첩 필드는 dotted path로 접근한다. -->
             <FixedField name="authorityControlStatus.command" value="1" dataType="UInt8"/>
-            <!-- 공용 구조체 설명상 commandTarget은 command=0에서 사용한다. 이 명령에서의 초기화 규칙은 미정이므로 raw 필드를 유지하고 HMI 입력으로 노출하지 않는다. -->
+            <!-- 공용 구조체 설명상 commandTarget은 command=0에서만 사용한다. command!=0에서의 초기화/무시 규칙은 원문에 없어 raw 필드를 유지한다. -->
             <Field name="authorityControlStatus.commandTarget" dataType="UInt8"/>
-            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않았다. -->
+            <!-- TBD: AuthorityControl.destination은 DestinationType임이 확정되지만 명령별 실제 값 결정 규칙은 확인되지 않았다. -->
             <Field name="authorityControlStatus.destination"/>
             <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
             <Reply semantic_id="requestControlAuthorityCommandStatusReply" required="true">
@@ -449,9 +489,9 @@
             <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
             <!-- 프로젝트 공통 Adapter 규칙에 따라 AuthorityControl 중첩 필드는 dotted path로 접근한다. -->
             <FixedField name="authorityControlStatus.command" value="2" dataType="UInt8"/>
-            <!-- 공용 구조체 설명상 commandTarget은 command=0에서 사용한다. 이 명령에서의 초기화 규칙은 미정이므로 raw 필드를 유지하고 HMI 입력으로 노출하지 않는다. -->
+            <!-- 공용 구조체 설명상 commandTarget은 command=0에서만 사용한다. command!=0에서의 초기화/무시 규칙은 원문에 없어 raw 필드를 유지한다. -->
             <Field name="authorityControlStatus.commandTarget" dataType="UInt8"/>
-            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않았다. -->
+            <!-- TBD: AuthorityControl.destination은 DestinationType임이 확정되지만 명령별 실제 값 결정 규칙은 확인되지 않았다. -->
             <Field name="authorityControlStatus.destination"/>
             <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
             <Reply semantic_id="approveControlAuthorityRequestCommandStatusReply" required="true">
@@ -470,9 +510,9 @@
             <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
             <!-- 프로젝트 공통 Adapter 규칙에 따라 AuthorityControl 중첩 필드는 dotted path로 접근한다. -->
             <FixedField name="authorityControlStatus.command" value="3" dataType="UInt8"/>
-            <!-- 공용 구조체 설명상 commandTarget은 command=0에서 사용한다. 이 명령에서의 초기화 규칙은 미정이므로 raw 필드를 유지하고 HMI 입력으로 노출하지 않는다. -->
+            <!-- 공용 구조체 설명상 commandTarget은 command=0에서만 사용한다. command!=0에서의 초기화/무시 규칙은 원문에 없어 raw 필드를 유지한다. -->
             <Field name="authorityControlStatus.commandTarget" dataType="UInt8"/>
-            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않았다. -->
+            <!-- TBD: AuthorityControl.destination은 DestinationType임이 확정되지만 명령별 실제 값 결정 규칙은 확인되지 않았다. -->
             <Field name="authorityControlStatus.destination"/>
             <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
             <Reply semantic_id="rejectControlAuthorityRequestCommandStatusReply" required="true">
@@ -491,9 +531,9 @@
             <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
             <!-- 프로젝트 공통 Adapter 규칙에 따라 AuthorityControl 중첩 필드는 dotted path로 접근한다. -->
             <FixedField name="authorityControlStatus.command" value="4" dataType="UInt8"/>
-            <!-- 공용 구조체 설명상 commandTarget은 command=0에서 사용한다. 이 명령에서의 초기화 규칙은 미정이므로 raw 필드를 유지하고 HMI 입력으로 노출하지 않는다. -->
+            <!-- 공용 구조체 설명상 commandTarget은 command=0에서만 사용한다. command!=0에서의 초기화/무시 규칙은 원문에 없어 raw 필드를 유지한다. -->
             <Field name="authorityControlStatus.commandTarget" dataType="UInt8"/>
-            <!-- TBD: AuthorityControl.destination의 정확한 업무 의미가 확인되지 않았다. -->
+            <!-- TBD: AuthorityControl.destination은 DestinationType임이 확정되지만 명령별 실제 값 결정 규칙은 확인되지 않았다. -->
             <Field name="authorityControlStatus.destination"/>
             <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
             <Reply semantic_id="reclaimControlAuthorityCommandStatusReply" required="true">
@@ -580,7 +620,7 @@
                     <Map cdm="Communication.Voice.Transmit.Transmit" value="1"/>
                 </ValueMap>
             </Field>
-            <!-- 필드 설명은 음성수신명령이나 CSV 비고가 1='송신'으로 되어 있어 용어 오기 여부가 TBD이다. -->
+            <!-- 필드명/설명은 음성수신명령이나 CSV 비고가 raw 1='송신'으로 되어 있어 논리 ValueMap은 확정하지 않는다. -->
             <Field name="voiceRxControl" cdm="Communication.Voice.Receive" dataType="UInt8"/>
             <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
             <Reply semantic_id="configureVoiceCommunicationCommandStatusReply" required="true">
