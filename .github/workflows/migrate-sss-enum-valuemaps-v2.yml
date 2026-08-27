@@ -1,0 +1,123 @@
+name: Migrate SSS Enum ValueMaps V2
+
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/migrate-sss-enum-valuemaps-v2.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+          fetch-depth: 0
+      - name: Migrate confirmed enum codes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re
+
+          base=Path('ProtocolXml/USV/SideScanSonar')
+          sem=base/'SideScanSonarSemantic.xml'; bind=base/'SideScanSonarBinding.xml'; issues=base/'SideScanSonar_OpenIssues.md'
+          s=sem.read_text(encoding='utf-8'); b=bind.read_text(encoding='utf-8')
+          sc=re.findall(r'<!--[\s\S]*?-->',s); bc=re.findall(r'<!--[\s\S]*?-->',b)
+
+          sets={
+            'operationalMode':[('Auto','Mode.Auto','0'),('Standby','Mode.Standby','1'),('ManualLaunch','Mode.ManualLaunch','2'),('ManualRecovery','Mode.ManualRecovery','3'),('ManualDeploy','Mode.ManualDeploy','4'),('EmergencyStop','Mode.EmergencyStop','5'),('CableSeparation','Mode.CableSeparation','6')],
+            'sssPulseType':[('ContinuousWave','Ping.PulseType.ContinuousWave','0'),('Chirp','Ping.PulseType.Chirp','1')],
+            'gfPulseType':[('ContinuousWave','Ping.PulseType.ContinuousWave','0'),('Chirp','Ping.PulseType.Chirp','1')],
+            'sssTvgMode':[('Off','Setting.TVG.Off','0'),('On','Setting.TVG.On','1')],
+            'gfTvgMode':[('Off','Setting.TVG.Off','0'),('On','Setting.TVG.On','1')],
+            'operationStatus':[('Standby','LaunchRecovery.State.Standby','0'),('Launching','LaunchRecovery.State.Launching','1'),('Launched','LaunchRecovery.State.Launched','2'),('Operating','LaunchRecovery.State.Operating','3'),('Recovering','LaunchRecovery.State.Recovering','4'),('Recovered','LaunchRecovery.State.Recovered','5'),('EmergencyStop','LaunchRecovery.State.EmergencyStop','6')],
+            'usblMode':[('Stop','LaunchRecovery.State.Stop','0'),('Launch','LaunchRecovery.State.Launch','1'),('Recovery','LaunchRecovery.State.Recovery','2')],
+            'winchMotorBrakeStatus':[('Released','Brake.Released','0'),('Locked','Brake.Locked','1')],
+            'slideMotorBrakeStatus':[('Released','Brake.Released','0'),('Locked','Brake.Locked','1')],
+            'ultraShortBaseLineMotorBrakeStatus':[('Released','Brake.Released','0'),('Locked','Brake.Locked','1')],
+            'launchLimitSwitchStatus':[('NotDetected','LimitSwitch.NotDetected','0'),('Detected','LimitSwitch.Detected','1')],
+            'recoveryLimitSwitchStatus':[('NotDetected','LimitSwitch.NotDetected','0'),('Detected','LimitSwitch.Detected','1')],
+          }
+          health=[('Normal','OperationalState.Normal','0'),('Degraded','OperationalState.Degraded','1'),('Unavailable','OperationalState.Unavailable','2'),('NoResponse','OperationalState.NoResponse','3')]
+
+          def replace_values(text, tag, sid, vals):
+              pat=re.compile(r'(<'+tag+r'\b[^>]*\bid="'+re.escape(sid)+r'"[^>]*>[\s\S]*?<Values>)([\s\S]*?)(</Values>)')
+              m=pat.search(text)
+              if not m: raise SystemExit(f'{tag}:{sid} not found')
+              codes=re.findall(r'<Value\b[^>]*>([^<]+)</Value>',m.group(2))
+              exp=[x[2] for x in vals]
+              if codes!=exp: raise SystemExit(f'{sid} raw values {codes} != {exp}')
+              im=re.search(r'\n(\s*)<Value',m.group(2)); ind=im.group(1) if im else '          '
+              body=''.join('\n'+ind+f'<Value name="{n}" cdm="{c}"/>' for n,c,_ in vals)+'\n'+ind[:-2]
+              return text[:m.start(2)]+body+text[m.end(2):]
+
+          for sid,vals in sets.items(): s=replace_values(s,'ValueSetSpec',sid,vals)
+          for sid in ['towedSonarAssembly','launchAndRecovery','towedSonarArray','sonarSignalProcessor','sonarImageProcessor','hullMountedSonar']:
+              s=replace_values(s,'HealthStatusSetSpec',sid,health)
+
+          qp='''        <QuantityProfile cdm="PowerSupplyState">\n          <Range min="0" max="1"/>\n          <Resolution>1</Resolution>\n        </QuantityProfile>'''
+          vp='''        <ValueSetProfile cdm="PowerSupplyState">\n          <Values>\n            <Value name="Off" cdm="PowerSupplyState.Off"/>\n            <Value name="On" cdm="PowerSupplyState.On"/>\n          </Values>\n        </ValueSetProfile>'''
+          if s.count(qp)!=1: raise SystemExit('PowerSupplyState profile mismatch')
+          s=s.replace(qp,vp,1)
+          qp='''        <QuantityProfile cdm="Ping.PulseType">\n          <Range min="0" max="1"/>\n          <Resolution>1</Resolution>\n        </QuantityProfile>'''
+          vp='''        <ValueSetProfile cdm="Ping.PulseType">\n          <Values>\n            <Value name="ContinuousWave" cdm="Ping.PulseType.ContinuousWave"/>\n            <Value name="Chirp" cdm="Ping.PulseType.Chirp"/>\n          </Values>\n        </ValueSetProfile>'''
+          if s.count(qp)!=1: raise SystemExit('Ping.PulseType profile mismatch')
+          s=s.replace(qp,vp,1)
+          sem.write_text(s,encoding='utf-8',newline='')
+
+          maps={
+            'operationalModeTSA':sets['operationalMode'],'sssPulseType':sets['sssPulseType'],'gfPulseType':sets['gfPulseType'],
+            'sssTvgMode':sets['sssTvgMode'],'gfTvgMode':sets['gfTvgMode'],'operationStatus':sets['operationStatus'],
+            'ultraShortBaseLineMode':sets['usblMode'],'winchMotorBrakeStatus':sets['winchMotorBrakeStatus'],
+            'slideMotorBrakeStatus':sets['slideMotorBrakeStatus'],'ultraShortBaseLineMotorBrakeStatus':sets['ultraShortBaseLineMotorBrakeStatus'],
+            'launchLimitSwitchStatus':sets['launchLimitSwitchStatus'],'recoveryLimitSwitchStatus':sets['recoveryLimitSwitchStatus'],
+            'towedSonarAssemblyTotalCBIT':health,'launchAndRecoveryTotalCBIT':health,'towedSonarArrayTotalCBIT':health,
+            'sonarSignalProcessingEquipmentTotalCBIT':health,'sonarImagingProcessingEquipmentTotalCBIT':health,'hullMountedSonarTotalCBIT':health,
+          }
+          def addmap(text,name,vals):
+              pat=re.compile(r'(?m)^(\s*)<Field name="'+re.escape(name)+r'"([^>]*)/>$'); mm=list(pat.finditer(text))
+              if len(mm)!=1: raise SystemExit(f'{name} field count {len(mm)}')
+              m=mm[0]; ind,attrs=m.group(1),m.group(2)
+              rows='\n'.join(ind+'    '+f'<Map cdm="{c}" value="{v}"/>' for _,c,v in vals)
+              rep=f'{ind}<Field name="{name}"{attrs}>\n{ind}  <ValueMap>\n{rows}\n{ind}  </ValueMap>\n{ind}</Field>'
+              return text[:m.start()]+rep+text[m.end():]
+          for n,v in maps.items(): b=addmap(b,n,v)
+          b=addmap(b,'pulseType',sets['sssPulseType'])
+          b=addmap(b,'powerOn',[('Off','PowerSupplyState.Off','0'),('On','PowerSupplyState.On','1')])
+          bind.write_text(b,encoding='utf-8',newline='')
+
+          if re.findall(r'<!--[\s\S]*?-->',s)!=sc: raise SystemExit('semantic comments changed')
+          if re.findall(r'<!--[\s\S]*?-->',b)!=bc: raise SystemExit('binding comments changed')
+          etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd')).assertValid(etree.parse(str(sem)))
+          etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd')).assertValid(etree.parse(str(bind)))
+
+          ns={'u':'http://lignex1.com/mcmc2/umsSchema'}; S=etree.parse(str(sem)); numeric=[]
+          for e in S.xpath('.//u:ValueSetSpec',namespaces=ns):
+              vv=e.xpath('./u:Values/u:Value',namespaces=ns); tt=[(x.text or '').strip() for x in vv]
+              if tt and all(x.isdigit() for x in tt): numeric.append(e.get('id'))
+          allowed={'towedSonarArrayPowerStatus','ultraShortBaseLinePowerStatus','winchPowerStatus','recoveryUnitPowerStatus','cameraPowerStatus'}
+          if set(numeric)!=allowed: raise SystemExit(f'remaining numeric sets {numeric}')
+          vm=etree.parse(str(bind)).xpath('.//u:ValueMap',namespaces=ns)
+          print('VALUE_MAP_COUNT',len(vm)); print('REMAINING_NUMERIC_VALUESETS',numeric); print('COMMENTS',len(sc),len(bc))
+
+          doc=issues.read_text(encoding='utf-8'); marker='## Enum / ValueMap migration'
+          if marker not in doc:
+              doc+='''\n\n## Enum / ValueMap migration\n\n- Semantic 논리 상태의 raw 숫자 코드를 제거하고 실제 DDS 코드는 Binding `ValueMap`으로 이동한다.\n- 반영: 운용모드, SSS/GF PulseType, SSS/GF TVG, 진회수 상태, USBL 모드, 3개 Brake, 2개 Limit Switch, CBIT 4상태, 제어 `powerOn`, 제어 `pulseType`.\n- 5개 `DetailSystemStatusType` powerStatus는 원문에서 0/1 의미가 직접 확인되지 않아 raw 0/1을 임시 유지한다.\n- `SideScanSonar.SonarType`, `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`, `SideScanSonar.Subsystem(targetDevice)`은 최종 논리 값/CDM 재확인 후 이동한다.\n- 최종 CDM 감사 전에는 기존 CDM을 재사용하고 새 CDM 생성을 최소화한다.\n'''
+              issues.write_text(doc,encoding='utf-8',newline='')
+          PY
+          git diff --check
+          git rm .github/workflows/migrate-sss-enum-valuemaps.yml .github/workflows/migrate-sss-enum-valuemaps-v2.yml
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Move confirmed SSS enum codes into Binding ValueMaps'
+          git push origin HEAD:feature/usv-semantic-binding-audit
