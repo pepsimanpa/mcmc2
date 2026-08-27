@@ -104,3 +104,15 @@
 - `ReceiveProcessing.TVG.Mode(0~1)`, `ReceiveProcessing.SoftwareGain.Mode(0~2)`, `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 정확한 논리 명칭을 이번 근거에서 확정하지 못해 QuantityProfile을 임시 유지한다.
 - `LanchAndRecoveryBackStopReportType.slideBackStop`, PBIT Total, IBIT Total/detail의 raw 의미는 기존 TBD를 유지한다.
 - 새 SonarType/Subsystem/MCS/LaunchReport 하위 CDM 경로는 연결용 임시 키이며 최종 USV CDM 감사에서 명칭/계층을 재검토한다.
+
+
+## Final structural audit
+
+- Semantic/Binding Control은 `38↔38`, Reply는 `47↔47`이며 ID 연결도 일치한다.
+- 수동 USBL 명령은 `launch=0/1/2/3`(정지/진수/회수/원점복귀), USBL 작동은 `start=0/1`, 슬라이드는 `start=0/1/2/3`, 윈치는 `start=0/1/2`의 분리 Control + `FixedField` 구조를 유지한다. 이 값들은 사용자 선택 enum이 아니라 이미 행위별 Control로 분리되었으므로 FixedField가 적절하다.
+- USBL `motorSpeed(0~0.011 m/s)`, 슬라이드 `slideDeploy(0~2.15 m)`, 윈치 `winchDeploy(0~100 m)` 보조 필드는 정지/원점복귀를 포함한 각 원문 메시지 구조에서 유지한다. 원문에 무시/고정값 규칙이 없으므로 임의 제거하지 않는다.
+- 케이블 분리 `0/1`, 화면모드 `0/1`, 자동 진회수 명령 `0/1/2`, BackStop 현재 `0/1/2` FixedField 구조를 확인했다. BackStop 결과 Report의 raw 의미는 별도 TBD이다.
+- PBIT/IBIT은 각각 하나의 결과 Reply + 하나의 GroupResult이며 내부 필드는 각각 6개/62개이다.
+- SensorProduct 5종은 Semantic/Binding `5↔5`: SSS 압축, GapFiller 압축, 병합 압축, ObjectDetection2D, 진회수 카메라 RTP이다. ProductBinding은 스트림 채널/메시지 선택 구조이므로 `ContactTypeList.sonarType` 같은 payload 내부 분류 필드를 별도 Binding Field로 누락된 것으로 보지 않는다.
+- converter는 0건이고 primitive dataType 미지정은 0건이다. `usvHeader`, `destination` composite만 의도적으로 dataType이 없다.
+- 설계를 막는 미해결 항목은 아니지만 원문 재확인이 필요한 핵심 TBD는 전원상태 5개 0/1 의미, TVG/SW Gain/LPF mode 논리명, PBIT/IBIT raw 상세 의미, BackStop 결과값 의미, commandID 없는 Result Report correlation, LastReceivedCommandID 동시성, dotted-path Adapter 규칙이다.
