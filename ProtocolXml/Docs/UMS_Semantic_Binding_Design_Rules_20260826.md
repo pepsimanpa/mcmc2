@@ -617,8 +617,8 @@ parser = ET.XMLParser(
 **Status: RESOLVED**
 
 - `MISSION_TRANS`는 실제 임무계획 전송이므로 INFORMATION2를 사용한다.
-- `MISSION_START`는 이미 전송된 임무를 시작하는 기능으로 INFORMATION3를 사용한다.
-- 원문 설명: INFORMATION1/2는 초반 RF 설정, 암호키 설정 또는 임무계획 시 사용하고 대부분 INFORMATION3를 사용한다.
+- `MISSION_START`는 이미 전송된 임무를 시작하는 기능으로 **프로젝트 설계 결정상 INFORMATION3를 사용한다.**
+- 첨부 `auv origin.csv`의 COMMAND 표에는 `MISSION_START=INFO2`로 기재되어 있으나, 본 설계에서는 협의된 운용 의미를 우선하여 INFORMATION3로 유지한다.
 - `startMission`에 별도 MissionPlan Parameter를 만들지 않는다.
 - 과거 Semantic 주석 중 MISSION_START가 INFORMATION2라고 되어 있는 표현은 수정 대상이다.
 
@@ -679,7 +679,7 @@ ACK bit:
 - `requestData`는 RF-1의 데이터 전송 요청 Control이다.
 - 실제 RF-3 파일 데이터는 SensorProduct / ProductBinding으로 표현한다.
 - `requestData` Semantic에는 일반 RF-2/RF-3 Reply를 두지 않는다.
-- Binding에 존재하는 `requestDataReply`는 제거 대상이다.
+- Binding의 기존 `requestDataReply`는 제거 완료하였다.
 
 ## Issue 6. CDM system-wide consistency
 
@@ -715,8 +715,15 @@ AUV Semantic/Binding 내부 문자열 일치만으로 CDM을 확정하지 않는
 - `2 = 정밀탐색모드`
 - `3~8 = TBD`
 
-따라서 현재 HMI/Semantic 선택 범위는 `1~2`를 유지한다.
-`3~8`을 유효 운용 입력으로 노출하지 않는다.
+Semantic에는 raw 범위 `1~2`를 노출하지 않고 다음 논리 선택값만 정의한다.
+- 광역탐색
+- 정밀탐색
+
+Binding `ValueMap`에서만 다음 raw code를 선언한다.
+- 광역탐색 → `1`
+- 정밀탐색 → `2`
+
+`3~8`은 TBD이므로 현재 Semantic 선택값 및 Binding ValueMap에서 제외한다.
 
 ## Issue 8. Semantic Result ↔ Binding BitMember 연결
 
@@ -798,7 +805,16 @@ XSD 1.0에 복잡한 산술/형제 비교 제약을 억지로 넣지 않는다.
 
 ## Issue 13. RF-2 ACK / RF_CMD_COMPLETE / Body
 
-**Status: PARTIALLY RESOLVED / simultaneity TBD**
+**Status: PHYSICAL LAYOUT RESOLVED / command-specific simultaneity TBD**
+
+RF-2는 모든 Reply에서 동일한 고정 80-byte 물리 구조를 유지한다. Semantic에서 사용하지 않는 Body 필드도 Binding에는 CDM 없이 남겨 실제 byte offset을 보존한다.
+
+- Header: 14 bytes
+- Fixed Body: 62 bytes
+- Tail: 4 bytes
+- Total: 80 bytes
+
+`AuvPlatformRfBinding.xml`과 `AuvRfCommBinding.xml`의 모든 `AuvRf2Telegram` Reply는 동일 필드 순서와 80-byte 크기를 갖도록 정규화하였다. 수신 checksum은 생성값이 아니라 wire Field로 표현한다.
 
 원문 의미:
 - `RF_CMD_COMPLETE`는 RF통신장치에 보낸 명령이 완료되었음을 알리는 bit이다.
@@ -812,6 +828,66 @@ XSD 1.0에 복잡한 산술/형제 비교 제약을 억지로 넣지 않는다.
 `RF_CMD_COMPLETE=1`은 AUV 본체의 실제 임무/동작 성공 또는 완료를 의미하지 않는다.
 
 ACK + RF_CMD_COMPLETE + Body 결과가 항상 동일 RF-2 Telegram에서 동시에 유효한지는 직접 근거가 없어 TBD로 유지한다.
+
+## Issue 14. AUV 파생 converter 정리
+
+**Status: RESOLVED**
+
+AUV RF Binding의 다음 계산성 converter를 선언형/책임분리 구조로 정리한다.
+
+- `TargetAuvToInformation1/2/3` 제거
+  - `Platform.Identifier.Numeric`은 AUV 대상 `1` 또는 `2`가 입력된다고 전제한다.
+  - `DerivedField/SourceValueMap`으로 INFO_NUM을 선언한다.
+  - INFORMATION1: `1→1`, `2→4`
+  - INFORMATION2: `1→2`, `2→5`
+  - INFORMATION3: `1→3`, `2→6`
+- `ArrayLengthUInt8` 제거
+  - `MissionPlan.WaypointCount`는 `MissionPlan.Waypoints` collection 길이에서 파생되어 준비되는 값이다.
+  - Semantic/HMI에 별도 중복 입력 Parameter로 노출하지 않는다.
+  - Binding은 준비된 `MissionPlan.WaypointCount`를 `UInt8`로 기록한다.
+- `ByteSumModulo65536LE` 제거
+  - RF-1 checksum 계산식 자체는 ICD 규칙을 유지한다: COUNT부터 INFORMATION 마지막 byte까지 unsigned byte 합의 modulo 65536.
+  - UCD checksum 계산식도 기존 ICD 규칙을 유지한다: UCD-1은 COMMAND부터 INFORMATION 끝까지, UCD-2는 ACK부터 INFORMATION 끝까지를 계산 범위로 사용한다.
+  - 송신 checksum 생성과 수신 checksum 검증은 OM/실행 계층 책임이며 Binding은 계산/검증을 수행하지 않는다.
+  - RF-1/UCD-1 Binding은 준비된 `System.Frame.Checksum`을 `UInt16`로 기록한다.
+  - RF-2/UCD-2 수신 checksum은 일반 wire `Field UInt16`으로 표현한다.
+
+공통 XSD에는 의미 enum의 `ValueMap`과 구분하여, 준비된 scalar source 값에서 wire 값으로의 선언형 매핑을 위한 `SourceValueMap`을 추가한다. 계산 함수명이나 특정 구현 함수는 Binding에 두지 않는다.
+
+## Issue 15. AUV Semantic-Binding 비-CDM 정합성 정리
+
+**Status: PARTIAL / CDM DEFERRED**
+
+- 이번 단계에서는 CDM 명칭/체계와 개별 bit CDM을 새로 확정하지 않는다.
+- 원문에서 자료형이 확정된 `RC_SPEED`, RF INFO1의 `RF_CONF_MODE/RF_CONF_PWR` 누락 `dataType`만 보강한다.
+- RF 상태 응답의 운용모드/Time Slot/채널/출력은 이미 확정된 논리 선택 집합이므로 `ValueSetResult`로 표현을 통일한다.
+- AUV 상세 점검, UCD 요약 점검, EOR, MODE, RF Pre-Launch, STAT_code의 개별 Result↔BitMember CDM 연결은 최종 CDM 감사 때 처리한다.
+- UCD-2의 IMU_LAT/IMU_LONG은 물리 필드로 유지하되 `emergencyReturnReply`의 Semantic 결과 채택 여부는 응답 의미/CDM 재검토 시 확정한다.
+- 프로젝트 bit 해석 규칙을 확정한다: 점검 계열은 `0=PASS, 1=FAIL`, 이상/이벤트 계열은 `0=정상·미발생, 1=이상·발생`, MODE/LOCK 등 상태 flag는 `0=비활성, 1=활성`으로 해석한다.
+- RF Pre-Launch Check 6개 항목도 위 점검 규칙에 따라 `0=PASS, 1=FAIL`로 확정한다.
+- STAT_code bit0~4는 `0=정상, 1=비정상`; DATA_LOCK/SYNC_LOCK은 정상/비정상 판정이 아니라 `0=비활성, 1=활성` flag로 유지한다.
+
+## Issue 16. AUV Control/Reply/Binding 구조 정합성 감사
+
+**Status: PASS / known TBD preserved**
+
+- Platform Semantic Control 12개와 Platform RF ControlBinding 12개의 `id/semantic_id`가 1:1 일치한다.
+- UCD는 원 ICD에서 정의된 `requestAuvCheck`, `emergencyReturn`, `deleteAllRecords` 3개 ControlBinding만 동일 Platform Semantic을 재사용한다.
+- RF 통신장치 Semantic Control 6개와 RF Comm ControlBinding 6개가 1:1 일치한다.
+- Semantic `Reply.bindRef`는 실제 Binding `Reply.semantic_id`로 모두 해소된다. `requestData`와 `toggleRfGain`은 합의대로 Reply가 없다.
+- RF-1 COMMAND의 주 기능 bit와 `RF_SEND(bit30)` / `RF_EXEC(bit31)`, expectedValue, RF-2 ACK expectedValue가 현재 확정표와 일치한다.
+- INFO_NUM은 Platform.Identifier.Numeric=1/2 기준 INFO1=`1/4`, INFO2=`2/5`, INFO3=`3/6`으로 일치한다.
+- `MISSION_START`는 origin CSV의 INFO2 표기와 달리 프로젝트 확정값 INFO3를 유지한다.
+- RF-3는 requestData Control Reply가 아니라 5종 SensorProduct로 유지하며 dataAck bit11~15 mask가 일치한다.
+- UCD-1 COMMAND와 UCD-2 ACK는 `AUV_CHECK_Req_L(bit0)=0x0001`, `EMER_RETURN(bit5)=0x0020`, `Record_Del(bit9)=0x0200`으로 일치한다.
+- `AuvSpecification.xml`은 Platform Semantic, RF/UCD Binding, RF Comm Semantic/Binding을 모두 참조하고 little-endian DataEncoding을 갖는다.
+
+다음 사항은 오류로 보정하지 않고 기존 TBD를 유지한다.
+- RF-2 ACK + RF_CMD_COMPLETE + Body 결과가 항상 한 Telegram에서 동시에 유효한지 여부.
+- RF_GAIN / KEY_CMD의 INFORMATION 종류는 원문에 기재가 없어 INFO1 잠정 매핑.
+- 원 ICD의 RF-1/RF-2 전송 표현과 현재 TCPChannel adapter 추상화의 관계.
+- RF-1/RF-2/RF-3 COUNT 간 상관관계.
+- INFO2 Waypoint 영역의 992-byte 표기와 최대 100개 좌표 산술 불일치.
 
 ## 확정된 별도 bit 규칙
 
@@ -884,10 +960,9 @@ ACK + RF_CMD_COMPLETE + Body 결과가 항상 동일 RF-2 Telegram에서 동시�
 
 1. Issue 6 전체 CDM 정합성 확인
 2. 위 결정에 따른 Semantic/Binding/XSD 정합성 유지
-3. RF-3 ProductBinding 구조 확인
-4. RF_CONF_MODE/PWR PackedField 정합성 확인
-5. Result ↔ BitMember CDM 연결 정합성 확인
-6. RF-2 ACK/RF_CMD_COMPLETE/Body 동시 유효성 원문 추가 확인
+3. RF_CONF_MODE/PWR PackedField 정합성 확인
+4. Result ↔ BitMember CDM 연결 정합성 확인
+5. RF-2 ACK/RF_CMD_COMPLETE/Body 동시 유효성 원문 추가 확인
 
 
 ---

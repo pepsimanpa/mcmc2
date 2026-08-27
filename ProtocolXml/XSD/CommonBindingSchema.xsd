@@ -94,6 +94,18 @@
         </xs:sequence>
     </xs:complexType>
 
+    <!-- Declarative mapping from a prepared sourceField scalar value to a wire value. -->
+    <xs:complexType name="SourceValueMapEntryType">
+        <xs:attribute name="sourceValue" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SourceValueMapType">
+        <xs:sequence>
+            <xs:element name="Map" type="SourceValueMapEntryType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="SemanticSetType">
         <xs:attribute name="cdm" type="xs:string" use="required"/>
         <xs:attribute name="value" type="xs:string" use="required"/>
@@ -155,6 +167,7 @@
     <xs:complexType name="DerivedFieldType">
         <xs:sequence>
             <xs:element name="ValueMap" type="ValueMapType" minOccurs="0"/>
+            <xs:element name="SourceValueMap" type="SourceValueMapType" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="cdm" type="xs:string"/>
