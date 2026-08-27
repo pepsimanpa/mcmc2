@@ -410,7 +410,18 @@
       <DDSChannel topicName="RUSV::C2::RCU::CommunicationLevelCommandType" typeName="CommunicationLevelCommandType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="videoQualityType" cdm="Communication.MCS.Level" dataType="UInt8"/>
+      <Field name="videoQualityType" cdm="Communication.MCS.Level" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="Communication.MCS.Level.Level1" value="0"/>
+          <Map cdm="Communication.MCS.Level.Level2" value="1"/>
+          <Map cdm="Communication.MCS.Level.Level3" value="2"/>
+          <Map cdm="Communication.MCS.Level.Level4" value="3"/>
+          <Map cdm="Communication.MCS.Level.Level5" value="4"/>
+          <Map cdm="Communication.MCS.Level.Level6" value="5"/>
+          <Map cdm="Communication.MCS.Level.Level7" value="6"/>
+          <Map cdm="Communication.MCS.Level.Level8" value="7"/>
+        </ValueMap>
+      </Field>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setCommunicationLevelAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
@@ -424,7 +435,18 @@
       <Reply semantic_id="setCommunicationLevelResult">
         <DDSChannel topicName="RUSV::C2::TSA::CommunicationLevelReportType" typeName="CommunicationLevelReportType"/>
         <Field name="usvHeader"/>
-        <Field name="videoQualityType" cdm="Communication.Level.Response.videoQualityType" dataType="UInt8"/>
+        <Field name="videoQualityType" cdm="Communication.Level.Response.videoQualityType" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="Communication.MCS.Level.Level1" value="0"/>
+            <Map cdm="Communication.MCS.Level.Level2" value="1"/>
+            <Map cdm="Communication.MCS.Level.Level3" value="2"/>
+            <Map cdm="Communication.MCS.Level.Level4" value="3"/>
+            <Map cdm="Communication.MCS.Level.Level5" value="4"/>
+            <Map cdm="Communication.MCS.Level.Level6" value="5"/>
+            <Map cdm="Communication.MCS.Level.Level7" value="6"/>
+            <Map cdm="Communication.MCS.Level.Level8" value="7"/>
+          </ValueMap>
+        </Field>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="configureOperatingParameters">
@@ -432,7 +454,13 @@
       <!-- frequency/range 및 SW Gain 하위 필드의 조건부 유효성은 CSCI 비고를 따른다. 현재 XSD는 파라미터 간 조건식을 직접 표현하지 않는다. -->
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8"/>
+      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="SideScanSonar.SonarType.TowedSideScanSonar" value="0"/>
+          <Map cdm="SideScanSonar.SonarType.TowedGapFiller" value="1"/>
+          <Map cdm="SideScanSonar.SonarType.HullMountedSideScanSonar" value="2"/>
+        </ValueMap>
+      </Field>
       <Field name="frequency" cdm="Ping.CarrierFrequency" dataType="UInt16"/>
       <Field name="range" cdm="Coverage.Range" dataType="UInt16"/>
       <Field name="gain" cdm="ReceiveProcessing.Gain" dataType="UInt8"/>
@@ -470,7 +498,12 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
       <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
-      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8"/>
+      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="SideScanSonar.SonarType.Towed" value="0"/>
+          <Map cdm="SideScanSonar.SonarType.HullMounted" value="1"/>
+        </ValueMap>
+      </Field>
       <FixedField name="start" cdm="Command.Execution" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="startAck" required="true">
@@ -488,7 +521,12 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
       <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
-      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8"/>
+      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="SideScanSonar.SonarType.Towed" value="0"/>
+          <Map cdm="SideScanSonar.SonarType.HullMounted" value="1"/>
+        </ValueMap>
+      </Field>
       <FixedField name="start" cdm="Command.Execution" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopAck" required="true">
@@ -504,7 +542,15 @@
       <DDSChannel topicName="RUSV::C2::RCU::PlatformPowerControlType" typeName="PlatformPowerControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="targetDevice" cdm="SideScanSonar.Subsystem" dataType="UInt8"/>
+      <Field name="targetDevice" cdm="SideScanSonar.Subsystem" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="SideScanSonar.Subsystem.SideScanSonar" value="1"/>
+          <Map cdm="SideScanSonar.Subsystem.USBL" value="2"/>
+          <Map cdm="SideScanSonar.Subsystem.Winch" value="3"/>
+          <Map cdm="SideScanSonar.Subsystem.Camera" value="4"/>
+          <Map cdm="SideScanSonar.Subsystem.HullMountedSonar" value="5"/>
+        </ValueMap>
+      </Field>
       <Field name="powerOn" cdm="PowerSupplyState" dataType="UInt8">
         <ValueMap>
           <Map cdm="PowerSupplyState.Off" value="0"/>
@@ -570,7 +616,13 @@
       <Reply semantic_id="stopTowfishResult">
         <DDSChannel topicName="RUSV::C2::TSA::LaunchReportType" typeName="LaunchReportType"/>
         <Field name="usvHeader"/>
-        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8"/>
+        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="LaunchRecovery.Response.StopState" value="0"/>
+            <Map cdm="LaunchRecovery.Response.LaunchCompleted" value="1"/>
+            <Map cdm="LaunchRecovery.Response.RecoveryCompleted" value="2"/>
+          </ValueMap>
+        </Field>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="launchTowfish">
@@ -592,7 +644,13 @@
       <Reply semantic_id="launchTowfishResult">
         <DDSChannel topicName="RUSV::C2::TSA::LaunchReportType" typeName="LaunchReportType"/>
         <Field name="usvHeader"/>
-        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8"/>
+        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="LaunchRecovery.Response.StopState" value="0"/>
+            <Map cdm="LaunchRecovery.Response.LaunchCompleted" value="1"/>
+            <Map cdm="LaunchRecovery.Response.RecoveryCompleted" value="2"/>
+          </ValueMap>
+        </Field>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="recoveryTowfish">
@@ -614,7 +672,13 @@
       <Reply semantic_id="recoveryTowfishResult">
         <DDSChannel topicName="RUSV::C2::TSA::LaunchReportType" typeName="LaunchReportType"/>
         <Field name="usvHeader"/>
-        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8"/>
+        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="LaunchRecovery.Response.StopState" value="0"/>
+            <Map cdm="LaunchRecovery.Response.LaunchCompleted" value="1"/>
+            <Map cdm="LaunchRecovery.Response.RecoveryCompleted" value="2"/>
+          </ValueMap>
+        </Field>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="emergencyStop">

@@ -90,3 +90,17 @@
 - `TSAPBITReportType`, `TSAIBITReportType` 내부 필드는 현재 Binding에 이미 존재하는 CDM을 그대로 Semantic Result에 재사용하며, Total 상태코드 및 IBIT detail bit의 raw 의미는 추가 추론하지 않는다.
 - `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType`도 하나의 결과 Report Reply를 유지하고 실제 payload 필드를 Semantic Result로 노출한다. raw 0/1/2 등의 의미 매핑은 원문 재확인 전까지 보류한다.
 - commandID가 없는 결과 Report의 요청-결과 correlation 방식은 기존 TBD를 유지한다.
+
+
+## Final parameter / source audit
+
+- `StatusConfigType.sonarType`: `0=예인형 SSS`, `1=예인형 GapFiller`, `2=선체부착형 SSS`를 Semantic 논리 선택 + Binding ValueMap으로 반영한다.
+- `StartControlType.sonarType`: 별도 코드 체계 `0=예인형`, `1=선체부착형`을 사용한다. 동일 필드명이어도 메시지별 wire code를 Binding에서 구분한다.
+- `PlatformPowerControlType.targetDevice`: `1=SSS`, `2=USBL`, `3=WINCH`, `4=CAMERA`, `5=HMS`로 반영한다.
+- `CommunicationLevelCommandType/ReportType.videoQualityType`: 모두 `0~7=MCS Level1~Level8`로 정의되어 제어/결과를 ValueSet으로 표현한다. Report가 요청값을 단순 echo한다고 추가 가정하지 않는다.
+- `LaunchReportType.launch`: 결과 의미 `0=정지상태`, `1=진수완료`, `2=회수완료`로 반영하며, `AutoLaunchControlType.launch` 명령의 `0=정지/1=진수/2=회수`와 구분한다.
+- `StatusConfigType.frequency`: 예인형 SSS(`sonarType=0`)에 대해 100/600 kHz만 원문에 명시된다. 현재 CommonSpecSchema에 제어용 `QuantityValueSetProfile`이 없어 `Profile`을 유지하고 XML 주석으로 제한을 보존한다. 선체부착형 frequency 허용값은 TBD이다.
+- GapFiller는 별도 range 설정이 없고 예인형 SSS range와 동기화된다. 현재 평면 Parameter 모델에서 조건부 적용은 직접 표현하지 않고 후속 스키마/OM 검토로 남긴다.
+- `ReceiveProcessing.TVG.Mode(0~1)`, `ReceiveProcessing.SoftwareGain.Mode(0~2)`, `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 정확한 논리 명칭을 이번 근거에서 확정하지 못해 QuantityProfile을 임시 유지한다.
+- `LanchAndRecoveryBackStopReportType.slideBackStop`, PBIT Total, IBIT Total/detail의 raw 의미는 기존 TBD를 유지한다.
+- 새 SonarType/Subsystem/MCS/LaunchReport 하위 CDM 경로는 연결용 임시 키이며 최종 USV CDM 감사에서 명칭/계층을 재검토한다.

@@ -457,10 +457,18 @@
     <ControlSpec id="setCommunicationLevel" name="음탐통신량 전환 명령" cdm="Control.Communication.Level">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Communication.MCS.Level">
-          <Range min="0" max="7"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="Communication.MCS.Level">
+          <Values>
+            <Value name="Level1" cdm="Communication.MCS.Level.Level1"/>
+            <Value name="Level2" cdm="Communication.MCS.Level.Level2"/>
+            <Value name="Level3" cdm="Communication.MCS.Level.Level3"/>
+            <Value name="Level4" cdm="Communication.MCS.Level.Level4"/>
+            <Value name="Level5" cdm="Communication.MCS.Level.Level5"/>
+            <Value name="Level6" cdm="Communication.MCS.Level.Level6"/>
+            <Value name="Level7" cdm="Communication.MCS.Level.Level7"/>
+            <Value name="Level8" cdm="Communication.MCS.Level.Level8"/>
+          </Values>
+        </ValueSetProfile>
       </Parameters>
       <Reply bindRef="setCommunicationLevelAck" cdm="Control.CommandStatus.Response" required="true">
         <Results>
@@ -469,18 +477,33 @@
       </Reply>
       <Reply bindRef="setCommunicationLevelResult" cdm="Control.Communication.Level.Response">
         <Results>
-            <Result name="videoQualityType" cdm="Communication.Level.Response.videoQualityType"/>
+            <ValueSetResult name="videoQualityType" cdm="Communication.Level.Response.videoQualityType">
+              <Values>
+                <Value name="Level1" cdm="Communication.MCS.Level.Level1"/>
+                <Value name="Level2" cdm="Communication.MCS.Level.Level2"/>
+                <Value name="Level3" cdm="Communication.MCS.Level.Level3"/>
+                <Value name="Level4" cdm="Communication.MCS.Level.Level4"/>
+                <Value name="Level5" cdm="Communication.MCS.Level.Level5"/>
+                <Value name="Level6" cdm="Communication.MCS.Level.Level6"/>
+                <Value name="Level7" cdm="Communication.MCS.Level.Level7"/>
+                <Value name="Level8" cdm="Communication.MCS.Level.Level8"/>
+              </Values>
+            </ValueSetResult>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="configureOperatingParameters" name="소나 설정 명령" cdm="Control.SetParameters">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="SideScanSonar.SonarType">
-          <Range min="0" max="2"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="SideScanSonar.SonarType">
+          <Values>
+            <Value name="TowedSideScanSonar" cdm="SideScanSonar.SonarType.TowedSideScanSonar"/>
+            <Value name="TowedGapFiller" cdm="SideScanSonar.SonarType.TowedGapFiller"/>
+            <Value name="HullMountedSideScanSonar" cdm="SideScanSonar.SonarType.HullMountedSideScanSonar"/>
+          </Values>
+        </ValueSetProfile>
         <Profile cdm="Ping.CarrierFrequency"/>
+        <!-- CSCI 적용조건: StatusConfigType frequency는 예인형 SSS(sonarType=0)에 대해 100/600 kHz만 명시된다. GapFiller는 별도 range 설정이 없고 예인형 SSS range와 동기화된다. 선체부착형 frequency 적용값은 원문에서 확정되지 않아 TBD. -->
         <QuantityProfile cdm="Coverage.Range">
           <Unit>m</Unit>
         </QuantityProfile>
@@ -558,10 +581,12 @@
     <ControlSpec id="start" name="장비 실행 명령" cdm="SideScanSonar.Control.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="SideScanSonar.SonarType">
-          <Range min="0" max="1"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="SideScanSonar.SonarType">
+          <Values>
+            <Value name="Towed" cdm="SideScanSonar.SonarType.Towed"/>
+            <Value name="HullMounted" cdm="SideScanSonar.SonarType.HullMounted"/>
+          </Values>
+        </ValueSetProfile>
       </Parameters>
       <Reply bindRef="startAck" cdm="Control.CommandStatus.Response" required="true">
         <Results>
@@ -572,10 +597,12 @@
     <ControlSpec id="stop" name="장비 중지 명령" cdm="Control.ShutDown">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="SideScanSonar.SonarType">
-          <Range min="0" max="1"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="SideScanSonar.SonarType">
+          <Values>
+            <Value name="Towed" cdm="SideScanSonar.SonarType.Towed"/>
+            <Value name="HullMounted" cdm="SideScanSonar.SonarType.HullMounted"/>
+          </Values>
+        </ValueSetProfile>
       </Parameters>
       <Reply bindRef="stopAck" cdm="Control.CommandStatus.Response" required="true">
         <Results>
@@ -586,10 +613,15 @@
     <ControlSpec id="powerOnOff" name="장비 전원 제어 명령" cdm="Control.PowerSupplyControl">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="SideScanSonar.Subsystem">
-          <Range min="1" max="5"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="SideScanSonar.Subsystem">
+          <Values>
+            <Value name="SideScanSonar" cdm="SideScanSonar.Subsystem.SideScanSonar"/>
+            <Value name="USBL" cdm="SideScanSonar.Subsystem.USBL"/>
+            <Value name="Winch" cdm="SideScanSonar.Subsystem.Winch"/>
+            <Value name="Camera" cdm="SideScanSonar.Subsystem.Camera"/>
+            <Value name="HullMountedSonar" cdm="SideScanSonar.Subsystem.HullMountedSonar"/>
+          </Values>
+        </ValueSetProfile>
         <ValueSetProfile cdm="PowerSupplyState">
           <Values>
             <Value name="Off" cdm="PowerSupplyState.Off"/>
@@ -629,7 +661,13 @@
       </Reply>
       <Reply bindRef="stopTowfishResult" cdm="Control.LaunchRecovery.Response">
         <Results>
-            <Result name="launch" cdm="LaunchRecovery.Response.launch"/>
+            <ValueSetResult name="launch" cdm="LaunchRecovery.Response.launch">
+              <Values>
+                <Value name="StopState" cdm="LaunchRecovery.Response.StopState"/>
+                <Value name="LaunchCompleted" cdm="LaunchRecovery.Response.LaunchCompleted"/>
+                <Value name="RecoveryCompleted" cdm="LaunchRecovery.Response.RecoveryCompleted"/>
+              </Values>
+            </ValueSetResult>
         </Results>
       </Reply>
     </ControlSpec>
@@ -643,7 +681,13 @@
       </Reply>
       <Reply bindRef="launchTowfishResult" cdm="Control.LaunchRecovery.Response">
         <Results>
-            <Result name="launch" cdm="LaunchRecovery.Response.launch"/>
+            <ValueSetResult name="launch" cdm="LaunchRecovery.Response.launch">
+              <Values>
+                <Value name="StopState" cdm="LaunchRecovery.Response.StopState"/>
+                <Value name="LaunchCompleted" cdm="LaunchRecovery.Response.LaunchCompleted"/>
+                <Value name="RecoveryCompleted" cdm="LaunchRecovery.Response.RecoveryCompleted"/>
+              </Values>
+            </ValueSetResult>
         </Results>
       </Reply>
     </ControlSpec>
@@ -657,7 +701,13 @@
       </Reply>
       <Reply bindRef="recoveryTowfishResult" cdm="Control.LaunchRecovery.Response">
         <Results>
-            <Result name="launch" cdm="LaunchRecovery.Response.launch"/>
+            <ValueSetResult name="launch" cdm="LaunchRecovery.Response.launch">
+              <Values>
+                <Value name="StopState" cdm="LaunchRecovery.Response.StopState"/>
+                <Value name="LaunchCompleted" cdm="LaunchRecovery.Response.LaunchCompleted"/>
+                <Value name="RecoveryCompleted" cdm="LaunchRecovery.Response.RecoveryCompleted"/>
+              </Values>
+            </ValueSetResult>
         </Results>
       </Reply>
     </ControlSpec>
