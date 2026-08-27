@@ -1,285 +1,130 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonBindingSchema.xsd">
   <!--항해레이더 정보처리장치 Binding: 항해레이더 정보처리 CSC 및 원격통제장치 CSCI 기준-->
-  <!--공용 식별자 규칙: SurfaceDetection=0x03, NavRadarProcessorCard=0x03. 세부 장비 ID는 별도 정의 없음.-->
+  <!--공용 식별자 규칙: SurfaceDetection=0x03, NavRadarProcessorCard=0x03, 별도 세부 장비 ID 없음 → System.Target.NavigationRadar는 0x03/0x03/0x00 DestinationType을 준비한다.-->
+  <!--생성 USVMessageBase/DestinationType/commandID는 OM/Adapter가 준비하고 Binding은 물리 wire 표현만 선언한다.-->
   <Monitors semantic_id="monitor">
     <MonitorBinding semantic_id="radarContacts">
       <DDSChannel topicName="RUSV::SA::CIPE::RadarContactReportType" typeName="RadarContactReportType"/>
       <Field name="usvHeader"/>
-      <Field name="contactNum" cdm="Contact.Radar.Count"/>
+      <Field name="contactNum" cdm="Contact.Radar.Count" dataType="Int32"/>
       <ArrayField name="contactTypeList" cdm="Contact.Radar.List" minOccurs="0" maxOccurs="256">
         <Element name="contact" cdm="Contact.Radar.Item">
-          <Field name="contactID" cdm="Contact.Identifier"/>
-          <Field name="detectionRange" cdm="Contact.Range"/>
-          <Field name="azimuth" cdm="Contact.Azimuth"/>
-          <Field name="latitude" cdm="Contact.Position.Latitude"/>
-          <Field name="longitude" cdm="Contact.Position.Longitude"/>
-          <Field name="course" cdm="Contact.Course"/>
-          <Field name="speed" cdm="Contact.Speed"/>
-          <Field name="size" cdm="Contact.Size"/>
-          <Field name="rcs" cdm="Contact.RCS"/>
-          <Field name="cpa" cdm="Contact.CPA"/>
-          <Field name="tcpa" cdm="Contact.TCPA"/>
-          <Field name="collisionRisk" cdm="Contact.CollisionRisk"/>
+          <Field name="contactID" cdm="Contact.Identifier" dataType="Int32"/>
+          <Field name="detectionRange" cdm="Contact.Range" dataType="Float32"/>
+          <Field name="azimuth" cdm="Contact.Azimuth" dataType="Float32"/>
+          <Field name="latitude" cdm="Contact.Position.Latitude" dataType="Float64"/>
+          <Field name="longitude" cdm="Contact.Position.Longitude" dataType="Float64"/>
+          <Field name="course" cdm="Contact.Course" dataType="Float32"/>
+          <Field name="speed" cdm="Contact.Speed" dataType="Float32"/>
+          <Field name="size" cdm="Contact.Size" dataType="Float32"/>
+          <Field name="rcs" cdm="Contact.RCS" dataType="Float32"/>
+          <Field name="cpa" cdm="Contact.CPA" dataType="Float32"/>
+          <Field name="tcpa" cdm="Contact.TCPA" dataType="Float32"/>
+          <Field name="collisionRisk" cdm="Contact.CollisionRisk" dataType="Float32"/>
         </Element>
       </ArrayField>
     </MonitorBinding>
     <MonitorBinding semantic_id="aisContacts">
       <DDSChannel topicName="RUSV::SA::CIPE::AISContactReportType" typeName="AISContactReportType"/>
-      <!--AISContactType 수치 Range는 공용 구조체 원본 정합성 확인 전까지 Binding converter/validation을 두지 않는다.-->
+      <!--AISContactType 일부 Range/Unavailable 셀의 열 정합성이 불명확하므로 타입/길이만 직접 반영하고 의미 보정은 하지 않는다.-->
       <Field name="usvHeader"/>
-      <Field name="contactNum" cdm="Contact.AIS.Count"/>
+      <Field name="contactNum" cdm="Contact.AIS.Count" dataType="Int32"/>
       <ArrayField name="contactTypeList" cdm="Contact.AIS.List" minOccurs="0" maxOccurs="256">
         <Element name="contact" cdm="Contact.AIS.Item">
-          <Field name="contactID" cdm="Contact.Identifier"/>
-          <Field name="mmsi" cdm="Contact.AIS.MMSI"/>
-          <Field name="latitude" cdm="Contact.Position.Latitude"/>
-          <Field name="longitude" cdm="Contact.Position.Longitude"/>
-          <Field name="course" cdm="Contact.Course"/>
-          <Field name="speed" cdm="Contact.Speed"/>
-          <Field name="detectionRange" cdm="Contact.Range"/>
-          <Field name="cpa" cdm="Contact.CPA"/>
-          <Field name="tcpa" cdm="Contact.TCPA"/>
-          <Field name="collisionRisk" cdm="Contact.CollisionRisk"/>
-          <Field name="heading" cdm="Contact.Heading"/>
-          <Field name="rateOfTurn" cdm="Contact.RateOfTurn"/>
-          <Field name="shipName" cdm="Contact.AIS.ShipName"/>
-          <Field name="shipType" cdm="Contact.AIS.ShipType"/>
-          <Field name="shipLength" cdm="Contact.Length"/>
-          <Field name="shipWidth" cdm="Contact.Width"/>
+          <Field name="contactID" cdm="Contact.Identifier" dataType="Int32"/>
+          <Field name="mmsi" cdm="Contact.AIS.MMSI" dataType="UInt32"/>
+          <Field name="latitude" cdm="Contact.Position.Latitude" dataType="Float64"/>
+          <Field name="longitude" cdm="Contact.Position.Longitude" dataType="Float64"/>
+          <Field name="course" cdm="Contact.Course" dataType="Float32"/>
+          <Field name="speed" cdm="Contact.Speed" dataType="Float32"/>
+          <Field name="detectionRange" cdm="Contact.Range" dataType="Float32"/>
+          <Field name="cpa" cdm="Contact.CPA" dataType="Float32"/>
+          <Field name="tcpa" cdm="Contact.TCPA" dataType="Float32"/>
+          <Field name="collisionRisk" cdm="Contact.CollisionRisk" dataType="Float32"/>
+          <Field name="heading" cdm="Contact.Heading" dataType="Float32"/>
+          <Field name="rateOfTurn" cdm="Contact.RateOfTurn" dataType="Float32"/>
+          <Field name="shipName" cdm="Contact.AIS.ShipName" dataType="UInt8" length="21" format="string"/>
+          <Field name="shipType" cdm="Contact.AIS.ShipType" dataType="UInt32"/>
+          <Field name="shipLength" cdm="Contact.Length" dataType="Int32"/>
+          <Field name="shipWidth" cdm="Contact.Width" dataType="Int32"/>
         </Element>
       </ArrayField>
     </MonitorBinding>
     <MonitorBinding semantic_id="radarStatus">
       <DDSChannel topicName="RUSV::SA::CIPE::RadarAISStatusReportType" typeName="RadarAISStatusReportType"/>
-      <!--TBD: radarMessageTransmitStatus의 구체적인 "레이더 메시지" 대상 확인 필요.-->
+      <!--radarMessageTransmitStatus의 구체적인 '레이더 메시지' 대상은 원문에서 미확정.-->
       <Field name="usvHeader"/>
-      <Field name="radarTransmitStatus" cdm="Radar.Status.Transmit"/>
-      <Field name="radarRange" cdm="Radar.Status.Range"/>
-      <Field name="radarMessageTransmitStatus" cdm="Radar.Status.MessageTransmit"/>
+      <Field name="radarTransmitStatus" cdm="Radar.Status.Transmit" dataType="UInt8"><ValueMap><Map cdm="Radar.Transmit.Standby" value="0"/><Map cdm="Radar.Transmit.Transmit" value="1"/></ValueMap></Field>
+      <Field name="radarRange" cdm="Radar.Status.Range" dataType="Int32"/>
+      <Field name="radarMessageTransmitStatus" cdm="Radar.Status.MessageTransmit" dataType="UInt8"><ValueMap><Map cdm="MessageOutput.Stop" value="0"/><Map cdm="MessageOutput.Output" value="1"/></ValueMap></Field>
     </MonitorBinding>
     <MonitorBinding semantic_id="radarVideoStatus">
       <DDSChannel topicName="RUSV::SA::CIPE::RadarAISStatusReportType" typeName="RadarAISStatusReportType"/>
       <Field name="usvHeader"/>
-      <Field name="videoBroadcastStatus" cdm="Radar.Video.BroadcastStatus"/>
+      <Field name="videoBroadcastStatus" cdm="Radar.Video.BroadcastStatus" dataType="UInt8"><ValueMap><Map cdm="Streaming.Stop" value="0"/><Map cdm="Streaming.Transmit" value="1"/></ValueMap></Field>
+      <!--frameWidth/frameHeight의 정확한 IDL primitive type은 항해레이더 정보처리 CSC 원문 재확인 전 임의 선언하지 않는다.-->
       <Field name="frameWidth" cdm="Radar.Video.Frame.Width"/>
       <Field name="frameHeight" cdm="Radar.Video.Frame.Height"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="aisStatus">
       <DDSChannel topicName="RUSV::SA::CIPE::RadarAISStatusReportType" typeName="RadarAISStatusReportType"/>
       <Field name="usvHeader"/>
-      <Field name="aisMessageTransmitStatus" cdm="AIS.Status.MessageTransmit"/>
-      <Field name="aisRange" cdm="AIS.Status.Range"/>
+      <Field name="aisMessageTransmitStatus" cdm="AIS.Status.MessageTransmit" dataType="UInt8"><ValueMap><Map cdm="MessageOutput.Standby" value="0"/><Map cdm="MessageOutput.Transmit" value="1"/></ValueMap></Field>
+      <Field name="aisRange" cdm="AIS.Status.Range" dataType="Int32"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="cipeCbitStatus">
       <DDSChannel topicName="RUSV::SO::CIPE::CIPECBITReportType" typeName="CIPECBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="cipeCBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
-      <Field name="cipeCBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
+      <Field name="cipeCBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8"><ValueMap>
+        <Map cdm="Health.CIPE.Radar.Connected" value="10"/><Map cdm="Health.CIPE.Radar.Disconnected" value="13"/>
+        <Map cdm="Health.CIPE.Lidar.Connected" value="20"/><Map cdm="Health.CIPE.Lidar.Disconnected" value="23"/>
+        <Map cdm="Health.CIPE.NearContact.Connected" value="30"/><Map cdm="Health.CIPE.NearContact.Disconnected" value="33"/>
+        <Map cdm="Health.CIPE.EOIR.Connected" value="40"/><Map cdm="Health.CIPE.EOIR.Disconnected" value="43"/>
+      </ValueMap></Field>
+      <Field name="cipeCBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus" dataType="UInt8"><ValueMap>
+        <Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/>
+      </ValueMap></Field>
     </MonitorBinding>
   </Monitors>
   <Controls semantic_id="control">
     <ControlBinding semantic_id="startIntegration">
       <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <!--DestinationType: dstEquipmentType=0x03(SurfaceDetection), dstEquipmentID=0x03(NavRadarProcessorCard).-->
-      <FixedField name="destination.dstEquipmentType" value="3"/>
-      <FixedField name="destination.dstEquipmentID" value="3"/>
-      <!--TBD: NavRadarProcessorCard의 dstSubEquipmentID는 공용 식별자 규칙에 별도 정의가 없어 실제 송신 적용값 확인 필요. 임의의 0/0xFF를 넣지 않는다.-->
-      <Reply semantic_id="startIntegrationAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="destination" sourceField="System.Target.NavigationRadar"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <Reply semantic_id="startIntegrationAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply>
     </ControlBinding>
     <ControlBinding semantic_id="restartSystem">
       <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <!--DestinationType: dstEquipmentType=0x03(SurfaceDetection), dstEquipmentID=0x03(NavRadarProcessorCard).-->
-      <FixedField name="destination.dstEquipmentType" value="3"/>
-      <FixedField name="destination.dstEquipmentID" value="3"/>
-      <!--TBD: NavRadarProcessorCard의 dstSubEquipmentID는 공용 식별자 규칙에 별도 정의가 없어 실제 송신 적용값 확인 필요. 임의의 0/0xFF를 넣지 않는다.-->
-      <Reply semantic_id="restartSystemAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><DerivedField name="destination" sourceField="System.Target.NavigationRadar"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <Reply semantic_id="restartSystemAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply>
     </ControlBinding>
     <ControlBinding semantic_id="requestIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <!--DestinationType: dstEquipmentType=0x03(SurfaceDetection), dstEquipmentID=0x03(NavRadarProcessorCard).-->
-      <FixedField name="destination.dstEquipmentType" value="3"/>
-      <FixedField name="destination.dstEquipmentID" value="3"/>
-      <!--TBD: NavRadarProcessorCard의 dstSubEquipmentID는 공용 식별자 규칙에 별도 정의가 없어 실제 송신 적용값 확인 필요. 임의의 0/0xFF를 넣지 않는다.-->
-      <Reply semantic_id="requestIbitAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-      <Reply semantic_id="requestIbitResult">
-        <DDSChannel topicName="RUSV::SO::CIPE::CIPEIBITReportType" typeName="CIPEIBITReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
-        <Field name="cipeIBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
-        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.Processor.CPUTemperature"/>
-        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.Processor.CPULoad"/>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><DerivedField name="destination" sourceField="System.Target.NavigationRadar"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <Reply semantic_id="requestIbitAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply>
+      <Reply semantic_id="requestIbitResult" required="true">
+        <DDSChannel topicName="RUSV::SO::CIPE::CIPEIBITReportType" typeName="CIPEIBITReportType"/><Field name="usvHeader"/>
+        <Field name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8"><ValueMap><Map cdm="Health.CIPE.Radar.Connected" value="10"/><Map cdm="Health.CIPE.Radar.Disconnected" value="13"/><Map cdm="Health.CIPE.Lidar.Connected" value="20"/><Map cdm="Health.CIPE.Lidar.Disconnected" value="23"/><Map cdm="Health.CIPE.NearContact.Connected" value="30"/><Map cdm="Health.CIPE.NearContact.Disconnected" value="33"/><Map cdm="Health.CIPE.EOIR.Connected" value="40"/><Map cdm="Health.CIPE.EOIR.Disconnected" value="43"/></ValueMap></Field>
+        <Field name="cipeIBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+        <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature" dataType="Float64"/><Field name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.CIPE.Processor.CpuLoad" dataType="Float64"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="requestPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <!--DestinationType: dstEquipmentType=0x03(SurfaceDetection), dstEquipmentID=0x03(NavRadarProcessorCard).-->
-      <FixedField name="destination.dstEquipmentType" value="3"/>
-      <FixedField name="destination.dstEquipmentID" value="3"/>
-      <!--TBD: NavRadarProcessorCard의 dstSubEquipmentID는 공용 식별자 규칙에 별도 정의가 없어 실제 송신 적용값 확인 필요. 임의의 0/0xFF를 넣지 않는다.-->
-      <Reply semantic_id="requestPbitAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-      <Reply semantic_id="requestPbitResult">
-        <DDSChannel topicName="RUSV::SO::CIPE::CIPEPBITReportType" typeName="CIPEPBITReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"/>
-        <Field name="cipePBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"/>
-      </Reply>
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><DerivedField name="destination" sourceField="System.Target.NavigationRadar"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <Reply semantic_id="requestPbitAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply>
+      <Reply semantic_id="requestPbitResult" required="true"><DDSChannel topicName="RUSV::SO::CIPE::CIPEPBITReportType" typeName="CIPEPBITReportType"/><Field name="usvHeader"/><Field name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8"><ValueMap><Map cdm="Health.CIPE.Radar.Connected" value="10"/><Map cdm="Health.CIPE.Radar.Disconnected" value="13"/><Map cdm="Health.CIPE.Lidar.Connected" value="20"/><Map cdm="Health.CIPE.Lidar.Disconnected" value="23"/><Map cdm="Health.CIPE.NearContact.Connected" value="30"/><Map cdm="Health.CIPE.NearContact.Disconnected" value="33"/><Map cdm="Health.CIPE.EOIR.Connected" value="40"/><Map cdm="Health.CIPE.EOIR.Disconnected" value="43"/></ValueMap></Field><Field name="cipePBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field></Reply>
     </ControlBinding>
-    <ControlBinding semantic_id="setRadarStandby">
-      <DDSChannel topicName="RUSV::C2::RCU::RadarTransmitControlType" typeName="RadarTransmitControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <FixedField name="transmitterStatus" value="0"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <Reply semantic_id="setRadarStandbyAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
-    <ControlBinding semantic_id="startRadarTransmit">
-      <DDSChannel topicName="RUSV::C2::RCU::RadarTransmitControlType" typeName="RadarTransmitControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <FixedField name="transmitterStatus" value="1"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <Reply semantic_id="startRadarTransmitAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
-    <ControlBinding semantic_id="setRadarRange">
-      <DDSChannel topicName="RUSV::C2::RCU::RadarRangeControlType" typeName="RadarRangeControlType"/>
-      <!--TBD: setTargetRange octet의 단위/범위/프리셋 변환 규칙 미정.-->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <Field name="setTargetRange" cdm="Control.Radar.Range.CommandValue"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <Reply semantic_id="setRadarRangeAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
-    <ControlBinding semantic_id="startRadarVideoStreaming">
-      <DDSChannel topicName="RUSV::C2::RCU::RadarVideoStreamingControlType" typeName="RadarVideoStreamingControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <FixedField name="videoBroadcastStatus" value="1"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <Reply semantic_id="startRadarVideoStreamingAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
-    <ControlBinding semantic_id="stopRadarVideoStreaming">
-      <DDSChannel topicName="RUSV::C2::RCU::RadarVideoStreamingControlType" typeName="RadarVideoStreamingControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <FixedField name="videoBroadcastStatus" value="0"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <Reply semantic_id="stopRadarVideoStreamingAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
-    <ControlBinding semantic_id="setAISMessageStandby">
-      <DDSChannel topicName="RUSV::C2::RCU::AISMessageTransmitControlType" typeName="AISMessageTransmitControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <FixedField name="messageTransmitterStatus" value="0"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <Reply semantic_id="setAISMessageStandbyAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
-    <ControlBinding semantic_id="startAISMessageTransmit">
-      <DDSChannel topicName="RUSV::C2::RCU::AISMessageTransmitControlType" typeName="AISMessageTransmitControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <FixedField name="messageTransmitterStatus" value="1"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <Reply semantic_id="startAISMessageTransmitAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
-    <ControlBinding semantic_id="setAISRange">
-      <DDSChannel topicName="RUSV::C2::RCU::AISRangeFilterControlType" typeName="AISRangeFilterControlType"/>
-      <!--TBD: setAISRange octet의 단위/범위/프리셋 변환 규칙 미정.-->
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <Field name="setAISRange" cdm="Control.AIS.Range.CommandValue"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <Reply semantic_id="setAISRangeAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
+    <ControlBinding semantic_id="setRadarStandby"><DDSChannel topicName="RUSV::C2::RCU::RadarTransmitControlType" typeName="RadarTransmitControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><FixedField name="transmitterStatus" value="0" dataType="UInt8"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="setRadarStandbyAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="startRadarTransmit"><DDSChannel topicName="RUSV::C2::RCU::RadarTransmitControlType" typeName="RadarTransmitControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><FixedField name="transmitterStatus" value="1" dataType="UInt8"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="startRadarTransmitAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="setRadarRange"><DDSChannel topicName="RUSV::C2::RCU::RadarRangeControlType" typeName="RadarRangeControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><Field name="setTargetRange" cdm="Control.Radar.Range.CommandValue" dataType="UInt8"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="setRadarRangeAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="startRadarVideoStreaming"><DDSChannel topicName="RUSV::C2::RCU::RadarVideoStreamingControlType" typeName="RadarVideoStreamingControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><FixedField name="videoBroadcastStatus" value="1" dataType="UInt8"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="startRadarVideoStreamingAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="stopRadarVideoStreaming"><DDSChannel topicName="RUSV::C2::RCU::RadarVideoStreamingControlType" typeName="RadarVideoStreamingControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><FixedField name="videoBroadcastStatus" value="0" dataType="UInt8"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="stopRadarVideoStreamingAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="setAISMessageStandby"><DDSChannel topicName="RUSV::C2::RCU::AISMessageTransmitControlType" typeName="AISMessageTransmitControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><FixedField name="messageTransmitterStatus" value="0" dataType="UInt8"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="setAISMessageStandbyAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="startAISMessageTransmit"><DDSChannel topicName="RUSV::C2::RCU::AISMessageTransmitControlType" typeName="AISMessageTransmitControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><FixedField name="messageTransmitterStatus" value="1" dataType="UInt8"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="startAISMessageTransmitAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="setAISRange"><DDSChannel topicName="RUSV::C2::RCU::AISRangeFilterControlType" typeName="AISRangeFilterControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><Field name="setAISRange" cdm="Control.AIS.Range.CommandValue" dataType="UInt8"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="setAISRangeAck" required="true"><DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
   </Controls>
-  <SensorProducts semantic_id="sensorProduct">
-    <ProductBinding semantic_id="radarVideo">
-      <!--CSCI는 항해레이더 스트리밍 영상을 RTP, 약 1 Mbps로 정의. IP/Port 등 통신 설정은 현재 ProductBinding 명세 범위에서 제외.-->
-      <RTPChannel/>
-    </ProductBinding>
-  </SensorProducts>
+  <SensorProducts semantic_id="sensorProduct"><ProductBinding semantic_id="radarVideo"><!--CSCI는 항해레이더 스트리밍 영상을 RTP, 약 1 Mbps로 정의. IP/Port 등 통신 설정은 현재 ProductBinding 명세 범위에서 제외.--><RTPChannel/></ProductBinding></SensorProducts>
 </SensorBinding>
