@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+            xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd">
   <!--
     전자광학장치 영상처리 CSC Semantic.
     원천 파일명은 '전자광학추적장치 CSCI.csv'이나 CSV 내부 Source/Destination 명칭은 '전자광학장치 영상처리 CSC'로 정의되어 있어 내부 명칭을 기준으로 작성한다.
     원격통제장치와 직접 연동되는 영상분석결과, CBIT/PBIT/IBIT, 비주기 명령 ACK 및 이미지 저장 명령만 포함한다.
+    물리 raw enum/type/commandID는 Binding 책임으로 둔다.
   -->
   <ConstantSpecs id="constant">
     <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
@@ -33,19 +34,19 @@
         <Range min="0" max="255"/>
         <Resolution>1</Resolution>
       </QuantitySpec>
-      <!-- imageObjectDetectionCnt의 0~255 범위를 기준으로 배열 최대 길이를 255개로 정의한다. -->
+      <!-- imageObjectDetectionCnt의 0~255 범위를 기준으로 배열 최대 길이를 255개로 정의한다. 실제 count와 sequence 길이의 일치 규칙은 OpenIssues에 남긴다. -->
       <CollectionSpec id="imageObjectDetection2DSeq" name="객체 탐지 결과 목록" cdm="Vision.ObjectDetection2D.List" minOccurs="0" maxOccurs="255">
         <ElementSpec id="imageObjectDetection2D" name="객체 탐지 결과" cdm="Vision.ObjectDetection2D.Item">
           <ValueSetSpec id="classID" name="클래스" cdm="Vision.ObjectDetection2D.Class">
             <Values>
-              <Value cdm="Contact.Class.PatrolVessel">0</Value>
-              <Value cdm="Contact.Class.NorthKoreanCargoShip">1</Value>
-              <Value cdm="Contact.Class.FlagOfConvenienceShip">2</Value>
-              <Value cdm="Contact.Class.Warship">3</Value>
-              <Value cdm="Contact.Class.FishingShip">4</Value>
-              <Value cdm="Contact.Class.CargoShip">5</Value>
-              <Value cdm="Contact.Class.Ferry">6</Value>
-              <Value cdm="Contact.Class.UnidentifiedShip">7</Value>
+              <Value name="PatrolVessel" cdm="Contact.Class.PatrolVessel"/>
+              <Value name="NorthKoreanCargoShip" cdm="Contact.Class.NorthKoreanCargoShip"/>
+              <Value name="FlagOfConvenienceShip" cdm="Contact.Class.FlagOfConvenienceShip"/>
+              <Value name="Warship" cdm="Contact.Class.Warship"/>
+              <Value name="FishingShip" cdm="Contact.Class.FishingShip"/>
+              <Value name="CargoShip" cdm="Contact.Class.CargoShip"/>
+              <Value name="Ferry" cdm="Contact.Class.Ferry"/>
+              <Value name="UnidentifiedShip" cdm="Contact.Class.UnidentifiedShip"/>
             </Values>
           </ValueSetSpec>
           <QuantitySpec id="confidence" name="분류 확률" cdm="Vision.ObjectDetection2D.Confidence">
@@ -92,19 +93,19 @@
     </GroupSpec>
 
     <GroupSpec id="cipeCbitStatus" name="전자광학 영상처리카드 CBIT 상태" cdm="Health.CBIT.CIPE">
-      <!-- 공용 CIPECBITReport의 cipeOperationalStatus 중 본 장치(EoSystemProcessor)에 해당하는 EOIR 연동 상태만 Semantic에 노출한다. -->
+      <!-- 공용 CIPECBITReport는 8개 센서 연동코드를 정의한다. 현재 영상처리카드의 직접 대상 EOIR에 해당하는 40/43만 논리값으로 노출하며 허용 subset 근거는 OpenIssues에 남긴다. -->
       <ValueSetSpec id="cipeOperationalStatus" name="전자광학장치 연동 상태" cdm="Health.CIPE.EquipmentLink">
         <Values>
-          <Value cdm="Health.CIPE.EOIR.Connected">40</Value>
-          <Value cdm="Health.CIPE.EOIR.Disconnected">43</Value>
+          <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
+          <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="operationalStatus" name="처리카드 정상 작동 여부" cdm="Health.CIPE.OperationalStatus">
         <Values>
-          <Value cdm="Health.Normal">0</Value>
-          <Value cdm="Health.Degraded">1</Value>
-          <Value cdm="Health.Unavailable">2</Value>
-          <Value cdm="Health.NoResponse">3</Value>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -112,27 +113,88 @@
 
   <ControlSpecs id="control">
     <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
     <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
     <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response"/>
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
+        <Results>
+          <GroupResult name="cipeIbit" cdm="Health.IBIT.ElectroOpticalProcessor">
+            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+              <Values>
+                <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
+                <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
+              </Values>
+            </ValueSetResult>
+            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+              <Values>
+                <Value name="Normal" cdm="Health.Normal"/>
+                <Value name="Degraded" cdm="Health.Degraded"/>
+                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                <Value name="NoResponse" cdm="Health.NoResponse"/>
+              </Values>
+            </ValueSetResult>
+            <QuantityResult name="cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature">
+              <Unit>degC</Unit>
+              <Range min="20" max="100"/>
+            </QuantityResult>
+            <QuantityResult name="cpuLoad" cdm="Health.CIPE.Processor.CpuLoad">
+              <Unit>percent</Unit>
+              <Range min="0" max="100"/>
+            </QuantityResult>
+          </GroupResult>
+        </Results>
+      </Reply>
     </ControlSpec>
     <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response"/>
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
+        <Results>
+          <GroupResult name="cipePbit" cdm="Health.PBIT.ElectroOpticalProcessor">
+            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+              <Values>
+                <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
+                <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
+              </Values>
+            </ValueSetResult>
+            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+              <Values>
+                <Value name="Normal" cdm="Health.Normal"/>
+                <Value name="Degraded" cdm="Health.Degraded"/>
+                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                <Value name="NoResponse" cdm="Health.NoResponse"/>
+              </Values>
+            </ValueSetResult>
+          </GroupResult>
+        </Results>
+      </Reply>
     </ControlSpec>
     <!-- controlImageSave의 0은 no change이고 1만 실제 저장 동작이므로 Semantic에서는 저장 동작 하나로 노출한다. -->
     <ControlSpec id="saveImage" name="전자광학장치 이미지 저장" cdm="Control.EOIR.Image.Save">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="saveImageAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="saveImageAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
   </ControlSpecs>
 </SensorSpec>
