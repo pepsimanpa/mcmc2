@@ -6,83 +6,83 @@
     <MonitorBinding semantic_id="mode">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="operationalModeTSA" cdm="Mode.Operation"/>
+      <Field name="operationalModeTSA" cdm="Mode.Operation" dataType="UInt8"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="pingSetting">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="transducerFreq" cdm="Ping.CarrierFrequency"/>
-      <Field name="sssPulseWidth" cdm="Ping.SideScanSonar.PulseWidth"/>
-      <Field name="sssPulseType" cdm="Ping.SideScanSonar.PulseType"/>
-      <Field name="gfPulseWidth" cdm="Ping.GapFiller.PulseWidth"/>
-      <Field name="gfPulseType" cdm="Ping.GapFiller.PulseType"/>
+      <Field name="transducerFreq" cdm="Ping.CarrierFrequency" dataType="UInt16"/>
+      <Field name="sssPulseWidth" cdm="Ping.SideScanSonar.PulseWidth" dataType="UInt16"/>
+      <Field name="sssPulseType" cdm="Ping.SideScanSonar.PulseType" dataType="UInt16"/>
+      <Field name="gfPulseWidth" cdm="Ping.GapFiller.PulseWidth" dataType="UInt16"/>
+      <Field name="gfPulseType" cdm="Ping.GapFiller.PulseType" dataType="UInt16"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="settingValues">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="sssRange" cdm="Setting.SideScanSonar.DetectionRange"/>
-      <Field name="sssGain" cdm="Setting.SideScanSonar.Gain"/>
-      <Field name="sssTvgMode" cdm="Setting.SideScanSonar.TVG.Mode"/>
-      <Field name="sssTvgDistCoeff" cdm="Setting.SideScanSonar.TVG.DistanceCoefficient"/>
-      <Field name="sssTvgAttenCoeff" cdm="Setting.SideScanSonar.TVG.AttenuationCoefficient"/>
-      <Field name="gfRange" cdm="Setting.GapFiller.DetectionRange"/>
-      <Field name="gfGain" cdm="Setting.GapFiller.Gain"/>
-      <Field name="gfTvgMode" cdm="Setting.GapFiller.TVG.Mode"/>
-      <Field name="gfTvgDistCoeff" cdm="Setting.GapFiller.TVG.DistanceCoefficient"/>
-      <Field name="gfTvgAttenCoeff" cdm="Setting.GapFiller.TVG.AttenuationCoefficient"/>
+      <Field name="sssRange" cdm="Setting.SideScanSonar.DetectionRange" dataType="UInt16"/>
+      <Field name="sssGain" cdm="Setting.SideScanSonar.Gain" dataType="UInt8"/>
+      <Field name="sssTvgMode" cdm="Setting.SideScanSonar.TVG.Mode" dataType="UInt8"/>
+      <Field name="sssTvgDistCoeff" cdm="Setting.SideScanSonar.TVG.DistanceCoefficient" dataType="UInt16"/>
+      <Field name="sssTvgAttenCoeff" cdm="Setting.SideScanSonar.TVG.AttenuationCoefficient" dataType="UInt16"/>
+      <Field name="gfRange" cdm="Setting.GapFiller.DetectionRange" dataType="UInt16"/>
+      <Field name="gfGain" cdm="Setting.GapFiller.Gain" dataType="UInt8"/>
+      <Field name="gfTvgMode" cdm="Setting.GapFiller.TVG.Mode" dataType="UInt8"/>
+      <Field name="gfTvgDistCoeff" cdm="Setting.GapFiller.TVG.DistanceCoefficient" dataType="UInt16"/>
+      <Field name="gfTvgAttenCoeff" cdm="Setting.GapFiller.TVG.AttenuationCoefficient" dataType="UInt16"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="position">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="towLatitude" cdm="Position.Latitude"/>
-      <Field name="towLongitude" cdm="Position.Longitude"/>
-      <Field name="towDepth" cdm="Position.Depth"/>
-      <Field name="towAltitude" cdm="Position.Altitude"/>
+      <Field name="towLatitude" cdm="Position.Latitude" dataType="Float64"/>
+      <Field name="towLongitude" cdm="Position.Longitude" dataType="Float64"/>
+      <Field name="towDepth" cdm="Position.Depth" dataType="Float32"/>
+      <Field name="towAltitude" cdm="Position.Altitude" dataType="Float32"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="attitude">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="towHeading" cdm="Attitude.Heading"/>
-      <Field name="towPitch" cdm="Attitude.Pitch"/>
-      <Field name="towRoll" cdm="Attitude.Roll"/>
+      <Field name="towHeading" cdm="Attitude.Heading" dataType="Float32"/>
+      <Field name="towPitch" cdm="Attitude.Pitch" dataType="Float32"/>
+      <Field name="towRoll" cdm="Attitude.Roll" dataType="Float32"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="launchRecoveryState">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="operationStatus" cdm="LaunchRecovery.Status.Operation"/>
-      <Field name="ultraShortBaseLineMode" cdm="LaunchRecovery.USBL.Mode"/>
-      <Field name="winchMotorBrakeStatus" cdm="LaunchRecovery.Winch.Brake"/>
-      <Field name="slideMotorBrakeStatus" cdm="LaunchRecovery.Slide.Brake"/>
-      <Field name="ultraShortBaseLineMotorBrakeStatus" cdm="LaunchRecovery.USBL.Brake"/>
-      <Field name="cableDeployLength" cdm="LaunchRecovery.Cable.Length"/>
-      <Field name="cableDeploySpeed" cdm="LaunchRecovery.Cable.Speed"/>
-      <Field name="slidePosition" cdm="LaunchRecovery.Slide.Position"/>
-      <Field name="ultraShortBaseLineVerticalPosition" cdm="LaunchRecovery.USBL.VerticalPosition"/>
-      <Field name="winchCurrent" cdm="LaunchRecovery.Winch.Current"/>
-      <Field name="recoveryUnitCurrent" cdm="LaunchRecovery.Slide.Current"/>
-      <Field name="ultraShortBaseLineVerticalCurrent" cdm="LaunchRecovery.USBL.Current"/>
-      <Field name="cableTension" cdm="LaunchRecovery.Cable.Tension"/>
-      <Field name="launchLimitSwitchStatus" cdm="LaunchRecovery.LimitSwitch.Launch"/>
-      <Field name="recoveryLimitSwitchStatus" cdm="LaunchRecovery.LimitSwitch.Recovery"/>
+      <Field name="operationStatus" cdm="LaunchRecovery.Status.Operation" dataType="UInt8"/>
+      <Field name="ultraShortBaseLineMode" cdm="LaunchRecovery.USBL.Mode" dataType="UInt8"/>
+      <Field name="winchMotorBrakeStatus" cdm="LaunchRecovery.Winch.Brake" dataType="UInt8"/>
+      <Field name="slideMotorBrakeStatus" cdm="LaunchRecovery.Slide.Brake" dataType="UInt8"/>
+      <Field name="ultraShortBaseLineMotorBrakeStatus" cdm="LaunchRecovery.USBL.Brake" dataType="UInt8"/>
+      <Field name="cableDeployLength" cdm="LaunchRecovery.Cable.Length" dataType="Float32"/>
+      <Field name="cableDeploySpeed" cdm="LaunchRecovery.Cable.Speed" dataType="Float32"/>
+      <Field name="slidePosition" cdm="LaunchRecovery.Slide.Position" dataType="Float32"/>
+      <Field name="ultraShortBaseLineVerticalPosition" cdm="LaunchRecovery.USBL.VerticalPosition" dataType="Float32"/>
+      <Field name="winchCurrent" cdm="LaunchRecovery.Winch.Current" dataType="Float32"/>
+      <Field name="recoveryUnitCurrent" cdm="LaunchRecovery.Slide.Current" dataType="Float32"/>
+      <Field name="ultraShortBaseLineVerticalCurrent" cdm="LaunchRecovery.USBL.Current" dataType="Float32"/>
+      <Field name="cableTension" cdm="LaunchRecovery.Cable.Tension" dataType="Float32"/>
+      <Field name="launchLimitSwitchStatus" cdm="LaunchRecovery.LimitSwitch.Launch" dataType="UInt8"/>
+      <Field name="recoveryLimitSwitchStatus" cdm="LaunchRecovery.LimitSwitch.Recovery" dataType="UInt8"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="powerState">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="towedSonarArrayPowerStatus" cdm="ElectricalState.Power.TowedSonarArray"/>
-      <Field name="ultraShortBaseLinePowerStatus" cdm="ElectricalState.Power.USBL"/>
-      <Field name="winchPowerStatus" cdm="ElectricalState.Power.Winch"/>
-      <Field name="recoveryUnitPowerStatus" cdm="ElectricalState.Power.RecoveryUnit"/>
-      <Field name="cameraPowerStatus" cdm="ElectricalState.Power.Camera"/>
+      <Field name="towedSonarArrayPowerStatus" cdm="ElectricalState.Power.TowedSonarArray" dataType="UInt8"/>
+      <Field name="ultraShortBaseLinePowerStatus" cdm="ElectricalState.Power.USBL" dataType="UInt8"/>
+      <Field name="winchPowerStatus" cdm="ElectricalState.Power.Winch" dataType="UInt8"/>
+      <Field name="recoveryUnitPowerStatus" cdm="ElectricalState.Power.RecoveryUnit" dataType="UInt8"/>
+      <Field name="cameraPowerStatus" cdm="ElectricalState.Power.Camera" dataType="UInt8"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="subsystemHealthStatus">
       <DDSChannel topicName="RUSV::SO::TSA::TSACBITReportType" typeName="TSACBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="towedSonarAssemblyTotalCBIT" cdm="CBIT.TowfishAssembly"/>
-      <Field name="launchAndRecoveryTotalCBIT" cdm="CBIT.LaunchRecoveryAssembly"/>
-      <Field name="towedSonarArrayTotalCBIT" cdm="CBIT.TransducerArray"/>
-      <Field name="sonarSignalProcessingEquipmentTotalCBIT" cdm="CBIT.SignalProcessor"/>
-      <Field name="sonarImagingProcessingEquipmentTotalCBIT" cdm="CBIT.ImageProcessor"/>
-      <Field name="hullMountedSonarTotalCBIT" cdm="CBIT.HullMountedSonar"/>
+      <Field name="towedSonarAssemblyTotalCBIT" cdm="CBIT.TowfishAssembly" dataType="UInt8"/>
+      <Field name="launchAndRecoveryTotalCBIT" cdm="CBIT.LaunchRecoveryAssembly" dataType="UInt8"/>
+      <Field name="towedSonarArrayTotalCBIT" cdm="CBIT.TransducerArray" dataType="UInt8"/>
+      <Field name="sonarSignalProcessingEquipmentTotalCBIT" cdm="CBIT.SignalProcessor" dataType="UInt8"/>
+      <Field name="sonarImagingProcessingEquipmentTotalCBIT" cdm="CBIT.ImageProcessor" dataType="UInt8"/>
+      <Field name="hullMountedSonarTotalCBIT" cdm="CBIT.HullMountedSonar" dataType="UInt8"/>
     </MonitorBinding>
   </Monitors>
   <Controls semantic_id="control">
@@ -96,10 +96,10 @@
       <Reply semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="restartSystem">
@@ -112,10 +112,10 @@
       <Reply semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="requestIbit">
@@ -129,77 +129,77 @@
       <Reply semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- IBIT 결과에는 commandID가 없다. 세부 오류 bit field는 원본 raw octet으로 보존하며 의미 bit 분해는 추후 Adapter/DerivedField 과제. -->
       <Reply semantic_id="requestIbitResult">
         <DDSChannel topicName="RUSV::SO::TSA::TSAIBITReportType" typeName="TSAIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="towedSonarAssemblyTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarAssemblyTotalIBIT"/>
-        <Field name="launchAndRecoveryTotalIBIT" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryTotalIBIT"/>
-        <Field name="launchAndRecoveryPowerDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail"/>
-        <Field name="launchAndRecoveryLinkDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail"/>
-        <Field name="launchAndRecoveryOverCurrentDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail"/>
-        <Field name="launchAndRecoveryFunctionDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail"/>
-        <Field name="towedSonarArrayTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarArrayTotalIBIT"/>
-        <Field name="towedSonarArrayDetail" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail"/>
-        <Field name="tsadMux12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux12vVoltage"/>
-        <Field name="tsadMux5vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux5vVoltage"/>
-        <Field name="tsadMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tsadMux3v3Voltage"/>
-        <Field name="tsadMuxPcmTemp" cdm="Health.IBIT.SideScanSonar.tsadMuxPcmTemp"/>
-        <Field name="tsadMuxOcxTemp" cdm="Health.IBIT.SideScanSonar.tsadMuxOcxTemp"/>
-        <Field name="tsadTxSupplyVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxSupplyVoltage"/>
-        <Field name="tsadTxPortCapVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxPortCapVoltage"/>
-        <Field name="tsadTxStbdCapVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxStbdCapVoltage"/>
-        <Field name="tsadTx12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadTx12vVoltage"/>
-        <Field name="tsadTxHfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfPortRms"/>
-        <Field name="tsadTxHfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfStbdRms"/>
-        <Field name="tsadTxLfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfPortRms"/>
-        <Field name="tsadTxLfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfStbdRms"/>
-        <Field name="sonarSignalProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalIBIT"/>
-        <Field name="sonarSignalProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail"/>
-        <Field name="tdcDemux5vVoltage" cdm="Health.IBIT.SideScanSonar.tdcDemux5vVoltage"/>
-        <Field name="tdcDemux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tdcDemux3v3Voltage"/>
-        <Field name="tdcDemuxTemp1" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp1"/>
-        <Field name="tdcDemuxTemp2" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp2"/>
-        <Field name="spcPower5vVoltage" cdm="Health.IBIT.SideScanSonar.spcPower5vVoltage"/>
-        <Field name="spcPowerTwfCurrentVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerTwfCurrentVoltage"/>
-        <Field name="spcPowerSysCurrentVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerSysCurrentVoltage"/>
-        <Field name="spcPowerTwfCurrentFault" cdm="Health.IBIT.SideScanSonar.spcPowerTwfCurrentFault"/>
-        <Field name="spcPowerTwfVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerTwfVoltage"/>
-        <Field name="spcPowerSysVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerSysVoltage"/>
-        <Field name="spcPowerTemp1" cdm="Health.IBIT.SideScanSonar.spcPowerTemp1"/>
-        <Field name="spcPowerTemp2" cdm="Health.IBIT.SideScanSonar.spcPowerTemp2"/>
-        <Field name="tpcPowerTpuVoltage" cdm="Health.IBIT.SideScanSonar.tpcPowerTpuVoltage"/>
-        <Field name="tpcPower12vVoltage" cdm="Health.IBIT.SideScanSonar.tpcPower12vVoltage"/>
-        <Field name="tpcPowerTpuCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tpcPowerTpuCurrentVoltage"/>
-        <Field name="tpcPower12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tpcPower12vCurrentVoltage"/>
-        <Field name="tlc5vVoltage" cdm="Health.IBIT.SideScanSonar.tlc5vVoltage"/>
-        <Field name="tlcN5vVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vVoltage"/>
-        <Field name="tlc12vVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vVoltage"/>
-        <Field name="tlcN12vVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vVoltage"/>
-        <Field name="tlc5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc5vCurrentVoltage"/>
-        <Field name="tlc12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vCurrentVoltage"/>
-        <Field name="tlcN5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vCurrentVoltage"/>
-        <Field name="tlcN12vCurrentRefVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vCurrentRefVoltage"/>
-        <Field name="sonarImagingProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalIBIT"/>
-        <Field name="sonarImagingProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentDetail"/>
-        <Field name="sonarImagingHealthDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail"/>
-        <Field name="powerCardTemp" cdm="Health.IBIT.SideScanSonar.powerCardTemp"/>
-        <Field name="sbcBoardTemp" cdm="Health.IBIT.SideScanSonar.sbcBoardTemp"/>
-        <Field name="hullMountedSonarTotalIBIT" cdm="Health.IBIT.SideScanSonar.hullMountedSonarTotalIBIT"/>
-        <Field name="hullMountedSonarDetail" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail"/>
-        <Field name="hmMux5vVoltage" cdm="Health.IBIT.SideScanSonar.hmMux5vVoltage"/>
-        <Field name="hmMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.hmMux3v3Voltage"/>
-        <Field name="hmMuxAdcIn1Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn1Temp"/>
-        <Field name="hmMuxAdcIn2Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn2Temp"/>
-        <Field name="hmTx5vVoltage" cdm="Health.IBIT.SideScanSonar.hmTx5vVoltage"/>
-        <Field name="hmTx12vVoltage" cdm="Health.IBIT.SideScanSonar.hmTx12vVoltage"/>
-        <Field name="hmTxSupplyVoltage" cdm="Health.IBIT.SideScanSonar.hmTxSupplyVoltage"/>
-        <Field name="hmTxCapVoltage" cdm="Health.IBIT.SideScanSonar.hmTxCapVoltage"/>
+        <Field name="towedSonarAssemblyTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarAssemblyTotalIBIT" dataType="UInt8"/>
+        <Field name="launchAndRecoveryTotalIBIT" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryTotalIBIT" dataType="UInt8"/>
+        <Field name="launchAndRecoveryPowerDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail" dataType="UInt8"/>
+        <Field name="launchAndRecoveryLinkDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail" dataType="UInt8"/>
+        <Field name="launchAndRecoveryOverCurrentDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail" dataType="UInt8"/>
+        <Field name="launchAndRecoveryFunctionDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail" dataType="UInt8"/>
+        <Field name="towedSonarArrayTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarArrayTotalIBIT" dataType="UInt8"/>
+        <Field name="towedSonarArrayDetail" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail" dataType="UInt8"/>
+        <Field name="tsadMux12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux12vVoltage" dataType="Float32"/>
+        <Field name="tsadMux5vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux5vVoltage" dataType="Float32"/>
+        <Field name="tsadMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tsadMux3v3Voltage" dataType="Float32"/>
+        <Field name="tsadMuxPcmTemp" cdm="Health.IBIT.SideScanSonar.tsadMuxPcmTemp" dataType="Float32"/>
+        <Field name="tsadMuxOcxTemp" cdm="Health.IBIT.SideScanSonar.tsadMuxOcxTemp" dataType="Float32"/>
+        <Field name="tsadTxSupplyVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxSupplyVoltage" dataType="Float32"/>
+        <Field name="tsadTxPortCapVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxPortCapVoltage" dataType="Float32"/>
+        <Field name="tsadTxStbdCapVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxStbdCapVoltage" dataType="Float32"/>
+        <Field name="tsadTx12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadTx12vVoltage" dataType="Float32"/>
+        <Field name="tsadTxHfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfPortRms" dataType="Float32"/>
+        <Field name="tsadTxHfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfStbdRms" dataType="Float32"/>
+        <Field name="tsadTxLfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfPortRms" dataType="Float32"/>
+        <Field name="tsadTxLfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfStbdRms" dataType="Float32"/>
+        <Field name="sonarSignalProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalIBIT" dataType="UInt8"/>
+        <Field name="sonarSignalProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail" dataType="UInt8"/>
+        <Field name="tdcDemux5vVoltage" cdm="Health.IBIT.SideScanSonar.tdcDemux5vVoltage" dataType="Float32"/>
+        <Field name="tdcDemux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tdcDemux3v3Voltage" dataType="Float32"/>
+        <Field name="tdcDemuxTemp1" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp1" dataType="Float32"/>
+        <Field name="tdcDemuxTemp2" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp2" dataType="Float32"/>
+        <Field name="spcPower5vVoltage" cdm="Health.IBIT.SideScanSonar.spcPower5vVoltage" dataType="Float32"/>
+        <Field name="spcPowerTwfCurrentVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerTwfCurrentVoltage" dataType="Float32"/>
+        <Field name="spcPowerSysCurrentVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerSysCurrentVoltage" dataType="Float32"/>
+        <Field name="spcPowerTwfCurrentFault" cdm="Health.IBIT.SideScanSonar.spcPowerTwfCurrentFault" dataType="Float32"/>
+        <Field name="spcPowerTwfVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerTwfVoltage" dataType="Float32"/>
+        <Field name="spcPowerSysVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerSysVoltage" dataType="Float32"/>
+        <Field name="spcPowerTemp1" cdm="Health.IBIT.SideScanSonar.spcPowerTemp1" dataType="Float32"/>
+        <Field name="spcPowerTemp2" cdm="Health.IBIT.SideScanSonar.spcPowerTemp2" dataType="Float32"/>
+        <Field name="tpcPowerTpuVoltage" cdm="Health.IBIT.SideScanSonar.tpcPowerTpuVoltage" dataType="Float32"/>
+        <Field name="tpcPower12vVoltage" cdm="Health.IBIT.SideScanSonar.tpcPower12vVoltage" dataType="Float32"/>
+        <Field name="tpcPowerTpuCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tpcPowerTpuCurrentVoltage" dataType="Float32"/>
+        <Field name="tpcPower12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tpcPower12vCurrentVoltage" dataType="Float32"/>
+        <Field name="tlc5vVoltage" cdm="Health.IBIT.SideScanSonar.tlc5vVoltage" dataType="Float32"/>
+        <Field name="tlcN5vVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vVoltage" dataType="Float32"/>
+        <Field name="tlc12vVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vVoltage" dataType="Float32"/>
+        <Field name="tlcN12vVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vVoltage" dataType="Float32"/>
+        <Field name="tlc5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc5vCurrentVoltage" dataType="Float32"/>
+        <Field name="tlc12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vCurrentVoltage" dataType="Float32"/>
+        <Field name="tlcN5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vCurrentVoltage" dataType="Float32"/>
+        <Field name="tlcN12vCurrentRefVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vCurrentRefVoltage" dataType="Float32"/>
+        <Field name="sonarImagingProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalIBIT" dataType="UInt8"/>
+        <Field name="sonarImagingProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentDetail" dataType="UInt8"/>
+        <Field name="sonarImagingHealthDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail" dataType="UInt8"/>
+        <Field name="powerCardTemp" cdm="Health.IBIT.SideScanSonar.powerCardTemp" dataType="Float32"/>
+        <Field name="sbcBoardTemp" cdm="Health.IBIT.SideScanSonar.sbcBoardTemp" dataType="Float32"/>
+        <Field name="hullMountedSonarTotalIBIT" cdm="Health.IBIT.SideScanSonar.hullMountedSonarTotalIBIT" dataType="UInt8"/>
+        <Field name="hullMountedSonarDetail" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail" dataType="UInt8"/>
+        <Field name="hmMux5vVoltage" cdm="Health.IBIT.SideScanSonar.hmMux5vVoltage" dataType="Float32"/>
+        <Field name="hmMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.hmMux3v3Voltage" dataType="Float32"/>
+        <Field name="hmMuxAdcIn1Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn1Temp" dataType="Float32"/>
+        <Field name="hmMuxAdcIn2Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn2Temp" dataType="Float32"/>
+        <Field name="hmTx5vVoltage" cdm="Health.IBIT.SideScanSonar.hmTx5vVoltage" dataType="Float32"/>
+        <Field name="hmTx12vVoltage" cdm="Health.IBIT.SideScanSonar.hmTx12vVoltage" dataType="Float32"/>
+        <Field name="hmTxSupplyVoltage" cdm="Health.IBIT.SideScanSonar.hmTxSupplyVoltage" dataType="Float32"/>
+        <Field name="hmTxCapVoltage" cdm="Health.IBIT.SideScanSonar.hmTxCapVoltage" dataType="Float32"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="requestPbit">
@@ -213,105 +213,105 @@
       <Reply semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- PBIT 결과에는 commandID가 없어 요청-결과 상관관계 방식은 TBD. -->
       <Reply semantic_id="requestPbitResult">
         <DDSChannel topicName="RUSV::SO::TSA::TSAPBITReportType" typeName="TSAPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="towedSonarAssemblyTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarAssemblyTotalPBIT"/>
-        <Field name="launchAndRecoveryTotalPBIT" cdm="Health.PBIT.SideScanSonar.launchAndRecoveryTotalPBIT"/>
-        <Field name="towedSonarArrayTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarArrayTotalPBIT"/>
-        <Field name="sonarSignalProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalPBIT"/>
-        <Field name="sonarImagingProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalPBIT"/>
-        <Field name="hullMountedSonarTotalPBIT" cdm="Health.PBIT.SideScanSonar.hullMountedSonarTotalPBIT"/>
+        <Field name="towedSonarAssemblyTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarAssemblyTotalPBIT" dataType="UInt8"/>
+        <Field name="launchAndRecoveryTotalPBIT" cdm="Health.PBIT.SideScanSonar.launchAndRecoveryTotalPBIT" dataType="UInt8"/>
+        <Field name="towedSonarArrayTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarArrayTotalPBIT" dataType="UInt8"/>
+        <Field name="sonarSignalProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalPBIT" dataType="UInt8"/>
+        <Field name="sonarImagingProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalPBIT" dataType="UInt8"/>
+        <Field name="hullMountedSonarTotalPBIT" cdm="Health.PBIT.SideScanSonar.hullMountedSonarTotalPBIT" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="stopSlideBackStop">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryBackStopCommandType" typeName="LaunchAndRecoveryBackStopCommandType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="0"/>
+      <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopSlideBackStopAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- 물리 Type명 LanchAndRecoveryBackStopReportType 오탈자를 CSCI 그대로 보존한다. 결과에는 commandID가 없다. -->
       <Reply semantic_id="stopSlideBackStopResult">
         <DDSChannel topicName="RUSV::C2::TSA::LanchAndRecoveryBackStopReportType" typeName="LanchAndRecoveryBackStopReportType"/>
         <Field name="usvHeader"/>
-        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop"/>
+        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="engageSlideBackStop">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryBackStopCommandType" typeName="LaunchAndRecoveryBackStopCommandType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="1"/>
+      <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="engageSlideBackStopAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- 물리 Type명 LanchAndRecoveryBackStopReportType 오탈자를 CSCI 그대로 보존한다. 결과에는 commandID가 없다. -->
       <Reply semantic_id="engageSlideBackStopResult">
         <DDSChannel topicName="RUSV::C2::TSA::LanchAndRecoveryBackStopReportType" typeName="LanchAndRecoveryBackStopReportType"/>
         <Field name="usvHeader"/>
-        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop"/>
+        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="returnSlideBackStop">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryBackStopCommandType" typeName="LaunchAndRecoveryBackStopCommandType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="2"/>
+      <FixedField name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Command" value="2" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="returnSlideBackStopAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- 물리 Type명 LanchAndRecoveryBackStopReportType 오탈자를 CSCI 그대로 보존한다. 결과에는 commandID가 없다. -->
       <Reply semantic_id="returnSlideBackStopResult">
         <DDSChannel topicName="RUSV::C2::TSA::LanchAndRecoveryBackStopReportType" typeName="LanchAndRecoveryBackStopReportType"/>
         <Field name="usvHeader"/>
-        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop"/>
+        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="setCommunicationLevel">
       <DDSChannel topicName="RUSV::C2::RCU::CommunicationLevelCommandType" typeName="CommunicationLevelCommandType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="videoQualityType" cdm="Communication.MCS.Level"/>
+      <Field name="videoQualityType" cdm="Communication.MCS.Level" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setCommunicationLevelAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- 통신량 전환 응답에는 commandID가 없어 직접 correlation 방식은 TBD. -->
       <Reply semantic_id="setCommunicationLevelResult">
         <DDSChannel topicName="RUSV::C2::TSA::CommunicationLevelReportType" typeName="CommunicationLevelReportType"/>
         <Field name="usvHeader"/>
-        <Field name="videoQualityType" cdm="Communication.Level.Response.videoQualityType"/>
+        <Field name="videoQualityType" cdm="Communication.Level.Response.videoQualityType" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="configureOperatingParameters">
@@ -319,31 +319,31 @@
       <!-- frequency/range 및 SW Gain 하위 필드의 조건부 유효성은 CSCI 비고를 따른다. 현재 XSD는 파라미터 간 조건식을 직접 표현하지 않는다. -->
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="sonarType" cdm="SideScanSonar.SonarType"/>
-      <Field name="frequency" cdm="Ping.CarrierFrequency"/>
-      <Field name="range" cdm="Coverage.Range"/>
-      <Field name="gain" cdm="ReceiveProcessing.Gain"/>
-      <Field name="tvgMode" cdm="ReceiveProcessing.TVG.Mode"/>
-      <Field name="tvgDistCoeff" cdm="ReceiveProcessing.TVG.DistanceCoefficient"/>
-      <Field name="tvgAttenCoeff" cdm="ReceiveProcessing.TVG.AttenuationCoefficient"/>
-      <Field name="pulseWidth" cdm="Ping.PulseWidth"/>
-      <Field name="pulseType" cdm="Ping.PulseType"/>
-      <Field name="swGainMode" cdm="ReceiveProcessing.SoftwareGain.Mode"/>
-      <Field name="autoGain" cdm="ReceiveProcessing.SoftwareGain.Auto"/>
-      <Field name="tvgA" cdm="ReceiveProcessing.SoftwareGain.TVGA"/>
-      <Field name="tvgB" cdm="ReceiveProcessing.SoftwareGain.TVGB"/>
-      <Field name="tvgC" cdm="ReceiveProcessing.SoftwareGain.TVGC"/>
-      <Field name="rawGain" cdm="ReceiveProcessing.SoftwareGain.Raw"/>
-      <Field name="lowPassFilterMode" cdm="ReceiveProcessing.LowPassFilter.Mode"/>
-      <Field name="lowPassFilterLevel" cdm="ReceiveProcessing.LowPassFilter.Level"/>
+      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8"/>
+      <Field name="frequency" cdm="Ping.CarrierFrequency" dataType="UInt16"/>
+      <Field name="range" cdm="Coverage.Range" dataType="UInt16"/>
+      <Field name="gain" cdm="ReceiveProcessing.Gain" dataType="UInt8"/>
+      <Field name="tvgMode" cdm="ReceiveProcessing.TVG.Mode" dataType="UInt8"/>
+      <Field name="tvgDistCoeff" cdm="ReceiveProcessing.TVG.DistanceCoefficient" dataType="UInt16"/>
+      <Field name="tvgAttenCoeff" cdm="ReceiveProcessing.TVG.AttenuationCoefficient" dataType="UInt16"/>
+      <Field name="pulseWidth" cdm="Ping.PulseWidth" dataType="UInt16"/>
+      <Field name="pulseType" cdm="Ping.PulseType" dataType="UInt8"/>
+      <Field name="swGainMode" cdm="ReceiveProcessing.SoftwareGain.Mode" dataType="UInt8"/>
+      <Field name="autoGain" cdm="ReceiveProcessing.SoftwareGain.Auto" dataType="UInt8"/>
+      <Field name="tvgA" cdm="ReceiveProcessing.SoftwareGain.TVGA" dataType="UInt8"/>
+      <Field name="tvgB" cdm="ReceiveProcessing.SoftwareGain.TVGB" dataType="UInt8"/>
+      <Field name="tvgC" cdm="ReceiveProcessing.SoftwareGain.TVGC" dataType="UInt8"/>
+      <Field name="rawGain" cdm="ReceiveProcessing.SoftwareGain.Raw" dataType="UInt8"/>
+      <Field name="lowPassFilterMode" cdm="ReceiveProcessing.LowPassFilter.Mode" dataType="UInt8"/>
+      <Field name="lowPassFilterLevel" cdm="ReceiveProcessing.LowPassFilter.Level" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="configureOperatingParametersAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="start">
@@ -352,16 +352,16 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
       <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
-      <Field name="sonarType" cdm="SideScanSonar.SonarType"/>
-      <FixedField name="start" cdm="Command.Execution" value="1"/>
+      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8"/>
+      <FixedField name="start" cdm="Command.Execution" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="startAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="stop">
@@ -370,62 +370,62 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
       <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
-      <Field name="sonarType" cdm="SideScanSonar.SonarType"/>
-      <FixedField name="start" cdm="Command.Execution" value="0"/>
+      <Field name="sonarType" cdm="SideScanSonar.SonarType" dataType="UInt8"/>
+      <FixedField name="start" cdm="Command.Execution" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="powerOnOff">
       <DDSChannel topicName="RUSV::C2::RCU::PlatformPowerControlType" typeName="PlatformPowerControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="targetDevice" cdm="SideScanSonar.Subsystem"/>
-      <Field name="powerOn" cdm="PowerSupplyState"/>
+      <Field name="targetDevice" cdm="SideScanSonar.Subsystem" dataType="UInt8"/>
+      <Field name="powerOn" cdm="PowerSupplyState" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="powerOnOffAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="setAutoMode">
       <DDSChannel topicName="RUSV::C2::RCU::TSAModeControlType" typeName="TSAModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="mode" cdm="Mode.Command" value="1"/>
+      <FixedField name="mode" cdm="Mode.Command" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setAutoModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="setManualMode">
       <DDSChannel topicName="RUSV::C2::RCU::TSAModeControlType" typeName="TSAModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="mode" cdm="Mode.Command" value="0"/>
+      <FixedField name="mode" cdm="Mode.Command" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setManualModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="stopTowfish">
@@ -433,21 +433,21 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
       <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
-      <FixedField name="launch" cdm="LaunchRecovery.Command" value="0"/>
+      <FixedField name="launch" cdm="LaunchRecovery.Command" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopTowfishAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- LaunchReportType에는 commandID가 없어 요청-완료 correlation 방식은 TBD. -->
       <Reply semantic_id="stopTowfishResult">
         <DDSChannel topicName="RUSV::C2::TSA::LaunchReportType" typeName="LaunchReportType"/>
         <Field name="usvHeader"/>
-        <Field name="launch" cdm="LaunchRecovery.Response.launch"/>
+        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="launchTowfish">
@@ -455,21 +455,21 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
       <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
-      <FixedField name="launch" cdm="LaunchRecovery.Command" value="1"/>
+      <FixedField name="launch" cdm="LaunchRecovery.Command" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="launchTowfishAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- LaunchReportType에는 commandID가 없어 요청-완료 correlation 방식은 TBD. -->
       <Reply semantic_id="launchTowfishResult">
         <DDSChannel topicName="RUSV::C2::TSA::LaunchReportType" typeName="LaunchReportType"/>
         <Field name="usvHeader"/>
-        <Field name="launch" cdm="LaunchRecovery.Response.launch"/>
+        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="recoveryTowfish">
@@ -477,81 +477,81 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <!-- CSCI 특수 규칙: 현재 제어 흐름에서 원격통제장치가 수신한 commandID를 그대로 계승한다. -->
       <DerivedField name="commandID" sourceField="System.Communication.LastReceivedCommandID" dataType="UInt16"/>
-      <FixedField name="launch" cdm="LaunchRecovery.Command" value="2"/>
+      <FixedField name="launch" cdm="LaunchRecovery.Command" value="2" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="recoveryTowfishAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <!-- LaunchReportType에는 commandID가 없어 요청-완료 correlation 방식은 TBD. -->
       <Reply semantic_id="recoveryTowfishResult">
         <DDSChannel topicName="RUSV::C2::TSA::LaunchReportType" typeName="LaunchReportType"/>
         <Field name="usvHeader"/>
-        <Field name="launch" cdm="LaunchRecovery.Response.launch"/>
+        <Field name="launch" cdm="LaunchRecovery.Response.launch" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="emergencyStop">
       <DDSChannel topicName="RUSV::C2::RCU::EmergencyStopControlType" typeName="EmergencyStopControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="emergencyStop" cdm="EmergencyStop.Command" value="1"/>
+      <FixedField name="emergencyStop" cdm="EmergencyStop.Command" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="emergencyStopAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="cancelEmergencyStop">
       <DDSChannel topicName="RUSV::C2::RCU::EmergencyStopControlType" typeName="EmergencyStopControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="emergencyStop" cdm="EmergencyStop.Command" value="0"/>
+      <FixedField name="emergencyStop" cdm="EmergencyStop.Command" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="cancelEmergencyStopAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="setTowingCableLength">
       <DDSChannel topicName="RUSV::C2::RCU::CableLengthControlType" typeName="CableLengthControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="lengthCommandWinch" cdm="LaunchRecovery.Cable.TargetLength"/>
+      <Field name="lengthCommandWinch" cdm="LaunchRecovery.Cable.TargetLength" dataType="Float32"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setTowingCableLengthAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="setTowfishDepth">
       <DDSChannel topicName="RUSV::C2::RCU::TargetLengthConfigType" typeName="TargetLengthConfigType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="targetDepth" cdm="Position.TargetDepth"/>
+      <Field name="targetDepth" cdm="Position.TargetDepth" dataType="Float32"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="setTowfishDepthAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="changeScreenRealTimeMode">
@@ -559,15 +559,15 @@
       <!-- CSCI의 물리 Type명 ScreanChangeConfigType 오탈자를 그대로 보존한다. -->
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="screenChangeMode" cdm="Display.Mode" value="0"/>
+      <FixedField name="screenChangeMode" cdm="Display.Mode" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="changeScreenRealTimeModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="changeScreenMergeMode">
@@ -575,251 +575,251 @@
       <!-- CSCI의 물리 Type명 ScreanChangeConfigType 오탈자를 그대로 보존한다. -->
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="screenChangeMode" cdm="Display.Mode" value="1"/>
+      <FixedField name="screenChangeMode" cdm="Display.Mode" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="changeScreenMergeModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="stopUsblMotion">
       <DDSChannel topicName="RUSV::C2::RCU::ManualUSBLMotorControlType" typeName="ManualUSBLMotorControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed"/>
-      <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="0"/>
+      <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed" dataType="Float32"/>
+      <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopUsblMotionAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="launchUsbl">
       <DDSChannel topicName="RUSV::C2::RCU::ManualUSBLMotorControlType" typeName="ManualUSBLMotorControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed"/>
-      <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="1"/>
+      <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed" dataType="Float32"/>
+      <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="launchUsblAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="recoveryUsbl">
       <DDSChannel topicName="RUSV::C2::RCU::ManualUSBLMotorControlType" typeName="ManualUSBLMotorControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed"/>
-      <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="2"/>
+      <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed" dataType="Float32"/>
+      <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="2" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="recoveryUsblAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="returnUsblOrigin">
       <DDSChannel topicName="RUSV::C2::RCU::ManualUSBLMotorControlType" typeName="ManualUSBLMotorControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed"/>
-      <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="3"/>
+      <Field name="motorSpeed" cdm="LaunchRecovery.USBL.MotorSpeed" dataType="Float32"/>
+      <FixedField name="launch" cdm="LaunchRecovery.USBL.Command" value="3" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="returnUsblOriginAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="startUsbl">
       <DDSChannel topicName="RUSV::C2::RCU::USBLStartControlType" typeName="USBLStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="start" cdm="Command.Execution" value="1"/>
+      <FixedField name="start" cdm="Command.Execution" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="startUsblAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="stopUsbl">
       <DDSChannel topicName="RUSV::C2::RCU::USBLStartControlType" typeName="USBLStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="start" cdm="Command.Execution" value="0"/>
+      <FixedField name="start" cdm="Command.Execution" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopUsblAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="stopSlide">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoverySlideStartControlType" typeName="LaunchAndRecoverySlideStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position"/>
-      <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="0"/>
+      <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position" dataType="Float32"/>
+      <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopSlideAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="moveSlide">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoverySlideStartControlType" typeName="LaunchAndRecoverySlideStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position"/>
-      <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="1"/>
+      <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position" dataType="Float32"/>
+      <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="moveSlideAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="returnSlideWithTowfish">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoverySlideStartControlType" typeName="LaunchAndRecoverySlideStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position"/>
-      <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="2"/>
+      <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position" dataType="Float32"/>
+      <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="2" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="returnSlideWithTowfishAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="returnSlideWithoutTowfish">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoverySlideStartControlType" typeName="LaunchAndRecoverySlideStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position"/>
-      <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="3"/>
+      <Field name="slideDeploy" cdm="LaunchRecovery.Slide.Position" dataType="Float32"/>
+      <FixedField name="start" cdm="LaunchRecovery.Slide.Command" value="3" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="returnSlideWithoutTowfishAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="stopWinch">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryWinchStartControlType" typeName="LaunchAndRecoveryWinchStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength"/>
-      <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="0"/>
+      <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength" dataType="Float32"/>
+      <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="stopWinchAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="deployWinch">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryWinchStartControlType" typeName="LaunchAndRecoveryWinchStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength"/>
-      <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="1"/>
+      <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength" dataType="Float32"/>
+      <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="deployWinchAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="recoveryWinch">
       <DDSChannel topicName="RUSV::C2::RCU::LaunchAndRecoveryWinchStartControlType" typeName="LaunchAndRecoveryWinchStartControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength"/>
-      <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="2"/>
+      <Field name="winchDeploy" cdm="LaunchRecovery.Winch.CableLength" dataType="Float32"/>
+      <FixedField name="start" cdm="LaunchRecovery.Winch.Command" value="2" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="recoveryWinchAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="separateCable">
       <DDSChannel topicName="RUSV::C2::RCU::CableSeparationCommandType" typeName="CableSeparationCommandType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="separation" cdm="LaunchRecovery.Cable.Separation" value="1"/>
+      <FixedField name="separation" cdm="LaunchRecovery.Cable.Separation" value="1" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="separateCableAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="cancelCableSeparation">
       <DDSChannel topicName="RUSV::C2::RCU::CableSeparationCommandType" typeName="CableSeparationCommandType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <FixedField name="separation" cdm="LaunchRecovery.Cable.Separation" value="0"/>
+      <FixedField name="separation" cdm="LaunchRecovery.Cable.Separation" value="0" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="cancelCableSeparationAck" required="true">
         <DDSChannel topicName="RUSV::C2::TSA::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
   </Controls>

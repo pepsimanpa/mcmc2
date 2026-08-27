@@ -62,3 +62,12 @@
 ### 8. CSCI 오탈자 보존
 
 - `LanchAndRecoveryBackStopReportType`, `ScreanChangeConfigType` 등 물리 Type 이름의 오탈자는 CSCI 원문 및 DDS `typeName`과의 정합성을 위해 현재 그대로 보존한다.
+
+
+## Primitive dataType migration
+
+- `예인형수중탐색장치 CSCI.csv`, `원격통제장치 CSCI.csv`, `공용 규칙.csv`, `공용 구조체.csv`에서 자료형이 직접 확인되는 primitive 필드만 Binding `dataType`으로 반영한다.
+- IDL 매핑 기준: `octet/unsigned char -> UInt8`, `short -> Int16`, `unsigned short -> UInt16`, `long -> Int32`, `unsigned long -> UInt32`, `float -> Float32`, `double -> Float64`.
+- `USVMessageBase`, `DestinationType` 등 composite 구조체에는 primitive `dataType`을 억지로 부여하지 않는다.
+- 동일 이름이라도 메시지별 타입이 달라질 수 있는 필드는 DDS `typeName` 문맥으로 재확인한다. 특히 원신호의 `pulseType`과 제어 `StatusConfigType.pulseType`처럼 이름 재사용이 있는 경우 현재 Binding에 실제 사용되는 메시지 정의를 우선한다.
+- `boolean`, 배열, 문자열/char, 사용자 정의 구조체처럼 현재 `WireDataType`으로 직접 표현하기 애매한 항목은 후속 검토로 남긴다.
