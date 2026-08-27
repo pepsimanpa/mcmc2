@@ -1,0 +1,332 @@
+name: Finalize CentralControl
+
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/finalize-central-control.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+          fetch-depth: 0
+
+      - name: Align CentralControl with current USV rules
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re
+
+          base=Path('ProtocolXml/USV/CentralControl')
+          sem=base/'CentralControlSemantic.xml'
+          bind=base/'CentralControlBinding.xml'
+          issues=base/'CentralControl_OpenIssues.md'
+          s=sem.read_text(encoding='utf-8')
+          b=bind.read_text(encoding='utf-8')
+          old_sem_comments=len(re.findall(r'<!--[\s\S]*?-->',s))
+          old_bind_comments=len(re.findall(r'<!--[\s\S]*?-->',b))
+
+          def one(text, old, new, label):
+              n=text.count(old)
+              if n!=1: raise SystemExit(f'{label}: expected 1 got {n}')
+              return text.replace(old,new,1)
+
+          # ------------------------------------------------------------------
+          # Semantic: schema path, display wording, logical value choices.
+          # ------------------------------------------------------------------
+          s=s.replace('xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd"',
+                      'xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd"')
+          s=one(s,'<GroupSpec id="centralControlHealth" name="중앙통제장치 CBIT 상태" cdm="Health.CBIT.CentralControl">',
+                  '<GroupSpec id="centralControlHealth" name="중앙통제장치 상태" cdm="Health.CBIT.CentralControl">','central health display name')
+
+          # Platform state/mode choices: exact source-defined raw mappings will live in Binding.
+          old='''            <ValueSetSpec id="operationalState" name="무인수상정 운용상태" cdm="Platform.OperationalState">\n                <Values>\n                    <Value>Normal</Value>\n                    <Value>Warning</Value>\n                </Values>\n            </ValueSetSpec>'''
+          new='''            <ValueSetSpec id="operationalState" name="무인수상정 운용상태" cdm="Platform.OperationalState">\n                <Values>\n                    <Value name="Normal" cdm="Platform.OperationalState.Normal"/>\n                    <Value name="Warning" cdm="Platform.OperationalState.Warning"/>\n                </Values>\n            </ValueSetSpec>'''
+          s=one(s,old,new,'operational state values')
+          old='''            <ValueSetSpec id="currentOperationMode" name="무인수상정 운용모드" cdm="Platform.OperationMode">\n                <Values>\n                    <Value>EmergencyStop</Value>\n                    <Value>EmergencyReturn</Value>\n                    <Value>RemoteManual</Value>\n                    <Value>LocalManual</Value>\n                    <Value>Autonomous</Value>\n                    <Value>CommandStandby</Value>\n                    <Value>Maintenance</Value>\n                    <Value>EmergencyAction</Value>\n                </Values>\n            </ValueSetSpec>'''
+          vals=[('EmergencyStop','0'),('EmergencyReturn','1'),('RemoteManual','2'),('LocalManual','3'),('Autonomous','4'),('CommandStandby','5'),('Maintenance','6'),('EmergencyAction','7')]
+          lines=['            <ValueSetSpec id="currentOperationMode" name="무인수상정 운용모드" cdm="Platform.OperationMode">','                <Values>']
+          lines += [f'                    <Value name="{name}" cdm="Platform.OperationMode.{name}"/>' for name,_ in vals]
+          lines += ['                </Values>','            </ValueSetSpec>']
+          s=one(s,old,'\n'.join(lines),'operation mode values')
+
+          # Central CBIT / authority monitor values become explicit logical choices.
+          old='''            <ValueSetSpec id="operationalStatus" name="중앙통제장치 운용상태" cdm="Health.OperationalStatus">\n                <Values>\n                    <Value>Normal</Value>\n                    <Value>Degraded</Value>\n                    <Value>Unavailable</Value>\n                    <Value>NoResponse</Value>\n                </Values>\n            </ValueSetSpec>'''
+          new='''            <ValueSetSpec id="operationalStatus" name="중앙통제장치 운용상태" cdm="Health.OperationalStatus">\n                <Values>\n                    <Value name="Normal" cdm="OperationalState.Normal"/>\n                    <Value name="Degraded" cdm="OperationalState.Degraded"/>\n                    <Value name="Unavailable" cdm="OperationalState.Unavailable"/>\n                    <Value name="NoResponse" cdm="OperationalState.NoResponse"/>\n                </Values>\n            </ValueSetSpec>'''
+          s=one(s,old,new,'central health values')
+          old='''            <ValueSetSpec id="currentController" name="현재 통제권 소유주체" cdm="Control.Authority.Owner">\n                <Values>\n                    <Value>USV</Value>\n                    <Value>FixedRemoteControl</Value>\n                    <Value>MobileRemoteControl</Value>\n                    <Value>PortAssistControl</Value>\n                    <Value>MaintenanceLaptop</Value>\n                </Values>\n            </ValueSetSpec>'''
+          owners=['USV','FixedRemoteControl','MobileRemoteControl','PortAssistControl','MaintenanceLaptop']
+          lines=['            <ValueSetSpec id="currentController" name="현재 통제권 소유주체" cdm="Control.Authority.Owner">','                <Values>']
+          lines += [f'                    <Value name="{x}" cdm="Control.Authority.Owner.{x}"/>' for x in owners]
+          lines += ['                </Values>','            </ValueSetSpec>']
+          s=one(s,old,'\n'.join(lines),'authority owner values')
+
+          def valueset_profile(cdm, choices, indent='                '):
+              z=[f'{indent}<ValueSetProfile cdm="{cdm}">',f'{indent}    <Values>']
+              z += [f'{indent}        <Value name="{n}" cdm="{k}"/>' for n,k,_ in choices]
+              z += [f'{indent}    </Values>',f'{indent}</ValueSetProfile>']
+              return '\n'.join(z)
+
+          topology=[('HighTransmit','Communication.WirelessPreset.TopologyMode.HighTransmit','0'),('LowTransmit','Communication.WirelessPreset.TopologyMode.LowTransmit','1')]
+          mission=[('Detection','Communication.WirelessPreset.MissionMode.Detection','0'),('Sonar','Communication.WirelessPreset.MissionMode.Sonar','1'),('Weapon','Communication.WirelessPreset.MissionMode.Weapon','2'),('Relay','Communication.WirelessPreset.MissionMode.Relay','3')]
+          authority_targets=[('FixedRemoteControl','Control.Authority.TargetControlStation.FixedRemoteControl','0'),('MobileRemoteControl','Control.Authority.TargetControlStation.MobileRemoteControl','1'),('PortAssistControl','Control.Authority.TargetControlStation.PortAssistControl','2')]
+          vhf_cmd=[('Stop','Communication.VHF.TransmitCommand.Stop','0'),('Transmit','Communication.VHF.TransmitCommand.Transmit','1')]
+          alarm_tx=[('Stop','Communication.Voice.AlarmTransmit.Stop','0'),('Transmit','Communication.Voice.AlarmTransmit.Transmit','1')]
+          voice_tx=[('Stop','Communication.Voice.Transmit.Stop','0'),('Transmit','Communication.Voice.Transmit.Transmit','1')]
+          video_sel=[('Monitor1','Video.Distribution.Selection.Monitor1','1'),('Monitor2','Video.Distribution.Selection.Monitor2','2'),('Monitor3','Video.Distribution.Selection.Monitor3','3'),('Monitor4','Video.Distribution.Selection.Monitor4','4')]
+
+          s=one(s,'                <Profile cdm="Communication.WirelessPreset.TopologyMode"/>',valueset_profile('Communication.WirelessPreset.TopologyMode',topology),'topology profile')
+          s=one(s,'                <Profile cdm="Communication.WirelessPreset.MissionMode"/>',valueset_profile('Communication.WirelessPreset.MissionMode',mission),'mission profile')
+          s=one(s,'                <Profile cdm="Control.Authority.TargetControlStation"/>',valueset_profile('Control.Authority.TargetControlStation',authority_targets),'authority target profile')
+          s=one(s,'                <Profile cdm="Communication.VHF.TransmitCommand"/>',valueset_profile('Communication.VHF.TransmitCommand',vhf_cmd),'vhf command profile')
+          s=one(s,'                <Profile cdm="Communication.Voice.AlarmTransmit"/>',valueset_profile('Communication.Voice.AlarmTransmit',alarm_tx),'alarm tx profile')
+          s=one(s,'                <Profile cdm="Communication.Voice.Transmit"/>',valueset_profile('Communication.Voice.Transmit',voice_tx),'voice tx profile')
+          s=one(s,'                <Profile cdm="Video.Distribution.Selection"/>',valueset_profile('Video.Distribution.Selection',video_sel),'video selection profile')
+
+          # Common command status reply payload exposed semantically as processing status only.
+          status_result='''\n                <Results>\n                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>\n                </Results>\n            </Reply>'''
+          pat=re.compile(r'<Reply cdm="Command\.ProcessingStatus\.Response" bindRef="([^"]+CommandStatusReply)" required="true"/>')
+          existing_status_refs=pat.findall(s)
+          if len(existing_status_refs)!=21: raise SystemExit(f'existing status reply count={len(existing_status_refs)}')
+          s=pat.sub(lambda m: f'<Reply cdm="Command.ProcessingStatus.Response" bindRef="{m.group(1)}" required="true">'+status_result, s)
+
+          # PBIT: add command-status ACK and explicit logical result.
+          old='''        <ControlSpec id="requestPbit" name="중앙통제장치 PBIT 요청" cdm="Request.Health.PBIT">\n            <Reply cdm="Request.Health.PBIT.Response" bindRef="requestPbitResultReply" required="true"/>\n        </ControlSpec>'''
+          new='''        <ControlSpec id="requestPbit" name="중앙통제장치 PBIT 요청" cdm="Request.Health.PBIT">\n            <Reply cdm="Command.ProcessingStatus.Response" bindRef="requestPbitCommandStatusReply" required="true">\n                <Results>\n                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>\n                </Results>\n            </Reply>\n            <Reply cdm="Request.Health.PBIT.Response" bindRef="requestPbitResultReply" required="true">\n                <Results>\n                    <ValueSetResult name="operationalStatus" cdm="Health.OperationalStatus">\n                        <Values>\n                            <Value name="Normal" cdm="OperationalState.Normal"/>\n                            <Value name="Degraded" cdm="OperationalState.Degraded"/>\n                            <Value name="Unavailable" cdm="OperationalState.Unavailable"/>\n                            <Value name="NoResponse" cdm="OperationalState.NoResponse"/>\n                        </Values>\n                    </ValueSetResult>\n                </Results>\n            </Reply>\n        </ControlSpec>'''
+          s=one(s,old,new,'PBIT semantic replies')
+
+          # IBIT: resolve ProcessorIBIT from current common structure (2 x double = 16 bytes).
+          old='''        <ControlSpec id="requestIbit" name="중앙통제장치 IBIT 요청" cdm="Request.Health.IBIT">\n            <Reply cdm="Request.Health.IBIT.Response" bindRef="requestIbitResultReply" required="true"/>\n        </ControlSpec>'''
+          new='''        <ControlSpec id="requestIbit" name="중앙통제장치 IBIT 요청" cdm="Request.Health.IBIT">\n            <Reply cdm="Command.ProcessingStatus.Response" bindRef="requestIbitCommandStatusReply" required="true">\n                <Results>\n                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>\n                </Results>\n            </Reply>\n            <Reply cdm="Request.Health.IBIT.Response" bindRef="requestIbitResultReply" required="true">\n                <Results>\n                    <GroupResult name="mceIbit" cdm="Health.IBIT.CentralControl">\n                        <ValueSetResult name="operationalStaus" cdm="Health.OperationalStatus">\n                            <Values>\n                                <Value name="Normal" cdm="OperationalState.Normal"/>\n                                <Value name="Degraded" cdm="OperationalState.Degraded"/>\n                                <Value name="Unavailable" cdm="OperationalState.Unavailable"/>\n                                <Value name="NoResponse" cdm="OperationalState.NoResponse"/>\n                            </Values>\n                        </ValueSetResult>\n                        <QuantityResult name="cpuTemperature" cdm="Health.Processor.CPU.Temperature"><Unit>degC</Unit></QuantityResult>\n                        <QuantityResult name="cpuLoad" cdm="Health.Processor.CPU.Load"><Unit>percent</Unit></QuantityResult>\n                    </GroupResult>\n                </Results>\n            </Reply>\n        </ControlSpec>'''
+          s=one(s,old,new,'IBIT semantic replies')
+
+          # Recorded project decision: video stop is a separate action; selection is only 1..4.
+          select_start='''        <!-- videoTransmitType: 0=중지, 1~4=감시#1~#4. -->\n        <ControlSpec id="selectVideoDistribution"'''
+          if select_start not in s: raise SystemExit('video selection anchor not found')
+          stop_block='''        <!-- videoTransmitType: 0=중지, 1~4=감시#1~#4. 중지는 선택 제어와 분리한다. -->\n        <ControlSpec id="stopVideoDistribution" name="영상분배 중지" cdm="Control.Video.Distribution.Stop">\n            <Reply cdm="Command.ProcessingStatus.Response" bindRef="stopVideoDistributionCommandStatusReply" required="true">\n                <Results>\n                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>\n                </Results>\n            </Reply>\n        </ControlSpec>\n\n        <ControlSpec id="selectVideoDistribution"'''
+          s=s.replace(select_start,stop_block,1)
+
+          # ------------------------------------------------------------------
+          # Binding: migrate legacy DDS-specific element names to common style.
+          # ------------------------------------------------------------------
+          b=b.replace('xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd"',
+                      'xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonBindingSchema.xsd"')
+          b=b.replace('<MonitorBindingDDS ','<MonitorBinding ').replace('</MonitorBindingDDS>','</MonitorBinding>')
+          b=b.replace('<ControlBindingDDS ','<ControlBinding ').replace('</ControlBindingDDS>','</ControlBinding>')
+          b=b.replace('<Channel ','<DDSChannel ').replace('</Channel>','</DDSChannel>')
+
+          # Replace every CommandStatusReport raw struct with project-wide dotted-path mapping.
+          ack_pat=re.compile(r'''(?P<i>\s*)<!-- CommandStatusReport 공용 구조체의 내부 status는 Executing/Pending/Failed/Reject/Canceled이며 Completed/Success 의미가 없다\. -->\n(?P=i)<!-- TBD: 현재 Binding XSD에는 일반 struct 중첩 표현이 없어 raw 구조체로 보존한다\. 내부 status 추출 방식은 Adapter 규칙 확정 후 보완한다\. -->\n(?P=i)<Field name="commandStatusReport"/>\n(?P=i)<Field name="commandID"/>''')
+          def ack_repl(m):
+              i=m.group('i')
+              return (f'{i}<!-- 공통 처리상태 ACK: routing/correlation은 Binding에 유지하고 Semantic에는 status만 노출한다. -->\n'
+                      f'{i}<Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>\n'
+                      f'{i}<Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>\n'
+                      f'{i}<Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>\n'
+                      f'{i}<Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>')
+          b,n_ack=ack_pat.subn(ack_repl,b)
+          if n_ack!=23: raise SystemExit(f'ACK physical replacements={n_ack}, expected 23 before video add')
+
+          # Per-control TX generated fields. Only the prefix before the first Reply is TX payload.
+          ctrl_pat=re.compile(r'(<ControlBinding\b[^>]*\bsemantic_id="([^"]+)"[^>]*>[\s\S]*?</ControlBinding>)')
+          def generated_fields(text):
+              out=[]; last=0
+              for m in list(ctrl_pat.finditer(text)):
+                  block=m.group(1); ridx=block.find('<Reply '); prefix=block if ridx<0 else block[:ridx]; suffix='' if ridx<0 else block[ridx:]
+                  prefix,c1=re.subn(r'(?m)^(\s*)<Field name="usvHeader"/>$',r'\1<DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>',prefix,count=1)
+                  prefix,c2=re.subn(r'(?m)^(\s*)<Field name="commandID"/>$',r'\1<DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>',prefix,count=1)
+                  if c1!=1 or c2!=1: raise SystemExit(f'{m.group(2)} generated field counts header={c1} command={c2}')
+                  out.append(text[last:m.start(1)] + prefix + suffix); last=m.end(1)
+              out.append(text[last:]); return ''.join(out)
+          b=generated_fields(b)
+
+          # Generic central target from common identifier rules: CoreProcessing(0x06) / CentralManagementControlCard(0x01) / sub=0x00.
+          for cid in ('startIntegration','restartSystem','requestPbit','requestIbit'):
+              p=re.compile(r'(<ControlBinding\b[^>]*semantic_id="'+cid+r'"[^>]*>[\s\S]*?<DerivedField name="usvHeader"[^>]*/>\n)(\s*<!--[\s\S]*?-->\n)?(\s*)<Field name="destination"/>')
+              m=p.search(b)
+              if not m: raise SystemExit(f'{cid} destination anchor')
+              comment=m.group(2) or ''
+              ind=m.group(3)
+              replacement=m.group(1)+ind+'<!-- 중앙통제 대상: 0x06(CoreProcessing) / 0x01(CentralManagementControlCard) / 0x00(sub-equipment 미사용) -->\n'+ind+'<DerivedField name="destination" sourceField="System.Target.CentralControl"/>'
+              b=b[:m.start()]+replacement+b[m.end():]
+
+          # Exact monitor mappings known from source/common structures.
+          b=one(b,'            <Field name="operationalStateUSV" cdm="Platform.OperationalState"/>','''            <Field name="operationalStateUSV" cdm="Platform.OperationalState" dataType="UInt8">\n                <ValueMap>\n                    <Map cdm="Platform.OperationalState.Normal" value="0"/>\n                    <Map cdm="Platform.OperationalState.Warning" value="1"/>\n                </ValueMap>\n            </Field>''','USV operational state binding')
+          maps='\n'.join(f'                    <Map cdm="Platform.OperationMode.{name}" value="{raw}"/>' for name,raw in vals)
+          b=one(b,'            <Field name="operationalModeUSV" cdm="Platform.OperationMode"/>',f'''            <Field name="operationalModeUSV" cdm="Platform.OperationMode" dataType="UInt8">\n                <ValueMap>\n{maps}\n                </ValueMap>\n            </Field>''','USV mode binding')
+          health_maps='''                <ValueMap>\n                    <Map cdm="OperationalState.Normal" value="0"/>\n                    <Map cdm="OperationalState.Degraded" value="1"/>\n                    <Map cdm="OperationalState.Unavailable" value="2"/>\n                    <Map cdm="OperationalState.NoResponse" value="3"/>\n                </ValueMap>'''
+          b=one(b,'            <Field name="operationalStatus" cdm="Health.OperationalStatus"/>',f'''            <Field name="operationalStatus" cdm="Health.OperationalStatus" dataType="UInt8">\n{health_maps}\n            </Field>''','CBIT monitor health binding')
+          owner_maps='\n'.join(f'                    <Map cdm="Control.Authority.Owner.{name}" value="{i}"/>' for i,name in enumerate(owners))
+          b=one(b,'            <Field name="controlCommand" cdm="Control.Authority.Owner"/>',f'''            <Field name="controlCommand" cdm="Control.Authority.Owner" dataType="UInt8">\n                <ValueMap>\n{owner_maps}\n                </ValueMap>\n            </Field>''','authority monitor binding')
+
+          # PBIT result health map.
+          target='                <Field name="operationalStatus" cdm="Health.OperationalStatus"/>'
+          if b.count(target)!=1: raise SystemExit(f'PBIT operationalStatus count={b.count(target)}')
+          b=b.replace(target,f'''                <Field name="operationalStatus" cdm="Health.OperationalStatus" dataType="UInt8">\n{health_maps.replace('                ','                    ',1)}\n                </Field>''',1)
+
+          # IBIT: keep source typo until IDL confirms spelling; resolve ProcessorIBIT children from common structure.
+          old='''                <!-- 원본 CSV 필드명이 operationalStaus로 표기되어 있어 오타 여부 확인 전까지 그대로 보존한다. -->\n                <Field name="operationalStaus" cdm="Health.OperationalStatus"/>\n                <!-- ProcessorIBIT 16-byte 공용 구조체의 세부 필드 의미는 본 CSV에 없으므로 raw BindingOnly로 보존한다. -->\n                <Field name="mceProcessorIBIT"/>'''
+          new=f'''                <!-- 중앙통제 CSV 원문 철자 operationalStaus는 실제 IDL 확인 전까지 보존한다. -->\n                <Field name="operationalStaus" cdm="Health.OperationalStatus" dataType="UInt8">\n{health_maps.replace('                ','                    ',1)}\n                </Field>\n                <!-- 공용 ProcessorIBIT(16B): cpuTemperature double 8B + cpuLoad double 8B. -->\n                <Field name="mceProcessorIBIT.cpuTemperature" cdm="Health.Processor.CPU.Temperature" dataType="Float64"/>\n                <Field name="mceProcessorIBIT.cpuLoad" cdm="Health.Processor.CPU.Load" dataType="Float64"/>'''
+          b=one(b,old,new,'IBIT common structure expansion')
+
+          # Wireless preset: two separate octets, bits 7..6 carry logical values. Declarative PackedField, no converter.
+          old='''            <!-- topology/mission은 각각 octet이지만 원문이 둘 다 "Bit 7~6"이라고 표기한다. 실제 shift/packing converter는 TBD이다. -->\n            <Field name="topology" cdm="Communication.WirelessPreset.TopologyMode"/>\n            <Field name="mission" cdm="Communication.WirelessPreset.MissionMode"/>'''
+          def bit_maps(choices,ind): return '\n'.join(f'{ind}<Map cdm="{k}" value="{v}"/>' for _,k,v in choices)
+          new=f'''            <!-- topology/mission은 각각 독립 1-byte 값이며 Bit 7~6을 사용한다. -->\n            <PackedField name="topology" width="8">\n                <BitMember name="topologyMode" cdm="Communication.WirelessPreset.TopologyMode" offset="6" width="2">\n                    <ValueMap>\n{bit_maps(topology,'                        ')}\n                    </ValueMap>\n                </BitMember>\n            </PackedField>\n            <PackedField name="mission" width="8">\n                <BitMember name="missionMode" cdm="Communication.WirelessPreset.MissionMode" offset="6" width="2">\n                    <ValueMap>\n{bit_maps(mission,'                        ')}\n                    </ValueMap>\n                </BitMember>\n            </PackedField>'''
+          b=one(b,old,new,'wireless packed fields')
+
+          # Operation mode split: dotted path is the established Adapter convention; each action owns a fixed raw code.
+          b=b.replace('TBD: 현재 Binding XSD에 일반 struct 중첩 표현이 없어 "operationModeControlStatus.operationMode" dotted path를 잠정 사용한다.\n                Adapter가 다른 중첩 접근 규칙을 요구하면 이 필드 경로만 교체한다.',
+                      '프로젝트 공통 Adapter 규칙에 따라 중첩 필드는 dotted path로 접근한다.')
+          b,n=re.subn(r'<FixedField name="operationModeControlStatus\.operationMode" cdm="Platform\.OperationMode" value="([0-7])"/>',r'<FixedField name="operationModeControlStatus.operationMode" cdm="Platform.OperationMode" value="\1" dataType="UInt8"/>',b)
+          if n!=8: raise SystemExit(f'operation mode fixed count={n}')
+
+          # Authority split values and target choices.
+          b=b.replace('<!-- AuthorityControl 일반 struct 중첩 경로는 dotted path를 잠정 사용한다. Adapter 중첩 접근 규칙 확인 필요. -->','<!-- 프로젝트 공통 Adapter 규칙에 따라 AuthorityControl 중첩 필드는 dotted path로 접근한다. -->')
+          b,n=re.subn(r'<FixedField name="authorityControlStatus\.command" value="([0-4])"/>',r'<FixedField name="authorityControlStatus.command" value="\1" dataType="UInt8"/>',b)
+          if n!=5: raise SystemExit(f'authority fixed count={n}')
+          prep='            <Field name="authorityControlStatus.commandTarget" cdm="Control.Authority.TargetControlStation"/>'
+          prep_new=f'''            <Field name="authorityControlStatus.commandTarget" cdm="Control.Authority.TargetControlStation" dataType="UInt8">\n                <ValueMap>\n{bit_maps(authority_targets,'                    ')}\n                </ValueMap>\n            </Field>'''
+          b=one(b,prep,prep_new,'authority prepare target')
+          b,n=re.subn(r'<Field name="authorityControlStatus\.commandTarget"/>',r'<Field name="authorityControlStatus.commandTarget" dataType="UInt8"/>',b)
+          if n!=4: raise SystemExit(f'authority unused commandTarget count={n}')
+
+          # VHF / volume-squelch / voice command scalar representations.
+          old='            <Field name="VHFchannelCommendType" cdm="Communication.VHF.TransmitCommand"/>'
+          new=f'''            <Field name="VHFchannelCommendType" cdm="Communication.VHF.TransmitCommand" dataType="UInt8">\n                <ValueMap>\n{bit_maps(vhf_cmd,'                    ')}\n                </ValueMap>\n            </Field>'''
+          b=one(b,old,new,'VHF command binding')
+          b=one(b,'            <Field name="rxChannel" cdm="Communication.VHF.Channel"/>','            <Field name="rxChannel" cdm="Communication.VHF.Channel" dataType="Int32"/>','VHF rxChannel type')
+          b=b.replace('<FixedField name="volumeSquelchControl" value="1"/>','<FixedField name="volumeSquelchControl" value="1" dataType="UInt8"/>')
+          b=b.replace('<FixedField name="volumeSquelchControl" value="2"/>','<FixedField name="volumeSquelchControl" value="2" dataType="UInt8"/>')
+          b=b.replace('<Field name="volumeSquelchState" cdm="Communication.Voice.Volume.Percent"/>','<Field name="volumeSquelchState" cdm="Communication.Voice.Volume.Percent" dataType="UInt8"/>')
+          b=b.replace('<Field name="volumeSquelchState" cdm="Communication.VHF.Squelch.Percent"/>','<Field name="volumeSquelchState" cdm="Communication.VHF.Squelch.Percent" dataType="UInt8"/>')
+          for fname,cdm,choices in [('alarmTxControl','Communication.Voice.AlarmTransmit',alarm_tx),('voiceTxControl','Communication.Voice.Transmit',voice_tx)]:
+              old=f'            <Field name="{fname}" cdm="{cdm}"/>'
+              new=f'''            <Field name="{fname}" cdm="{cdm}" dataType="UInt8">\n                <ValueMap>\n{bit_maps(choices,'                    ')}\n                </ValueMap>\n            </Field>'''
+              b=one(b,old,new,f'{fname} binding')
+          b=one(b,'            <Field name="voiceRxControl" cdm="Communication.Voice.Receive"/>','            <Field name="voiceRxControl" cdm="Communication.Voice.Receive" dataType="UInt8"/>','voice rx type')
+
+          # Video select is 1..4 only; add dedicated stop action raw 0.
+          old='            <Field name="videoTransmitType" cdm="Video.Distribution.Selection"/>'
+          new=f'''            <Field name="videoTransmitType" cdm="Video.Distribution.Selection" dataType="UInt8">\n                <ValueMap>\n{bit_maps(video_sel,'                    ')}\n                </ValueMap>\n            </Field>'''
+          b=one(b,old,new,'video selection binding')
+          anchor='''        <ControlBinding semantic_id="selectVideoDistribution">'''
+          if b.count(anchor)!=1: raise SystemExit('video binding anchor')
+          stop='''        <ControlBinding semantic_id="stopVideoDistribution">\n            <DDSChannel topicName="RUSV::C2::RCU::VideoOutCommandType" typeName="VideoOutCommandType"/>\n            <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>\n            <FixedField name="videoTransmitType" cdm="Video.Distribution.Selection" value="0" dataType="UInt8"/>\n            <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>\n            <Reply semantic_id="stopVideoDistributionCommandStatusReply" required="true">\n                <DDSChannel topicName="RUSV::C2::MCE::CommandStatusReportType" typeName="CommandStatusReportType"/>\n                <Field name="usvHeader"/>\n                <!-- 공통 처리상태 ACK: routing/correlation은 Binding에 유지하고 Semantic에는 status만 노출한다. -->\n                <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>\n                <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>\n                <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>\n                <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>\n            </Reply>\n        </ControlBinding>\n\n'''+anchor
+          b=b.replace(anchor,stop,1)
+
+          # ------------------------------------------------------------------
+          # Final active issue list: SSS/common duplicates are not left open.
+          # ------------------------------------------------------------------
+          issue_text='''# CentralControl Semantic/Binding 최종 감사\n\n## 1. 범위\n\n- 대상 경계: 원격통제장치(RCU) ↔ 중앙통제장치(MCE).\n- 중앙통제가 자율운항/선체제어/네트워크/영상장치로 재배포하는 내부 DDS는 본 Binding 범위에서 제외한다.\n- 원통→중통 `RCUHeartBeatReportType` 5 Hz는 원격통제장치 생존정보이므로 중앙통제 HMI 기능으로 노출하지 않는다.\n- SSS에서 확정한 공통 규칙(생성 header/commandID, Derived destination, dotted-path struct 접근, CommandStatus 처리상태, converter 금지, PBIT/IBIT 요청-결과 분리)은 중앙통제에도 동일 적용하며 별도 Open Issue로 중복 관리하지 않는다.\n\n## 2. 이번 패스에서 확정/정리\n\n- 공용 식별자 규칙에 따라 중앙통제 일반 대상은 `dstEquipmentType=0x06(CoreProcessing)`, `dstEquipmentID=0x01(CentralManagementControlCard)`, `dstSubEquipmentID=0x00`으로 확정하고 `System.Target.CentralControl` Derived destination을 사용한다.\n- 기존 `MonitorBindingDDS/ControlBindingDDS/Channel`을 공통 `MonitorBinding/ControlBinding/DDSChannel` 형식으로 통일한다.\n- `CommandStatusReportType`은 SSS와 동일하게 `dstEquipmentType/dstEquipmentID/status/commandID`를 Binding에서 보존하고 Semantic에는 처리상태 `status`만 노출한다. 완료/성공 응답으로 해석하지 않는다.\n- `OperationModeControl.operationMode` 0~7은 기존 8개 독립 Control + UInt8 FixedField 구조를 유지한다.\n- `AuthorityControl.command` 0~4는 기존 5개 독립 Control + UInt8 FixedField 구조를 유지한다. command=0의 `commandTarget`은 `0=고정형 원격통제`, `1=이동형 원격통제`, `2=출입항보조` ValueSet으로 표현한다.\n- 무선 Preset은 topology와 mission이 각각 독립 octet이고 각 octet의 Bit7~6을 사용하므로 `PackedField(width=8) / BitMember(offset=6,width=2)`로 선언한다. converter는 사용하지 않는다.\n- `ProcessorIBIT` 공용 16-byte 구조를 확인하여 `cpuTemperature(Float64)`와 `cpuLoad(Float64)`를 IBIT 결과에 노출한다.\n- VHF `VHFchannelCommendType`은 원문 철자를 보존하고 `0=중지`, `1=송신` ValueSet으로 표현한다. `rxChannel`의 물리 자료형은 4-byte long → `Int32`로 반영한다.\n- Volume/Squelch selector 1/2는 기존처럼 별도 Control + FixedField로 유지한다.\n- 영상분배는 확정된 프로젝트 결정대로 `videoTransmitType=0`을 `stopVideoDistribution`으로 분리하고, `selectVideoDistribution`은 `1~4=감시#1~#4` 선택만 노출한다.\n- 중앙통제 CBIT Monitor 표시명은 확정된 운용자 관점 명칭인 `중앙통제장치 상태`로 정리한다.\n\n## 3. 중앙통제 고유 Remaining TBD\n\n1. **AuthorityControl.destination 업무 의미**: 3-byte 물리 구조는 확정되어 있으나 통제권 업무에서 해당 destination이 누구/무엇을 지칭하는지 원문 설명이 부족하다. Semantic 입력으로 올리지 않고 BindingOnly로 유지한다.\n2. **VHF rxChannel 값 체계**: `long` 4-byte 및 '채널/채널 및 주파수' 설명만 확인된다. 허용 범위, 주파수 단위, 채널표는 원문만으로 확정할 수 없다.\n3. **MCEPBITReportType 1 Hz 표기**: 이름/원통 요청 구조는 PBIT 결과 응답 형태이나 중앙통제 자료에는 1 Hz 표기가 존재한다. 현재는 요청의 전용 Result Reply로 유지하고 실제 송신주기 확인이 필요하다.\n4. **PBIT/IBIT Result correlation**: 요청에는 commandID가 있으나 MCEPBIT/MCEIBIT 결과에는 commandID가 없다. CommandStatus ACK는 commandID로 연결되지만 전용 결과의 런타임 매칭 규칙은 확인이 필요하다.\n5. **MCEIBITReportType.operationalStaus 철자**: 중앙통제 자료의 `operationalStaus`를 그대로 보존한다. 실제 DDS IDL이 `operationalStatus`인지 확인 필요하다.\n6. **VoiceRxTxControlType.voiceRxControl 설명 불일치**: 필드명/설명은 수신인데 비고의 raw 1 설명은 '송신'으로 적혀 있다. 0/1 물리값은 유지하되 raw 1의 논리명은 IDL/구현 확인 전 확정하지 않는다.\n7. **ControlCommandReportType 원본 #REF!**: controlCommand 필드와 값 의미는 식별 가능하지만 주변 원본 셀의 `#REF!`는 source defect로 남는다.\n8. **USVHeartBeat 세부 enum**: `operationalModeUSV` 0~7과 `operationalStateUSV`의 0/1은 확정했다. missionModeAC / operationalModeEOIR / operationalModeTSA / operationalModeRCWS의 raw code는 이번 근거에서 독립적으로 재확인되지 않아 기존 논리 목록만 유지하고 Binding ValueMap은 임의 생성하지 않는다.\n9. **operationalStateUSV 2~7**: 원문 범위는 0~7이나 확인된 의미는 0=정상, 1=경고뿐이다. 2~7 의미를 추정하지 않는다.\n\n## 4. 전역 후속 항목\n\n- CDM 명칭/계층은 다른 USV 장치 완료 후 최종 USV CDM 감사에서 일괄 재검토한다. 이는 중앙통제 고유 Open Issue로 세지 않는다.\n'''
+          issues.write_text(issue_text,encoding='utf-8',newline='')
+
+          sem.write_text(s,encoding='utf-8',newline='')
+          bind.write_text(b,encoding='utf-8',newline='')
+
+          # ------------------------------------------------------------------
+          # Validation / audit
+          # ------------------------------------------------------------------
+          spec_schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          bind_schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          spec_schema.assertValid(etree.parse(str(sem)))
+          bind_schema.assertValid(etree.parse(str(bind)))
+          ns={'u':'http://lignex1.com/mcmc2/umsSchema'}
+          S=etree.parse(str(sem)); B=etree.parse(str(bind))
+          controls=S.xpath('.//u:ControlSpec|.//u:SetPointSpec',namespaces=ns)
+          bcontrols=B.xpath('.//u:ControlBinding',namespaces=ns)
+          replies=S.xpath('.//u:Reply',namespaces=ns)
+          breplies=B.xpath('.//u:Reply',namespaces=ns)
+          monitors=S.xpath('.//u:MonitorSpecs/*',namespaces=ns)
+          bmon=B.xpath('.//u:Monitors/u:MonitorBinding',namespaces=ns)
+          if len(controls)!=24 or len(bcontrols)!=24: raise SystemExit(f'control count {len(controls)}/{len(bcontrols)}')
+          if len(replies)!=26 or len(breplies)!=26: raise SystemExit(f'reply count {len(replies)}/{len(breplies)}')
+          if len(monitors)!=3 or len(bmon)!=3: raise SystemExit(f'monitor count {len(monitors)}/{len(bmon)}')
+          if {x.get('id') for x in controls}!={x.get('semantic_id') for x in bcontrols}: raise SystemExit('control id mismatch')
+          if {x.get('bindRef') for x in replies}!={x.get('semantic_id') for x in breplies}: raise SystemExit('reply id mismatch')
+          if {x.get('id') for x in monitors}!={x.get('semantic_id') for x in bmon}: raise SystemExit('monitor id mismatch')
+          if int(B.xpath('count(.//*[@converter])',namespaces=ns))!=0: raise SystemExit('converter remains')
+          if B.xpath('.//u:ControlBindingDDS|.//u:MonitorBindingDDS|.//u:Channel',namespaces=ns): raise SystemExit('legacy DDS binding elements remain')
+          # Every command-status Semantic Reply exposes one processing status result.
+          sr=[x for x in replies if (x.get('bindRef') or '').endswith('CommandStatusReply')]
+          if len(sr)!=24: raise SystemExit(f'semantic command status replies={len(sr)}')
+          for r in sr:
+              rr=r.xpath('./u:Results/*',namespaces=ns)
+              if len(rr)!=1 or rr[0].get('cdm')!='Control.Response.Status': raise SystemExit(f'bad semantic status result {r.get("bindRef")}')
+          # Every physical ACK has dotted status plus typed commandID.
+          pr=[x for x in breplies if (x.get('semantic_id') or '').endswith('CommandStatusReply')]
+          if len(pr)!=24: raise SystemExit(f'physical command status replies={len(pr)}')
+          for r in pr:
+              if len(r.xpath('./u:Field[@name="commandStatusReport.status"]',namespaces=ns))!=1: raise SystemExit(f'no status field {r.get("semantic_id")}')
+              ci=r.xpath('./u:Field[@name="commandID"]',namespaces=ns)
+              if len(ci)!=1 or ci[0].get('dataType')!='UInt16': raise SystemExit(f'bad reply commandID {r.get("semantic_id")}')
+          # All TX control command IDs are generated and typed.
+          for c in bcontrols:
+              x=c.xpath('./u:DerivedField[@name="commandID"]',namespaces=ns)
+              if len(x)!=1 or x[0].get('sourceField')!='System.Generated.CommandSequence' or x[0].get('dataType')!='UInt16': raise SystemExit(f'bad TX commandID {c.get("semantic_id")}')
+              h=c.xpath('./u:DerivedField[@name="usvHeader"]',namespaces=ns)
+              if len(h)!=1: raise SystemExit(f'bad TX header {c.get("semantic_id")}')
+          # Four general central-target controls use resolved Derived destination.
+          for cid in ('startIntegration','restartSystem','requestPbit','requestIbit'):
+              x=B.xpath(f'.//u:ControlBinding[@semantic_id="{cid}"]/u:DerivedField[@name="destination"]',namespaces=ns)
+              if len(x)!=1 or x[0].get('sourceField')!='System.Target.CentralControl': raise SystemExit(f'bad central destination {cid}')
+          # Exact split/fixed command checks.
+          modes={'emergencyStop':'0','emergencyReturn':'1','enterRemoteManualMode':'2','enterLocalManualMode':'3','enterAutonomousMode':'4','enterCommandStandby':'5','enterMaintenanceMode':'6','executeEmergencyAction':'7'}
+          for cid,v in modes.items():
+              x=B.xpath(f'.//u:ControlBinding[@semantic_id="{cid}"]/u:FixedField[@name="operationModeControlStatus.operationMode"]',namespaces=ns)
+              if len(x)!=1 or x[0].get('value')!=v or x[0].get('dataType')!='UInt8': raise SystemExit(f'bad operation mode {cid}')
+          auth={'prepareAuthorityTransfer':'0','requestControlAuthority':'1','approveControlAuthorityRequest':'2','rejectControlAuthorityRequest':'3','reclaimControlAuthority':'4'}
+          for cid,v in auth.items():
+              x=B.xpath(f'.//u:ControlBinding[@semantic_id="{cid}"]/u:FixedField[@name="authorityControlStatus.command"]',namespaces=ns)
+              if len(x)!=1 or x[0].get('value')!=v: raise SystemExit(f'bad authority {cid}')
+          # Wireless packing exact.
+          for fld in ('topology','mission'):
+              x=B.xpath(f'.//u:ControlBinding[@semantic_id="configureWirelessPreset"]/u:PackedField[@name="{fld}"]/u:BitMember',namespaces=ns)
+              if len(x)!=1 or x[0].get('offset')!='6' or x[0].get('width')!='2': raise SystemExit(f'bad wireless packed {fld}')
+          # ProcessorIBIT exact physical members.
+          for fn in ('mceProcessorIBIT.cpuTemperature','mceProcessorIBIT.cpuLoad'):
+              x=B.xpath(f'.//u:Reply[@semantic_id="requestIbitResultReply"]/u:Field[@name="{fn}"]',namespaces=ns)
+              if len(x)!=1 or x[0].get('dataType')!='Float64': raise SystemExit(f'bad ProcessorIBIT {fn}')
+          # Video split exact.
+          st=B.xpath('.//u:ControlBinding[@semantic_id="stopVideoDistribution"]/u:FixedField[@name="videoTransmitType"]',namespaces=ns)
+          if len(st)!=1 or st[0].get('value')!='0': raise SystemExit('video stop fixed')
+          sel=B.xpath('.//u:ControlBinding[@semantic_id="selectVideoDistribution"]/u:Field[@name="videoTransmitType"]/u:ValueMap/u:Map',namespaces=ns)
+          if [x.get('value') for x in sel]!=['1','2','3','4']: raise SystemExit('video select map')
+          # Source typo and intentionally unresolved raw receive meaning preserved.
+          if len(B.xpath('.//u:Reply[@semantic_id="requestIbitResultReply"]/u:Field[@name="operationalStaus"]',namespaces=ns))!=1: raise SystemExit('operationalStaus source spelling lost')
+          if len(B.xpath('.//u:ControlBinding[@semantic_id="configureVoiceCommunication"]/u:Field[@name="voiceRxControl"]',namespaces=ns))!=1: raise SystemExit('voiceRx lost')
+
+          # Comments: stale comments are intentionally consolidated, but explanatory coverage must remain substantial.
+          new_sem_comments=len(re.findall(r'<!--[\s\S]*?-->',s)); new_bind_comments=len(re.findall(r'<!--[\s\S]*?-->',b))
+          if new_sem_comments < old_sem_comments: raise SystemExit(f'Semantic comments unexpectedly reduced {old_sem_comments}->{new_sem_comments}')
+          if new_bind_comments < 20: raise SystemExit(f'Binding explanatory comments too low {new_bind_comments}')
+
+          print('CENTRAL_CONTROL_FINAL_AUDIT PASS')
+          print('CONTROLS',len(controls),'REPLIES',len(replies),'MONITORS',len(monitors))
+          print('COMMAND_STATUS_REPLIES',len(sr))
+          print('CONVERTERS',int(B.xpath('count(.//*[@converter])',namespaces=ns)))
+          print('WIRELESS_PACKED','topology/mission bit7..6')
+          print('PROCESSOR_IBIT','cpuTemperature/cpuLoad Float64')
+          print('VIDEO_SPLIT','stop=0 select=1..4')
+          print('COMMENTS',old_sem_comments,'->',new_sem_comments,old_bind_comments,'->',new_bind_comments)
+          PY
+          git diff --check
+          git rm .github/workflows/finalize-central-control.yml
+
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Finalize CentralControl semantic binding audit'
+          git push origin HEAD:feature/usv-semantic-binding-audit
