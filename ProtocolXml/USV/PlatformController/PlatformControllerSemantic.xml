@@ -631,9 +631,7 @@
         <ControlSpec id="configureEnvironmentSystem" name="환경센서 계통 제어" cdm="Control.Environment.Configuration">
       <Parameters>
         <Profile cdm="Environment.SeaWaterAirConditioner.Control"/>
-        <QuantityProfile cdm="Environment.SeaWaterAirConditioner.TemperatureSetpoint">
-          <Unit>degC</Unit>
-        </QuantityProfile>
+        <QuantityProfile cdm="Environment.SeaWaterAirConditioner.TemperatureSetpoint"><Unit>degC</Unit></QuantityProfile>
         <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher1.Command"/>
         <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher2.Command"/>
         <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher3.Command"/>
