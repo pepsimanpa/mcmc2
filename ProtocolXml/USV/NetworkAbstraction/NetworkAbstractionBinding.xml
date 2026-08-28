@@ -195,16 +195,16 @@
       <DDSChannel topicName="RUSV::CO::NAE::GeoSatCommsReportType" typeName="GeoSatCommsReportType"/>
       <Field name="usvHeader"/>
       <Field name="modulatorStatus.valid" cdm="Communication.GeoSat.Modulator.Valid" dataType="Boolean"/>
-      <Field name="modulatorStatus.outputLevel" cdm="Communication.GeoSat.Modulator.OutputLevel"/>
-      <Field name="modulatorStatus.dataBW" cdm="Communication.GeoSat.Modulator.DataBandwidth" scale="0.001"/>
-      <Field name="modulatorStatus.dataRate" cdm="Communication.GeoSat.Modulator.DataRate" scale="0.001"/>
+      <Field name="modulatorStatus.outputLevel" cdm="Communication.GeoSat.Modulator.OutputLevel" dataType="UInt32"/>
+      <Field name="modulatorStatus.dataBW" cdm="Communication.GeoSat.Modulator.DataBandwidth" dataType="Float64" scale="0.001"/>
+      <Field name="modulatorStatus.dataRate" cdm="Communication.GeoSat.Modulator.DataRate" dataType="Float64" scale="0.001"/>
       <Field name="modulatorStatus.status" cdm="Communication.GeoSat.Modulator.StatusText" dataType="UInt8" length="21" format="string"/>
       <Field name="demodulatorStatus.valid" cdm="Communication.GeoSat.Demodulator.Valid" dataType="Boolean"/>
-      <Field name="demodulatorStatus.signalPower" cdm="Communication.GeoSat.Demodulator.SignalPower"/>
-      <Field name="demodulatorStatus.cn" cdm="Communication.GeoSat.Demodulator.CN"/>
-      <Field name="demodulatorStatus.ber" cdm="Communication.GeoSat.Demodulator.BER"/>
-      <Field name="demodulatorStatus.bitRate" cdm="Communication.GeoSat.Demodulator.BitRate" scale="0.000001"/>
-      <Field name="demodulatorStatus.trafficRate" cdm="Communication.GeoSat.Demodulator.TrafficRate" scale="0.000001"/>
+      <Field name="demodulatorStatus.signalPower" cdm="Communication.GeoSat.Demodulator.SignalPower" dataType="Float32"/>
+      <Field name="demodulatorStatus.cn" cdm="Communication.GeoSat.Demodulator.CN" dataType="Float64"/>
+      <Field name="demodulatorStatus.ber" cdm="Communication.GeoSat.Demodulator.BER" dataType="Float64"/>
+      <Field name="demodulatorStatus.bitRate" cdm="Communication.GeoSat.Demodulator.BitRate" dataType="Float64" scale="0.000001"/>
+      <Field name="demodulatorStatus.trafficRate" cdm="Communication.GeoSat.Demodulator.TrafficRate" dataType="Float64" scale="0.000001"/>
       <!--modulatorStatus.valid/demodulatorStatus.valid가 false이면 원본 정의상 해당 하위 데이터는 신뢰하지 않는다. BER은 원본 단위 E-7을 그대로 유지하여 별도 converter를 적용하지 않는다.-->
     </MonitorBinding>
     <MonitorBinding semantic_id="lBandTerminalDeviceCbitStatus">

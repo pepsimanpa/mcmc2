@@ -79,9 +79,9 @@
           <Map cdm="Streaming.Transmit" value="1"/>
         </ValueMap>
       </Field>
-      <!--frameWidth/frameHeight의 정확한 IDL primitive type은 항해레이더 정보처리 CSC 원문 재확인 전 임의 선언하지 않는다.-->
-      <Field name="frameWidth" cdm="Radar.Video.Frame.Width"/>
-      <Field name="frameHeight" cdm="Radar.Video.Frame.Height"/>
+      <!--frameWidth/frameHeight는 항해레이더 정보처리 CSC에서 long(4 Byte)로 확인되어 Int32로 선언한다.-->
+      <Field name="frameWidth" cdm="Radar.Video.Frame.Width" dataType="Int32"/>
+      <Field name="frameHeight" cdm="Radar.Video.Frame.Height" dataType="Int32"/>
     </MonitorBinding>
         <MonitorBinding semantic_id="aisStatus">
       <DDSChannel topicName="RUSV::SA::CIPE::RadarAISStatusReportType" typeName="RadarAISStatusReportType"/>

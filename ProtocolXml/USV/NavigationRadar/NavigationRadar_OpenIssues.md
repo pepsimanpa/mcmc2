@@ -19,6 +19,7 @@
 - PBIT/IBIT는 CommandStatus 처리 ACK와 별도의 CIPE 단일 Result Reply로 유지하였다.
 - 기존 `BuildUSVMessageBase`, `UInt16` converter를 제거하고 공통 XSD 경로를 `../../XSD/...`로 정리하였다.
 - 레이더 영상은 기존대로 SensorProduct/RTP로 유지한다.
+- `RadarAISStatusReportType.frameWidth`와 `frameHeight`는 `항해레이더 정보처리 CSC.csv`에서 각각 `long`, 4 Byte로 확인되어 Binding `Int32`로 확정하였다.
 
 ## 3. Remaining TBD
 
@@ -50,9 +51,6 @@
    - 일부 Range/Unavailable 셀이 인접 필드 값과 섞인 것으로 보이며 의미가 명확하지 않다.
    - 특히 위치/회전율 등의 비정상 표기는 원작자/IDL 근거 전까지 임의 수정하지 않는다.
 
-8. **RadarAISStatusReportType frame 크기 primitive type**
-   - 현재 확보된 원통/공용 근거만으로 `frameWidth`, `frameHeight`의 실제 IDL primitive type을 재확정하지 못했다.
-   - 따라서 해당 두 필드는 `dataType`을 임의 부여하지 않고 원본 항해레이더 CSC/IDL 재확인 대상으로 남긴다.
 
 ## 4. 현재 상태
 

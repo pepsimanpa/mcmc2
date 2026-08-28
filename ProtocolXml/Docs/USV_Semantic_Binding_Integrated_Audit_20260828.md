@@ -368,19 +368,19 @@ SideScanSonar의 다음 상태 필드는 Semantic 논리 상태가 존재하지�
 
 원문 / IDL 근거가 직접 확인되는 primitive 필드는 Binding `dataType`을 선언하는 것이 원칙이다.
 
-최종 감사에서 `usvHeader` / `destination` composite를 제외하고 남은 primitive `dataType` 미지정은 총 **429건**이다.
+최종 감사에서 `usvHeader` / `destination` composite를 제외하고 남은 primitive `dataType` 미지정은 총 **419건**이다.
 
 | 장치 | 미지정 수 | 사유 |
 |---|---:|---|
 | ElectroOptical | 0 | 실제 DDS boolean 8개를 `dataType="Boolean"`으로 해결 |
 | ElectroOpticalProcessor | 0 | `controlImageSave`를 `dataType="Boolean"`으로 해결 |
-| NavigationRadar | 2 | `frameWidth`, `frameHeight` 실제 IDL primitive type 재확인 필요 |
-| NetworkAbstraction | 8 | GeoSat `valid` 2개는 Boolean 확정; 나머지 수치 8개 primitive type 불명확 |
+| NavigationRadar | 0 | `항해레이더 정보처리 CSC.csv`에서 `frameWidth/frameHeight=long(4 Byte)` 확인 후 `Int32` 반영 |
+| NetworkAbstraction | 0 | `공용 구조체.csv`에서 GeoSat 수치 8개 primitive type까지 확인 완료 |
 | PlatformController | 419 | 실제 DDS boolean 10개 해결; 나머지 legacy 상태/PBIT/IBIT primitive type 근거 부족 |
 | 기타 9개 장치 | 0 | 확인 가능한 primitive type 반영 완료 |
-| **합계** | **429** |  |
+| **합계** | **419** |  |
 
-이 429건은 XSD 오류가 아니다. 현재 XSD에서 `dataType` 속성 자체는 선택적이다.
+이 419건은 XSD 오류가 아니다. 현재 XSD에서 `dataType` 속성 자체는 선택적이다.
 
 다만 프로젝트 설계 규칙상 확인 가능한 primitive type은 선언해야 하므로, **추가 CSCI / IDL 근거 확보 후 보강할 공통 후속항목**으로 관리한다.
 
@@ -423,7 +423,7 @@ DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표�
 
 ### USV-COMMON-04 — 원문 부족 primitive wire dataType
 
-- 총 미지정: 429건
+- 총 미지정: 419건
 - Boolean schema gap은 해결되었고, 남은 항목은 CSCI/IDL primitive 근거 미확보 항목
 - 원문 없이 추정하여 채우지 않는다.
 
