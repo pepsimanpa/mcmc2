@@ -413,9 +413,9 @@
       <Field name="noFiringZone11" cdm="Control.RCWS.Menu.NoFiringZone11.LowerAngle" dataType="Float32"/>
       <Field name="noFiringZone12" cdm="Control.RCWS.Menu.NoFiringZone12.LowerAngle" dataType="Float32"/>
       <DerivedField name="calTrajectory" cdm="Control.RCWS.Menu.TrajectoryCorrection.Enabled" sourceField="Control.RCWS.Menu.TrajectoryCorrection.Enabled" dataType="UInt8"><SourceValueMap><Map sourceValue="false" value="1"/><Map sourceValue="true" value="0"/></SourceValueMap></DerivedField>
-      <Field name="stabilization" cdm="Control.RCWS.Menu.StabilizationToggleEvent" dataType="UInt8"/>
+      <DerivedField name="stabilization" cdm="Control.RCWS.Menu.StabilizationToggleEvent" sourceField="Control.RCWS.Menu.StabilizationToggleEvent" dataType="UInt8"><SourceValueMap><Map sourceValue="false" value="0"/><Map sourceValue="true" value="1"/></SourceValueMap></DerivedField>
       <DerivedField name="zeroingMode" cdm="Control.RCWS.Menu.ZeroingMode.Enabled" sourceField="Control.RCWS.Menu.ZeroingMode.Enabled" dataType="UInt8"><SourceValueMap><Map sourceValue="false" value="0"/><Map sourceValue="true" value="1"/></SourceValueMap></DerivedField>
-      <Field name="initZeroing" cdm="Control.RCWS.Menu.InitializeZeroingAction" dataType="UInt8"/>
+      <DerivedField name="initZeroing" cdm="Control.RCWS.Menu.InitializeZeroingAction" sourceField="Control.RCWS.Menu.InitializeZeroingAction" dataType="UInt8"><SourceValueMap><Map sourceValue="false" value="0"/><Map sourceValue="true" value="1"/></SourceValueMap></DerivedField>
       <DerivedField name="overlayLOS" cdm="Control.RCWS.Menu.OverlayLOS.Enabled" sourceField="Control.RCWS.Menu.OverlayLOS.Enabled" dataType="UInt8"><SourceValueMap><Map sourceValue="false" value="0"/><Map sourceValue="true" value="1"/></SourceValueMap></DerivedField>
       <Field name="eoLos1X" cdm="Control.RCWS.Menu.EOLos1.X" dataType="Int16"/>
       <Field name="eoLos1Y" cdm="Control.RCWS.Menu.EOLos1.Y" dataType="Int16"/>

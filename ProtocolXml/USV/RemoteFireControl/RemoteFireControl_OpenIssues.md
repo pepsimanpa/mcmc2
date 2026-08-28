@@ -22,6 +22,7 @@
 - PBIT/IBIT 및 CIPE/EOIR 지향·거리측정·메뉴 결과는 각 실제 물리 결과 메시지별 단일 Reply 구조를 유지하였다.
 - 동일 RCWS CSCI 내부 교차검증으로 `firingMode` 유효 raw를 0/1로 확정하고 `turningAngle` 범위를 -180~180 deg로 확정하였다.
 - RCWS IBIT detail 4개 octet은 CSCI의 bit 위치/대상 정의를 따라 PackedField로 분해하되, 0/1 polarity가 없어 bit별 Raw 의미로 유지하였다.
+- 원격통제장치 CSCI의 `MenuConfigType`을 재대조하여 `stabilization(0=초기,1=토글)`과 `initZeroing(0=초기,1=영점초기화)`을 논리 Boolean 입력 + Binding `SourceValueMap(false→0,true→1)`으로 정리하였다. `stabilization`은 원문에 1 이후 0 초기화가 명시되지만 `initZeroing`에는 동일 문구가 없어 후자의 one-shot reset 정책은 TBD로 유지한다.
 
 ## 3. Remaining TBD — 9개
 
@@ -51,8 +52,9 @@
    - 원통 측 제어 원문은 `noDrivingZone1`에 -30 deg 설정 시 해당 구동제한구역을 설정하지 않는다고 명시하지만, 이번 RCWS CSCI의 `MenuStatusType`은 zone1~12 모두 단순 -30~30 deg 상태값으로만 기재한다.
    - 동일 특수 규칙이 zone2~12 제어에도 적용되는지는 여전히 직접 근거가 없어 확대 적용하지 않는다.
 
-7. **`initZeroing` event reset 규칙**
-   - 0=초기, 1=영점 초기화는 원통 측 제어 원문에서 확인되나 1 송신 후 자동으로 0으로 초기화해야 하는지는 이번 RCWS CSCI에도 정의가 없다.
+7. **`initZeroing` one-shot reset 규칙**
+   - 원격통제장치 CSCI에서 wire 값 `0=초기, 1=영점 초기화`는 직접 확인되어 Binding `SourceValueMap(false→0,true→1)`으로 반영하였다.
+   - 바로 앞 `stabilization` 등 다른 이벤트 필드는 `1 이후 다시 0으로 초기화`가 명시되어 있지만 `initZeroing`에는 그 문구가 없다. 따라서 wire 인코딩은 확정하되, 송신 후 OM/UI가 자동으로 논리값을 false로 되돌려야 하는지는 TBD로 유지한다.
 
 8. **Menu SystemAction과 공용 Restart 중복**
    - `SystemAction`: 0=None, 1=Shutdown, 2=Reboot가 원통 측 제어 원문에 존재하며 `2=Reboot`는 공용 `SystemRebootControlType`과 기능적으로 중복된다.
@@ -70,4 +72,4 @@
 ## 4. 현재 상태
 
 - 원통 직접 연동 범위의 Semantic/Binding 구조 정리와 선언형 변환은 완료하였다.
-- 이번 RCWS CSCI 재감사로 `firingMode`/`turningAngle` 2건은 해결하고 IBIT detail은 bit 위치/대상까지 정밀화하였다. 남은 9건은 추가 원통 제어 원문/IDL/Adapter/운용 규칙 근거가 필요한 비차단 TBD이다.
+- RCWS/원격통제장치 CSCI 교차감사로 `firingMode`/`turningAngle` 2건은 해결하고 IBIT detail 및 Menu event wire 매핑을 정밀화하였다. 남은 9건은 추가 IDL/Adapter/운용 규칙 근거가 필요한 비차단 TBD이다.
