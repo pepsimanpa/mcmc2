@@ -28,9 +28,10 @@
 
 ## 3. Remaining TBD
 
-1. **GeoSat 통신상태 10개 필드의 실제 DDS primitive type**
-   - `modulatorStatus.valid`, `outputLevel`, `dataBW`, `dataRate`, `demodulatorStatus.valid`, `signalPower`, `cn`, `ber`, `bitRate`, `trafficRate`의 실제 IDL primitive type을 현재 근거만으로 안전하게 재확정하지 못했다.
-   - 단위/scale은 원문에 따라 유지하되 `dataType`은 임의 지정하지 않는다.
+1. **GeoSat 통신상태 8개 필드의 실제 DDS primitive type**
+   - `modulatorStatus.valid`와 `demodulatorStatus.valid`는 원 DDS/IDL boolean으로 확인되어 `dataType="Boolean"`으로 확정하였다.
+   - 남은 `outputLevel`, `dataBW`, `dataRate`, `signalPower`, `cn`, `ber`, `bitRate`, `trafficRate` 8개 수치 필드의 실제 IDL primitive type은 현재 근거만으로 안전하게 재확정하지 못했다.
+   - 단위/scale은 원문에 따라 유지하되 남은 8개 `dataType`은 임의 지정하지 않는다.
 
 2. **`commsChannelID=2` 의미**
    - Add/Delete 메시지의 Range는 0~2이나 직접 정의된 값은 0=무선, 1=위성뿐이다.
@@ -64,5 +65,5 @@
 ## 4. 현재 상태
 
 - 원통 직접 연동 구조, raw enum 분리, converter 제거, 확정 가능한 primitive type 보강은 완료하였다.
-- `configureLBandComms`의 일부 `*.Raw` Semantic Profile과 GeoSat 10개 `dataType`은 근거 부족 때문에 의도적으로 미확정 상태로 보존한다.
+- `configureLBandComms`의 일부 `*.Raw` Semantic Profile과 GeoSat 수치 8개 `dataType`은 근거 부족 때문에 의도적으로 미확정 상태로 보존한다.
 - 남은 8건은 사용자가 임의로 결정할 사항이 아니라 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.

@@ -165,8 +165,8 @@
       <DDSChannel topicName="RUSV::C2::RCU::EOIRImageSaveControlType" typeName="EOIRImageSaveControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <!-- 0=no change, 1=전자광학장치 이미지 저장. source IDL type은 boolean이나 CommonBindingSchema WireDataType에 Boolean이 없어 dataType은 임의 UInt8로 치환하지 않는다. -->
-      <FixedField name="controlImageSave" value="1"/>
+      <!-- 0=no change, 1=전자광학장치 이미지 저장. source IDL type은 boolean이며 공통 WireDataType Boolean으로 직접 선언한다. -->
+      <FixedField name="controlImageSave" value="1" dataType="Boolean"/>
       <Reply semantic_id="saveImageAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>

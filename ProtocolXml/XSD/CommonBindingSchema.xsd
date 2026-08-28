@@ -80,6 +80,7 @@
             <xs:enumeration value="Int64"/>
             <xs:enumeration value="Float32"/>
             <xs:enumeration value="Float64"/>
+            <xs:enumeration value="Boolean"/>
         </xs:restriction>
     </xs:simpleType>
 

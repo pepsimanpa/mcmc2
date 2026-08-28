@@ -123,11 +123,11 @@
       <Field name="environmentSensorDeviceStatus" cdm="Health.CBIT.environmentSensorDeviceStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="windSensorStatus" cdm="Health.CBIT.windSensorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="fireDetectorStatus" cdm="Health.CBIT.fireDetectorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
-      <Field name="fireDetected" cdm="Health.CBIT.fireDetected"/>
+      <Field name="fireDetected" cdm="Health.CBIT.fireDetected" dataType="Boolean"/>
       <Field name="leakDetectorStatus" cdm="Health.CBIT.leakDetectorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
-      <Field name="leakDetected" cdm="Health.CBIT.leakDetected"/>
+      <Field name="leakDetected" cdm="Health.CBIT.leakDetected" dataType="Boolean"/>
       <Field name="flowMeterStatus" cdm="Health.CBIT.flowMeterStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
-      <Field name="flowAnomalyDetected" cdm="Health.CBIT.flowAnomalyDetected"/>
+      <Field name="flowAnomalyDetected" cdm="Health.CBIT.flowAnomalyDetected" dataType="Boolean"/>
       <Field name="stabilizerStatus" cdm="Health.CBIT.stabilizerStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="interceptorStatus" cdm="Health.CBIT.interceptorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
     </MonitorBinding>
@@ -173,13 +173,13 @@
       <Field name="leakSensor2Depth" cdm="Platform.Environment.leakSensor2Depth"/>
       <Field name="leakSensor1Temperature" cdm="Platform.Environment.leakSensor1Temperature"/>
       <Field name="leakSensor2Temperature" cdm="Platform.Environment.leakSensor2Temperature"/>
-      <Field name="fireSensor1Alarm" cdm="Platform.Environment.fireSensor1Alarm"/>
-      <Field name="fireSensor2Alarm" cdm="Platform.Environment.fireSensor2Alarm"/>
-      <Field name="fireSensor3Alarm" cdm="Platform.Environment.fireSensor3Alarm"/>
-      <Field name="autoExtinguisher1Active" cdm="Platform.Environment.autoExtinguisher1Active"/>
-      <Field name="autoExtinguisher2Active" cdm="Platform.Environment.autoExtinguisher2Active"/>
-      <Field name="autoExtinguisher3Active" cdm="Platform.Environment.autoExtinguisher3Active"/>
-      <Field name="autoExtinguisher4Active" cdm="Platform.Environment.autoExtinguisher4Active"/>
+      <Field name="fireSensor1Alarm" cdm="Platform.Environment.fireSensor1Alarm" dataType="Boolean"/>
+      <Field name="fireSensor2Alarm" cdm="Platform.Environment.fireSensor2Alarm" dataType="Boolean"/>
+      <Field name="fireSensor3Alarm" cdm="Platform.Environment.fireSensor3Alarm" dataType="Boolean"/>
+      <Field name="autoExtinguisher1Active" cdm="Platform.Environment.autoExtinguisher1Active" dataType="Boolean"/>
+      <Field name="autoExtinguisher2Active" cdm="Platform.Environment.autoExtinguisher2Active" dataType="Boolean"/>
+      <Field name="autoExtinguisher3Active" cdm="Platform.Environment.autoExtinguisher3Active" dataType="Boolean"/>
+      <Field name="autoExtinguisher4Active" cdm="Platform.Environment.autoExtinguisher4Active" dataType="Boolean"/>
     </MonitorBinding>
         <MonitorBinding semantic_id="propulsionControlStatus">
       <!--공용 구조체 비고상 현 프로젝트 미사용 필드도 원본 구조 보존을 위해 BindingOnly로 유지.-->

@@ -23,7 +23,7 @@
 - OperationMode/CBIT/전원상태 등 Semantic raw 숫자를 논리값으로 이동하고 확인 가능한 raw code는 Binding ValueMap/FixedField에 배치하였다.
 - 공통 XSD 참조 경로를 `../../XSD/...`로 정리하였다.
 
-## 3. Remaining TBD
+## 3. Remaining TBD / Resolved
 
 1. **PowerControlType 장비별 64-bit 제어 mask 매핑**
    - `powerControlDestination`, `stateControl`, `reset`은 `unsigned long long`이다.
@@ -58,9 +58,10 @@
    - 따라서 '내부 필드를 여러 Reply로 쪼개지 않는다'는 공통 원칙을 유지하면서도, 물리 메시지 타입별 Reply는 각각 유지한다.
    - 향후 원작자가 하나의 상위 시험 완료 집계 메시지를 정의할 경우 재검토한다.
 
-9. **DDS boolean wire type**
-   - 환경 Alarm/자동소화 상태 등 DDS boolean 필드가 존재하지만 현재 `CommonBindingSchema.xsd/WireDataType`에는 Boolean이 없다.
-   - 실제 boolean Field에 임의 `UInt8`을 강제하지 않은 항목이 남아 있다.
+9. **[RESOLVED] DDS boolean wire type**
+   - 공통 `WireDataType`에 `Boolean`을 추가하였다.
+   - 원 CSCI/IDL에서 실제 DDS boolean으로 확인된 CBIT/환경상태 직접 Field 10개를 `dataType="Boolean"`으로 선언하였다.
+   - octet으로 정의된 ENV command와 bow-thruster enable 등은 기존 UInt8/SourceValueMap을 유지한다.
 
 10. **일부 선체 상태/IBIT 상세 primitive dataType**
    - 선체제어 CSCI의 대형 상태/IBIT 구조체 중 현재 확보 근거에서 primitive type을 직접 재확인하지 못한 필드는 BindingOnly 또는 dataType 미지정으로 유지한다.

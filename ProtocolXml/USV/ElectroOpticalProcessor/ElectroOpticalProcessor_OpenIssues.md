@@ -27,7 +27,7 @@
 - 공통 XSD 경로를 `../../XSD/...`로 정리하였다.
 - `relativeAngle`의 원문 Range `-PI~+PI`는 XSD decimal에 임의 근사값을 넣지 않고 Semantic 주석으로 보존하였다.
 
-## 3. Remaining TBD
+## 3. Remaining TBD / Resolved
 
 1. **공용 CIPE Topic의 송신 카드 식별 방식**
    - 센서융합/라이다/항해레이더/전자광학 영상처리카드가 동일한 `CIPEPBITReportType`, `CIPECBITReportType`, `CIPEIBITReportType` Topic/Type을 사용한다.
@@ -52,10 +52,10 @@
    - 현재 Semantic XSD `Range`는 decimal이므로 PI 상수를 직접 표현할 수 없으며 임의 근사값을 넣지 않았다.
    - 향후 상수/수식 Range 표현을 XSD에서 지원할지 여부는 전역 스키마 개선 사항이다.
 
-6. **`controlImageSave`의 boolean wire type 표현**
+6. **[RESOLVED] `controlImageSave`의 boolean wire type 표현**
    - 원 CSCI/IDL의 `controlImageSave`는 `boolean`이다.
-   - 현재 `CommonBindingSchema.xsd`의 `WireDataType`에는 Boolean 항목이 없어 `dataType="UInt8"`로 임의 치환하지 않고 `FixedField value="1"`만 유지한다.
-   - 향후 Binding XSD에 Boolean wire type을 추가할지, DDS boolean은 별도 규칙으로 처리할지 전역 결정이 필요하다.
+   - 공통 `WireDataType`에 `Boolean`을 추가하고 `FixedField value="1" dataType="Boolean"`으로 명시하였다.
+   - UInt8로 임의 치환하지 않고 원 IDL primitive를 그대로 표현한다.
 
 ## 4. 현재 상태
 

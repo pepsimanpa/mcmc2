@@ -368,23 +368,23 @@ SideScanSonar의 다음 상태 필드는 Semantic 논리 상태가 존재하지�
 
 원문 / IDL 근거가 직접 확인되는 primitive 필드는 Binding `dataType`을 선언하는 것이 원칙이다.
 
-최종 감사에서 `usvHeader` / `destination` composite를 제외하고 남은 primitive `dataType` 미지정은 총 **450건**이다.
+최종 감사에서 `usvHeader` / `destination` composite를 제외하고 남은 primitive `dataType` 미지정은 총 **429건**이다.
 
 | 장치 | 미지정 수 | 사유 |
 |---|---:|---|
-| ElectroOptical | 8 | 원 CSCI가 DDS `boolean`; 현 `WireDataType`에 Boolean 없음 |
-| ElectroOpticalProcessor | 1 | `controlImageSave` DDS `boolean`; 동일 XSD 제약 |
+| ElectroOptical | 0 | 실제 DDS boolean 8개를 `dataType="Boolean"`으로 해결 |
+| ElectroOpticalProcessor | 0 | `controlImageSave`를 `dataType="Boolean"`으로 해결 |
 | NavigationRadar | 2 | `frameWidth`, `frameHeight` 실제 IDL primitive type 재확인 필요 |
-| NetworkAbstraction | 10 | GeoSat 상태 상세 primitive type이 현재 근거에서 불명확 |
-| PlatformController | 429 | 대형 legacy 상태/PBIT/IBIT 구조체의 원 CSCI/IDL primitive type 근거 부족 |
+| NetworkAbstraction | 8 | GeoSat `valid` 2개는 Boolean 확정; 나머지 수치 8개 primitive type 불명확 |
+| PlatformController | 419 | 실제 DDS boolean 10개 해결; 나머지 legacy 상태/PBIT/IBIT primitive type 근거 부족 |
 | 기타 9개 장치 | 0 | 확인 가능한 primitive type 반영 완료 |
-| **합계** | **450** |  |
+| **합계** | **429** |  |
 
-이 450건은 XSD 오류가 아니다. 현재 XSD에서 `dataType` 속성 자체는 선택적이다.
+이 429건은 XSD 오류가 아니다. 현재 XSD에서 `dataType` 속성 자체는 선택적이다.
 
 다만 프로젝트 설계 규칙상 확인 가능한 primitive type은 선언해야 하므로, **추가 CSCI / IDL 근거 확보 후 보강할 공통 후속항목**으로 관리한다.
 
-특히 DDS `boolean`은 `UInt8`로 임의 치환하지 않는다.
+DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표현한다. Semantic Boolean이 octet/packed bit/sentinel에서 파생되는 경우에는 실제 wire 타입을 유지한다.
 
 ---
 
@@ -401,12 +401,12 @@ SideScanSonar의 다음 상태 필드는 Semantic 논리 상태가 존재하지�
 - 결과 Reply의 commandID: 0개
 - 상태: 추가 Adapter / runtime correlation 규칙 필요
 
-### USV-COMMON-02 — DDS Boolean wire type 표현
+### USV-COMMON-02 — DDS Boolean wire type 표현 — **RESOLVED (2026-08-28)**
 
-- 대표 장치: ElectroOptical, ElectroOpticalProcessor, PlatformController
-- 원문 타입: `boolean`
-- 현재 `CommonBindingSchema.xsd/WireDataType`: Boolean 없음
-- 상태: XSD 또는 DDS boolean 공통 처리 규칙 필요
+- 공통 `CommonBindingSchema.xsd/WireDataType`에 `Boolean` 추가
+- 실제 DDS/IDL boolean 직접 필드 21개 반영: ElectroOptical 8, ElectroOpticalProcessor 1, PlatformController 10, NetworkAbstraction 2
+- Semantic Boolean이라고 해서 자동으로 wire Boolean으로 변경하지 않는 규칙을 공통 설계문서에 명시
+- AUV / MDV / EMDW 교차 감사 결과 직접 wire Boolean 후보는 0개였으며, 기존 Boolean 의미는 packed bit 또는 numeric sentinel/파생 의미이므로 실제 wire 타입을 유지
 
 ### USV-COMMON-03 — 공용 Result Topic source routing / fan-out
 
@@ -423,8 +423,8 @@ SideScanSonar의 다음 상태 필드는 Semantic 논리 상태가 존재하지�
 
 ### USV-COMMON-04 — 원문 부족 primitive wire dataType
 
-- 총 미지정: 450건
-- Boolean schema gap 및 CSCI/IDL 근거 미확보 항목 포함
+- 총 미지정: 429건
+- Boolean schema gap은 해결되었고, 남은 항목은 CSCI/IDL primitive 근거 미확보 항목
 - 원문 없이 추정하여 채우지 않는다.
 
 ### 장치 고유로 유지하는 대표 이슈

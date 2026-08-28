@@ -194,12 +194,12 @@
     <MonitorBinding semantic_id="geoSatCommsStatus">
       <DDSChannel topicName="RUSV::CO::NAE::GeoSatCommsReportType" typeName="GeoSatCommsReportType"/>
       <Field name="usvHeader"/>
-      <Field name="modulatorStatus.valid" cdm="Communication.GeoSat.Modulator.Valid"/>
+      <Field name="modulatorStatus.valid" cdm="Communication.GeoSat.Modulator.Valid" dataType="Boolean"/>
       <Field name="modulatorStatus.outputLevel" cdm="Communication.GeoSat.Modulator.OutputLevel"/>
       <Field name="modulatorStatus.dataBW" cdm="Communication.GeoSat.Modulator.DataBandwidth" scale="0.001"/>
       <Field name="modulatorStatus.dataRate" cdm="Communication.GeoSat.Modulator.DataRate" scale="0.001"/>
       <Field name="modulatorStatus.status" cdm="Communication.GeoSat.Modulator.StatusText" dataType="UInt8" length="21" format="string"/>
-      <Field name="demodulatorStatus.valid" cdm="Communication.GeoSat.Demodulator.Valid"/>
+      <Field name="demodulatorStatus.valid" cdm="Communication.GeoSat.Demodulator.Valid" dataType="Boolean"/>
       <Field name="demodulatorStatus.signalPower" cdm="Communication.GeoSat.Demodulator.SignalPower"/>
       <Field name="demodulatorStatus.cn" cdm="Communication.GeoSat.Demodulator.CN"/>
       <Field name="demodulatorStatus.ber" cdm="Communication.GeoSat.Demodulator.BER"/>

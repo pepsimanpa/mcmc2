@@ -21,13 +21,13 @@
 - `BuildUSVMessageBase`, `UInt16`, `DivideBy100`, `MultiplyBy2` converter를 선언형 Binding으로 대체하였다.
 - 공통 XSD 경로를 `../../XSD/...`로 정리하였다.
 
-## 3. Remaining TBD
+## 3. Remaining TBD / Resolved
 
-1. **DDS boolean의 Binding wire type 표현**
+1. **[RESOLVED] DDS boolean의 Binding wire type 표현**
    - 원 CSCI에 `boolean`인 필드가 다수 존재한다: referenceModeResult, autoTrackingSetting, swingFlagResult, irSwitching, eoirFlagResult, laserIlluminatorSetting 등.
-   - 현재 `CommonBindingSchema.xsd/WireDataType`에는 Boolean이 없다.
-   - 실제 boolean을 `UInt8`로 임의 치환하지 않고 해당 필드는 dataType 미지정으로 보존한다.
-   - 향후 Boolean wire type 추가 또는 DDS boolean 공통 처리 규칙이 필요하다.
+   - `CommonBindingSchema.xsd/WireDataType`에 `Boolean`을 추가하였다.
+   - 원 CSCI/IDL primitive가 실제 `boolean`인 8개 직접 Field를 `dataType="Boolean"`으로 선언하였다.
+   - Semantic Boolean이라도 원 wire가 octet/bit/sentinel인 항목은 Boolean으로 강제 변경하지 않는다.
 
 2. **Zoom/Focus `0x5555` No-change sentinel**
    - `positionZoomControl` / `positionFocusControl`은 유효 raw 0~1000 외에 `0x5555=No change`가 존재한다.

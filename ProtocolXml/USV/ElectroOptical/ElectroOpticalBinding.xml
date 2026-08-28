@@ -81,7 +81,7 @@
       <Field name="statusIrZoom" cdm="EOIR.IR.Zoom.Step" dataType="UInt16"/>
       <Field name="statusHFOV" cdm="EOIR.FOV.Horizontal" dataType="Float32"/>
       <Field name="statusVFOV" cdm="EOIR.FOV.Vertical" dataType="Float32"/>
-      <Field name="statusEoirLock" cdm="EOIR.Tracking.Lock"/>
+      <Field name="statusEoirLock" cdm="EOIR.Tracking.Lock" dataType="Boolean"/>
       <Field name="statusBrightness" cdm="EOIR.Illuminator.Brightness" dataType="UInt8"/>
       <Field name="statusBeamAngle" cdm="EOIR.Illuminator.BeamRange" dataType="UInt16"/>
       <!--Semantic percent -> wire raw는 x100. 수신 시 wire/100.-->
@@ -286,7 +286,7 @@
       <DDSChannel topicName="RUSV::C2::RCU::EOIRManualActuatorControlType" typeName="EOIRManualActuatorControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="referenceModeResult" cdm="Control.EOIR.Position.ReferenceTrueNorth"/>
+      <Field name="referenceModeResult" cdm="Control.EOIR.Position.ReferenceTrueNorth" dataType="Boolean"/>
       <Field name="panResult" cdm="Control.EOIR.Position.Pan" dataType="Float32"/>
       <Field name="tiltResult" cdm="Control.EOIR.Position.Tilt" dataType="Float32"/>
       <Reply semantic_id="pointToPositionAck" required="true">
@@ -303,7 +303,7 @@
       <DDSChannel topicName="RUSV::C2::RCU::EOIRTrackingControlType" typeName="EOIRTrackingControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="autoTrackingSetting" cdm="Control.EOIR.Tracking.AutoEnabled"/>
+      <Field name="autoTrackingSetting" cdm="Control.EOIR.Tracking.AutoEnabled" dataType="Boolean"/>
       <Field name="targetSetting" cdm="Control.EOIR.Tracking.TargetSetting" dataType="UInt8">
         <ValueMap>
           <Map cdm="EOIR.Tracking.TargetSetting.NoChange" value="0"/>
@@ -359,7 +359,7 @@
       <DDSChannel topicName="RUSV::C2::RCU::EOIRSwingControlType" typeName="EOIRSwingControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="swingFlagResult" cdm="Control.EOIR.Swing.Enabled"/>
+      <Field name="swingFlagResult" cdm="Control.EOIR.Swing.Enabled" dataType="Boolean"/>
       <Field name="swingStartResult" cdm="Control.EOIR.Swing.StartAngle" dataType="Float32"/>
       <Field name="swingEndResult" cdm="Control.EOIR.Swing.EndAngle" dataType="Float32"/>
       <Field name="swingSpeedResult" cdm="Control.EOIR.Swing.Speed" dataType="Float32"/>
@@ -376,7 +376,7 @@
       <DDSChannel topicName="RUSV::C2::RCU::EOIRSwitchingControlType" typeName="EOIRSwitchingControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="irSwitching" cdm="Control.EOIR.Video.IR.UseSWIR"/>
+      <Field name="irSwitching" cdm="Control.EOIR.Video.IR.UseSWIR" dataType="Boolean"/>
       <Reply semantic_id="switchIrVideoAck" required="true">
         <DDSChannel topicName="RUSV::C2::EOIR::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
@@ -390,7 +390,7 @@
       <DDSChannel topicName="RUSV::C2::RCU::EOIRZoomControlType" typeName="EOIRZoomControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="eoirFlagResult" cdm="Control.EOIR.Zoom.UseMWIR"/>
+      <Field name="eoirFlagResult" cdm="Control.EOIR.Zoom.UseMWIR" dataType="Boolean"/>
       <Field name="zoomControl" cdm="Control.EOIR.Zoom.Mode" dataType="UInt8">
         <ValueMap>
           <Map cdm="EOIR.Zoom.Mode.NoChange" value="0"/>
@@ -421,7 +421,7 @@
       <DDSChannel topicName="RUSV::C2::RCU::EOIRFocusControlType" typeName="EOIRFocusControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="eoirFlagResult" cdm="Control.EOIR.Focus.UseMWIR"/>
+      <Field name="eoirFlagResult" cdm="Control.EOIR.Focus.UseMWIR" dataType="Boolean"/>
       <Field name="focusControl" cdm="Control.EOIR.Focus.Mode" dataType="UInt8">
         <ValueMap>
           <Map cdm="EOIR.Focus.Mode.NoChange" value="0"/>
@@ -606,7 +606,7 @@
       <DDSChannel topicName="RUSV::C2::RCU::EOIRLaserIlluminatorControlType" typeName="EOIRLaserIlluminatorControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Field name="laserIlluminatorSetting" cdm="Control.EOIR.Illuminator.Disabled"/>
+      <Field name="laserIlluminatorSetting" cdm="Control.EOIR.Illuminator.Disabled" dataType="Boolean"/>
       <Field name="brightnessControl" cdm="Control.EOIR.Illuminator.Brightness" dataType="UInt8"/>
       <Field name="beamAngleTele" cdm="Control.EOIR.Illuminator.BeamTeleStep" dataType="UInt8"/>
       <Field name="beamAngleWide" cdm="Control.EOIR.Illuminator.BeamWideStep" dataType="UInt8"/>

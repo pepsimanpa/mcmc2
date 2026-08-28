@@ -142,6 +142,12 @@ Field마다 `little` / `big`을 반복 선언하지 않는다.
 
 사용 가능한 기본 WireDataType은 XSD 정의를 따른다.
 
+DDS / IDL의 실제 primitive가 `boolean`인 경우 Binding은 `dataType="Boolean"`을 사용한다.
+
+단, Semantic의 `BooleanSpec` / `BooleanProfile`은 **논리 의미가 true/false라는 뜻일 뿐 wire primitive가 Boolean임을 의미하지 않는다.** 원문 wire가 octet/정수이면 해당 실제 정수 `dataType`과 `ValueMap`/`SourceValueMap`을 유지하고, packed bit이면 `PackedField / BitMember`, 정수 sentinel에서 파생되는 Boolean이면 원 정수 `dataType`과 `Sentinel / Normal`을 유지한다.
+
+예: MDV / EMDW의 `MissionPlan.CurrentWaypoint.Available`은 Semantic Boolean이지만 실제 wire는 `UInt16 currentWaypointIndex`의 `0xFFFF` sentinel에서 파생되므로 `dataType="Boolean"`으로 변경하지 않는다.
+
 ### 3.3 scale
 
 Semantic 실제값과 wire 정수 표현의 고정 배율을 선언한다.
