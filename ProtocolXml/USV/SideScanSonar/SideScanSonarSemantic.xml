@@ -329,14 +329,55 @@
       <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response">
         <Results>
             <GroupResult name="IBIT 점검 결과">
-              <Result name="towedSonarAssemblyTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarAssemblyTotalIBIT"/>
+              <ValueSetResult name="towedSonarAssemblyTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarAssemblyTotalIBIT">
+                <Values>
+                  <Value name="Normal" cdm="Health.Normal"/>
+                  <Value name="Degraded" cdm="Health.Degraded"/>
+                  <Value name="Unavailable" cdm="Health.Unavailable"/>
+                  <Value name="NoResponse" cdm="Health.NoResponse"/>
+                </Values>
+              </ValueSetResult>
               <Result name="launchAndRecoveryTotalIBIT" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryTotalIBIT"/>
-              <Result name="launchAndRecoveryPowerDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail"/>
-              <Result name="launchAndRecoveryLinkDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail"/>
-              <Result name="launchAndRecoveryOverCurrentDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail"/>
-              <Result name="launchAndRecoveryFunctionDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail"/>
-              <Result name="towedSonarArrayTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarArrayTotalIBIT"/>
-              <Result name="towedSonarArrayDetail" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail"/>
+              <GroupResult name="launchAndRecoveryPowerDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail">
+                <BooleanResult name="input220VacError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.input220VacError"/>
+                <BooleanResult name="output220VacError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.output220VacError"/>
+                <BooleanResult name="output320VdcError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.output320VdcError"/>
+              </GroupResult>
+              <GroupResult name="launchAndRecoveryLinkDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail">
+                <BooleanResult name="winchMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.winchMotorDriverLinkError"/>
+                <BooleanResult name="recoveryLeftMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryLeftMotorDriverLinkError"/>
+                <BooleanResult name="recoveryRightMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryRightMotorDriverLinkError"/>
+                <BooleanResult name="usblVerticalActuatorLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.usblVerticalActuatorLinkError"/>
+                <BooleanResult name="winchEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.winchEncoderLinkError"/>
+                <BooleanResult name="loadCellLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.loadCellLinkError"/>
+                <BooleanResult name="recoveryLeftEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryLeftEncoderLinkError"/>
+                <BooleanResult name="recoveryRightEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryRightEncoderLinkError"/>
+              </GroupResult>
+              <GroupResult name="launchAndRecoveryOverCurrentDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail">
+                <BooleanResult name="winchMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.winchMotorDriverOverCurrent"/>
+                <BooleanResult name="recoveryLeftMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.recoveryLeftMotorDriverOverCurrent"/>
+                <BooleanResult name="recoveryRightMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.recoveryRightMotorDriverOverCurrent"/>
+                <BooleanResult name="usblVerticalActuatorOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.usblVerticalActuatorOverCurrent"/>
+              </GroupResult>
+              <GroupResult name="launchAndRecoveryFunctionDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail">
+                <BooleanResult name="referenceTensionExceeded" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.referenceTensionExceeded"/>
+                <BooleanResult name="controlCardUartError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardUartError"/>
+                <BooleanResult name="controlCardEthernetError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardEthernetError"/>
+                <BooleanResult name="controlCardMemoryError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardMemoryError"/>
+                <BooleanResult name="positionInformationLost" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.positionInformationLost"/>
+              </GroupResult>
+              <ValueSetResult name="towedSonarArrayTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarArrayTotalIBIT">
+                <Values>
+                  <Value name="Normal" cdm="Health.Normal"/>
+                  <Value name="Degraded" cdm="Health.Degraded"/>
+                  <Value name="Unavailable" cdm="Health.Unavailable"/>
+                  <Value name="NoResponse" cdm="Health.NoResponse"/>
+                </Values>
+              </ValueSetResult>
+              <GroupResult name="towedSonarArrayDetail" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail">
+                <BooleanResult name="muxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail.muxCardVoltageAbnormal"/>
+                <BooleanResult name="sssTxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail.sssTxCardVoltageAbnormal"/>
+              </GroupResult>
               <Result name="tsadMux12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux12vVoltage"/>
               <Result name="tsadMux5vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux5vVoltage"/>
               <Result name="tsadMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tsadMux3v3Voltage"/>
@@ -350,8 +391,20 @@
               <Result name="tsadTxHfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfStbdRms"/>
               <Result name="tsadTxLfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfPortRms"/>
               <Result name="tsadTxLfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfStbdRms"/>
-              <Result name="sonarSignalProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalIBIT"/>
-              <Result name="sonarSignalProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail"/>
+              <ValueSetResult name="sonarSignalProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalIBIT">
+                <Values>
+                  <Value name="Normal" cdm="Health.Normal"/>
+                  <Value name="Degraded" cdm="Health.Degraded"/>
+                  <Value name="Unavailable" cdm="Health.Unavailable"/>
+                  <Value name="NoResponse" cdm="Health.NoResponse"/>
+                </Values>
+              </ValueSetResult>
+              <GroupResult name="sonarSignalProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail">
+                <BooleanResult name="towedDemuxInterfaceCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedDemuxInterfaceCardVoltageAbnormal"/>
+                <BooleanResult name="towedSonarPowerSupplyCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedSonarPowerSupplyCardVoltageAbnormal"/>
+                <BooleanResult name="towedPowerSupplyCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedPowerSupplyCardVoltageAbnormal"/>
+                <BooleanResult name="towedPowerLineCommunicationCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedPowerLineCommunicationCardVoltageAbnormal"/>
+              </GroupResult>
               <Result name="tdcDemux5vVoltage" cdm="Health.IBIT.SideScanSonar.tdcDemux5vVoltage"/>
               <Result name="tdcDemux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tdcDemux3v3Voltage"/>
               <Result name="tdcDemuxTemp1" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp1"/>
@@ -376,13 +429,35 @@
               <Result name="tlc12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vCurrentVoltage"/>
               <Result name="tlcN5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vCurrentVoltage"/>
               <Result name="tlcN12vCurrentRefVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vCurrentRefVoltage"/>
-              <Result name="sonarImagingProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalIBIT"/>
+              <ValueSetResult name="sonarImagingProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalIBIT">
+                <Values>
+                  <Value name="Normal" cdm="Health.Normal"/>
+                  <Value name="Degraded" cdm="Health.Degraded"/>
+                  <Value name="Unavailable" cdm="Health.Unavailable"/>
+                  <Value name="NoResponse" cdm="Health.NoResponse"/>
+                </Values>
+              </ValueSetResult>
               <Result name="sonarImagingProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentDetail"/>
-              <Result name="sonarImagingHealthDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail"/>
+              <GroupResult name="sonarImagingHealthDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail">
+                <BooleanResult name="powerSupplyCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.powerSupplyCardPowerAbnormal"/>
+                <BooleanResult name="networkSwitchCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.networkSwitchCardPowerAbnormal"/>
+                <BooleanResult name="sonarComputeProcessingCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.sonarComputeProcessingCardPowerAbnormal"/>
+                <BooleanResult name="coolingFanAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.coolingFanAbnormal"/>
+              </GroupResult>
               <Result name="powerCardTemp" cdm="Health.IBIT.SideScanSonar.powerCardTemp"/>
               <Result name="sbcBoardTemp" cdm="Health.IBIT.SideScanSonar.sbcBoardTemp"/>
-              <Result name="hullMountedSonarTotalIBIT" cdm="Health.IBIT.SideScanSonar.hullMountedSonarTotalIBIT"/>
-              <Result name="hullMountedSonarDetail" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail"/>
+              <ValueSetResult name="hullMountedSonarTotalIBIT" cdm="Health.IBIT.SideScanSonar.hullMountedSonarTotalIBIT">
+                <Values>
+                  <Value name="Normal" cdm="Health.Normal"/>
+                  <Value name="Degraded" cdm="Health.Degraded"/>
+                  <Value name="Unavailable" cdm="Health.Unavailable"/>
+                  <Value name="NoResponse" cdm="Health.NoResponse"/>
+                </Values>
+              </ValueSetResult>
+              <GroupResult name="hullMountedSonarDetail" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail">
+                <BooleanResult name="hullMuxInterfaceCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail.hullMuxInterfaceCardVoltageAbnormal"/>
+                <BooleanResult name="hullTxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail.hullTxCardVoltageAbnormal"/>
+              </GroupResult>
               <Result name="hmMux5vVoltage" cdm="Health.IBIT.SideScanSonar.hmMux5vVoltage"/>
               <Result name="hmMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.hmMux3v3Voltage"/>
               <Result name="hmMuxAdcIn1Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn1Temp"/>
@@ -405,7 +480,14 @@
       <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response">
         <Results>
             <GroupResult name="PBIT 점검 결과">
-              <Result name="towedSonarAssemblyTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarAssemblyTotalPBIT"/>
+              <ValueSetResult name="towedSonarAssemblyTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarAssemblyTotalPBIT">
+                <Values>
+                  <Value name="Normal" cdm="Health.Normal"/>
+                  <Value name="Degraded" cdm="Health.Degraded"/>
+                  <Value name="Unavailable" cdm="Health.Unavailable"/>
+                  <Value name="NoResponse" cdm="Health.NoResponse"/>
+                </Values>
+              </ValueSetResult>
               <Result name="launchAndRecoveryTotalPBIT" cdm="Health.PBIT.SideScanSonar.launchAndRecoveryTotalPBIT"/>
               <Result name="towedSonarArrayTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarArrayTotalPBIT"/>
               <Result name="sonarSignalProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalPBIT"/>
@@ -424,7 +506,13 @@
       </Reply>
       <Reply bindRef="stopSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
         <Results>
-            <Result name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop"/>
+            <ValueSetResult name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
+              <Values>
+                <Value name="Stopped" cdm="LaunchRecovery.Slide.BackStop.State.Stopped"/>
+                <Value name="Engaged" cdm="LaunchRecovery.Slide.BackStop.State.Engaged"/>
+                <Value name="Returned" cdm="LaunchRecovery.Slide.BackStop.State.Returned"/>
+              </Values>
+            </ValueSetResult>
         </Results>
       </Reply>
     </ControlSpec>
@@ -437,7 +525,13 @@
       </Reply>
       <Reply bindRef="engageSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
         <Results>
-            <Result name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop"/>
+            <ValueSetResult name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
+              <Values>
+                <Value name="Stopped" cdm="LaunchRecovery.Slide.BackStop.State.Stopped"/>
+                <Value name="Engaged" cdm="LaunchRecovery.Slide.BackStop.State.Engaged"/>
+                <Value name="Returned" cdm="LaunchRecovery.Slide.BackStop.State.Returned"/>
+              </Values>
+            </ValueSetResult>
         </Results>
       </Reply>
     </ControlSpec>
@@ -450,7 +544,13 @@
       </Reply>
       <Reply bindRef="returnSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
         <Results>
-            <Result name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop"/>
+            <ValueSetResult name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
+              <Values>
+                <Value name="Stopped" cdm="LaunchRecovery.Slide.BackStop.State.Stopped"/>
+                <Value name="Engaged" cdm="LaunchRecovery.Slide.BackStop.State.Engaged"/>
+                <Value name="Returned" cdm="LaunchRecovery.Slide.BackStop.State.Returned"/>
+              </Values>
+            </ValueSetResult>
         </Results>
       </Reply>
     </ControlSpec>

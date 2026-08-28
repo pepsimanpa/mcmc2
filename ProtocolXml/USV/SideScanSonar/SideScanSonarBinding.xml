@@ -251,14 +251,41 @@
       <Reply semantic_id="requestIbitResult">
         <DDSChannel topicName="RUSV::SO::TSA::TSAIBITReportType" typeName="TSAIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="towedSonarAssemblyTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarAssemblyTotalIBIT" dataType="UInt8"/>
+        <Field name="towedSonarAssemblyTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarAssemblyTotalIBIT" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
         <Field name="launchAndRecoveryTotalIBIT" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryTotalIBIT" dataType="UInt8"/>
-        <Field name="launchAndRecoveryPowerDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail" dataType="UInt8"/>
-        <Field name="launchAndRecoveryLinkDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail" dataType="UInt8"/>
-        <Field name="launchAndRecoveryOverCurrentDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail" dataType="UInt8"/>
-        <Field name="launchAndRecoveryFunctionDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail" dataType="UInt8"/>
-        <Field name="towedSonarArrayTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarArrayTotalIBIT" dataType="UInt8"/>
-        <Field name="towedSonarArrayDetail" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail" dataType="UInt8"/>
+        <PackedField name="launchAndRecoveryPowerDetail" width="8" defaultValue="0">
+          <BitMember name="input220VacError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.input220VacError" offset="0"/>
+          <BitMember name="output220VacError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.output220VacError" offset="1"/>
+          <BitMember name="output320VdcError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.output320VdcError" offset="2"/>
+        </PackedField>
+        <PackedField name="launchAndRecoveryLinkDetail" width="8" defaultValue="0">
+          <BitMember name="winchMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.winchMotorDriverLinkError" offset="0"/>
+          <BitMember name="recoveryLeftMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryLeftMotorDriverLinkError" offset="1"/>
+          <BitMember name="recoveryRightMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryRightMotorDriverLinkError" offset="2"/>
+          <BitMember name="usblVerticalActuatorLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.usblVerticalActuatorLinkError" offset="3"/>
+          <BitMember name="winchEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.winchEncoderLinkError" offset="4"/>
+          <BitMember name="loadCellLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.loadCellLinkError" offset="5"/>
+          <BitMember name="recoveryLeftEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryLeftEncoderLinkError" offset="6"/>
+          <BitMember name="recoveryRightEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryRightEncoderLinkError" offset="7"/>
+        </PackedField>
+        <PackedField name="launchAndRecoveryOverCurrentDetail" width="8" defaultValue="0">
+          <BitMember name="winchMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.winchMotorDriverOverCurrent" offset="0"/>
+          <BitMember name="recoveryLeftMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.recoveryLeftMotorDriverOverCurrent" offset="1"/>
+          <BitMember name="recoveryRightMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.recoveryRightMotorDriverOverCurrent" offset="2"/>
+          <BitMember name="usblVerticalActuatorOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.usblVerticalActuatorOverCurrent" offset="3"/>
+        </PackedField>
+        <PackedField name="launchAndRecoveryFunctionDetail" width="8" defaultValue="0">
+          <BitMember name="referenceTensionExceeded" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.referenceTensionExceeded" offset="0"/>
+          <BitMember name="controlCardUartError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardUartError" offset="1"/>
+          <BitMember name="controlCardEthernetError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardEthernetError" offset="2"/>
+          <BitMember name="controlCardMemoryError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardMemoryError" offset="3"/>
+          <BitMember name="positionInformationLost" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.positionInformationLost" offset="4"/>
+        </PackedField>
+        <Field name="towedSonarArrayTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarArrayTotalIBIT" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+        <PackedField name="towedSonarArrayDetail" width="8" defaultValue="0">
+          <BitMember name="muxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail.muxCardVoltageAbnormal" offset="0"/>
+          <BitMember name="sssTxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail.sssTxCardVoltageAbnormal" offset="1"/>
+        </PackedField>
         <Field name="tsadMux12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux12vVoltage" dataType="Float32"/>
         <Field name="tsadMux5vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux5vVoltage" dataType="Float32"/>
         <Field name="tsadMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tsadMux3v3Voltage" dataType="Float32"/>
@@ -272,8 +299,13 @@
         <Field name="tsadTxHfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfStbdRms" dataType="Float32"/>
         <Field name="tsadTxLfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfPortRms" dataType="Float32"/>
         <Field name="tsadTxLfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfStbdRms" dataType="Float32"/>
-        <Field name="sonarSignalProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalIBIT" dataType="UInt8"/>
-        <Field name="sonarSignalProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail" dataType="UInt8"/>
+        <Field name="sonarSignalProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalIBIT" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+        <PackedField name="sonarSignalProcessingEquipmentDetail" width="8" defaultValue="0">
+          <BitMember name="towedDemuxInterfaceCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedDemuxInterfaceCardVoltageAbnormal" offset="0"/>
+          <BitMember name="towedSonarPowerSupplyCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedSonarPowerSupplyCardVoltageAbnormal" offset="1"/>
+          <BitMember name="towedPowerSupplyCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedPowerSupplyCardVoltageAbnormal" offset="2"/>
+          <BitMember name="towedPowerLineCommunicationCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedPowerLineCommunicationCardVoltageAbnormal" offset="3"/>
+        </PackedField>
         <Field name="tdcDemux5vVoltage" cdm="Health.IBIT.SideScanSonar.tdcDemux5vVoltage" dataType="Float32"/>
         <Field name="tdcDemux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tdcDemux3v3Voltage" dataType="Float32"/>
         <Field name="tdcDemuxTemp1" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp1" dataType="Float32"/>
@@ -298,13 +330,21 @@
         <Field name="tlc12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vCurrentVoltage" dataType="Float32"/>
         <Field name="tlcN5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vCurrentVoltage" dataType="Float32"/>
         <Field name="tlcN12vCurrentRefVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vCurrentRefVoltage" dataType="Float32"/>
-        <Field name="sonarImagingProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalIBIT" dataType="UInt8"/>
+        <Field name="sonarImagingProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalIBIT" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
         <Field name="sonarImagingProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentDetail" dataType="UInt8"/>
-        <Field name="sonarImagingHealthDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail" dataType="UInt8"/>
+        <PackedField name="sonarImagingHealthDetail" width="8" defaultValue="0">
+          <BitMember name="powerSupplyCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.powerSupplyCardPowerAbnormal" offset="0"/>
+          <BitMember name="networkSwitchCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.networkSwitchCardPowerAbnormal" offset="1"/>
+          <BitMember name="sonarComputeProcessingCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.sonarComputeProcessingCardPowerAbnormal" offset="2"/>
+          <BitMember name="coolingFanAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.coolingFanAbnormal" offset="3"/>
+        </PackedField>
         <Field name="powerCardTemp" cdm="Health.IBIT.SideScanSonar.powerCardTemp" dataType="Float32"/>
         <Field name="sbcBoardTemp" cdm="Health.IBIT.SideScanSonar.sbcBoardTemp" dataType="Float32"/>
-        <Field name="hullMountedSonarTotalIBIT" cdm="Health.IBIT.SideScanSonar.hullMountedSonarTotalIBIT" dataType="UInt8"/>
-        <Field name="hullMountedSonarDetail" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail" dataType="UInt8"/>
+        <Field name="hullMountedSonarTotalIBIT" cdm="Health.IBIT.SideScanSonar.hullMountedSonarTotalIBIT" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+        <PackedField name="hullMountedSonarDetail" width="8" defaultValue="0">
+          <BitMember name="hullMuxInterfaceCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail.hullMuxInterfaceCardVoltageAbnormal" offset="0"/>
+          <BitMember name="hullTxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail.hullTxCardVoltageAbnormal" offset="1"/>
+        </PackedField>
         <Field name="hmMux5vVoltage" cdm="Health.IBIT.SideScanSonar.hmMux5vVoltage" dataType="Float32"/>
         <Field name="hmMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.hmMux3v3Voltage" dataType="Float32"/>
         <Field name="hmMuxAdcIn1Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn1Temp" dataType="Float32"/>
@@ -335,7 +375,7 @@
       <Reply semantic_id="requestPbitResult">
         <DDSChannel topicName="RUSV::SO::TSA::TSAPBITReportType" typeName="TSAPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="towedSonarAssemblyTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarAssemblyTotalPBIT" dataType="UInt8"/>
+        <Field name="towedSonarAssemblyTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarAssemblyTotalPBIT" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
         <Field name="launchAndRecoveryTotalPBIT" cdm="Health.PBIT.SideScanSonar.launchAndRecoveryTotalPBIT" dataType="UInt8"/>
         <Field name="towedSonarArrayTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarArrayTotalPBIT" dataType="UInt8"/>
         <Field name="sonarSignalProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalPBIT" dataType="UInt8"/>
@@ -361,7 +401,13 @@
       <Reply semantic_id="stopSlideBackStopResult">
         <DDSChannel topicName="RUSV::C2::TSA::LanchAndRecoveryBackStopReportType" typeName="LanchAndRecoveryBackStopReportType"/>
         <Field name="usvHeader"/>
-        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8"/>
+        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Stopped" value="0"/>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Engaged" value="1"/>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Returned" value="2"/>
+          </ValueMap>
+        </Field>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="engageSlideBackStop">
@@ -382,7 +428,13 @@
       <Reply semantic_id="engageSlideBackStopResult">
         <DDSChannel topicName="RUSV::C2::TSA::LanchAndRecoveryBackStopReportType" typeName="LanchAndRecoveryBackStopReportType"/>
         <Field name="usvHeader"/>
-        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8"/>
+        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Stopped" value="0"/>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Engaged" value="1"/>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Returned" value="2"/>
+          </ValueMap>
+        </Field>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="returnSlideBackStop">
@@ -403,7 +455,13 @@
       <Reply semantic_id="returnSlideBackStopResult">
         <DDSChannel topicName="RUSV::C2::TSA::LanchAndRecoveryBackStopReportType" typeName="LanchAndRecoveryBackStopReportType"/>
         <Field name="usvHeader"/>
-        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8"/>
+        <Field name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Stopped" value="0"/>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Engaged" value="1"/>
+            <Map cdm="LaunchRecovery.Slide.BackStop.State.Returned" value="2"/>
+          </ValueMap>
+        </Field>
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="setCommunicationLevel">

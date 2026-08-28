@@ -38,11 +38,11 @@
 - 반면 `DetailSystemStatusType`의 `towedSonarArrayPowerStatus` 등 전원 상태 필드는 원문에 0/1 의미가 직접 명시되어 있지 않다.
 - 제어값과 상태값이 동일할 가능성은 높지만 현재 단계에서는 확정하지 않는다.
 
-### 4. IBIT 상세 bit 해석
+### 4. IBIT 상세 bit 해석 — 부분 해결
 
-- 다수 IBIT detail octet은 비정상 bit flag이다.
-- 그러나 `sonarImagingProcessingEquipmentDetail`은 CSCI에서 보드/조립체 **장착 유무** bit flag로 정의되어 있다.
-- 따라서 모든 IBIT detail bit를 일괄적으로 `0=PASS / 1=FAIL` 또는 `0=정상 / 1=비정상`으로 해석하지 않는다. 필드별 원문 기준으로 후속 분석한다.
+- CSCI가 `오류/비정상 비트플래그`로 직접 정의하고 각 bit 대상까지 명시한 8개 detail octet은 Binding `PackedField/BitMember`와 Semantic BooleanResult로 분해하였다.
+- `sonarImagingProcessingEquipmentDetail`은 보드/조립체 **장착 유무** bit flag이지만 0/1 polarity가 직접 명시되지 않아 Raw로 유지한다.
+- reserved bit와 polarity가 직접 확인되지 않은 항목은 계속 추정하지 않는다.
 
 ### 5. DDS 중첩 구조체 접근 표기
 
@@ -88,7 +88,7 @@
 - 38개 `CommandStatusReportType` ACK는 라우팅/상관관계 필드가 아니라 `commandStatusReport.status`만 Semantic Result로 노출한다. `dstEquipmentType`, `dstEquipmentID`, `commandID`는 Binding/Adapter 메타데이터로 유지한다.
 - `CommandStatusReport.status`의 원문 값(Executing/Pending/Failed/Reject/Canceled)은 확정되어 있으나, 세부 상태 CDM 명칭은 최종 CDM 감사까지 새로 만들지 않는다. 따라서 현재 Semantic은 `Control.Response.Status` 결과 존재만 선언한다.
 - `TSAPBITReportType`, `TSAIBITReportType` 내부 필드는 현재 Binding에 이미 존재하는 CDM을 그대로 Semantic Result에 재사용하며, Total 상태코드 및 IBIT detail bit의 raw 의미는 추가 추론하지 않는다.
-- `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType`도 하나의 결과 Report Reply를 유지하고 실제 payload 필드를 Semantic Result로 노출한다. raw 0/1/2 등의 의미 매핑은 원문 재확인 전까지 보류한다.
+- `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType`도 하나의 결과 Report Reply를 유지한다. `LaunchReportType.launch`와 `LanchAndRecoveryBackStopReportType.slideBackStop`은 원문 raw 의미를 Semantic 논리값 + Binding ValueMap으로 반영했고, 나머지는 원문 직접 근거가 있는 경우에만 매핑한다.
 - commandID가 없는 결과 Report의 요청-결과 correlation 방식은 기존 TBD를 유지한다.
 
 
@@ -101,8 +101,8 @@
 - `LaunchReportType.launch`: 결과 의미 `0=정지상태`, `1=진수완료`, `2=회수완료`로 반영하며, `AutoLaunchControlType.launch` 명령의 `0=정지/1=진수/2=회수`와 구분한다.
 - `StatusConfigType.frequency`: 예인형 SSS(`sonarType=0`)에 대해 100/600 kHz만 원문에 명시된다. 현재 CommonSpecSchema에 제어용 `QuantityValueSetProfile`이 없어 `Profile`을 유지하고 XML 주석으로 제한을 보존한다. 선체부착형 frequency 허용값은 TBD이다.
 - GapFiller는 별도 range 설정이 없고 예인형 SSS range와 동기화된다. 현재 평면 Parameter 모델에서 조건부 적용은 직접 표현하지 않고 후속 스키마/OM 검토로 남긴다.
-- `ReceiveProcessing.TVG.Mode(0~1)`, `ReceiveProcessing.SoftwareGain.Mode(0~2)`, `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 정확한 논리 명칭을 이번 근거에서 확정하지 못해 QuantityProfile을 임시 유지한다.
-- `LanchAndRecoveryBackStopReportType.slideBackStop`, PBIT Total, IBIT Total/detail의 raw 의미는 기존 TBD를 유지한다.
+- `ReceiveProcessing.TVG.Mode`는 CSCI에서 `0=Off(TVG 미사용), 1=On`이 직접 확인되어 이미 Semantic ValueSet/Binding ValueMap으로 반영되어 있다. `ReceiveProcessing.SoftwareGain.Mode(0~2)`와 `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 이번 CSCI에 해당 모드 필드/코드 의미가 없어 QuantityProfile TBD를 유지한다.
+- `LanchAndRecoveryBackStopReportType.slideBackStop`은 CSCI에서 `0=정지상태, 1=슬라이드 후퇴고정완료, 2=복귀완료`가 직접 확인되어 Semantic ValueSetResult/Binding ValueMap으로 반영하였다. PBIT/IBIT은 각 필드 자체에 직접 코드/bit 의미가 명시된 항목만 추가 논리화하고, 근거가 비어 있는 항목은 Raw/TBD를 유지한다.
 - 새 SonarType/Subsystem/MCS/LaunchReport 하위 CDM 경로는 연결용 임시 키이며 최종 USV CDM 감사에서 명칭/계층을 재검토한다.
 
 
@@ -115,4 +115,4 @@
 - PBIT/IBIT은 각각 하나의 결과 Reply + 하나의 GroupResult이며 내부 필드는 각각 6개/62개이다.
 - SensorProduct 5종은 Semantic/Binding `5↔5`: SSS 압축, GapFiller 압축, 병합 압축, ObjectDetection2D, 진회수 카메라 RTP이다. ProductBinding은 스트림 채널/메시지 선택 구조이므로 `ContactTypeList.sonarType` 같은 payload 내부 분류 필드를 별도 Binding Field로 누락된 것으로 보지 않는다.
 - converter는 0건이고 primitive dataType 미지정은 0건이다. `usvHeader`, `destination` composite만 의도적으로 dataType이 없다.
-- 설계를 막는 미해결 항목은 아니지만 원문 재확인이 필요한 핵심 TBD는 전원상태 5개 0/1 의미, TVG/SW Gain/LPF mode 논리명, PBIT/IBIT raw 상세 의미, BackStop 결과값 의미, commandID 없는 Result Report correlation, LastReceivedCommandID 동시성, dotted-path Adapter 규칙이다.
+- 설계를 막는 미해결 항목은 아니지만 원문 재확인이 필요한 핵심 TBD는 전원상태 5개 0/1 의미, SW Gain/LPF mode 논리명, 원문에서 코드/bit 의미가 비어 있는 PBIT/IBIT 항목, commandID 없는 Result Report correlation, LastReceivedCommandID 동시성, dotted-path Adapter 규칙이다.
