@@ -41,42 +41,42 @@
       <Field name="usvHeader"/>
       <Field name="portEngineStatus" cdm="Health.CBIT.portEngineStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
       <Field name="starboardEngineStatus" cdm="Health.CBIT.starboardEngineStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
       <Field name="portWaterjetStatus" cdm="Health.CBIT.portWaterjetStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
       <Field name="starboardWaterjetStatus" cdm="Health.CBIT.starboardWaterjetStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
       <Field name="bowThrustertStatus" cdm="Health.CBIT.bowThrusterStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
     </MonitorBinding>
@@ -85,34 +85,34 @@
       <Field name="usvHeader"/>
       <Field name="pduStatus" cdm="Health.CBIT.pduStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
       <Field name="batteryStatus" cdm="Health.CBIT.batteryStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
       <Field name="portGeneratorStatus" cdm="Health.CBIT.portGeneratorStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
       <Field name="starboardGeneratorStatus" cdm="Health.CBIT.starboardGeneratorStatus" dataType="UInt8">
         <ValueMap>
-          <Map cdm="Health.Status.Normal" value="0"/>
-          <Map cdm="Health.Status.Degraded" value="1"/>
-          <Map cdm="Health.Status.Unavailable" value="2"/>
-          <Map cdm="Health.Status.NoResponse" value="3"/>
+          <Map cdm="Health.Normal" value="0"/>
+          <Map cdm="Health.Degraded" value="1"/>
+          <Map cdm="Health.Unavailable" value="2"/>
+          <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
       <Field name="powerStatus"/>
@@ -120,29 +120,29 @@
         <MonitorBinding semantic_id="accessoriesCbitStatus">
       <DDSChannel topicName="RUSV::SO::SPCE::AccessoriesCBITReportType" typeName="AccessoriesCBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="environmentSensorDeviceStatus" cdm="Health.CBIT.environmentSensorDeviceStatus" dataType="UInt8"/>
-      <Field name="windSensorStatus" cdm="Health.CBIT.windSensorStatus" dataType="UInt8"/>
-      <Field name="fireDetectorStatus" cdm="Health.CBIT.fireDetectorStatus" dataType="UInt8"/>
+      <Field name="environmentSensorDeviceStatus" cdm="Health.CBIT.environmentSensorDeviceStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+      <Field name="windSensorStatus" cdm="Health.CBIT.windSensorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+      <Field name="fireDetectorStatus" cdm="Health.CBIT.fireDetectorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="fireDetected" cdm="Health.CBIT.fireDetected"/>
-      <Field name="leakDetectorStatus" cdm="Health.CBIT.leakDetectorStatus" dataType="UInt8"/>
+      <Field name="leakDetectorStatus" cdm="Health.CBIT.leakDetectorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="leakDetected" cdm="Health.CBIT.leakDetected"/>
-      <Field name="flowMeterStatus" cdm="Health.CBIT.flowMeterStatus" dataType="UInt8"/>
+      <Field name="flowMeterStatus" cdm="Health.CBIT.flowMeterStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="flowAnomalyDetected" cdm="Health.CBIT.flowAnomalyDetected"/>
-      <Field name="stabilizerStatus" cdm="Health.CBIT.stabilizerStatus" dataType="UInt8"/>
-      <Field name="interceptorStatus" cdm="Health.CBIT.interceptorStatus" dataType="UInt8"/>
+      <Field name="stabilizerStatus" cdm="Health.CBIT.stabilizerStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+      <Field name="interceptorStatus" cdm="Health.CBIT.interceptorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
     </MonitorBinding>
         <MonitorBinding semantic_id="subsystemCbitStatus">
       <DDSChannel topicName="RUSV::SO::SPCE::SubsystemCBITReportType" typeName="SubsystemCBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="seaWaterAirConditionerStatus" cdm="Health.CBIT.seaWaterAirConditionerStatus" dataType="UInt8"/>
-      <Field name="towingDeviceStatus" cdm="Health.CBIT.towingDeviceStatus" dataType="UInt8"/>
+      <Field name="seaWaterAirConditionerStatus" cdm="Health.CBIT.seaWaterAirConditionerStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+      <Field name="towingDeviceStatus" cdm="Health.CBIT.towingDeviceStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
     </MonitorBinding>
         <MonitorBinding semantic_id="spceCbitStatus">
       <DDSChannel topicName="RUSV::SO::SPCE::SPCECBITReportType" typeName="SPCECBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="spceStatus" cdm="Health.CBIT.spceStatus" dataType="UInt8"/>
-      <Field name="vcuStatus" cdm="Health.CBIT.vcuStatus" dataType="UInt8"/>
-      <Field name="vcuTmpStatus" cdm="Health.CBIT.vcuTmpStatus" dataType="UInt8"/>
+      <Field name="spceStatus" cdm="Health.CBIT.spceStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+      <Field name="vcuStatus" cdm="Health.CBIT.vcuStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+      <Field name="vcuTmpStatus" cdm="Health.CBIT.vcuTmpStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
     </MonitorBinding>
     <MonitorBinding semantic_id="propulsionStatus">
       <DDSChannel topicName="RUSV::SO::SPCE::PropulsionHeartBeatReportType" typeName="PropulsionHeartBeatReportType"/>
@@ -266,11 +266,11 @@
         <BitMember name="commonPlatformControllerPowerOn" cdm="Platform.Power.commonPlatformControllerPowerOn" offset="0"/>
       </PackedField>
       <Field name="pduTemp" cdm="Platform.Power.PDU.Temperature"/>
-      <Field name="powerSourceStatus" cdm="Platform.Power.Source"/>
-      <Field name="pduSourceStatus" cdm="Platform.Power.PDU.Source"/>
-      <Field name="batteryChargeStatus" cdm="Platform.Power.Battery.ChargeState"/>
-      <Field name="batteryLevel" cdm="Platform.Power.Battery.Level"/>
-      <Field name="batteryFaultStatus" cdm="Platform.Power.Battery.FaultStatus"/>
+      <Field name="powerSourceStatus" cdm="Platform.Power.Source"><ValueMap><Map cdm="Platform.Power.Source.Battery" value="0"/><Map cdm="Platform.Power.Source.PDU" value="1"/></ValueMap></Field>
+      <Field name="pduSourceStatus" cdm="Platform.Power.PDU.Source"><ValueMap><Map cdm="Platform.Power.PDU.Source.Generator" value="0"/><Map cdm="Platform.Power.PDU.Source.Shore" value="1"/></ValueMap></Field>
+      <Field name="batteryChargeStatus" cdm="Platform.Power.Battery.ChargeState"><ValueMap><Map cdm="Platform.Power.Battery.Standby" value="0"/><Map cdm="Platform.Power.Battery.Charging" value="1"/><Map cdm="Platform.Power.Battery.Discharging" value="2"/></ValueMap></Field>
+      <Field name="batteryLevel" cdm="Platform.Power.Battery.Level"><ValueMap><Map cdm="Platform.Power.Battery.Level.0" value="0"/><Map cdm="Platform.Power.Battery.Level.1" value="1"/><Map cdm="Platform.Power.Battery.Level.2" value="2"/><Map cdm="Platform.Power.Battery.Level.3" value="3"/><Map cdm="Platform.Power.Battery.Level.4" value="4"/><Map cdm="Platform.Power.Battery.Level.5" value="5"/></ValueMap></Field>
+      <Field name="batteryFaultStatus" cdm="Platform.Power.Battery.FaultStatus"><ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Warning" value="1"/><Map cdm="Health.Status.Fault" value="2"/><Map cdm="Health.Status.Failure" value="3"/></ValueMap></Field>
       <Field name="inputVS" cdm="Platform.Power.PDU.InputVoltage"/>
       <Field name="inputCS" cdm="Platform.Power.PDU.InputCurrent"/>
       <Field name="batteryAssemblyVS" cdm="Platform.Power.Battery.Voltage"/>

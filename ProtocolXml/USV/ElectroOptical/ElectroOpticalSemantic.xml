@@ -182,6 +182,7 @@
   </MonitorSpecs>
   <ControlSpecs id="control">
         <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
+          <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
@@ -189,6 +190,7 @@
       </Reply>
     </ControlSpec>
         <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
+          <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
@@ -196,6 +198,7 @@
       </Reply>
     </ControlSpec>
         <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
+          <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
@@ -240,6 +243,7 @@
       </Reply>
     </ControlSpec>
         <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
+          <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>

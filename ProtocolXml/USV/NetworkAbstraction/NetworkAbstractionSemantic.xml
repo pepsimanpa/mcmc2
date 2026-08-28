@@ -37,34 +37,34 @@
     <GroupSpec id="networkIntegrationCbitStatus" name="네트워크추상화장치 CBIT 상태" cdm="Health.NetworkAbstraction.CBIT">
       <ValueSetSpec id="overallStatus" name="종합 상태" cdm="Health.NetworkAbstraction.Overall.Status">
         <Values>
-          <Value cdm="Health.Status.Normal" name="Normal"/>
-          <Value cdm="Health.Status.Degraded" name="Degraded"/>
-          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
-          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
+          <Value cdm="Health.Normal" name="Normal"/>
+          <Value cdm="Health.Degraded" name="Degraded"/>
+          <Value cdm="Health.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="mccStatus" name="주제어카드 상태" cdm="Health.NetworkAbstraction.MCC.Status">
         <Values>
-          <Value cdm="Health.Status.Normal" name="Normal"/>
-          <Value cdm="Health.Status.Degraded" name="Degraded"/>
-          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
-          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
+          <Value cdm="Health.Normal" name="Normal"/>
+          <Value cdm="Health.Degraded" name="Degraded"/>
+          <Value cdm="Health.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="ddcStatus" name="DDS회로카드 상태" cdm="Health.NetworkAbstraction.DDC.Status">
         <Values>
-          <Value cdm="Health.Status.Normal" name="Normal"/>
-          <Value cdm="Health.Status.Degraded" name="Degraded"/>
-          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
-          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
+          <Value cdm="Health.Normal" name="Normal"/>
+          <Value cdm="Health.Degraded" name="Degraded"/>
+          <Value cdm="Health.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="nmcStatus" name="상태감시/안티탬퍼링유닛 상태" cdm="Health.NetworkAbstraction.NMC.Status">
         <Values>
-          <Value cdm="Health.Status.Normal" name="Normal"/>
-          <Value cdm="Health.Status.Degraded" name="Degraded"/>
-          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
-          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
+          <Value cdm="Health.Normal" name="Normal"/>
+          <Value cdm="Health.Degraded" name="Degraded"/>
+          <Value cdm="Health.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -935,7 +935,7 @@
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
       <Reply bindRef="requestNetworkIntegrationControlStationPbitResult" cdm="Request.Health.PBIT.Response" required="true">
-      <Results><ValueSetResult name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult></Results>
+      <Results><ValueSetResult name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results>
     </Reply>
     </ControlSpec>
     <ControlSpec id="requestNetworkIntegrationUsvPbit" name="네트워크추상화장치 PBIT 요청(USV)" cdm="Request.Health.PBIT">
@@ -945,7 +945,7 @@
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
       <Reply bindRef="requestNetworkIntegrationUsvPbitResult" cdm="Request.Health.PBIT.Response" required="true">
-      <Results><ValueSetResult name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult></Results>
+      <Results><ValueSetResult name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results>
     </Reply>
     </ControlSpec>
     <ControlSpec id="requestLBandControlStationGroupPbit" name="무선통신장치 PBIT 요청(통제소/중계소)" cdm="Request.Health.PBIT">
@@ -1002,7 +1002,7 @@
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
       <Reply bindRef="requestNetworkIntegrationControlStationIbitResult" cdm="Request.Health.IBIT.Response" required="true">
-      <Results><ValueSetResult name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult></Results>
+      <Results><ValueSetResult name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results>
     </Reply>
     </ControlSpec>
     <ControlSpec id="requestNetworkIntegrationUsvIbit" name="네트워크추상화장치 IBIT 요청(USV)" cdm="Request.Health.IBIT">
@@ -1012,7 +1012,7 @@
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
       <Reply bindRef="requestNetworkIntegrationUsvIbitResult" cdm="Request.Health.IBIT.Response" required="true">
-      <Results><ValueSetResult name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult></Results>
+      <Results><ValueSetResult name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results>
     </Reply>
     </ControlSpec>
     <ControlSpec id="requestLBandControlStationGroupIbit" name="무선통신장치 IBIT 요청(통제소/중계소)" cdm="Request.Health.IBIT">

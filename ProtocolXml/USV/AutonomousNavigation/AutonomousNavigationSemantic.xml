@@ -194,10 +194,10 @@
     <GroupSpec id="anuCbitStatus" name="자율운항제어카드 CBIT 상태" cdm="Health.CBIT.AutonomousNavigation">
       <ValueSetSpec id="operationalStatus" name="자율운항제어카드 작동 상태" cdm="Health.CBIT.AutonomousNavigation.Status">
         <Values>
-          <Value cdm="Health.Status.Normal" name="Normal"/>
-          <Value cdm="Health.Status.Degraded" name="Degraded"/>
-          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
-          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
+          <Value cdm="Health.Normal" name="Normal"/>
+          <Value cdm="Health.Degraded" name="Degraded"/>
+          <Value cdm="Health.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>

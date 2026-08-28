@@ -242,60 +242,60 @@
     <GroupSpec id="subsystemHealthStatus" name="구성품 정상 작동 여부" cdm="CBIT">
       <HealthStatusSetSpec id="towedSonarAssembly" name="예인형수중탐색장치 정상 작동 여부" cdm="CBIT.TowfishAssembly">
         <Values>
-          <Value name="Normal" cdm="OperationalState.Normal"/>
-          <Value name="Degraded" cdm="OperationalState.Degraded"/>
-          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="TowfishAssembly"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="launchAndRecovery" name="진회수장치 정상 작동 여부" cdm="CBIT.LaunchRecoveryAssembly">
         <Values>
-          <Value name="Normal" cdm="OperationalState.Normal"/>
-          <Value name="Degraded" cdm="OperationalState.Degraded"/>
-          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="LaunchRecoveryAssembly"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="towedSonarArray" name="예인형음탐기 정상 작동 여부" cdm="CBIT.TransducerArray">
         <Values>
-          <Value name="Normal" cdm="OperationalState.Normal"/>
-          <Value name="Degraded" cdm="OperationalState.Degraded"/>
-          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="TransducerArray"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="sonarSignalProcessor" name="음탐기신호처리장치 정상 작동 여부" cdm="CBIT.SignalProcessor">
         <Values>
-          <Value name="Normal" cdm="OperationalState.Normal"/>
-          <Value name="Degraded" cdm="OperationalState.Degraded"/>
-          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="SignalProcessor"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="sonarImageProcessor" name="음탐기영상처리장치 정상 작동 여부" cdm="CBIT.ImageProcessor">
         <Values>
-          <Value name="Normal" cdm="OperationalState.Normal"/>
-          <Value name="Degraded" cdm="OperationalState.Degraded"/>
-          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="ImageProcessor"/>
       </HealthStatusSetSpec>
       <HealthStatusSetSpec id="hullMountedSonar" name="선체부착형음탐기 정상 작동 여부" cdm="CBIT.HullMountedSonar">
         <Values>
-          <Value name="Normal" cdm="OperationalState.Normal"/>
-          <Value name="Degraded" cdm="OperationalState.Degraded"/>
-          <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-          <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
         <ComponentDomain cdm="SensorSubsystem"/>
         <ComponentRole cdm="HullMountedSonar"/>

@@ -43,178 +43,178 @@
         <GroupSpec id="propulsionCbitStatus" name="추진계통 CBIT 상태" cdm="Health.CBIT.propulsionCbitStatus">
       <ValueSetSpec id="portEngineStatus" name="좌현 엔진 정상 작동 상태" cdm="Health.CBIT.portEngineStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="starboardEngineStatus" name="우현 엔진 정상 작동 상태" cdm="Health.CBIT.starboardEngineStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="portWaterjetStatus" name="좌현 워터젯 정상 작동 상태" cdm="Health.CBIT.portWaterjetStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="starboardWaterjetStatus" name="우현 워터젯 정상 작동 상태" cdm="Health.CBIT.starboardWaterjetStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="bowThrusterStatus" name="선수추력기 정상 작동 상태" cdm="Health.CBIT.bowThrusterStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
         <GroupSpec id="electricalCbitStatus" name="전기계통 CBIT 상태" cdm="Health.CBIT.electricalCbitStatus">
       <ValueSetSpec id="pduStatus" name="전원분배장치 정상 작동 상태" cdm="Health.CBIT.pduStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="batteryStatus" name="배터리 정상 작동 상태" cdm="Health.CBIT.batteryStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="portGeneratorStatus" name="좌현 발전기 정상 작동 상태" cdm="Health.CBIT.portGeneratorStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="starboardGeneratorStatus" name="우현 발전기 정상 작동 상태" cdm="Health.CBIT.starboardGeneratorStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
         <GroupSpec id="subsystemCbitStatus" name="의장계통 CBIT 상태" cdm="Health.CBIT.subsystemCbitStatus">
       <ValueSetSpec id="seaWaterAirConditionerStatus" name="해수공조장치 정상 작동 상태" cdm="Health.CBIT.seaWaterAirConditionerStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="towingDeviceStatus" name="피예인장치 정상 작동 상태" cdm="Health.CBIT.towingDeviceStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
         <GroupSpec id="spceCbitStatus" name="선체제어장치 CBIT 상태" cdm="Health.CBIT.spceCbitStatus">
       <ValueSetSpec id="spceStatus" name="선체제어장치 정상 작동 상태" cdm="Health.CBIT.spceStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="vcuStatus" name="선체운용카드 정상 작동 상태" cdm="Health.CBIT.vcuStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="vcuTmpStatus" name="환경센서(선체운용이중화)카드 정상 작동 상태" cdm="Health.CBIT.vcuTmpStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
         <GroupSpec id="accessoriesCbitStatus" name="보기계통 CBIT 상태" cdm="Health.CBIT.Accessories">
       <ValueSetSpec id="environmentSensorDeviceStatus" name="환경센서처리기 정상 작동 상태" cdm="Health.CBIT.environmentSensorDeviceStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="windSensorStatus" name="풍향풍속계 정상 작동 상태" cdm="Health.CBIT.windSensorStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="fireDetectorStatus" name="화재감지기 정상 작동 상태" cdm="Health.CBIT.fireDetectorStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="leakDetectorStatus" name="누수감지기 정상 작동 상태" cdm="Health.CBIT.leakDetectorStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="flowMeterStatus" name="유량측정기 정상 작동 상태" cdm="Health.CBIT.flowMeterStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="stabilizerStatus" name="횡동요저감장치 정상 작동 상태" cdm="Health.CBIT.stabilizerStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="interceptorStatus" name="인터셉터 정상 작동 상태" cdm="Health.CBIT.interceptorStatus">
         <Values>
-          <Value name="Normal" cdm="Health.Status.Normal"/>
-          <Value name="Degraded" cdm="Health.Status.Degraded"/>
-          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
-          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Degraded" cdm="Health.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
         </Values>
       </ValueSetSpec>
       <BooleanSpec id="fireDetected" name="화재 감지" cdm="Health.CBIT.fireDetected"/>
@@ -541,17 +541,20 @@
   </MonitorSpecs>
   <ControlSpecs id="control">
         <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
+          <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
+          <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
     </ControlSpec>
     <!--선체제어 PBIT/IBIT은 원 CSCI에서 여러 개의 서로 다른 물리 결과 메시지 타입으로 정의되어 있으므로 각 물리 결과 메시지당 하나의 Reply를 유지한다.-->
         <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
+          <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
@@ -573,6 +576,7 @@
       <Reply bindRef="requestIbitSPCEResult" cdm="Request.Health.IBIT.Response"/>
     </ControlSpec>
         <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
+          <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>

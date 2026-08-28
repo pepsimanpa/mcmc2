@@ -26,16 +26,16 @@
       <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDeviceCBITReportType" typeName="NetworkIntegrationDeviceCBITReportType"/>
       <Field name="usvHeader"/>
       <Field name="networkIntegrationDeviceCBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
-        <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+        <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
       </Field>
       <Field name="networkIntegrationDeviceCBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status" dataType="UInt8">
-        <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+        <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
       </Field>
       <Field name="networkIntegrationDeviceCBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status" dataType="UInt8">
-        <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+        <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
       </Field>
       <Field name="networkIntegrationDeviceCBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status" dataType="UInt8">
-      <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+      <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
     </Field>
     </MonitorBinding>
     <MonitorBinding semantic_id="lBandControlStationCommsStatus">
@@ -549,16 +549,16 @@
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDevicePBITReportType" typeName="NetworkIntegrationDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDevicePBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDevicePBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDevicePBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x01)/USV(0x02) 대상 식별 방법은 TBD.-->
       </Reply>
@@ -580,16 +580,16 @@
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDevicePBITReportType" typeName="NetworkIntegrationDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDevicePBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDevicePBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDevicePBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x01)/USV(0x02) 대상 식별 방법은 TBD.-->
       </Reply>
@@ -611,19 +611,19 @@
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDeviceIBITReportType" typeName="NetworkIntegrationDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDeviceIBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDeviceIBIT.mccDetail1" cdm="Health.NetworkAbstraction.MCC.Detail1.Raw" dataType="UInt8"/>
         <Field name="networkIntegrationDeviceIBIT.mccDetail2" cdm="Health.NetworkAbstraction.MCC.Detail2.Raw" dataType="UInt8"/>
         <Field name="networkIntegrationDeviceIBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDeviceIBIT.ddcDetail" cdm="Health.NetworkAbstraction.DDC.Detail.Raw" dataType="UInt8"/>
         <Field name="networkIntegrationDeviceIBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDeviceIBIT.nmcDetail" cdm="Health.NetworkAbstraction.NMC.Detail.Raw" dataType="UInt8"/>
         <!--NetworkIntegrationDeviceIBIT raw bit 정의: mccDetail1 Bit3=Flash, Bit2=메모리, Bit1=보안칩, Bit0=전원; mccDetail2 Bit6=저궤도위성 포트(J1), Bit5=출입항보조 송수신기 포트(J3), Bit4=고궤도위성 트래픽(J8), Bit3=무선통신 트래픽(J2), Bit2=암호장비 수신(J6), Bit1=암호장비 송신(J6), Bit0=내부 포트; ddcDetail Bit6=메모리, Bit5=Flash, Bit4=고궤도위성 제어/상태(J8), Bit3=무선통신 제어/상태(J2), Bit2=USV 비상망(J4), Bit1=RCS/USV 주망(J4), Bit0=내부 포트; nmcDetail Bit0=MCU. 세부 bit는 정상/Success/Alive/On=0, 비가용/Failure/Down/Off=1의 원문 의미를 유지한다.-->
@@ -647,19 +647,19 @@
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDeviceIBITReportType" typeName="NetworkIntegrationDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDeviceIBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDeviceIBIT.mccDetail1" cdm="Health.NetworkAbstraction.MCC.Detail1.Raw" dataType="UInt8"/>
         <Field name="networkIntegrationDeviceIBIT.mccDetail2" cdm="Health.NetworkAbstraction.MCC.Detail2.Raw" dataType="UInt8"/>
         <Field name="networkIntegrationDeviceIBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDeviceIBIT.ddcDetail" cdm="Health.NetworkAbstraction.DDC.Detail.Raw" dataType="UInt8"/>
         <Field name="networkIntegrationDeviceIBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status" dataType="UInt8">
-          <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.NoResponse" value="3"/></ValueMap>
+          <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <Field name="networkIntegrationDeviceIBIT.nmcDetail" cdm="Health.NetworkAbstraction.NMC.Detail.Raw" dataType="UInt8"/>
         <!--NetworkIntegrationDeviceIBIT raw bit 정의: mccDetail1 Bit3=Flash, Bit2=메모리, Bit1=보안칩, Bit0=전원; mccDetail2 Bit6=저궤도위성 포트(J1), Bit5=출입항보조 송수신기 포트(J3), Bit4=고궤도위성 트래픽(J8), Bit3=무선통신 트래픽(J2), Bit2=암호장비 수신(J6), Bit1=암호장비 송신(J6), Bit0=내부 포트; ddcDetail Bit6=메모리, Bit5=Flash, Bit4=고궤도위성 제어/상태(J8), Bit3=무선통신 제어/상태(J2), Bit2=USV 비상망(J4), Bit1=RCS/USV 주망(J4), Bit0=내부 포트; nmcDetail Bit0=MCU. 세부 bit는 정상/Success/Alive/On=0, 비가용/Failure/Down/Off=1의 원문 의미를 유지한다.-->

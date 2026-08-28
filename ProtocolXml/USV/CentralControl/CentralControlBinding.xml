@@ -101,10 +101,10 @@
             <Field name="usvHeader"/>
             <Field name="operationalStatus" cdm="Health.OperationalStatus" dataType="UInt8">
                 <ValueMap>
-                    <Map cdm="OperationalState.Normal" value="0"/>
-                    <Map cdm="OperationalState.Degraded" value="1"/>
-                    <Map cdm="OperationalState.Unavailable" value="2"/>
-                    <Map cdm="OperationalState.NoResponse" value="3"/>
+                    <Map cdm="Health.Normal" value="0"/>
+                    <Map cdm="Health.Degraded" value="1"/>
+                    <Map cdm="Health.Unavailable" value="2"/>
+                    <Map cdm="Health.NoResponse" value="3"/>
                 </ValueMap>
             </Field>
         </MonitorBinding>
@@ -188,10 +188,10 @@
                 <Field name="usvHeader"/>
                 <Field name="operationalStatus" cdm="Health.OperationalStatus" dataType="UInt8">
                     <ValueMap>
-                        <Map cdm="OperationalState.Normal" value="0"/>
-                        <Map cdm="OperationalState.Degraded" value="1"/>
-                        <Map cdm="OperationalState.Unavailable" value="2"/>
-                        <Map cdm="OperationalState.NoResponse" value="3"/>
+                        <Map cdm="Health.Normal" value="0"/>
+                        <Map cdm="Health.Degraded" value="1"/>
+                        <Map cdm="Health.Unavailable" value="2"/>
+                        <Map cdm="Health.NoResponse" value="3"/>
                     </ValueMap>
                 </Field>
             </Reply>
@@ -222,10 +222,10 @@
                 <!-- 중앙통제 CSV 원문 철자 operationalStaus는 실제 IDL 확인 전까지 보존한다. Semantic 논리명은 operationalStatus를 사용한다. -->
                 <Field name="operationalStaus" cdm="Health.OperationalStatus" dataType="UInt8">
                     <ValueMap>
-                        <Map cdm="OperationalState.Normal" value="0"/>
-                        <Map cdm="OperationalState.Degraded" value="1"/>
-                        <Map cdm="OperationalState.Unavailable" value="2"/>
-                        <Map cdm="OperationalState.NoResponse" value="3"/>
+                        <Map cdm="Health.Normal" value="0"/>
+                        <Map cdm="Health.Degraded" value="1"/>
+                        <Map cdm="Health.Unavailable" value="2"/>
+                        <Map cdm="Health.NoResponse" value="3"/>
                     </ValueMap>
                 </Field>
                 <!-- 공용 ProcessorIBIT(16B): cpuTemperature double 8B + cpuLoad double 8B. -->

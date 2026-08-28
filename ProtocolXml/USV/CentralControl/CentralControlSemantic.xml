@@ -118,10 +118,10 @@
         <GroupSpec id="centralControlHealth" name="중앙통제장치 상태" cdm="Health.CBIT.CentralControl">
             <ValueSetSpec id="operationalStatus" name="중앙통제장치 운용상태" cdm="Health.OperationalStatus">
                 <Values>
-                    <Value name="Normal" cdm="OperationalState.Normal"/>
-                    <Value name="Degraded" cdm="OperationalState.Degraded"/>
-                    <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-                    <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+                    <Value name="Normal" cdm="Health.Normal"/>
+                    <Value name="Degraded" cdm="Health.Degraded"/>
+                    <Value name="Unavailable" cdm="Health.Unavailable"/>
+                    <Value name="NoResponse" cdm="Health.NoResponse"/>
                 </Values>
             </ValueSetSpec>
         </GroupSpec>
@@ -141,6 +141,7 @@
 
     <ControlSpecs id="control">
         <ControlSpec id="startIntegration" name="연동 개시" cdm="Control.Integration.Start">
+          <Target cdm="Platform.Identifier.Numeric"/>
             <Reply cdm="Command.ProcessingStatus.Response" bindRef="startIntegrationCommandStatusReply" required="true">
                 <Results>
                     <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
@@ -149,6 +150,7 @@
         </ControlSpec>
 
         <ControlSpec id="restartSystem" name="중앙통제장치 재시작" cdm="Control.System.Restart">
+          <Target cdm="Platform.Identifier.Numeric"/>
             <Reply cdm="Command.ProcessingStatus.Response" bindRef="restartSystemCommandStatusReply" required="true">
                 <Results>
                     <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
@@ -158,6 +160,7 @@
 
         <!-- PBIT 요청은 원통의 비주기 RCUPBITControlType에 의해 수행된다. 중앙통제 CSCI의 MCEPBITReportType 주기가 1 Hz로 적혀 있으나, 타 장비 PBIT 패턴과 상충하므로 Request/Reply로 해석한다. -->
         <ControlSpec id="requestPbit" name="중앙통제장치 PBIT 요청" cdm="Request.Health.PBIT">
+          <Target cdm="Platform.Identifier.Numeric"/>
             <Reply cdm="Command.ProcessingStatus.Response" bindRef="requestPbitCommandStatusReply" required="true">
                 <Results>
                     <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
@@ -167,10 +170,10 @@
                 <Results>
                     <ValueSetResult name="operationalStatus" cdm="Health.OperationalStatus">
                         <Values>
-                            <Value name="Normal" cdm="OperationalState.Normal"/>
-                            <Value name="Degraded" cdm="OperationalState.Degraded"/>
-                            <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-                            <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+                            <Value name="Normal" cdm="Health.Normal"/>
+                            <Value name="Degraded" cdm="Health.Degraded"/>
+                            <Value name="Unavailable" cdm="Health.Unavailable"/>
+                            <Value name="NoResponse" cdm="Health.NoResponse"/>
                         </Values>
                     </ValueSetResult>
                 </Results>
@@ -178,6 +181,7 @@
         </ControlSpec>
 
         <ControlSpec id="requestIbit" name="중앙통제장치 IBIT 요청" cdm="Request.Health.IBIT">
+          <Target cdm="Platform.Identifier.Numeric"/>
             <Reply cdm="Command.ProcessingStatus.Response" bindRef="requestIbitCommandStatusReply" required="true">
                 <Results>
                     <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
@@ -188,10 +192,10 @@
                     <GroupResult name="mceIbit" cdm="Health.IBIT.CentralControl">
                         <ValueSetResult name="operationalStatus" cdm="Health.OperationalStatus">
                             <Values>
-                                <Value name="Normal" cdm="OperationalState.Normal"/>
-                                <Value name="Degraded" cdm="OperationalState.Degraded"/>
-                                <Value name="Unavailable" cdm="OperationalState.Unavailable"/>
-                                <Value name="NoResponse" cdm="OperationalState.NoResponse"/>
+                                <Value name="Normal" cdm="Health.Normal"/>
+                                <Value name="Degraded" cdm="Health.Degraded"/>
+                                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                                <Value name="NoResponse" cdm="Health.NoResponse"/>
                             </Values>
                         </ValueSetResult>
                         <QuantityResult name="cpuTemperature" cdm="Health.Processor.CPU.Temperature">
