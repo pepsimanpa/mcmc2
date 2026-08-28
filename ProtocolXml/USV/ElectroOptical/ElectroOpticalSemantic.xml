@@ -223,11 +223,44 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <Result name="statusInternalGimbal" cdm="Health.EOIR.IBIT.InternalGimbal.Raw"/>
-            <Result name="statusSensorAssembly1" cdm="Health.EOIR.IBIT.SensorAssembly1.Raw"/>
-            <Result name="statusSensorAssembly2" cdm="Health.EOIR.IBIT.SensorAssembly2.Raw"/>
-            <Result name="statusPowerSwir" cdm="Health.EOIR.IBIT.SWIR.Power"/>
-            <Result name="statusControlSwir" cdm="Health.EOIR.IBIT.SWIR.Control"/>
+            <GroupResult name="statusInternalGimbal" cdm="Health.EOIR.IBIT.InternalGimbal">
+              <Result name="internalAzimuthMotorDrive" cdm="Health.EOIR.IBIT.InternalGimbal.InternalAzimuthMotorDrive.Raw"/>
+              <Result name="internalElevationMotorDrive" cdm="Health.EOIR.IBIT.InternalGimbal.InternalElevationMotorDrive.Raw"/>
+              <Result name="internalAzimuthEncoderCommunication" cdm="Health.EOIR.IBIT.InternalGimbal.InternalAzimuthEncoderCommunication.Raw"/>
+              <Result name="internalElevationEncoderCommunication" cdm="Health.EOIR.IBIT.InternalGimbal.InternalElevationEncoderCommunication.Raw"/>
+            </GroupResult>
+            <GroupResult name="statusSensorAssembly1" cdm="Health.EOIR.IBIT.SensorAssembly1">
+              <Result name="eoCameraPower" cdm="Health.EOIR.IBIT.SensorAssembly1.EOCameraPower.Raw"/>
+              <Result name="eoCameraControl" cdm="Health.EOIR.IBIT.SensorAssembly1.EOCameraControl.Raw"/>
+              <Result name="mwirCameraPower" cdm="Health.EOIR.IBIT.SensorAssembly1.MWIRCameraPower.Raw"/>
+              <Result name="mwirCameraControl" cdm="Health.EOIR.IBIT.SensorAssembly1.MWIRCameraControl.Raw"/>
+              <Result name="illuminatorPower" cdm="Health.EOIR.IBIT.SensorAssembly1.IlluminatorPower.Raw"/>
+              <Result name="illuminatorControl" cdm="Health.EOIR.IBIT.SensorAssembly1.IlluminatorControl.Raw"/>
+              <Result name="lrfPower" cdm="Health.EOIR.IBIT.SensorAssembly1.LRFPower.Raw"/>
+              <Result name="lrfControl" cdm="Health.EOIR.IBIT.SensorAssembly1.LRFControl.Raw"/>
+            </GroupResult>
+            <GroupResult name="statusSensorAssembly2" cdm="Health.EOIR.IBIT.SensorAssembly2">
+              <Result name="imuCommunication" cdm="Health.EOIR.IBIT.SensorAssembly2.IMUCommunication.Raw"/>
+              <Result name="cameraControlBoardControl" cdm="Health.EOIR.IBIT.SensorAssembly2.CameraControlBoardControl.Raw"/>
+              <Result name="imageTrackingBoardControl" cdm="Health.EOIR.IBIT.SensorAssembly2.ImageTrackingBoardControl.Raw"/>
+              <Result name="wiperOperation" cdm="Health.EOIR.IBIT.SensorAssembly2.WiperOperation.Raw"/>
+            </GroupResult>
+            <ValueSetResult name="statusPowerSwir" cdm="Health.EOIR.IBIT.SWIR.Power">
+              <Values>
+                <Value name="Normal" cdm="Health.Normal"/>
+                <Value name="Degraded" cdm="Health.Degraded"/>
+                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                <Value name="NoResponse" cdm="Health.NoResponse"/>
+              </Values>
+            </ValueSetResult>
+            <ValueSetResult name="statusControlSwir" cdm="Health.EOIR.IBIT.SWIR.Control">
+              <Values>
+                <Value name="Normal" cdm="Health.Normal"/>
+                <Value name="Degraded" cdm="Health.Degraded"/>
+                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                <Value name="NoResponse" cdm="Health.NoResponse"/>
+              </Values>
+            </ValueSetResult>
             <ValueSetResult name="statusMainBodyAssembly" cdm="Health.EOIR.IBIT.MainBodyAssembly">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
@@ -236,8 +269,15 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <Result name="statusExternalGimbal" cdm="Health.EOIR.IBIT.ExternalGimbal.Raw"/>
-            <Result name="statusStabilizationControlBoard" cdm="Health.EOIR.IBIT.StabilizationControlBoard.Raw"/>
+            <GroupResult name="statusExternalGimbal" cdm="Health.EOIR.IBIT.ExternalGimbal">
+              <Result name="externalAzimuthMotorDrive" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalAzimuthMotorDrive.Raw"/>
+              <Result name="externalElevationMotorDrive" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalElevationMotorDrive.Raw"/>
+              <Result name="externalAzimuthEncoderCommunication" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalAzimuthEncoderCommunication.Raw"/>
+              <Result name="externalElevationEncoderCommunication" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalElevationEncoderCommunication.Raw"/>
+            </GroupResult>
+            <GroupResult name="statusStabilizationControlBoard" cdm="Health.EOIR.IBIT.StabilizationControlBoard">
+              <Result name="stabilizationControlBoardControl" cdm="Health.EOIR.IBIT.StabilizationControlBoard.Control.Raw"/>
+            </GroupResult>
           </GroupResult>
         </Results>
       </Reply>

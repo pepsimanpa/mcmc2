@@ -20,6 +20,9 @@
 - PBIT/IBIT는 CommandStatus 처리 ACK와 별개의 단일 EOIR Result Reply로 유지하고 내부 결과를 한 Reply 안에 보존하였다.
 - `BuildUSVMessageBase`, `UInt16`, `DivideBy100`, `MultiplyBy2` converter를 선언형 Binding으로 대체하였다.
 - 공통 XSD 경로를 `../../XSD/...`로 정리하였다.
+- 전자광학장치 CSCI 재심층 감사에서 `statusPowerSwir/statusControlSwir`의 4상태 코드를 직접 확인하여 Semantic ValueSetResult + Binding ValueMap으로 반영하였다.
+- IBIT detail 5개 octet은 CSCI에 명시된 bit 위치/점검 대상까지 PackedField/BitMember 및 Semantic GroupResult로 분해하되, 0/1 polarity는 근거가 없어 bit별 Raw로 유지하였다.
+- Boolean WireDataType 추가 전의 오래된 Binding 주석을 현재 공용 XSD 정책에 맞게 정리하였다.
 
 ## 3. Remaining TBD / Resolved
 
@@ -64,11 +67,11 @@
    - 공용 요청에는 commandID가 있으나 EOIR 전용 PBIT/IBIT 결과에는 commandID가 없다.
    - CommandStatus ACK 이후 결과의 런타임 매칭 규칙 확인이 필요하다.
 
-10. **IBIT 내부 raw bitfield 해석**
-   - `statusInternalGimbal`, `statusSensorAssembly1/2`, `statusExternalGimbal`, `statusStabilizationControlBoard`는 원본 bitfield 성격을 유지한다.
-   - 각 bit의 논리 의미가 확정된 원본이 확보되기 전에는 여러 Semantic Reply로 분해하지 않는다.
+10. **IBIT 내부 bit polarity — 부분 해결**
+   - 전자광학장치 CSCI 재심층 감사로 `statusInternalGimbal`, `statusSensorAssembly1/2`, `statusExternalGimbal`, `statusStabilizationControlBoard`의 bit 위치와 각 점검 대상은 직접 확인하였다. 따라서 Binding `PackedField/BitMember`와 Semantic `GroupResult`로 bit별 항목을 분해하였다.
+   - 다만 원문은 각 bit의 `0/1` 중 어느 값이 정상/이상인지 직접 정의하지 않는다. 따라서 `BooleanResult`/ValueMap으로 확대 해석하지 않고 각 bit를 Raw 의미로 유지한다.
 
 ## 4. 현재 상태
 
-- 직접 RCU 연동 범위의 원문 근거가 있는 Semantic/Binding 정합성 보강은 완료하였다.
+- 직접 RCU 연동 범위의 원문 근거가 있는 Semantic/Binding 정합성 보강과 전자광학장치 CSCI 재심층 감사까지 완료하였다.
 - 남은 항목은 사용자가 임의로 정책을 선택할 사항이 아니라 추가 IDL/XSD/ICD/원작자 근거가 필요한 비차단 TBD이다.

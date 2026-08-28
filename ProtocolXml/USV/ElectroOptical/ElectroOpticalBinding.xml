@@ -2,7 +2,7 @@
 <SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonBindingSchema.xsd">
   <!--전자광학장치(EOIR) Binding: 원격통제장치 CSCI ↔ 전자광학장치 CSCI 직접 연동 DDS/RTP 매핑-->
   <!--공용 식별자: SurfaceDetection=0x03 / EOIR=0x05 / subEquipment=0x00. 공용 Control destination은 OM/Adapter의 System.Target.ElectroOptical이 준비한다.-->
-  <!--DDS boolean은 현재 WireDataType에 Boolean이 없어 해당 필드에 임의 UInt8 dataType을 부여하지 않는다. OpenIssues 참조.-->
+  <!--원 CSCI primitive가 실제 boolean인 직접 DDS 필드는 공용 WireDataType Boolean으로 선언한다. Semantic Boolean이라도 원 wire가 octet/bit/sentinel이면 해당 물리 표현을 유지한다.-->
   <Monitors semantic_id="monitor">
         <MonitorBinding semantic_id="trackingStatus">
       <!--target1/target2는 공용 EOIRTrackingBboxType 구조체이며 dotted path로 하위 필드를 매핑한다. SWIR trackingSensor 값은 원본 CSCI에 없음(TBD).-->
@@ -150,7 +150,7 @@
     </ControlBinding>
         <ControlBinding semantic_id="requestIbit">
       <!--전자광학장치는 equipmentType=0x03, equipmentID=0x05만으로 식별되며 별도 세부 장비 ID가 정의되어 있지 않아 dstSubEquipmentID는 미사용값 0x00을 적용한다.-->
-      <!--statusInternalGimbal/statusSensorAssembly1/statusSensorAssembly2/statusExternalGimbal/statusStabilizationControlBoard는 원본 octet bit field를 raw 단위로 유지한다. Range의 0~N(bit)은 값 범위가 아니라 사용 비트 위치이며 BitField XSD 확장은 이번 설계에서 하지 않는다.-->
+      <!--IBIT detail 5개 octet은 CSCI가 bit 위치와 점검 대상을 직접 명시하므로 PackedField/BitMember로 분해한다. 다만 각 bit의 0/1 정상/이상 polarity는 직접 정의되지 않아 bit별 Raw 의미로 유지한다.-->
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.ElectroOptical"/>
@@ -182,11 +182,44 @@
             <Map cdm="Health.NoResponse" value="3"/>
           </ValueMap>
         </Field>
-        <Field name="statusInternalGimbal" cdm="Health.EOIR.IBIT.InternalGimbal.Raw" dataType="UInt8"/>
-        <Field name="statusSensorAssembly1" cdm="Health.EOIR.IBIT.SensorAssembly1.Raw" dataType="UInt8"/>
-        <Field name="statusSensorAssembly2" cdm="Health.EOIR.IBIT.SensorAssembly2.Raw" dataType="UInt8"/>
-        <Field name="statusPowerSwir" cdm="Health.EOIR.IBIT.SWIR.Power" dataType="UInt8"/>
-        <Field name="statusControlSwir" cdm="Health.EOIR.IBIT.SWIR.Control" dataType="UInt8"/>
+        <PackedField name="statusInternalGimbal" width="8" defaultValue="0">
+          <BitMember name="internalAzimuthMotorDrive" cdm="Health.EOIR.IBIT.InternalGimbal.InternalAzimuthMotorDrive.Raw" offset="0"/>
+          <BitMember name="internalElevationMotorDrive" cdm="Health.EOIR.IBIT.InternalGimbal.InternalElevationMotorDrive.Raw" offset="1"/>
+          <BitMember name="internalAzimuthEncoderCommunication" cdm="Health.EOIR.IBIT.InternalGimbal.InternalAzimuthEncoderCommunication.Raw" offset="2"/>
+          <BitMember name="internalElevationEncoderCommunication" cdm="Health.EOIR.IBIT.InternalGimbal.InternalElevationEncoderCommunication.Raw" offset="3"/>
+        </PackedField>
+        <PackedField name="statusSensorAssembly1" width="8" defaultValue="0">
+          <BitMember name="eoCameraPower" cdm="Health.EOIR.IBIT.SensorAssembly1.EOCameraPower.Raw" offset="0"/>
+          <BitMember name="eoCameraControl" cdm="Health.EOIR.IBIT.SensorAssembly1.EOCameraControl.Raw" offset="1"/>
+          <BitMember name="mwirCameraPower" cdm="Health.EOIR.IBIT.SensorAssembly1.MWIRCameraPower.Raw" offset="2"/>
+          <BitMember name="mwirCameraControl" cdm="Health.EOIR.IBIT.SensorAssembly1.MWIRCameraControl.Raw" offset="3"/>
+          <BitMember name="illuminatorPower" cdm="Health.EOIR.IBIT.SensorAssembly1.IlluminatorPower.Raw" offset="4"/>
+          <BitMember name="illuminatorControl" cdm="Health.EOIR.IBIT.SensorAssembly1.IlluminatorControl.Raw" offset="5"/>
+          <BitMember name="lrfPower" cdm="Health.EOIR.IBIT.SensorAssembly1.LRFPower.Raw" offset="6"/>
+          <BitMember name="lrfControl" cdm="Health.EOIR.IBIT.SensorAssembly1.LRFControl.Raw" offset="7"/>
+        </PackedField>
+        <PackedField name="statusSensorAssembly2" width="8" defaultValue="0">
+          <BitMember name="imuCommunication" cdm="Health.EOIR.IBIT.SensorAssembly2.IMUCommunication.Raw" offset="0"/>
+          <BitMember name="cameraControlBoardControl" cdm="Health.EOIR.IBIT.SensorAssembly2.CameraControlBoardControl.Raw" offset="1"/>
+          <BitMember name="imageTrackingBoardControl" cdm="Health.EOIR.IBIT.SensorAssembly2.ImageTrackingBoardControl.Raw" offset="2"/>
+          <BitMember name="wiperOperation" cdm="Health.EOIR.IBIT.SensorAssembly2.WiperOperation.Raw" offset="3"/>
+        </PackedField>
+        <Field name="statusPowerSwir" cdm="Health.EOIR.IBIT.SWIR.Power" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="Health.Normal" value="0"/>
+            <Map cdm="Health.Degraded" value="1"/>
+            <Map cdm="Health.Unavailable" value="2"/>
+            <Map cdm="Health.NoResponse" value="3"/>
+          </ValueMap>
+        </Field>
+        <Field name="statusControlSwir" cdm="Health.EOIR.IBIT.SWIR.Control" dataType="UInt8">
+          <ValueMap>
+            <Map cdm="Health.Normal" value="0"/>
+            <Map cdm="Health.Degraded" value="1"/>
+            <Map cdm="Health.Unavailable" value="2"/>
+            <Map cdm="Health.NoResponse" value="3"/>
+          </ValueMap>
+        </Field>
         <Field name="statusMainBodyAssembly" cdm="Health.EOIR.IBIT.MainBodyAssembly" dataType="UInt8">
           <ValueMap>
             <Map cdm="Health.Normal" value="0"/>
@@ -195,8 +228,15 @@
             <Map cdm="Health.NoResponse" value="3"/>
           </ValueMap>
         </Field>
-        <Field name="statusExternalGimbal" cdm="Health.EOIR.IBIT.ExternalGimbal.Raw" dataType="UInt8"/>
-        <Field name="statusStabilizationControlBoard" cdm="Health.EOIR.IBIT.StabilizationControlBoard.Raw" dataType="UInt8"/>
+        <PackedField name="statusExternalGimbal" width="8" defaultValue="0">
+          <BitMember name="externalAzimuthMotorDrive" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalAzimuthMotorDrive.Raw" offset="0"/>
+          <BitMember name="externalElevationMotorDrive" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalElevationMotorDrive.Raw" offset="1"/>
+          <BitMember name="externalAzimuthEncoderCommunication" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalAzimuthEncoderCommunication.Raw" offset="2"/>
+          <BitMember name="externalElevationEncoderCommunication" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalElevationEncoderCommunication.Raw" offset="3"/>
+        </PackedField>
+        <PackedField name="statusStabilizationControlBoard" width="8" defaultValue="0">
+          <BitMember name="stabilizationControlBoardControl" cdm="Health.EOIR.IBIT.StabilizationControlBoard.Control.Raw" offset="0"/>
+        </PackedField>
       </Reply>
     </ControlBinding>
         <ControlBinding semantic_id="requestPbit">
