@@ -37,7 +37,7 @@ reps = [
     ('이 419건은 XSD 오류가 아니다. 현재 XSD에서 `dataType` 속성 자체는 선택적이다.\n\n다만 프로젝트 설계 규칙상 확인 가능한 primitive type은 선언해야 하므로, **추가 CSCI / IDL 근거 확보 후 보강할 공통 후속항목**으로 관리한다.',
      '현재 14개 USV 장치의 source-confirmed primitive field는 모두 `dataType`이 선언되었다. `usvHeader`, `destination`, `ProcessorIBIT` 등 복합 구조체는 primitive `WireDataType` 대상이 아니므로 예외로 유지한다.'),
     ('### USV-COMMON-04 — 원문 부족 primitive wire dataType\n\n- 총 미지정: 419건\n- Boolean schema gap은 해결되었고, 남은 항목은 CSCI/IDL primitive 근거 미확보 항목\n- 원문 없이 추정하여 채우지 않는다.',
-     '### USV-COMMON-04 — 원문 부족 primitive wire dataType — **RESOLVED (2026-08-28)**\n\n- NavigationRadar 및 NetworkAbstraction의 잔여 type은 장치 CSCI/공용 구조체에서 확인하여 해결하였다.\n- PlatformController 419건은 `선체제어장치 CSCI.csv`를 message/type별로 전수 재감사하여 primitive type을 확정하였다.\n- 최종 primitive `dataType` 미지정: 0건. 복합 구조체에는 primitive type을 강제하지 않는다.')
+     '### USV-COMMON-04 — 원문 부족 primitive wire dataType — **RESOLVED (2026-08-28)**\n\n- NavigationRadar 및 NetworkAbstraction의 잔여 type은 장치 CSCI/공용 구조체에서 확인하여 해결하였다.\n- PlatformController의 기존 미지정 항목은 `선체제어장치 CSCI.csv`를 message/type별로 전수 재감사하여 primitive type을 확정하였다.\n- 최종 primitive `dataType` 미지정: 0건. 복합 구조체에는 primitive type을 강제하지 않는다.')
 ]
 for a, b in reps:
     if a not in d:
