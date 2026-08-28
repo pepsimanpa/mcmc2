@@ -1,0 +1,30 @@
+name: temporary fix final two apply script
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Patch comment-node handling once
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/tmp-final-two-apply.yml')
+          s=p.read_text()
+          s=s.replace("fixed=[x for x in cb if etree.QName(x).localname=='FixedField' and x.get('name','').startswith('destination.')]", "fixed=[x for x in cb if isinstance(x.tag,str) and etree.QName(x).localname=='FixedField' and x.get('name','').startswith('destination.')]")
+          s=s.replace("f={x.get('name'):x for x in rep if etree.QName(x).localname=='Field'}", "f={x.get('name'):x for x in rep if isinstance(x.tag,str) and etree.QName(x).localname=='Field'}")
+          p.write_text(s)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/tmp-final-two-apply.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Fix temporary final USV audit script"
+          git push origin HEAD:feature/usv-semantic-binding-audit
