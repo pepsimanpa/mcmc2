@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
-               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonBindingSchema.xsd">
   <!--근거리접촉물탐지장치 Binding: 근거리접촉물탐지장치 CSCI + 원격통제장치 CSCI 직접 연동 기준.-->
   <!--공용 식별자: SurfaceDetection=0x03, NearContactDetectionDevice=0x04. 세부 ID 0x01/0x02는 SCDE/Lidar 상태보고 구분용으로 유지하고 공통 명령 목적지는 0x03/0x04/0x00으로 설정한다.-->
   <!--ContactReportType/WaveReportType은 센서융합/중앙통제 대상이며, 라이다 정보처리 CSC 전용 RTP는 직접 RCU 연동 범위에서 제외한다.-->
@@ -9,13 +7,13 @@
     <MonitorBinding semantic_id="scdeCbitStatus">
       <DDSChannel topicName="RUSV::SO::SCDE::SCDECBITReportType" typeName="SCDECBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall"/>
+      <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <!--원문 usvHeader 식별: 0x03/0x04/0x01 = 근거리접촉물탐지장치 상태정보.-->
     </MonitorBinding>
     <MonitorBinding semantic_id="lidarCbitStatus">
       <DDSChannel topicName="RUSV::SO::SCDE::LidarCBITReportType" typeName="LidarCBITReportType"/>
       <Field name="usvHeader"/>
-      <Field name="lidarStatus" cdm="Health.NearContactDetection.Lidar.Overall"/>
+      <Field name="lidarStatus" cdm="Health.NearContactDetection.Lidar.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <!--원문 usvHeader 식별: 0x03/0x04/0x02 = 근거리접촉물탐지장치 내부 라이다 상태정보.-->
     </MonitorBinding>
   </Monitors>
@@ -23,117 +21,105 @@
   <Controls semantic_id="control">
     <ControlBinding semantic_id="startIntegration">
       <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x04"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
-      <Reply semantic_id="startIntegrationAck" required="true">
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><Reply semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::SCDE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
 
     <ControlBinding semantic_id="restartSystem">
       <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x04"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
-      <Reply semantic_id="restartSystemAck" required="true">
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><Reply semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::SCDE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
     </ControlBinding>
 
     <ControlBinding semantic_id="requestPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x04"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
-      <Reply semantic_id="requestPbitAck" required="true">
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><Reply semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::SCDE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <Reply semantic_id="requestPbitScdeResult">
         <DDSChannel topicName="RUSV::SO::SCDE::SCDEPBITReportType" typeName="SCDEPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall"/>
+        <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
         <!--PBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하며, SCDE/Lidar PBIT Report는 실제 점검 결과 Reply로 처리한다.-->
       </Reply>
       <Reply semantic_id="requestPbitLidarResult">
         <DDSChannel topicName="RUSV::SO::SCDE::LidarPBITReportType" typeName="LidarPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="lidarStatus" cdm="Health.NearContactDetection.Lidar.Overall"/>
+        <Field name="lidarStatus" cdm="Health.NearContactDetection.Lidar.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       </Reply>
       <!--PBIT 결과 Report에는 commandID가 없으므로 CommandStatusReport 외의 명시적 요청 상관관계를 임의로 추가하지 않는다.-->
     </ControlBinding>
 
     <ControlBinding semantic_id="requestIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x04"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
-      <Reply semantic_id="requestIbitAck" required="true">
+      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
+      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><Reply semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::SCDE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
+        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
+        <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
+        <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
       <Reply semantic_id="requestIbitScdeResult">
         <DDSChannel topicName="RUSV::SO::SCDE::SCDEIBITReportType" typeName="SCDEIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall"/>
-        <Field name="powerManagingModuleStatus" cdm="Health.NearContactDetection.IBIT.PowerManagingModule.Raw"/>
-        <Field name="ecuComputing1ModuleStatus" cdm="Health.NearContactDetection.IBIT.ECUComputing1.Raw"/>
-        <Field name="ecuComputing2ModuleStatus" cdm="Health.NearContactDetection.IBIT.ECUComputing2.Raw"/>
-        <Field name="ecuComputing3ModuleStatus" cdm="Health.NearContactDetection.IBIT.ECUComputing3.Raw"/>
-        <Field name="t1Converter1ModuleStatus" cdm="Health.NearContactDetection.IBIT.T1Converter1.Raw"/>
-        <Field name="t1Converter2ModuleStatus" cdm="Health.NearContactDetection.IBIT.T1Converter2.Raw"/>
-        <Field name="ethernetHubStatus" cdm="Health.NearContactDetection.IBIT.EthernetHub.Raw"/>
-        <Field name="fourDImageRadar1Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar1.Raw"/>
-        <Field name="fourDImageRadar2Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar2.Raw"/>
-        <Field name="fourDImageRadar3Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar3.Raw"/>
-        <Field name="fourDImageRadar4Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar4.Raw"/>
-        <Field name="fourDImageRadar5Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar5.Raw"/>
-        <Field name="fourDImageRadar6Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar6.Raw"/>
-        <Field name="fourDImageRadar7Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar7.Raw"/>
-        <Field name="fourDImageRadar8Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar8.Raw"/>
-        <Field name="fourDImageRadar9Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar9.Raw"/>
-        <Field name="rgbCameraContact1Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact1.Raw"/>
-        <Field name="rgbCameraContact2Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact2.Raw"/>
-        <Field name="rgbCameraContact3Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact3.Raw"/>
-        <Field name="rgbCameraContact4Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact4.Raw"/>
-        <Field name="rgbCameraContact5Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact5.Raw"/>
-        <Field name="rgbCameraContact6Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact6.Raw"/>
-        <Field name="rgbCameraContact7Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact7.Raw"/>
-        <Field name="rgbCameraContact8Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact8.Raw"/>
-        <Field name="rgbCameraContact9Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact9.Raw"/>
-        <Field name="rgbCameraSVM1Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView1.Raw"/>
-        <Field name="rgbCameraSVM2Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView2.Raw"/>
-        <Field name="rgbCameraSVM3Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView3.Raw"/>
-        <Field name="rgbCameraSVM4Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView4.Raw"/>
-        <Field name="rgbCameraSVM5Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView5.Raw"/>
-        <Field name="rgbCameraSVM6Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView6.Raw"/>
+        <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+        <PackedField name="powerManagingModuleStatus" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.PowerManagingModule.PowerNormal" offset="0" width="1"/></PackedField>
+        <PackedField name="ecuComputing1ModuleStatus" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.ecuComputing1.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.ecuComputing1.OperationNormal" offset="1" width="1"/></PackedField>
+        <PackedField name="ecuComputing2ModuleStatus" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.ecuComputing2.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.ecuComputing2.OperationNormal" offset="1" width="1"/></PackedField>
+        <PackedField name="ecuComputing3ModuleStatus" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.ecuComputing3.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.ecuComputing3.OperationNormal" offset="1" width="1"/></PackedField>
+        <PackedField name="t1Converter1ModuleStatus" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.t1Converter1.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.t1Converter1.OperationNormal" offset="1" width="1"/></PackedField>
+        <PackedField name="t1Converter2ModuleStatus" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.t1Converter2.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.t1Converter2.OperationNormal" offset="1" width="1"/></PackedField>
+        <PackedField name="ethernetHubStatus" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.ethernetHub.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.ethernetHub.OperationNormal" offset="1" width="1"/></PackedField>
+        <PackedField name="fourDImageRadar1Status" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.FourDImageRadar1.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.FourDImageRadar1.OperationNormal" offset="1" width="1"/></PackedField>
+        <Field name="fourDImageRadar2Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar2.Raw" dataType="UInt8"/>
+        <Field name="fourDImageRadar3Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar3.Raw" dataType="UInt8"/>
+        <Field name="fourDImageRadar4Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar4.Raw" dataType="UInt8"/>
+        <Field name="fourDImageRadar5Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar5.Raw" dataType="UInt8"/>
+        <Field name="fourDImageRadar6Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar6.Raw" dataType="UInt8"/>
+        <Field name="fourDImageRadar7Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar7.Raw" dataType="UInt8"/>
+        <Field name="fourDImageRadar8Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar8.Raw" dataType="UInt8"/>
+        <Field name="fourDImageRadar9Status" cdm="Health.NearContactDetection.IBIT.FourDImageRadar9.Raw" dataType="UInt8"/>
+        <PackedField name="rgbCameraContact1Status" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact1.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact1.OperationNormal" offset="1" width="1"/></PackedField>
+        <Field name="rgbCameraContact2Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact2.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraContact3Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact3.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraContact4Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact4.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraContact5Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact5.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraContact6Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact6.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraContact7Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact7.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraContact8Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact8.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraContact9Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.Contact9.Raw" dataType="UInt8"/>
+        <PackedField name="rgbCameraSVM1Status" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView1.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView1.OperationNormal" offset="1" width="1"/></PackedField>
+        <Field name="rgbCameraSVM2Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView2.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraSVM3Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView3.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraSVM4Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView4.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraSVM5Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView5.Raw" dataType="UInt8"/>
+        <Field name="rgbCameraSVM6Status" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView6.Raw" dataType="UInt8"/>
         <!--SCDE IBIT의 장치별 상세 octet은 원문 bit-packed 값을 raw로 유지하며 임의의 bit extractor를 적용하지 않는다.-->
         <!--powerManagingModuleStatus: Bit0=보드장비 전원 상태, Bit1~7 reserved.-->
         <!--ecuComputing1~3ModuleStatus, t1Converter1~2ModuleStatus, ethernetHubStatus: Bit1=동작 상태, Bit0=전원 상태, Bit2~7 reserved.-->
@@ -145,16 +131,16 @@
       <Reply semantic_id="requestIbitLidarResult">
         <DDSChannel topicName="RUSV::SO::SCDE::LidarIBITReportType" typeName="LidarIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="lidar1Status" cdm="Health.NearContactDetection.Lidar1.Overall"/>
-        <Field name="lidar1Category" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.Raw"/>
-        <Field name="lidar1Level" cdm="Health.NearContactDetection.Lidar1.IBIT.Level.Raw"/>
-        <Field name="lidar1SensorAction" cdm="Health.NearContactDetection.Lidar1.IBIT.SensorAction.Raw"/>
-        <Field name="lidar1ID" cdm="Health.NearContactDetection.Lidar1.IBIT.MappingID"/>
-        <Field name="lidar2Status" cdm="Health.NearContactDetection.Lidar2.Overall"/>
-        <Field name="lidar2Category" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.Raw"/>
-        <Field name="lidar2Level" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Raw"/>
-        <Field name="lidar2SensorAction" cdm="Health.NearContactDetection.Lidar2.IBIT.SensorAction.Raw"/>
-        <Field name="lidar2ID" cdm="Health.NearContactDetection.Lidar2.IBIT.MappingID"/>
+        <Field name="lidar1Status" cdm="Health.NearContactDetection.Lidar1.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+        <PackedField name="lidar1Category" width="16" defaultValue="0"><BitMember name="OverTemperature" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.OverTemperature" offset="0" width="1"/><BitMember name="UnderTemperature" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.UnderTemperature" offset="1" width="1"/><BitMember name="InternalCommunication" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.InternalCommunication" offset="2" width="1"/><BitMember name="ShotLimiting" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.ShotLimiting" offset="3" width="1"/><BitMember name="InternalFirmware" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.InternalFirmware" offset="4" width="1"/><BitMember name="EthernetLinkBad" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.EthernetLinkBad" offset="5" width="1"/><BitMember name="UDPTransmission" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.UDPTransmission" offset="6" width="1"/><BitMember name="Startup" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.Startup" offset="7" width="1"/><BitMember name="InputVoltage" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.InputVoltage" offset="8" width="1"/><BitMember name="UDPConnect" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.UDPConnect" offset="9" width="1"/><BitMember name="InternalFault" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.InternalFault" offset="10" width="1"/><BitMember name="WarmupIssue" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.WarmupIssue" offset="11" width="1"/><BitMember name="MotorControl" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.MotorControl" offset="12" width="1"/><BitMember name="Config" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.Config" offset="13" width="1"/><BitMember name="IOConnection" cdm="Health.NearContactDetection.Lidar1.IBIT.Category.IOConnection" offset="14" width="1"/></PackedField>
+        <PackedField name="lidar1Level" width="8" defaultValue="0"><BitMember name="Normal" cdm="Health.NearContactDetection.Lidar1.IBIT.Level.Normal" offset="0" width="1"/><BitMember name="Notice" cdm="Health.NearContactDetection.Lidar1.IBIT.Level.Notice" offset="1" width="1"/><BitMember name="Warning" cdm="Health.NearContactDetection.Lidar1.IBIT.Level.Warning" offset="2" width="1"/><BitMember name="Error" cdm="Health.NearContactDetection.Lidar1.IBIT.Level.Error" offset="3" width="1"/></PackedField>
+        <PackedField name="lidar1SensorAction" width="8" defaultValue="0"><BitMember name="NoAction" cdm="Health.NearContactDetection.Lidar1.IBIT.SensorAction.NoAction" offset="0" width="1"/><BitMember name="Shutdown" cdm="Health.NearContactDetection.Lidar1.IBIT.SensorAction.Shutdown" offset="1" width="1"/><BitMember name="Restart" cdm="Health.NearContactDetection.Lidar1.IBIT.SensorAction.Restart" offset="2" width="1"/></PackedField>
+        <Field name="lidar1ID" cdm="Health.NearContactDetection.Lidar1.IBIT.MappingID" dataType="UInt32"/>
+        <Field name="lidar2Status" cdm="Health.NearContactDetection.Lidar2.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+        <PackedField name="lidar2Category" width="16" defaultValue="0"><BitMember name="OverTemperature" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.OverTemperature" offset="0" width="1"/><BitMember name="UnderTemperature" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.UnderTemperature" offset="1" width="1"/><BitMember name="InternalCommunication" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.InternalCommunication" offset="2" width="1"/><BitMember name="ShotLimiting" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.ShotLimiting" offset="3" width="1"/><BitMember name="InternalFirmware" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.InternalFirmware" offset="4" width="1"/><BitMember name="EthernetLinkBad" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.EthernetLinkBad" offset="5" width="1"/><BitMember name="UDPTransmission" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.UDPTransmission" offset="6" width="1"/><BitMember name="Startup" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.Startup" offset="7" width="1"/><BitMember name="InputVoltage" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.InputVoltage" offset="8" width="1"/><BitMember name="UDPConnect" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.UDPConnect" offset="9" width="1"/><BitMember name="InternalFault" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.InternalFault" offset="10" width="1"/><BitMember name="WarmupIssue" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.WarmupIssue" offset="11" width="1"/><BitMember name="MotorControl" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.MotorControl" offset="12" width="1"/><BitMember name="Config" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.Config" offset="13" width="1"/><BitMember name="IOConnection" cdm="Health.NearContactDetection.Lidar2.IBIT.Category.IOConnection" offset="14" width="1"/></PackedField>
+        <PackedField name="lidar2Level" width="8" defaultValue="0"><BitMember name="Normal" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Normal" offset="0" width="1"/><BitMember name="Notice" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Notice" offset="1" width="1"/><BitMember name="Warning" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Warning" offset="2" width="1"/><BitMember name="Error" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Error" offset="3" width="1"/></PackedField>
+        <PackedField name="lidar2SensorAction" width="8" defaultValue="0"><BitMember name="NoAction" cdm="Health.NearContactDetection.Lidar2.IBIT.SensorAction.NoAction" offset="0" width="1"/><BitMember name="Shutdown" cdm="Health.NearContactDetection.Lidar2.IBIT.SensorAction.Shutdown" offset="1" width="1"/><BitMember name="Restart" cdm="Health.NearContactDetection.Lidar2.IBIT.SensorAction.Restart" offset="2" width="1"/></PackedField>
+        <Field name="lidar2ID" cdm="Health.NearContactDetection.Lidar2.IBIT.MappingID" dataType="UInt32"/>
         <!--라이다 IBIT의 category/level/sensorAction은 원문 bit-packed 값을 raw로 유지한다.-->
         <!--lidar#Category: Bit14 IO_CONNECTION, 13 CONFIG, 12 MOTOR_CONTROL, 11 WARMUP_ISSUE, 10 INTERNAL_FAULT, 9 UDP_CONNECT, 8 INPUT_VOLTAGE, 7 STARTUP, 6 UDP_TRANSMISSION, 5 ETHERNET_LINK_BAD, 4 INTERNAL_FW, 3 SHOT_LIMITING, 2 INTERNAL_COMM, 1 UNDERTEMP, 0 OVERTEMP; Bit15 reserved.-->
         <!--lidar#Level: Bit3 Error, Bit2 Warning, Bit1 Notice, Bit0 Normal; Bit4~7 reserved.-->
