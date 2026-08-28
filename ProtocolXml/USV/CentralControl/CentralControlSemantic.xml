@@ -140,7 +140,7 @@
     </MonitorSpecs>
 
     <ControlSpecs id="control">
-        <ControlSpec id="startIntegration" name="연동 개시" cdm="Control.Equipment.Integration.Start">
+        <ControlSpec id="startIntegration" name="연동 개시" cdm="Control.Integration.Start">
             <Reply cdm="Command.ProcessingStatus.Response" bindRef="startIntegrationCommandStatusReply" required="true">
                 <Results>
                     <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
@@ -148,7 +148,7 @@
             </Reply>
         </ControlSpec>
 
-        <ControlSpec id="restartSystem" name="중앙통제장치 재시작" cdm="Control.Equipment.Restart">
+        <ControlSpec id="restartSystem" name="중앙통제장치 재시작" cdm="Control.System.Restart">
             <Reply cdm="Command.ProcessingStatus.Response" bindRef="restartSystemCommandStatusReply" required="true">
                 <Results>
                     <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>

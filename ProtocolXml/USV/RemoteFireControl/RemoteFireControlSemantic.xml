@@ -117,33 +117,33 @@
     <BooleanSpec id="firingAlarm" name="150발 지속사격 경고" cdm="Weapon.RCWS.FireWarning.Active"/>
   </MonitorSpecs>
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="원격사격통제장치 연동 개시" cdm="Control.RCWS.Integration.Start">
+    <ControlSpec id="startIntegration" name="원격사격통제장치 연동 개시" cdm="Control.Integration.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
     </Reply>
     </ControlSpec>
-    <ControlSpec id="restartSystem" name="원격사격통제장치 시스템 재시작" cdm="Control.RCWS.System.Restart">
+    <ControlSpec id="restartSystem" name="원격사격통제장치 시스템 재시작" cdm="Control.System.Restart">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
     </Reply>
     </ControlSpec>
-    <ControlSpec id="requestPbit" name="원격사격통제장치 PBIT 요청" cdm="Request.Health.PBIT.RCWS">
+    <ControlSpec id="requestPbit" name="원격사격통제장치 PBIT 요청" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response.RCWS" required="true">
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
       <Results><ValueSetResult name="remoteControlledWeaponSystemPBIT" cdm="Health.RCWS.Overall"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="surveillanceAndStrikePBIT" cdm="Health.RCWS.SurveillanceAndStrike"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="drivingPBIT" cdm="Health.RCWS.Driving"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="surveillancePBIT" cdm="Health.RCWS.Surveillance"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="strikePBIT" cdm="Health.RCWS.Strike"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="controlPBIT" cdm="Health.RCWS.Control"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results>
     </Reply>
     </ControlSpec>
-    <ControlSpec id="requestIbit" name="원격사격통제장치 IBIT 요청" cdm="Request.Health.IBIT.RCWS">
+    <ControlSpec id="requestIbit" name="원격사격통제장치 IBIT 요청" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response.RCWS" required="true">
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
       <Results><ValueSetResult name="remoteControlledWeaponSystemIBIT" cdm="Health.RCWS.Overall"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="surveillanceAndStrikeIBIT" cdm="Health.RCWS.SurveillanceAndStrike"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="drivingIBIT" cdm="Health.RCWS.Driving"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="surveillanceIBIT" cdm="Health.RCWS.Surveillance"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="strikeIBIT" cdm="Health.RCWS.Strike"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><ValueSetResult name="controlIBIT" cdm="Health.RCWS.Control"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results>
     </Reply>
     </ControlSpec>
@@ -162,7 +162,7 @@
         <ValueSetProfile cdm="Control.RCWS.Driving.AutoOrientationAction"><Values><Value name="Initial" cdm="Control.RCWS.Driving.AutoOrientationAction.Initial"/><Value name="AutoAim" cdm="Control.RCWS.Driving.AutoOrientationAction.AutoAim"/><Value name="SaveCurrentAngle" cdm="Control.RCWS.Driving.AutoOrientationAction.SaveCurrentAngle"/></Values></ValueSetProfile>
       </Parameters>
       <!--autoOrientationAction 물리값: 0=초기상태, 1=자동지향, 2=현재 포탑 선회/고저각 저장. protectedMode는 1 발생 후 0으로 초기화되는 이벤트이다.-->
-      <Reply bindRef="configureDrivingAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="configureDrivingAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
     </Reply>
     </ControlSpec>
@@ -174,7 +174,7 @@
         <BooleanProfile cdm="Control.RCWS.Camera.ZoomOutEvent"/>
       </Parameters>
       <!--cameraType 물리값: 0=주간, 1=야간(광각), 2=야간(협각). zoomIn/zoomOut은 1 발생 후 0으로 초기화되는 이벤트이다.-->
-      <Reply bindRef="configureCameraAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="configureCameraAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
     </Reply>
     </ControlSpec>
@@ -191,7 +191,7 @@
         <BooleanProfile cdm="Control.RCWS.Contact.DistanceMeasureEvent"/>
       </Parameters>
       <!--접촉물/수동선보상/조준점/거리측정 항목은 원문상 이벤트 입력이며 1 또는 방향값 발생 후 0으로 초기화된다. 좌우조정: 0=초기,1=오른쪽,2=왼쪽; 상하조정: 0=초기,1=위,2=아래.-->
-      <Reply bindRef="configureContactAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="configureContactAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
     </Reply>
     </ControlSpec>
@@ -202,7 +202,7 @@
         <ValueSetProfile cdm="Control.RCWS.Weapon.TriggerMode"><Values><Value name="FullAuto" cdm="Weapon.RCWS.TriggerMode.FullAuto"/><Value name="Single" cdm="Weapon.RCWS.TriggerMode.Single"/><Value name="ThreeRoundBurst" cdm="Weapon.RCWS.TriggerMode.ThreeRoundBurst"/><Value name="FiveRoundBurst" cdm="Weapon.RCWS.TriggerMode.FiveRoundBurst"/><Value name="TenRoundBurst" cdm="Weapon.RCWS.TriggerMode.TenRoundBurst"/></Values></ValueSetProfile>
       </Parameters>
       <!--TriggerMode 물리값: 0=연발, 1=1점사, 2=3점사, 3=5점사, 4=10점사. backStop은 이벤트이다.-->
-      <Reply bindRef="configureWeaponAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="configureWeaponAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
     </Reply>
     </ControlSpec>
@@ -226,7 +226,7 @@
         <BooleanProfile cdm="Control.RCWS.ControlPanel.EmergencyStop"/>
       </Parameters>
       <!--height/turn은 조이스틱 원시 입력값 0~65535로 유지한다. 원문 비고에는 조이스틱 가동범위 -20도~+20도가 기재되어 있으나 물리값↔각도 변환관계는 미정의(TBD). firingMode 원문 Range 0~3 중 의미는 0=안전,1=사격만 정의되어 있다.-->
-      <Reply bindRef="configureControlPanelAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="configureControlPanelAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
     </Reply>
     </ControlSpec>
@@ -235,7 +235,7 @@
       <Parameters>
         <BooleanProfile cdm="Control.RCWS.Fire.Enabled"/>
       </Parameters>
-      <Reply bindRef="fireWeaponAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="fireWeaponAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
     </Reply>
     </ControlSpec>
@@ -247,7 +247,7 @@
           <Resolution>1</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="aimNavigationRadarAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="aimNavigationRadarAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
       <Reply bindRef="aimNavigationRadarResult" cdm="Control.RCWS.Aim.NavigationRadar.Response" required="true">
@@ -257,7 +257,7 @@
     </ControlSpec>
     <ControlSpec id="aimEoir" name="RCWS 전자광학장치 지향" cdm="Control.RCWS.Aim.EOIR">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="aimEoirAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="aimEoirAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
       <Reply bindRef="aimEoirResult" cdm="Control.RCWS.Aim.EOIR.Response" required="true">
@@ -267,7 +267,7 @@
     </ControlSpec>
     <ControlSpec id="measureDistance" name="RCWS 거리 측정" cdm="Control.RCWS.DistanceMeasure">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="measureDistanceAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="measureDistanceAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
       <Reply bindRef="measureDistanceResult" cdm="Control.RCWS.DistanceMeasure.Response" required="true">
@@ -529,7 +529,7 @@
       </Parameters>
       <!--displayIRW/displayIRT/patrolMode/calTrajectory의 Semantic enabled=true는 물리 MenuConfig 송신값 0(켬), false는 1(끔)로 반전한다. MenuStatus 수신값은 0=비활성화,1=활성화이므로 반전하지 않는다.-->
       <!--stabilization은 1 발생 후 0으로 초기화되는 토글 이벤트. zeroingMode/overlayLOS는 유지형 상태. initZeroing 물리값은 0=초기상태, 1=영점 초기화이며 1 이후 0으로 자동 초기화되는지 여부는 원문에 정의되어 있지 않다. systemAction 물리값: 0=None, 1=Shutdown, 2=Reboot이며 2는 공용 restartSystem과 기능상 중복된다.-->
-      <Reply bindRef="configureMenuAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="configureMenuAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
       </Reply>
       <Reply bindRef="configureMenuResult" cdm="Control.RCWS.Menu.Response" required="true">

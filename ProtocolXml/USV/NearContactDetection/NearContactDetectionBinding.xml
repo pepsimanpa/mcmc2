@@ -59,13 +59,13 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestPbitScdeResult">
+      <Reply semantic_id="requestPbitScdeResult" required="true">
         <DDSChannel topicName="RUSV::SO::SCDE::SCDEPBITReportType" typeName="SCDEPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
         <!--PBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하며, SCDE/Lidar PBIT Report는 실제 점검 결과 Reply로 처리한다.-->
       </Reply>
-      <Reply semantic_id="requestPbitLidarResult">
+      <Reply semantic_id="requestPbitLidarResult" required="true">
         <DDSChannel topicName="RUSV::SO::SCDE::LidarPBITReportType" typeName="LidarPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="lidarStatus" cdm="Health.NearContactDetection.Lidar.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
@@ -85,7 +85,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestIbitScdeResult">
+      <Reply semantic_id="requestIbitScdeResult" required="true">
         <DDSChannel topicName="RUSV::SO::SCDE::SCDEIBITReportType" typeName="SCDEIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
@@ -128,7 +128,7 @@
         <!--rgbCameraSVM1Status: Bit1=동작 상태, Bit0=전원 상태, Bit2~7 reserved. 2~6번은 원문에 개별 비트 설명이 없어 동일 구조를 임의 확정하지 않는다.-->
         <!--IBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하며, SCDE/Lidar IBIT Report는 실제 점검 결과 Reply로 처리한다.-->
       </Reply>
-      <Reply semantic_id="requestIbitLidarResult">
+      <Reply semantic_id="requestIbitLidarResult" required="true">
         <DDSChannel topicName="RUSV::SO::SCDE::LidarIBITReportType" typeName="LidarIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="lidar1Status" cdm="Health.NearContactDetection.Lidar1.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>

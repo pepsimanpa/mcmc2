@@ -156,12 +156,12 @@
   </MonitorSpecs>
 
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="복합항법장치 연동 개시" cdm="Control.Navigation.Integration.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="restartSystem" name="복합항법장치 시스템 재시작" cdm="Control.Navigation.System.Restart"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="requestPbit" name="복합항법장치 PBIT 요청" cdm="Control.Navigation.PBIT.Request">
+    <ControlSpec id="startIntegration" name="복합항법장치 연동 개시" cdm="Control.Integration.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
+    <ControlSpec id="restartSystem" name="복합항법장치 시스템 재시작" cdm="Control.System.Restart"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
+    <ControlSpec id="requestPbit" name="복합항법장치 PBIT 요청" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
-      <Reply bindRef="requestPbitResult" cdm="Control.Navigation.PBIT.Result" required="true"><Results><GroupResult name="cnePbit" cdm="Health.CNE.PBIT">
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true"><Results><GroupResult name="cnePbit" cdm="Health.CNE.PBIT">
           <ValueSetResult name="sys.systemError" cdm="Health.CNE.PBIT.sys.systemError">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
@@ -278,10 +278,10 @@
           </ValueSetResult>
       </GroupResult></Results></Reply>
     </ControlSpec>
-    <ControlSpec id="requestIbit" name="복합항법장치 IBIT 요청" cdm="Control.Navigation.IBIT.Request">
+    <ControlSpec id="requestIbit" name="복합항법장치 IBIT 요청" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
-      <Reply bindRef="requestIbitResult" cdm="Control.Navigation.IBIT.Result" required="true"><Results><GroupResult name="cneIbit" cdm="Health.CNE.IBIT">
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true"><Results><GroupResult name="cneIbit" cdm="Health.CNE.IBIT">
         <ValueSetResult name="sys.systemError" cdm="Health.CNE.IBIT.sys.systemError"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
         <ValueSetResult name="sys.clockConfig" cdm="Health.CNE.IBIT.sys.clockConfig"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
         <ValueSetResult name="sys.powerConfig" cdm="Health.CNE.IBIT.sys.powerConfig"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>

@@ -258,23 +258,23 @@
     </CollectionSpec>
   </MonitorSpecs>
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="연동 개시" cdm="Control.Autonomy.Integration.Start">
+    <ControlSpec id="startIntegration" name="연동 개시" cdm="Control.Integration.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Control.Autonomy.Integration.Start.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
     </ControlSpec>
-    <ControlSpec id="restartSystem" name="자율운항장치 시스템 재시작" cdm="Control.Autonomy.System.Restart">
+    <ControlSpec id="restartSystem" name="자율운항장치 시스템 재시작" cdm="Control.System.Restart">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Control.Autonomy.System.Restart.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
     </ControlSpec>
-    <ControlSpec id="requestPbit" name="자율운항장치 PBIT 요청" cdm="Control.Autonomy.PBIT.Request">
+    <ControlSpec id="requestPbit" name="자율운항장치 PBIT 요청" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Control.Autonomy.PBIT.Request.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
-      <Reply bindRef="requestPbitResult" cdm="Control.Autonomy.PBIT.Result" required="true"><Results><ValueSetResult name="operationalStatus" cdm="Health.PBIT.AutonomousNavigation.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results></Reply>
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true"><Results><ValueSetResult name="operationalStatus" cdm="Health.PBIT.AutonomousNavigation.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results></Reply>
     </ControlSpec>
-    <ControlSpec id="requestIbit" name="자율운항장치 IBIT 요청" cdm="Control.Autonomy.IBIT.Request">
+    <ControlSpec id="requestIbit" name="자율운항장치 IBIT 요청" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Control.Autonomy.IBIT.Request.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
-      <Reply bindRef="requestIbitResult" cdm="Control.Autonomy.IBIT.Result" required="true"><Results><GroupResult name="anuIbit" cdm="Health.IBIT.AutonomousNavigation"><ValueSetResult name="operationalIBITStatus" cdm="Health.IBIT.AutonomousNavigation.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><QuantityResult name="cpuTemperature" cdm="Health.IBIT.CPU.Temperature"><Unit>degC</Unit><Range min="20" max="100"/></QuantityResult><QuantityResult name="cpuLoad" cdm="Health.IBIT.CPU.Load"><Unit>%</Unit><Range min="0" max="100"/></QuantityResult></GroupResult></Results></Reply>
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true"><Results><GroupResult name="anuIbit" cdm="Health.IBIT.AutonomousNavigation"><ValueSetResult name="operationalIBITStatus" cdm="Health.IBIT.AutonomousNavigation.Status"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><QuantityResult name="cpuTemperature" cdm="Health.IBIT.CPU.Temperature"><Unit>degC</Unit><Range min="20" max="100"/></QuantityResult><QuantityResult name="cpuLoad" cdm="Health.IBIT.CPU.Load"><Unit>%</Unit><Range min="0" max="100"/></QuantityResult></GroupResult></Results></Reply>
     </ControlSpec>
     <ControlSpec id="recordWaypointMission" name="경로점 레코드 설정" cdm="Control.Autonomy.Mission.Record.Waypoint">
       <Target cdm="Platform.Identifier.Numeric"/>
@@ -306,7 +306,7 @@
         </QuantityProfile>
       </Parameters>
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 0을 Binding에서 설정한다.-->
-      <Reply bindRef="recordWaypointMissionAck" cdm="Control.Autonomy.Mission.Record.Waypoint.CommandStatus" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="recordWaypointMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="recordWaypointMissionRecordAck" cdm="Control.Autonomy.Mission.Record.Waypoint.RecordEcho" required="true"><Results><GroupResult name="recordEcho" cdm="Control.Autonomy.Mission.Record.Waypoint.RecordEcho"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="recordGlobalHoverMission" name="목표해점위치고정 레코드 설정" cdm="Control.Autonomy.Mission.Record.GlobalHover">
@@ -338,7 +338,7 @@
       </Parameters>
       <!--GlobalHoverRecordCommand.endTime은 원문상 절대시각/지속시간 의미가 혼재되어 raw unsigned long long 의미로 유지한다. heading Unit도 원문 미기재.-->
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 1을 Binding에서 설정한다.-->
-      <Reply bindRef="recordGlobalHoverMissionAck" cdm="Control.Autonomy.Mission.Record.GlobalHover.CommandStatus" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="recordGlobalHoverMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="recordGlobalHoverMissionRecordAck" cdm="Control.Autonomy.Mission.Record.GlobalHover.RecordEcho" required="true"><Results><GroupResult name="recordEcho" cdm="Control.Autonomy.Mission.Record.GlobalHover.RecordEcho"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="recordTargetTrackingMission" name="표적추종 레코드 설정" cdm="Control.Autonomy.Mission.Record.TargetTracking">
@@ -375,7 +375,7 @@
       <!--targetTrackingID 원문 Range 0xX.Y.0001~0xX.Y.FFFE와 0/65535 Not available 설명을 그대로 따른다. X.Y의 의미는 임의 해석하지 않는다.-->
       <!--rangeToTarget의 Range는 원문대로 0~2000 m. 0=충돌회피만 수행, 50~2000=이격거리 유지이며 1~49의 의미는 원문에 정의되지 않았다.-->
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 2을 Binding에서 설정한다.-->
-      <Reply bindRef="recordTargetTrackingMissionAck" cdm="Control.Autonomy.Mission.Record.TargetTracking.CommandStatus" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="recordTargetTrackingMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="recordTargetTrackingMissionRecordAck" cdm="Control.Autonomy.Mission.Record.TargetTracking.RecordEcho" required="true"><Results><GroupResult name="recordEcho" cdm="Control.Autonomy.Mission.Record.TargetTracking.RecordEcho"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="recordPointAndGoMission" name="Point &amp; Go 레코드 설정" cdm="Control.Autonomy.Mission.Record.PointAndGo">
@@ -405,7 +405,7 @@
         </QuantityProfile>
       </Parameters>
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 3을 Binding에서 설정한다.-->
-      <Reply bindRef="recordPointAndGoMissionAck" cdm="Control.Autonomy.Mission.Record.PointAndGo.CommandStatus" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="recordPointAndGoMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="recordPointAndGoMissionRecordAck" cdm="Control.Autonomy.Mission.Record.PointAndGo.RecordEcho" required="true"><Results><GroupResult name="recordEcho" cdm="Control.Autonomy.Mission.Record.PointAndGo.RecordEcho"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="recordAutonomousNavigationMission" name="자동운항 레코드 설정" cdm="Control.Autonomy.Mission.Record.AutonomousNavigation">
@@ -435,7 +435,7 @@
         </QuantityProfile>
       </Parameters>
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 4을 Binding에서 설정한다.-->
-      <Reply bindRef="recordAutonomousNavigationMissionAck" cdm="Control.Autonomy.Mission.Record.AutonomousNavigation.CommandStatus" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="recordAutonomousNavigationMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="recordAutonomousNavigationMissionRecordAck" cdm="Control.Autonomy.Mission.Record.AutonomousNavigation.RecordEcho" required="true"><Results><GroupResult name="recordEcho" cdm="Control.Autonomy.Mission.Record.AutonomousNavigation.RecordEcho"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="recordSurfaceReconnaissanceMission" name="수상감시정찰 레코드 설정" cdm="Control.Autonomy.Mission.Record.SurfaceReconnaissance">
@@ -471,7 +471,7 @@
         </QuantityProfile>
       </Parameters>
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 5을 Binding에서 설정한다.-->
-      <Reply bindRef="recordSurfaceReconnaissanceMissionAck" cdm="Control.Autonomy.Mission.Record.SurfaceReconnaissance.CommandStatus" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="recordSurfaceReconnaissanceMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="recordSurfaceReconnaissanceMissionRecordAck" cdm="Control.Autonomy.Mission.Record.SurfaceReconnaissance.RecordEcho" required="true"><Results><GroupResult name="recordEcho" cdm="Control.Autonomy.Mission.Record.SurfaceReconnaissance.RecordEcho"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="recordUnderwaterReconnaissanceMission" name="수중감시정찰 레코드 설정" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance">
@@ -516,7 +516,7 @@
       </Parameters>
       <!--searchingRange wire raw 3750~15000은 Semantic 37.5~150.0 m(0.01 m resolution)로 해석한다. timeLimit은 seconds로 정의한다.-->
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 6을 Binding에서 설정한다.-->
-      <Reply bindRef="recordUnderwaterReconnaissanceMissionAck" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance.CommandStatus" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="recordUnderwaterReconnaissanceMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="recordUnderwaterReconnaissanceMissionRecordAck" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance.RecordEcho" required="true"><Results><GroupResult name="recordEcho" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance.RecordEcho"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="setEmergencyReturnRoute" name="비상복귀점 및 경로 설정" cdm="Control.Autonomy.Return.EmergencyRoute">
@@ -547,7 +547,7 @@
         <ValueSetProfile cdm="Autonomy.Return.EndAction"><Values><Value name="Drift" cdm="Autonomy.Return.EndAction.Drift"/><Value name="HoldPosition" cdm="Autonomy.Return.EndAction.HoldPosition"/><Value name="Signal" cdm="Autonomy.Return.EndAction.Signal"/></Values></ValueSetProfile>
       </Parameters>
       <!--action 원문 Range는 0~0x03이나 의미가 정의된 값은 0=정지(표류), 1=함위 유지(default), 2=주기적 경적/등화 신호뿐이다. Semantic 입력 범위는 0~2로 제한한다.-->
-      <Reply bindRef="setEmergencyReturnRouteAck" cdm="Control.Autonomy.Return.EmergencyRoute.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="setEmergencyReturnRouteAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="setReturnToBasePoint" name="기지복귀점 설정" cdm="Control.Autonomy.Return.BasePoint">
       <Target cdm="Platform.Identifier.Numeric"/>
@@ -561,7 +561,7 @@
           <Range min="-180" max="180"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="setReturnToBasePointAck" cdm="Control.Autonomy.Return.BasePoint.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="setReturnToBasePointAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="startMission" name="임무 시작" cdm="Control.Autonomy.Mission.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
@@ -571,7 +571,7 @@
         </QuantityProfile>
       </Parameters>
       <!--missionActionCommand=0은 Binding FixedField로 설정한다. 원문 Range "11~93"은 비고의 0/1/2 정의와 충돌하므로 비고 정의를 따른다.-->
-      <Reply bindRef="startMissionAck" cdm="Control.Autonomy.Mission.Action.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="startMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="resumeMission" name="임무 재개" cdm="Control.Autonomy.Mission.Resume">
       <Target cdm="Platform.Identifier.Numeric"/>
@@ -581,14 +581,14 @@
         </QuantityProfile>
       </Parameters>
       <!--missionActionCommand=1은 Binding FixedField로 설정한다. 원문 Range "11~93"은 비고의 0/1/2 정의와 충돌하므로 비고 정의를 따른다.-->
-      <Reply bindRef="resumeMissionAck" cdm="Control.Autonomy.Mission.Action.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="resumeMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="abortMission" name="임무 중단" cdm="Control.Autonomy.Mission.Abort">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters/>
       <!--abortMission은 사용자 결정에 따라 pointIndex=0을 Binding FixedField로 설정한다. CSV의 0 의미는 "기존에 진행하고 있던 경로점 추종"으로 기재되어 있음.-->
       <!--missionActionCommand=2은 Binding FixedField로 설정한다. 원문 Range "11~93"은 비고의 0/1/2 정의와 충돌하므로 비고 정의를 따른다.-->
-      <Reply bindRef="abortMissionAck" cdm="Control.Autonomy.Mission.Action.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="abortMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
     </ControlSpec>
     <ControlSpec id="setRestrictedAreas" name="접근금지구역 설정" cdm="Control.Autonomy.RestrictedArea.Set">
       <Target cdm="Platform.Identifier.Numeric"/>
@@ -616,7 +616,7 @@
         </CollectionProfile>
       </Parameters>
       <!--RestrictArea는 원문에 두 좌표점만 정의되어 있다. 실제 사각형/다각형 생성 규칙은 명시되지 않아 두 점을 그대로 노출하고 형상 구성 규칙은 TBD로 남긴다.-->
-      <Reply bindRef="setRestrictedAreasAck" cdm="Control.Autonomy.RestrictedArea.Set.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="setRestrictedAreasAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
     </ControlSpec>
   </ControlSpecs>
 </PlatformSpec>

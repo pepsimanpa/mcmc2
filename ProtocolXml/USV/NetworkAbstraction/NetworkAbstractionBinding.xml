@@ -545,7 +545,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestNetworkIntegrationControlStationPbitResult">
+      <Reply semantic_id="requestNetworkIntegrationControlStationPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDevicePBITReportType" typeName="NetworkIntegrationDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
@@ -576,7 +576,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestNetworkIntegrationUsvPbitResult">
+      <Reply semantic_id="requestNetworkIntegrationUsvPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDevicePBITReportType" typeName="NetworkIntegrationDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
@@ -607,7 +607,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestNetworkIntegrationControlStationIbitResult">
+      <Reply semantic_id="requestNetworkIntegrationControlStationIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDeviceIBITReportType" typeName="NetworkIntegrationDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
@@ -643,7 +643,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestNetworkIntegrationUsvIbitResult">
+      <Reply semantic_id="requestNetworkIntegrationUsvIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDeviceIBITReportType" typeName="NetworkIntegrationDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
@@ -679,7 +679,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestLBandControlStationGroupPbitResult">
+      <Reply semantic_id="requestLBandControlStationGroupPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::LBandControlStationDevicePBITReportType" typeName="LBandControlStationDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <PackedField name="lBandControlStationDevicePBIT.operation" width="8" defaultValue="0">
@@ -853,7 +853,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestLBandTerminalPbitResult">
+      <Reply semantic_id="requestLBandTerminalPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::LBandTerminalDevicePBITReportType" typeName="LBandTerminalDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <PackedField name="lBandTerminalDevicePBIT.operation" width="8" defaultValue="0">
@@ -897,7 +897,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestLBandControlStationGroupIbitResult">
+      <Reply semantic_id="requestLBandControlStationGroupIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::LBandControlStationDeviceIBITReportType" typeName="LBandControlStationDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="lBandControlStationDeviceIBIT.operation" cdm="Health.LBand.ControlStation.OperationalStatus" dataType="UInt8">
@@ -1097,7 +1097,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestLBandTerminalIbitResult">
+      <Reply semantic_id="requestLBandTerminalIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::LBandTerminalDeviceIBITReportType" typeName="LBandTerminalDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="lBandTerminalDeviceIBIT.operation" cdm="Health.LBand.Terminal.OperationalStatus" dataType="UInt8">
@@ -1147,7 +1147,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestAuxControlPbitResult">
+      <Reply semantic_id="requestAuxControlPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::AuxControlDevicePBITReportType" typeName="AuxControlDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="auxControlDevicePBIT" cdm="Health.AuxControl.Transceiver.Status" dataType="UInt8">
@@ -1168,7 +1168,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestAuxControlIbitResult">
+      <Reply semantic_id="requestAuxControlIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::AuxControlDeviceIBITReportType" typeName="AuxControlDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="auxControlDeviceStatus" cdm="Health.AuxControl.Transceiver.Status" dataType="UInt8">
@@ -1191,7 +1191,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestGeoSatControlStationPbitResult">
+      <Reply semantic_id="requestGeoSatControlStationPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::GeoSatDevicePBITReportType" typeName="GeoSatDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="geoSatDevicePBIT" cdm="Health.GeoSat.Device.Status" dataType="UInt8">
@@ -1213,7 +1213,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestGeoSatUsvPbitResult">
+      <Reply semantic_id="requestGeoSatUsvPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::GeoSatDevicePBITReportType" typeName="GeoSatDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="geoSatDevicePBIT" cdm="Health.GeoSat.Device.Status" dataType="UInt8">
@@ -1235,7 +1235,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestGeoSatControlStationIbitResult">
+      <Reply semantic_id="requestGeoSatControlStationIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::GeoSatDeviceIBITReportType" typeName="GeoSatDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="geoSatDeviceStatus" cdm="Health.GeoSat.Device.Status" dataType="UInt8">
@@ -1259,7 +1259,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestGeoSatUsvIbitResult">
+      <Reply semantic_id="requestGeoSatUsvIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::GeoSatDeviceIBITReportType" typeName="GeoSatDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="geoSatDeviceStatus" cdm="Health.GeoSat.Device.Status" dataType="UInt8">

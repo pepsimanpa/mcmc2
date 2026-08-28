@@ -62,9 +62,9 @@
   </MonitorSpecs>
 
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="운항용카메라장치 연동 개시" cdm="Control.NavigationCamera.Integration.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="restartSystem" name="운항용카메라장치 시스템 재시작" cdm="Control.NavigationCamera.System.Restart"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="requestPbit" name="운항용카메라장치 PBIT 요청" cdm="Request.Health.PBIT.NavigationCamera">
+    <ControlSpec id="startIntegration" name="운항용카메라장치 연동 개시" cdm="Control.Integration.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
+    <ControlSpec id="restartSystem" name="운항용카메라장치 시스템 재시작" cdm="Control.System.Restart"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
+    <ControlSpec id="requestPbit" name="운항용카메라장치 PBIT 요청" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true"><Results><GroupResult name="navigationCameraPbit" cdm="Health.PBIT.NavigationCamera">
@@ -78,7 +78,7 @@
         <ValueSetResult name="statusIR" cdm="Health.NavigationCamera.IRAssembly"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
       </GroupResult></Results></Reply>
     </ControlSpec>
-    <ControlSpec id="requestIbit" name="운항용카메라장치 IBIT 요청" cdm="Request.Health.IBIT.NavigationCamera">
+    <ControlSpec id="requestIbit" name="운항용카메라장치 IBIT 요청" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true"><Results><GroupResult name="navigationCameraIbit" cdm="Health.IBIT.NavigationCamera">

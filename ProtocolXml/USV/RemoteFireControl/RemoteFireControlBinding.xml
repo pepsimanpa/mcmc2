@@ -100,7 +100,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestPbitResult">
+      <Reply semantic_id="requestPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::RCWS::RCWSPBITReportType" typeName="RCWSPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="remoteControlledWeaponSystemPBIT" cdm="Health.RCWS.Overall" dataType="UInt8">
@@ -137,7 +137,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestIbitResult">
+      <Reply semantic_id="requestIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::RCWS::RCWSIBITReportType" typeName="RCWSIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="remoteControlledWeaponSystemIBIT" cdm="Health.RCWS.Overall" dataType="UInt8">
@@ -300,7 +300,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="aimNavigationRadarResult">
+      <Reply semantic_id="aimNavigationRadarResult" required="true">
         <DDSChannel topicName="RUSV::MM::RCWS::CIPEAimStatusType" typeName="CIPEAimStatusType"/>
         <Field name="usvHeader"/>
         <Field name="targetID" cdm="Control.RCWS.Aim.NavigationRadar.Result.TargetID" dataType="Int32"/>
@@ -322,7 +322,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="aimEoirResult">
+      <Reply semantic_id="aimEoirResult" required="true">
         <DDSChannel topicName="RUSV::MM::RCWS::EOIRAimStatusType" typeName="EOIRAimStatusType"/>
         <Field name="usvHeader"/>
         <Field name="eoirHeight" cdm="Control.RCWS.Aim.EOIR.Result.ElevationAngle" dataType="Int32"/>
@@ -341,7 +341,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="measureDistanceResult">
+      <Reply semantic_id="measureDistanceResult" required="true">
         <DDSChannel topicName="RUSV::MM::RCWS::DistanceMeasureReportType" typeName="DistanceMeasureReportType"/>
         <Field name="usvHeader"/>
         <Field name="targetDistance" cdm="Control.RCWS.DistanceMeasure.Result.Distance" dataType="UInt16"/>
@@ -436,7 +436,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="configureMenuResult">
+      <Reply semantic_id="configureMenuResult" required="true">
         <DDSChannel topicName="RUSV::MM::RCWS::MenuStatusType" typeName="MenuStatusType"/>
         <Field name="usvHeader"/>
         <Field name="reloadingCount" cdm="Weapon.RCWS.Menu.Status.ReloadingCount" dataType="UInt16"/>

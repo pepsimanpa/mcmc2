@@ -148,7 +148,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestPbitResult">
+      <Reply semantic_id="requestPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::ANU::ANUPBITReportType" typeName="ANUPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="operationalStatus" cdm="Health.PBIT.AutonomousNavigation.Status" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
@@ -167,7 +167,7 @@
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
       </Reply>
-      <Reply semantic_id="requestIbitResult">
+      <Reply semantic_id="requestIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::ANU::ANUIBITReportType" typeName="ANUIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="operationalIBITStatus" cdm="Health.IBIT.AutonomousNavigation.Status" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>

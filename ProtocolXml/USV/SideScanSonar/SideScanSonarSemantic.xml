@@ -210,32 +210,32 @@
     <GroupSpec id="powerState" name="장비 전원 상태" cdm="ElectricalState.Power">
       <ValueSetSpec id="towedSonarArrayPowerStatus" name="예인형음탐기 전원 상태" cdm="ElectricalState.Power.TowedSonarArray">
         <Values>
-          <Value cdm="PowerSupplyState.Off">0</Value>
-          <Value cdm="PowerSupplyState.On">1</Value>
+          <Value name="Off" cdm="PowerSupplyState.Off"/>
+          <Value name="On" cdm="PowerSupplyState.On"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="ultraShortBaseLinePowerStatus" name="USBL 전원 상태" cdm="ElectricalState.Power.USBL">
         <Values>
-          <Value cdm="PowerSupplyState.Off">0</Value>
-          <Value cdm="PowerSupplyState.On">1</Value>
+          <Value name="Off" cdm="PowerSupplyState.Off"/>
+          <Value name="On" cdm="PowerSupplyState.On"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="winchPowerStatus" name="윈치 전원 상태" cdm="ElectricalState.Power.Winch">
         <Values>
-          <Value cdm="PowerSupplyState.Off">0</Value>
-          <Value cdm="PowerSupplyState.On">1</Value>
+          <Value name="Off" cdm="PowerSupplyState.Off"/>
+          <Value name="On" cdm="PowerSupplyState.On"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="recoveryUnitPowerStatus" name="진회수장치 전원 상태" cdm="ElectricalState.Power.RecoveryUnit">
         <Values>
-          <Value cdm="PowerSupplyState.Off">0</Value>
-          <Value cdm="PowerSupplyState.On">1</Value>
+          <Value name="Off" cdm="PowerSupplyState.Off"/>
+          <Value name="On" cdm="PowerSupplyState.On"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="cameraPowerStatus" name="카메라 전원 상태" cdm="ElectricalState.Power.Camera">
         <Values>
-          <Value cdm="PowerSupplyState.Off">0</Value>
-          <Value cdm="PowerSupplyState.On">1</Value>
+          <Value name="Off" cdm="PowerSupplyState.Off"/>
+          <Value name="On" cdm="PowerSupplyState.On"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -305,15 +305,15 @@
   <ControlSpecs id="control">
     <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
-    <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.Restart">
+    <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -321,7 +321,7 @@
     </ControlSpec>
     <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -397,7 +397,7 @@
     </ControlSpec>
     <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -417,7 +417,7 @@
     </ControlSpec>
     <ControlSpec id="stopSlideBackStop" name="슬라이드 후퇴고정 정지 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="stopSlideBackStopAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="stopSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -430,7 +430,7 @@
     </ControlSpec>
     <ControlSpec id="engageSlideBackStop" name="슬라이드 후퇴고정 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Engage">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="engageSlideBackStopAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="engageSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -443,7 +443,7 @@
     </ControlSpec>
     <ControlSpec id="returnSlideBackStop" name="슬라이드 후퇴고정 복귀 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Return">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="returnSlideBackStopAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="returnSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -470,7 +470,7 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="setCommunicationLevelAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="setCommunicationLevelAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -572,7 +572,7 @@
           <Resolution>1</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="configureOperatingParametersAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="configureOperatingParametersAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -588,7 +588,7 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="startAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="startAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -604,7 +604,7 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="stopAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="stopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -629,7 +629,7 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="powerOnOffAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="powerOnOffAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -637,7 +637,7 @@
     </ControlSpec>
     <ControlSpec id="setAutoMode" name="자동 모드 변경 명령" cdm="Control.ModeChange">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="setAutoModeAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="setAutoModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -645,7 +645,7 @@
     </ControlSpec>
     <ControlSpec id="setManualMode" name="수동 모드 변경 명령" cdm="Control.ModeChange">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="setManualModeAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="setManualModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -654,7 +654,7 @@
     <ControlSpec id="stopTowfish" name="자동모드 진수/회수 정지 명령" cdm="Control.LaunchRecovery.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Auto"/>
-      <Reply bindRef="stopTowfishAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="stopTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -674,7 +674,7 @@
     <ControlSpec id="launchTowfish" name="자동모드 진수 명령" cdm="Control.Launch">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Auto"/>
-      <Reply bindRef="launchTowfishAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="launchTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -694,7 +694,7 @@
     <ControlSpec id="recoveryTowfish" name="자동모드 회수 명령" cdm="Control.Recovery">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Auto"/>
-      <Reply bindRef="recoveryTowfishAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="recoveryTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -713,7 +713,7 @@
     </ControlSpec>
     <ControlSpec id="emergencyStop" name="비상 정지 명령" cdm="Control.EmergencyStop">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="emergencyStopAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="emergencyStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -721,7 +721,7 @@
     </ControlSpec>
     <ControlSpec id="cancelEmergencyStop" name="비상 정지 해제 명령" cdm="Control.EmergencyStop.Cancel">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="cancelEmergencyStopAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="cancelEmergencyStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -735,7 +735,7 @@
           <Range min="0" max="100"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="setTowingCableLengthAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="setTowingCableLengthAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -749,7 +749,7 @@
           <Range min="0" max="80"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="setTowfishDepthAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="setTowfishDepthAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -757,7 +757,7 @@
     </SetPointSpec>
     <ControlSpec id="changeScreenRealTimeMode" name="실시간 화면 모드 변경 명령" cdm="Control.Display.RealTime">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="changeScreenRealTimeModeAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="changeScreenRealTimeModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -765,7 +765,7 @@
     </ControlSpec>
     <ControlSpec id="changeScreenMergeMode" name="병합 화면 모드 변경 명령" cdm="Control.Display.Merge">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="changeScreenMergeModeAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="changeScreenMergeModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -780,7 +780,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="stopUsblMotionAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="stopUsblMotionAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -795,7 +795,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="launchUsblAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="launchUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -810,7 +810,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="recoveryUsblAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="recoveryUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -825,7 +825,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="returnUsblOriginAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="returnUsblOriginAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -834,7 +834,7 @@
     <ControlSpec id="startUsbl" name="수동 모드 USBL 작동 명령" cdm="Control.ExecutionControl.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="startUsblAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="startUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -843,7 +843,7 @@
     <ControlSpec id="stopUsbl" name="수동 모드 USBL 정지 명령" cdm="Control.ExecutionControl.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="stopUsblAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="stopUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -858,7 +858,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="stopSlideAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="stopSlideAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -873,7 +873,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="moveSlideAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="moveSlideAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -888,7 +888,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="returnSlideWithTowfishAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="returnSlideWithTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -903,7 +903,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="returnSlideWithoutTowfishAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="returnSlideWithoutTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -918,7 +918,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="stopWinchAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="stopWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -933,7 +933,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="deployWinchAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="deployWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -948,7 +948,7 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="recoveryWinchAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="recoveryWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -956,7 +956,7 @@
     </ControlSpec>
     <ControlSpec id="separateCable" name="케이블 분리 명령" cdm="Control.Cable.Separate">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="separateCableAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="separateCableAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
@@ -964,7 +964,7 @@
     </ControlSpec>
     <ControlSpec id="cancelCableSeparation" name="케이블 분리 해제 명령" cdm="Control.Cable.SeparationCancel">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="cancelCableSeparationAck" cdm="Control.CommandStatus.Response" required="true">
+      <Reply bindRef="cancelCableSeparationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
             <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
