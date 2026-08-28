@@ -17,8 +17,10 @@
 - `displayMode`는 Bit0 EO, Bit1 IR, Bit2 화질을 Semantic 논리 선택값으로 분리하고 Binding `PackedField`로 선언하였다.
 - 기존 `BuildUSVMessageBase`, `UInt16`, `PackNavigationCameraDisplayMode` converter를 제거하였다.
 - 원문 근거가 있는 primitive 필드에 wire `dataType`을 반영하였다.
+- 운항용카메라 CSCI 재심층 감사에서 PBIT/CBIT 하위 상태 필드와 동일 이름의 IBIT 필드가 `0=정상, 1=기능저하, 2=비가용, 3=미응답(기능저하 미사용)`을 직접 정의함을 교차확인하여 기존 0/2/3 매핑의 근거를 확정하였다.
+- CSCI가 bit 위치/점검 대상을 직접 정의한 IBIT detail 8개 octet(`statusCCDDetail`, 전원보드/MUX/영상처리보드 5개, EO1, IR1)을 `PackedField/BitMember` + Semantic bit별 Raw `GroupResult`로 분해하였다.
 
-## 3. Remaining TBD
+## 3. Remaining TBD / Resolved — 미해결 6개
 
 1. **원격 전시 RTP IP/Port**
    - CSCI에 송수신 IP/Port가 `todo`로 남아 있다.
@@ -26,19 +28,20 @@
 
 2. **객체탐지 sequence 최대 길이**
    - `imageObjectDetectionCnt`는 0~255이지만 `sequence<ImageObjectDetection2DType>` 자체의 명시적 최대 길이는 원문에 없다.
-   - 현재 Collection 최대 255는 count 필드 범위에 맞춘 정합성 가정이다.
+   - 현재 Collection 최대 255는 count 필드 범위에 맞춘 정합성 가정이므로, 실제 IDL sequence bound 확인 전에는 source-confirmed 최대 길이로 간주하지 않는다.
 
-3. **PBIT/CBIT 하위 상태 code 적용 근거**
-   - `statusCCD`에는 0/2/3 의미가 명시되어 있으나 나머지 7개 상태 필드는 Range 0~3만 기재되어 있다.
-   - 동일 상태 구조와 IBIT 명세를 근거로 0=정상, 2=비가용, 3=미응답을 적용했으며 별도 IDL enum 정의가 있으면 재확인한다.
+3. **[RESOLVED] PBIT/CBIT 하위 상태 code 적용 근거**
+   - PBIT/CBIT에서는 `statusCCD`만 `0=정상, 2=비가용, 3=미응답`이 직접 적혀 있고 나머지 하위 상태 행의 비고는 비어 있다.
+   - 그러나 동일 CSCI의 IBIT에서 동일한 `statusPowerBoard`, `statusEOMuxingBoard`, `statusIRMuxingBoard`, `statusEOProcessingBoard`, `statusIRProcessingBoard`, `statusEO`, `statusIR` 필드 각각에 `0=정상, 1=기능저하, 2=비가용, 3=미응답(기능저하 미사용)`이 직접 정의되어 있다.
+   - 동일 장치/동일 필드명 교차검증에 따라 현재 PBIT/CBIT Semantic/Binding의 `0/2/3` 매핑을 source-confirmed로 확정한다.
 
-4. **IBIT 상세 octet polarity**
-   - 상세 필드는 비트 위치와 점검 대상은 정의되어 있으나 각 bit의 0/1 의미가 명시되지 않았다.
-   - 따라서 임의 Boolean 의미를 부여하지 않고 UInt8 Raw로 유지한다.
+4. **IBIT 상세 octet polarity — 부분 해결**
+   - CSCI가 bit 위치와 점검 대상을 직접 명시한 8개 detail octet은 Binding `PackedField/BitMember`와 Semantic bit별 Raw `GroupResult`로 분해하였다.
+   - 다만 각 bit의 `0/1` 중 어느 값이 정상/이상인지 직접 정의되지 않아 Boolean/ValueMap 의미는 부여하지 않는다.
 
 5. **카메라 2~8 상세 비트 설명**
-   - EO1/IR1 상세만 각 bit 의미가 설명되어 있고 EO2~8/IR2~8은 범위만 존재한다.
-   - 동일 구조라고 단정하지 않고 Raw로 유지한다.
+   - EO1/IR1은 Bit0~3의 점검 대상이 직접 정의되어 이번에 분해하였다.
+   - EO2~8/IR2~8은 Range `0~3(bit)`만 있고 개별 bit 설명이 비어 있으므로 EO1/IR1 구조를 복제하지 않고 UInt8 Raw로 유지한다.
 
 6. **PBIT/IBIT Result correlation**
    - 요청에는 commandID가 있으나 전용 CCDPBIT/CCDIBIT 결과에는 commandID가 없다.
@@ -50,5 +53,5 @@
 
 ## 4. 현재 상태
 
-- 원통 직접 연동 범위의 Semantic/Binding 정리는 완료하였다.
-- 남은 7건은 사용자 정책 선택사항이 아니라 추가 IDL/Adapter/원문 확인이 필요한 비차단 TBD이다.
+- 원통 직접 연동 범위의 Semantic/Binding 정리와 운항용카메라 CSCI 재심층 감사까지 완료하였다.
+- 미해결 6건은 사용자 정책 선택사항이 아니라 추가 IDL/Adapter/원문 확인이 필요한 비차단 TBD이다.
