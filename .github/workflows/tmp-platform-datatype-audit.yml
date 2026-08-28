@@ -1,52 +1,140 @@
-name: temporary PlatformController datatype audit
+name: temporary PlatformController datatype migration
 on:
-  workflow_dispatch:
   push:
     branches: [feature/usv-semantic-binding-audit]
 permissions:
-  contents: read
+  contents: write
 jobs:
-  audit:
+  migrate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Dry-run source datatype audit
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Apply CSCI-confirmed primitive datatypes
         shell: python
         run: |
-          import xml.etree.ElementTree as ET, json, collections
+          import re
           p='ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml'
+          text=open(p,encoding='utf-8').read()
+
+          def expected(ctx, n):
+              # Common CBIT/PBIT result messages.
+              if ctx in {'PropulsionCBITReportType','PropulsionPBITReportType','AccessoriesCBITReportType','AccessoriesPBITReportType','SubsystemCBITReportType','SubsystemPBITReportType','SPCECBITReportType','SPCEPBITReportType'}:
+                  return 'UInt8'
+              if ctx=='ElectricalCBITReportType':
+                  return 'Int64' if n=='powerStatus' else 'UInt8'
+              if ctx=='ElectricalPBITReportType':
+                  return 'UInt64' if n=='powerStatus' else 'UInt8'
+
+              if ctx=='EngineIBITReportType':
+                  if n=='engineStatus' or n.endswith(('EngineLoad','EngineTorque','TransGear')): return 'UInt8'
+                  if n.endswith('TotalEngineHours'): return 'UInt64'
+                  if n.endswith('AlternatorPotential') or n.endswith('FuelRate'): return 'Int16'
+                  return 'UInt16'
+              if ctx=='WaterJetIBITReportType': return 'UInt8'
+              if ctx=='BowThrusterIBITReportType':
+                  return 'UInt16' if n in {'bowThrusterTemperature','bowThrusterMotorOperationTime'} else 'UInt8'
+              if ctx=='PowerIBITReportType':
+                  if n=='pduStatus': return 'UInt8'
+                  if n=='powerStatus': return 'UInt64'
+                  return 'UInt16'
+              if ctx=='BatteryIBITReportType': return 'UInt8'
+              if ctx=='GeneratorIBITReportType':
+                  if n.endswith('OperatingHours'): return 'UInt32'
+                  if n.endswith(('GeneratorAPhaseACFrequency','SystemBatteryVoltage')): return 'UInt16'
+                  if n.endswith(('GeneratorAPhaseRealPower','GeneratorAPhaseReactivePower')): return 'Int32'
+                  return 'UInt8'
+              if ctx in {'EnvironmentIBITReportType','WindSensorIBITReportType','FireDetectorIBITReportType','LeakDetectorIBITReportType','FlowMeterIBITReportType','SeaWaterConditionerIBITReportType','TowingDeviceIBITReportType'}:
+                  return 'UInt8'
+              if ctx=='StabilizerIBITReportType':
+                  if n in {'boatRollAngle','seakeeperAngle'}: return 'Int16'
+                  if n in {'flywheelSpeed','enclosure'}: return 'UInt16'
+                  return 'UInt8'
+              if ctx=='InterceptorIBITReportType':
+                  return 'Float32' if n=='targetLIST' else 'UInt8'
+              if ctx=='SPCEIBITReportType':
+                  if n in {'vcuProcessorIBIT','vcuTmpProcessorIBIT'}: return None
+                  return 'UInt8'
+
+              if ctx=='PropulsionHeartBeatReportType':
+                  if n.endswith('AlternatorPotential') or n=='fuelRemain': return 'Int16'
+                  if n.endswith('CurrentSteering'): return 'Float32'
+                  return 'UInt16'
+              if ctx=='ENVHeartBeatReportType':
+                  if n in {'cctvStateMask','environmentWarning'} or n.startswith('fireSensor') or n.startswith('autoExtinguisher'): return 'UInt8'
+                  if n.startswith('flowMeter'): return 'UInt16'
+                  if n.startswith('leakSensor'): return 'Float32'
+              if ctx=='PowerHeartBeatReportType':
+                  if n=='portONStatus': return 'UInt64'
+                  if n in {'pduTemp','powerSourceStatus','pduSourceStatus','batteryChargeStatus','batteryLevel','batteryFaultStatus'}: return 'UInt8'
+                  return 'UInt16'
+              if ctx=='DistressReportType':
+                  if n in {'latitude','longitude','altitude'}: return 'Float64'
+              if ctx=='WindReportType': return 'Float64'
+              if ctx=='SeaWaterConditionerStatusReportType': return 'Float32'
+              return None
+
+          out=[]; ctx=None; changes=[]
+          for line in text.splitlines(True):
+              ch=re.search(r'<DDSChannel\b[^>]*\btypeName="([^"]+)"',line)
+              if ch: ctx=ch.group(1)
+              fm=re.search(r'<(Field|FixedField|DerivedField)\b[^>]*\bname="([^"]+)"[^>]*>',line)
+              if fm:
+                  full=fm.group(0); name=fm.group(2); leaf=name.split('.')[-1]
+                  want=expected(ctx,leaf)
+                  if want:
+                      dm=re.search(r'\bdataType="([^"]+)"',full)
+                      old=dm.group(1) if dm else None
+                      if old!=want:
+                          if dm:
+                              new=re.sub(r'\bdataType="[^"]+"',f'dataType="{want}"',full,count=1)
+                          else:
+                              new=full[:-1]+f' dataType="{want}">'
+                          line=line[:fm.start()]+new+line[fm.end():]
+                          changes.append((ctx,name,old,want))
+              out.append(line)
+          open(p,'w',encoding='utf-8',newline='').write(''.join(out))
+          print('CHANGES',len(changes))
+          for x in changes: print('|'.join('' if v is None else str(v) for v in x))
+
+          # Source audit: all primitive fields in the audited SPCE messages must now have dataType.
+          import xml.etree.ElementTree as ET
           ns='{http://lignex1.com/mcmc2/umsSchema}'
-          msg_map=json.loads(r'''{"PropulsionCBITReportType|portEngineStatus":"UInt8","PropulsionCBITReportType|starboardEngineStatus":"UInt8","PropulsionCBITReportType|portWaterjetStatus":"UInt8","PropulsionCBITReportType|starboardWaterjetStatus":"UInt8","PropulsionCBITReportType|bowThrustertStatus":"UInt8","ElectricalCBITReportType|pduStatus":"UInt8","ElectricalCBITReportType|batteryStatus":"UInt8","ElectricalCBITReportType|portGeneratorStatus":"UInt8","ElectricalCBITReportType|starboardGeneratorStatus":"UInt8","ElectricalCBITReportType|powerStatus":"Int64","AccessoriesCBITReportType|environmentSensorDeviceStatus":"UInt8","AccessoriesCBITReportType|windSensorStatus":"UInt8","AccessoriesCBITReportType|fireDetectorStatus":"UInt8","AccessoriesCBITReportType|fireDetected":"UInt8","AccessoriesCBITReportType|leakDetectorStatus":"UInt8","AccessoriesCBITReportType|leakDetected":"UInt8","AccessoriesCBITReportType|flowMeterStatus":"UInt8","AccessoriesCBITReportType|flowAnomalyDetected":"UInt8","AccessoriesCBITReportType|stabilizerStatus":"UInt8","AccessoriesCBITReportType|interceptorStatus":"UInt8","SubsystemCBITReportType|seaWaterAirConditionerStatus":"UInt8","SubsystemCBITReportType|towingDeviceStatus":"UInt8","SPCECBITReportType|spceStatus":"UInt8","SPCECBITReportType|vcuStatus":"UInt8","SPCECBITReportType|vcuTmpStatus":"UInt8","PropulsionPBITReportType|portEngineStatus":"UInt8","PropulsionPBITReportType|starboardEngineStatus":"UInt8","PropulsionPBITReportType|portWaterjetStatus":"UInt8","PropulsionPBITReportType|starboardWaterjetStatus":"UInt8","PropulsionPBITReportType|bowThrustertStatus":"UInt8","ElectricalPBITReportType|pduStatus":"UInt8","ElectricalPBITReportType|batteryStatus":"UInt8","ElectricalPBITReportType|portGeneratorStatus":"UInt8","ElectricalPBITReportType|starboardGeneratorStatus":"UInt8","ElectricalPBITReportType|powerStatus":"UInt64","AccessoriesPBITReportType|environmentSensorDeviceStatus":"UInt8","AccessoriesPBITReportType|windSensorStatus":"UInt8","AccessoriesPBITReportType|fireDetectorStatus":"UInt8","AccessoriesPBITReportType|fireDetected":"UInt8","AccessoriesPBITReportType|leakDetectorStatus":"UInt8","AccessoriesPBITReportType|leakDetected":"UInt8","AccessoriesPBITReportType|flowMeterStatus":"UInt8","AccessoriesPBITReportType|flowAnomalyDetected":"UInt8","AccessoriesPBITReportType|stabilizerStatus":"UInt8","AccessoriesPBITReportType|interceptorStatus":"UInt8","SubsystemPBITReportType|seaWaterAirConditionerStatus":"UInt8","SubsystemPBITReportType|towingDeviceStatus":"UInt8","SPCEPBITReportType|spceStatus":"UInt8","SPCEPBITReportType|vcuStatus":"UInt8","SPCEPBITReportType|vcuTmpStatus":"UInt8","EngineIBITReportType|engineStatus":"UInt8","EngineIBITReportType|portEngineOilPressure":"UInt16","EngineIBITReportType|portEngineOilTemperature":"UInt16","EngineIBITReportType|portEngineTemperature":"UInt16","EngineIBITReportType|portAlternatorPotential":"Int16","EngineIBITReportType|portFuelRate":"Int16","EngineIBITReportType|portTotalEngineHours":"UInt64","EngineIBITReportType|portCoolantPressure":"UInt16","EngineIBITReportType|portFuelPressure":"UInt16","EngineIBITReportType|portEngineState1":"UInt16","EngineIBITReportType|portEngineState2":"UInt16","EngineIBITReportType|portEngineLoad":"UInt8","EngineIBITReportType|portEngineTorque":"UInt8","EngineIBITReportType|portTransGear":"UInt8","EngineIBITReportType|portTransOilPressure":"UInt16","EngineIBITReportType|portTransOilTemperature":"UInt16","EngineIBITReportType|starboardEngineOilPressure":"UInt16","EngineIBITReportType|starboardEngineOilTemperature":"UInt16","EngineIBITReportType|starboardEngineTemperature":"UInt16","EngineIBITReportType|starboardAlternatorPotential":"Int16","EngineIBITReportType|starboardFuelRate":"Int16","EngineIBITReportType|starboardTotalEngineHours":"UInt64","EngineIBITReportType|starboardCoolantPressure":"UInt16","EngineIBITReportType|starboardFuelPressure":"UInt16","EngineIBITReportType|starboardEngineState1":"UInt16","EngineIBITReportType|starboardEngineState2":"UInt16","EngineIBITReportType|starboardEngineLoad":"UInt8","EngineIBITReportType|starboardEngineTorque":"UInt8","EngineIBITReportType|starboardTransGear":"UInt8","EngineIBITReportType|starboardTransOilPressure":"UInt16","EngineIBITReportType|starboardTransOilTemperature":"UInt16","WaterJetIBITReportType|portWaterjetStatus":"UInt8","WaterJetIBITReportType|portFailToSafe":"UInt8","WaterJetIBITReportType|portNoClutchFeedback":"UInt8","WaterJetIBITReportType|portHydOilLevelLow":"UInt8","WaterJetIBITReportType|portHydTemperatureHigh":"UInt8","WaterJetIBITReportType|portHydPressureLow":"UInt8","WaterJetIBITReportType|portLubOilLevelLow":"UInt8","WaterJetIBITReportType|portLubOilPressureLow":"UInt8","WaterJetIBITReportType|portHydLubSensorError":"UInt8","WaterJetIBITReportType|portBucketNotInSetpoint":"UInt8","WaterJetIBITReportType|portBucketFeedbackOutOfSpan":"UInt8","WaterJetIBITReportType|portNozzleNotInSetPoint":"UInt8","WaterJetIBITReportType|portNozzleFeedbackSensorError":"UInt8","WaterJetIBITReportType|starboardWaterjetStatus":"UInt8","WaterJetIBITReportType|starboardFailToSafe":"UInt8","WaterJetIBITReportType|starboardNoClutchFeedback":"UInt8","WaterJetIBITReportType|starboardHydOilLevelLow":"UInt8","WaterJetIBITReportType|starboardHydTemperatureHigh":"UInt8","WaterJetIBITReportType|starboardHydPressureLow":"UInt8","WaterJetIBITReportType|starboardLubOilLevelLow":"UInt8","WaterJetIBITReportType|starboardLubOilPressureLow":"UInt8","WaterJetIBITReportType|starboardHydLubSensorError":"UInt8","WaterJetIBITReportType|starboardBucketNotInSetpoint":"UInt8","WaterJetIBITReportType|starboardBucketFeedbackOutOfSpan":"UInt8","WaterJetIBITReportType|starboardNozzleNotInSetPoint":"UInt8","WaterJetIBITReportType|starboardNozzleFeedbackSensorError":"UInt8","BowThrusterIBITReportType|bowThrusterStatus":"UInt8","BowThrusterIBITReportType|bowThrusterMotorError":"UInt8","BowThrusterIBITReportType|bowThrusterRetractState":"UInt8","BowThrusterIBITReportType|bowThrusterTemperature":"UInt16","BowThrusterIBITReportType|bowThrusterMotorCurrent":"UInt8","BowThrusterIBITReportType|bowThrusterMotorOperationTime":"UInt16","PowerIBITReportType|pduStatus":"UInt8","PowerIBITReportType|powerStatus":"UInt64","PowerIBITReportType|inputVS":"UInt16","PowerIBITReportType|inputCS":"UInt16","PowerIBITReportType|batteryAssemblyVS":"UInt16","PowerIBITReportType|batteryAssemblyCS":"UInt16","PowerIBITReportType|tsadVS":"UInt16","PowerIBITReportType|tsadCS":"UInt16","PowerIBITReportType|ssdVS":"UInt16","PowerIBITReportType|ssdCS":"UInt16","PowerIBITReportType|sidVS":"UInt16","PowerIBITReportType|sidCS":"UInt16","PowerIBITReportType|fanEngineRoomVS":"UInt16","PowerIBITReportType|fanEngineRoomCS":"UInt16","PowerIBITReportType|fanEquipRoomVS":"UInt16","PowerIBITReportType|fanEquipRoomCS":"UInt16","PowerIBITReportType|damperAndContVS":"UInt16","PowerIBITReportType|damperAndContCS":"UInt16","PowerIBITReportType|seaWaterAirConditionerVS":"UInt16","PowerIBITReportType|seaWaterAirConditionerCS":"UInt16","PowerIBITReportType|seaWaterAirConditionerContVS":"UInt16","PowerIBITReportType|seaWaterAirConditionerContCS":"UInt16","PowerIBITReportType|interceptorVS":"UInt16","PowerIBITReportType|interceptorCS":"UInt16","PowerIBITReportType|bowThrustVS":"UInt16","PowerIBITReportType|bowThrustCS":"UInt16","PowerIBITReportType|stabilizerVS":"UInt16","PowerIBITReportType|stabilizerCS":"UInt16","PowerIBITReportType|stabilizerContVS":"UInt16","PowerIBITReportType|stabilizerContCS":"UInt16","PowerIBITReportType|bilgePumpEngineRoomVS":"UInt16","PowerIBITReportType|bilgePumpEngineRoomCS":"UInt16","PowerIBITReportType|bilgePumpEquipRoomVS":"UInt16","PowerIBITReportType|bilgePumpEquipRoomCS":"UInt16","PowerIBITReportType|bilgePumpBowRoomVS":"UInt16","PowerIBITReportType|bilgePumpBowRoomCS":"UInt16","PowerIBITReportType|eoirVS":"UInt16","PowerIBITReportType|eoirCS":"UInt16","PowerIBITReportType|cipecVS":"UInt16","PowerIBITReportType|cipecCS":"UInt16","PowerIBITReportType|navRadarVS":"UInt16","PowerIBITReportType|navRadarCS":"UInt16","PowerIBITReportType|scdeVS":"UInt16","PowerIBITReportType|scdeCS":"UInt16","PowerIBITReportType|ccdVS":"UInt16","PowerIBITReportType|ccdCS":"UInt16","PowerIBITReportType|spceVS":"UInt16","PowerIBITReportType|spceCS":"UInt16","PowerIBITReportType|ccVS":"UInt16","PowerIBITReportType|ccCS":"UInt16","PowerIBITReportType|lightNavigationVS":"UInt16","PowerIBITReportType|lightNavigationCS":"UInt16","PowerIBITReportType|lightHullVS":"UInt16","PowerIBITReportType|lightHullCS":"UInt16","PowerIBITReportType|lightInteriorWheelhouseVS":"UInt16","PowerIBITReportType|lightInteriorWheelhouseCS":"UInt16","PowerIBITReportType|lightInteriorEngineRoomVS":"UInt16","PowerIBITReportType|lightInteriorEngineRoomCS":"UInt16","PowerIBITReportType|lightExternalVS":"UInt16","PowerIBITReportType|lightExternalCS":"UInt16","PowerIBITReportType|warningLightVS":"UInt16","PowerIBITReportType|warningLightCS":"UInt16","PowerIBITReportType|decuTransceiverVS":"UInt16","PowerIBITReportType|decuTransceiverCS":"UInt16","PowerIBITReportType|cneVS":"UInt16","PowerIBITReportType|cneCS":"UInt16","PowerIBITReportType|aisTransceiverVS":"UInt16","PowerIBITReportType|aisTransceiverCS":"UInt16","PowerIBITReportType|aisReceiverDvlVS":"UInt16","PowerIBITReportType|aisReceiverDvlCS":"UInt16","PowerIBITReportType|ajasAntennaVS":"UInt16","PowerIBITReportType|ajasAntennaCS":"UInt16","PowerIBITReportType|naeVS":"UInt16","PowerIBITReportType|naeCS":"UInt16","PowerIBITReportType|satcomModemVS":"UInt16","PowerIBITReportType|satcomModemCS":"UInt16","PowerIBITReportType|ethernetSwitchPrimaryVS":"UInt16","PowerIBITReportType|ethernetSwitchPrimaryCS":"UInt16","PowerIBITReportType|ethernetSwitchEmergencyVS":"UInt16","PowerIBITReportType|ethernetSwitchEmergencyCS":"UInt16","PowerIBITReportType|radioVS":"UInt16","PowerIBITReportType|radioCS":"UInt16","PowerIBITReportType|satcomAcuVS":"UInt16","PowerIBITReportType|satcomAcuCS":"UInt16","PowerIBITReportType|cryptoVS":"UInt16","PowerIBITReportType|cryptoCS":"UInt16","PowerIBITReportType|rcwsVS":"UInt16","PowerIBITReportType|rcwsCS":"UInt16","PowerIBITReportType|torsionSensorVS":"UInt16","PowerIBITReportType|torsionSensorCS":"UInt16","PowerIBITReportType|vibrationSensorVS":"UInt16","PowerIBITReportType|vibrationSensorCS":"UInt16","PowerIBITReportType|vdrVS":"UInt16","PowerIBITReportType|vdrCS":"UInt16","PowerIBITReportType|voiceTransceiverVS":"UInt16","PowerIBITReportType|voiceTransceiverCS":"UInt16","PowerIBITReportType|environmentSensorProcessorVS":"UInt16","PowerIBITReportType|environmentSensorProcessorCS":"UInt16","PowerIBITReportType|towedDeviceVS":"UInt16","PowerIBITReportType|towedDeviceCS":"UInt16","PowerIBITReportType|commonWeaponVS":"UInt16","PowerIBITReportType|commonWeaponCS":"UInt16","PowerIBITReportType|commonPlatformControlVS":"UInt16","PowerIBITReportType|commonPlatformControlCS":"UInt16","BatteryIBITReportType|batteryStatus":"UInt8","BatteryIBITReportType|batterySource":"UInt8","BatteryIBITReportType|batteryChargeStatus":"UInt8","BatteryIBITReportType|batteryLevel":"UInt8","BatteryIBITReportType|batteryFaultStatus":"UInt8","BatteryIBITReportType|batteryVoltage":"UInt16","BatteryIBITReportType|batteryCurrent":"UInt16","BatteryIBITReportType|batteryTemperature":"Int16","BatteryIBITReportType|batterySoc":"UInt16","BatteryIBITReportType|batterySoh":"UInt16","GeneratorIBITReportType|portGeneratorStatus":"UInt8","GeneratorIBITReportType|portGeneratorVoltage":"UInt16","GeneratorIBITReportType|portGeneratorCurrent":"UInt16","GeneratorIBITReportType|portGeneratorFrequency":"UInt16","GeneratorIBITReportType|portGeneratorSpeed":"UInt16","GeneratorIBITReportType|portGeneratorOilPressure":"UInt16","GeneratorIBITReportType|portGeneratorCoolantTemperature":"UInt16","GeneratorIBITReportType|portGeneratorFuelRate":"UInt16","GeneratorIBITReportType|portGeneratorTotalHours":"UInt64","GeneratorIBITReportType|starboardGeneratorStatus":"UInt8","GeneratorIBITReportType|starboardGeneratorVoltage":"UInt16","GeneratorIBITReportType|starboardGeneratorCurrent":"UInt16","GeneratorIBITReportType|starboardGeneratorFrequency":"UInt16","GeneratorIBITReportType|starboardGeneratorSpeed":"UInt16","GeneratorIBITReportType|starboardGeneratorOilPressure":"UInt16","GeneratorIBITReportType|starboardGeneratorCoolantTemperature":"UInt16","GeneratorIBITReportType|starboardGeneratorFuelRate":"UInt16","GeneratorIBITReportType|starboardGeneratorTotalHours":"UInt64","ENVIBITReportType|environmentSensorDeviceStatus":"UInt8","ENVIBITReportType|windSensorStatus":"UInt8","ENVIBITReportType|fireDetectorStatus":"UInt8","ENVIBITReportType|fireDetected":"UInt8","ENVIBITReportType|leakDetectorStatus":"UInt8","ENVIBITReportType|leakDetected":"UInt8","ENVIBITReportType|flowMeterStatus":"UInt8","ENVIBITReportType|flowAnomalyDetected":"UInt8","ENVIBITReportType|stabilizerStatus":"UInt8","ENVIBITReportType|interceptorStatus":"UInt8","ENVIBITReportType|windDirection":"UInt16","ENVIBITReportType|windSpeed":"UInt16","ENVIBITReportType|outsideTemperature":"Int16","ENVIBITReportType|outsideHumidity":"UInt16","ENVIBITReportType|outsidePressure":"UInt16","ENVIBITReportType|flowMeter1Flow":"UInt16","ENVIBITReportType|flowMeter2Flow":"UInt16","ENVIBITReportType|flowMeter3Flow":"UInt16","ENVIBITReportType|flowMeter4Flow":"UInt16","ENVIBITReportType|leakSensor1Depth":"UInt16","ENVIBITReportType|leakSensor2Depth":"UInt16","ENVIBITReportType|leakSensor1Temperature":"Int16","ENVIBITReportType|leakSensor2Temperature":"Int16","ENVIBITReportType|fireSensor1Alarm":"UInt8","ENVIBITReportType|fireSensor2Alarm":"UInt8","ENVIBITReportType|fireSensor3Alarm":"UInt8","ENVIBITReportType|autoExtinguisher1Active":"UInt8","ENVIBITReportType|autoExtinguisher2Active":"UInt8","ENVIBITReportType|autoExtinguisher3Active":"UInt8","ENVIBITReportType|autoExtinguisher4Active":"UInt8","ENVIBITReportType|processorIBIT":"ProcessorIBIT","ENVIBITReportType|cpuTemperature":"Float64","ENVIBITReportType|cpuLoad":"Float64","PropulsionHeartBeatReportType|portAlternatorPotential":"Int16","PropulsionHeartBeatReportType|starboardAlternatorPotential":"Int16","PropulsionHeartBeatReportType|portEngineTemperature":"UInt16","PropulsionHeartBeatReportType|starboardEngineTemperature":"UInt16","PropulsionHeartBeatReportType|portTransOilTemperature":"UInt16","PropulsionHeartBeatReportType|starboardTransOilTemperature":"UInt16","PropulsionHeartBeatReportType|fuelRemain":"UInt16","PropulsionHeartBeatReportType|portCurrentRPM":"UInt16","PropulsionHeartBeatReportType|starboardCurrentRPM":"UInt16","PropulsionHeartBeatReportType|portCurrentSteering":"Int16","PropulsionHeartBeatReportType|starboardCurrentSteering":"Int16","ENVHeartBeatReportType|cctvStateMask":"UInt8","ENVHeartBeatReportType|environmentWarning":"UInt8","ENVHeartBeatReportType|flowMeter1Flow":"UInt16","ENVHeartBeatReportType|flowMeter2Flow":"UInt16","ENVHeartBeatReportType|flowMeter3Flow":"UInt16","ENVHeartBeatReportType|flowMeter4Flow":"UInt16","ENVHeartBeatReportType|leakSensor1Depth":"UInt16","ENVHeartBeatReportType|leakSensor2Depth":"UInt16","ENVHeartBeatReportType|leakSensor1Temperature":"Int16","ENVHeartBeatReportType|leakSensor2Temperature":"Int16","ENVHeartBeatReportType|fireSensor1Alarm":"UInt8","ENVHeartBeatReportType|fireSensor2Alarm":"UInt8","ENVHeartBeatReportType|fireSensor3Alarm":"UInt8","ENVHeartBeatReportType|autoExtinguisher1Active":"UInt8","ENVHeartBeatReportType|autoExtinguisher2Active":"UInt8","ENVHeartBeatReportType|autoExtinguisher3Active":"UInt8","ENVHeartBeatReportType|autoExtinguisher4Active":"UInt8","PowerHeartBeatReportType|pduSourceStatus":"UInt8","PowerHeartBeatReportType|inputVS":"UInt16","PowerHeartBeatReportType|inputCS":"UInt16","PowerHeartBeatReportType|portONStatus":"UInt64","PowerHeartBeatReportType|starboardONStatus":"UInt64","PowerHeartBeatReportType|batterySource":"UInt8","PowerHeartBeatReportType|batteryChargeStatus":"UInt8","PowerHeartBeatReportType|batteryLevel":"UInt8","PowerHeartBeatReportType|batteryFaultStatus":"UInt8","PowerHeartBeatReportType|batteryVoltage":"UInt16","PowerHeartBeatReportType|batteryCurrent":"UInt16","PowerHeartBeatReportType|batteryTemperature":"Int16","PowerHeartBeatReportType|batterySoc":"UInt16","PowerHeartBeatReportType|batterySoh":"UInt16","PowerHeartBeatReportType|portGeneratorVoltage":"UInt16","PowerHeartBeatReportType|portGeneratorCurrent":"UInt16","PowerHeartBeatReportType|portGeneratorFrequency":"UInt16","PowerHeartBeatReportType|portGeneratorSpeed":"UInt16","PowerHeartBeatReportType|portGeneratorOilPressure":"UInt16","PowerHeartBeatReportType|portGeneratorCoolantTemperature":"UInt16","PowerHeartBeatReportType|portGeneratorFuelRate":"UInt16","PowerHeartBeatReportType|portGeneratorTotalHours":"UInt64","PowerHeartBeatReportType|starboardGeneratorVoltage":"UInt16","PowerHeartBeatReportType|starboardGeneratorCurrent":"UInt16","PowerHeartBeatReportType|starboardGeneratorFrequency":"UInt16","PowerHeartBeatReportType|starboardGeneratorSpeed":"UInt16","PowerHeartBeatReportType|starboardGeneratorOilPressure":"UInt16","PowerHeartBeatReportType|starboardGeneratorCoolantTemperature":"UInt16","PowerHeartBeatReportType|starboardGeneratorFuelRate":"UInt16","PowerHeartBeatReportType|starboardGeneratorTotalHours":"UInt64","DistressReportType|distress":"UInt8","USVControlType|targetRPM":"UInt16","USVControlType|targetSteering":"Int16","USVControlType|targetBowThruster":"Int16","PowerControlType|powerOn":"UInt64","PowerControlType|powerOff":"UInt64","CCTVControlType|cctvMask":"UInt8"}''')
-          global_map=json.loads(r'''{"platformType":"UInt8","platformID":"UInt8","equipmentType":"UInt8","equipmentID":"UInt8","dstEquipmentType":"UInt8","dstEquipmentID":"UInt8","status":"UInt8","linkStatus":"UInt8","throughput":"UInt8","networkID":"UInt8","gpsOnePPS":"UInt8","latitude":"Float64","longtitude":"Float64","altitude":"Float64","handoverMode":"UInt8","output":"UInt8","connect":"UInt8","fa":"UInt8","topology":"UInt8","amc":"UInt8","netSet":"UInt8","comFA":"UInt8","resource":"UInt8","debug":"UInt8","sourceIP":"UInt8","targetPort":"UInt8","threatCode":"UInt8","currentStatus":"UInt8","cpuTemperature":"Float64","cpuLoad":"Float64","operationMode":"UInt8","portEngineStatus":"UInt8","starboardEngineStatus":"UInt8","portWaterjetStatus":"UInt8","starboardWaterjetStatus":"UInt8","bowThrustertStatus":"UInt8","pduStatus":"UInt8","batteryStatus":"UInt8","portGeneratorStatus":"UInt8","starboardGeneratorStatus":"UInt8","environmentSensorDeviceStatus":"UInt8","windSensorStatus":"UInt8","fireDetectorStatus":"UInt8","fireDetected":"UInt8","leakDetectorStatus":"UInt8","leakDetected":"UInt8","flowMeterStatus":"UInt8","flowAnomalyDetected":"UInt8","stabilizerStatus":"UInt8","interceptorStatus":"UInt8","seaWaterAirConditionerStatus":"UInt8","towingDeviceStatus":"UInt8","spceStatus":"UInt8","vcuStatus":"UInt8","vcuTmpStatus":"UInt8","engineStatus":"UInt8","portEngineOilPressure":"UInt16","portEngineOilTemperature":"UInt16","portEngineTemperature":"UInt16","portAlternatorPotential":"Int16","portFuelRate":"Int16","portTotalEngineHours":"UInt64","portCoolantPressure":"UInt16","portFuelPressure":"UInt16","portEngineState1":"UInt16","portEngineState2":"UInt16","portEngineLoad":"UInt8","portEngineTorque":"UInt8","portTransGear":"UInt8","portTransOilPressure":"UInt16","portTransOilTemperature":"UInt16","starboardEngineOilPressure":"UInt16","starboardEngineOilTemperature":"UInt16","starboardEngineTemperature":"UInt16","starboardAlternatorPotential":"Int16","starboardFuelRate":"Int16","starboardTotalEngineHours":"UInt64","starboardCoolantPressure":"UInt16","starboardFuelPressure":"UInt16","starboardEngineState1":"UInt16","starboardEngineState2":"UInt16","starboardEngineLoad":"UInt8","starboardEngineTorque":"UInt8","starboardTransGear":"UInt8","starboardTransOilPressure":"UInt16","starboardTransOilTemperature":"UInt16","portFailToSafe":"UInt8","portNoClutchFeedback":"UInt8","portHydOilLevelLow":"UInt8","portHydTemperatureHigh":"UInt8","portHydPressureLow":"UInt8","portLubOilLevelLow":"UInt8","portLubOilPressureLow":"UInt8","portHydLubSensorError":"UInt8","portBucketNotInSetpoint":"UInt8","portBucketFeedbackOutOfSpan":"UInt8","portNozzleNotInSetPoint":"UInt8","portNozzleFeedbackSensorError":"UInt8","starboardFailToSafe":"UInt8","starboardNoClutchFeedback":"UInt8","starboardHydOilLevelLow":"UInt8","starboardHydTemperatureHigh":"UInt8","starboardHydPressureLow":"UInt8","starboardLubOilLevelLow":"UInt8","starboardLubOilPressureLow":"UInt8","starboardHydLubSensorError":"UInt8","starboardBucketNotInSetpoint":"UInt8","starboardBucketFeedbackOutOfSpan":"UInt8","starboardNozzleNotInSetPoint":"UInt8","starboardNozzleFeedbackSensorError":"UInt8","bowThrusterStatus":"UInt8","bowThrusterMotorError":"UInt8","bowThrusterRetractState":"UInt8","bowThrusterTemperature":"UInt16","bowThrusterMotorCurrent":"UInt8","bowThrusterMotorOperationTime":"UInt16","inputVS":"UInt16","inputCS":"UInt16","batteryAssemblyVS":"UInt16","batteryAssemblyCS":"UInt16","tsadVS":"UInt16","tsadCS":"UInt16","ssdVS":"UInt16","ssdCS":"UInt16","sidVS":"UInt16","sidCS":"UInt16","fanEngineRoomVS":"UInt16","fanEngineRoomCS":"UInt16","fanEquipRoomVS":"UInt16","fanEquipRoomCS":"UInt16","damperAndContVS":"UInt16","damperAndContCS":"UInt16","seaWaterAirConditionerVS":"UInt16","seaWaterAirConditionerCS":"UInt16","seaWaterAirConditionerContVS":"UInt16","seaWaterAirConditionerContCS":"UInt16","interceptorVS":"UInt16","interceptorCS":"UInt16","bowThrustVS":"UInt16","bowThrustCS":"UInt16","stabilizerVS":"UInt16","stabilizerCS":"UInt16","stabilizerContVS":"UInt16","stabilizerContCS":"UInt16","bilgePumpEngineRoomVS":"UInt16","bilgePumpEngineRoomCS":"UInt16","bilgePumpEquipRoomVS":"UInt16","bilgePumpEquipRoomCS":"UInt16","bilgePumpBowRoomVS":"UInt16","bilgePumpBowRoomCS":"UInt16","eoirVS":"UInt16","eoirCS":"UInt16","cipecVS":"UInt16","cipecCS":"UInt16","navRadarVS":"UInt16","navRadarCS":"UInt16","scdeVS":"UInt16","scdeCS":"UInt16","ccdVS":"UInt16","ccdCS":"UInt16","spceVS":"UInt16","spceCS":"UInt16","ccVS":"UInt16","ccCS":"UInt16","lightNavigationVS":"UInt16","lightNavigationCS":"UInt16","lightHullVS":"UInt16","lightHullCS":"UInt16","lightInteriorWheelhouseVS":"UInt16","lightInteriorWheelhouseCS":"UInt16","lightInteriorEngineRoomVS":"UInt16","lightInteriorEngineRoomCS":"UInt16","lightExternalVS":"UInt16","lightExternalCS":"UInt16","warningLightVS":"UInt16","warningLightCS":"UInt16","decuTransceiverVS":"UInt16","decuTransceiverCS":"UInt16","cneVS":"UInt16","cneCS":"UInt16","aisTransceiverVS":"UInt16","aisTransceiverCS":"UInt16","aisReceiverDvlVS":"UInt16","aisReceiverDvlCS":"UInt16","ajasAntennaVS":"UInt16","ajasAntennaCS":"UInt16","naeVS":"UInt16","naeCS":"UInt16","satcomModemVS":"UInt16","satcomModemCS":"UInt16","ethernetSwitchPrimaryVS":"UInt16","ethernetSwitchPrimaryCS":"UInt16","ethernetSwitchEmergencyVS":"UInt16","ethernetSwitchEmergencyCS":"UInt16","radioVS":"UInt16","radioCS":"UInt16","satcomAcuVS":"UInt16","satcomAcuCS":"UInt16","cryptoVS":"UInt16","cryptoCS":"UInt16","rcwsVS":"UInt16","rcwsCS":"UInt16","torsionSensorVS":"UInt16","torsionSensorCS":"UInt16","vibrationSensorVS":"UInt16","vibrationSensorCS":"UInt16","vdrVS":"UInt16","vdrCS":"UInt16","voiceTransceiverVS":"UInt16","voiceTransceiverCS":"UInt16","environmentSensorProcessorVS":"UInt16","environmentSensorProcessorCS":"UInt16","towedDeviceVS":"UInt16","towedDeviceCS":"UInt16","commonWeaponVS":"UInt16","commonWeaponCS":"UInt16","commonPlatformControlVS":"UInt16","commonPlatformControlCS":"UInt16","batterySource":"UInt8","batteryChargeStatus":"UInt8","batteryLevel":"UInt8","batteryFaultStatus":"UInt8","batteryVoltage":"UInt16","batteryCurrent":"UInt16","batteryTemperature":"Int16","batterySoc":"UInt16","batterySoh":"UInt16","portGeneratorVoltage":"UInt16","portGeneratorCurrent":"UInt16","portGeneratorFrequency":"UInt16","portGeneratorSpeed":"UInt16","portGeneratorOilPressure":"UInt16","portGeneratorCoolantTemperature":"UInt16","portGeneratorFuelRate":"UInt16","portGeneratorTotalHours":"UInt64","starboardGeneratorVoltage":"UInt16","starboardGeneratorCurrent":"UInt16","starboardGeneratorFrequency":"UInt16","starboardGeneratorSpeed":"UInt16","starboardGeneratorOilPressure":"UInt16","starboardGeneratorCoolantTemperature":"UInt16","starboardGeneratorFuelRate":"UInt16","starboardGeneratorTotalHours":"UInt64","windDirection":"UInt16","windSpeed":"UInt16","outsideTemperature":"Int16","outsideHumidity":"UInt16","outsidePressure":"UInt16","flowMeter1Flow":"UInt16","flowMeter2Flow":"UInt16","flowMeter3Flow":"UInt16","flowMeter4Flow":"UInt16","leakSensor1Depth":"UInt16","leakSensor2Depth":"UInt16","leakSensor1Temperature":"Int16","leakSensor2Temperature":"Int16","fireSensor1Alarm":"UInt8","fireSensor2Alarm":"UInt8","fireSensor3Alarm":"UInt8","autoExtinguisher1Active":"UInt8","autoExtinguisher2Active":"UInt8","autoExtinguisher3Active":"UInt8","autoExtinguisher4Active":"UInt8","fuelRemain":"UInt16","portCurrentRPM":"UInt16","starboardCurrentRPM":"UInt16","portCurrentSteering":"Int16","starboardCurrentSteering":"Int16","cctvStateMask":"UInt8","environmentWarning":"UInt8","pduSourceStatus":"UInt8","portONStatus":"UInt64","starboardONStatus":"UInt64","distress":"UInt8","targetRPM":"UInt16","targetSteering":"Int16","targetBowThruster":"Int16","powerOn":"UInt64","powerOff":"UInt64","cctvMask":"UInt8","seconds":"UInt64","nanoseconds":"UInt32","outputLevel":"UInt32","dataBW":"Float64","dataRate":"Float64","signalPower":"Float32","cn":"Float64","ber":"Float64","bitRate":"Float64","trafficRate":"Float64","valid":"Boolean","statusText":"UInt8"}''')
           root=ET.parse(p).getroot()
-          missing=[]; resolvable=[]; mismatches=[]; unresolved=[]
-          def visit(el, ctx=None):
+          missing=[]; booleans=[]
+          def walk(el,c=None):
               ch=el.find(ns+'DDSChannel')
-              if ch is not None and ch.get('typeName'):
-                  ctx=ch.get('typeName')
+              if ch is not None and ch.get('typeName'): c=ch.get('typeName')
               tag=el.tag.split('}')[-1]
-              if tag in ('Field','FixedField','DerivedField'):
+              if tag in {'Field','FixedField','DerivedField'}:
                   name=el.get('name',''); leaf=name.split('.')[-1]
-                  expected=msg_map.get((ctx or '')+'|'+leaf); source='message'
-                  if expected is None:
-                      expected=global_map.get(leaf); source='global'
-                  dt=el.get('dataType')
-                  if dt is None and name not in ('usvHeader','destination'):
-                      missing.append((ctx,name))
-                      if expected: resolvable.append((ctx,name,expected,source))
-                      else: unresolved.append((ctx,name))
-                  elif dt and expected and dt != expected:
-                      mismatches.append((ctx,name,dt,expected,source))
-              for c in list(el):
-                  if c.tag == ns+'DDSChannel': continue
-                  visit(c,ctx)
-          visit(root)
-          print('MISSING_TOTAL',len(missing))
-          print('RESOLVABLE',len(resolvable))
-          print('UNRESOLVED',len(unresolved))
-          print('MISMATCHES',len(mismatches))
-          print('RESOLVED_TYPES',dict(collections.Counter(x[2] for x in resolvable)))
-          print('--- MISMATCHES ---')
-          for x in mismatches: print('|'.join(str(v) for v in x))
-          print('--- UNRESOLVED ---')
-          for x in unresolved: print('|'.join(str(v) for v in x))
+                  want=expected(c,leaf)
+                  if want and not el.get('dataType'): missing.append((c,name,want))
+                  if el.get('dataType')=='Boolean': booleans.append((c,name))
+              for child in list(el):
+                  if child.tag==ns+'DDSChannel': continue
+                  walk(child,c)
+          walk(root)
+          print('SOURCE_PRIMITIVE_MISSING',len(missing),missing)
+          print('PLATFORM_BOOLEAN_COUNT',len(booleans),booleans)
+          if missing: raise SystemExit('source-confirmed primitive dataType still missing')
+          if booleans: raise SystemExit('PlatformController source CSCI has no primitive boolean fields')
+      - name: XSD validate
+        run: |
+          python -m pip install -q lxml
+          python - <<'PY'
+          from lxml import etree
+          schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          doc=etree.parse('ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml')
+          schema.assertValid(doc)
+          print('XSD PASS')
+          PY
+      - name: Commit migration
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml
+          if git diff --cached --quiet; then echo 'No changes'; exit 0; fi
+          git commit -m 'Resolve PlatformController primitive datatypes from CSCI'
+          git push origin HEAD:feature/usv-semantic-binding-audit
