@@ -1,0 +1,161 @@
+name: temporary CSV datatype resolution
+
+on:
+  push:
+    branches:
+      - feature/usv-semantic-binding-audit
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Apply CSV-confirmed primitive datatypes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(text, old, new, label):
+              c = text.count(old)
+              if c != 1:
+                  raise SystemExit(f'{label}: expected 1 occurrence, got {c}')
+              return text.replace(old, new, 1)
+
+          # NavigationRadar Binding: CSCI rows explicitly say long / 4 bytes.
+          p = Path('ProtocolXml/USV/NavigationRadar/NavigationRadarBinding.xml')
+          t = p.read_text(encoding='utf-8')
+          t = replace_once(t,
+              '<!--frameWidth/frameHeight의 정확한 IDL primitive type은 항해레이더 정보처리 CSC 원문 재확인 전 임의 선언하지 않는다.-->',
+              '<!--frameWidth/frameHeight는 항해레이더 정보처리 CSC에서 long(4 Byte)로 확인되어 Int32로 선언한다.-->',
+              'radar comment')
+          t = replace_once(t, '<Field name="frameWidth" cdm="Radar.Video.Frame.Width"/>', '<Field name="frameWidth" cdm="Radar.Video.Frame.Width" dataType="Int32"/>', 'frameWidth')
+          t = replace_once(t, '<Field name="frameHeight" cdm="Radar.Video.Frame.Height"/>', '<Field name="frameHeight" cdm="Radar.Video.Frame.Height" dataType="Int32"/>', 'frameHeight')
+          p.write_text(t, encoding='utf-8')
+
+          # NetworkAbstraction Binding: common-structure CSV gives exact primitive types.
+          p = Path('ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionBinding.xml')
+          t = p.read_text(encoding='utf-8')
+          fields = {
+              'modulatorStatus.outputLevel': 'UInt32',
+              'modulatorStatus.dataBW': 'Float64',
+              'modulatorStatus.dataRate': 'Float64',
+              'demodulatorStatus.signalPower': 'Float32',
+              'demodulatorStatus.cn': 'Float64',
+              'demodulatorStatus.ber': 'Float64',
+              'demodulatorStatus.bitRate': 'Float64',
+              'demodulatorStatus.trafficRate': 'Float64',
+          }
+          for name, dtype in fields.items():
+              pat = rf'(<Field name="{re.escape(name)}"\s+cdm="[^"]+")((?:\s+scale="[^"]+")?\s*/>)'
+              m = re.search(pat, t)
+              if not m:
+                  raise SystemExit(f'network field not found or already changed: {name}')
+              repl = m.group(1) + f' dataType="{dtype}"' + m.group(2)
+              t = t[:m.start()] + repl + t[m.end():]
+          p.write_text(t, encoding='utf-8')
+
+          # NavigationRadar OpenIssues: close frame type TBD.
+          p = Path('ProtocolXml/USV/NavigationRadar/NavigationRadar_OpenIssues.md')
+          t = p.read_text(encoding='utf-8')
+          anchor = '- 레이더 영상은 기존대로 SensorProduct/RTP로 유지한다.\n'
+          addition = '- `RadarAISStatusReportType.frameWidth`와 `frameHeight`는 `항해레이더 정보처리 CSC.csv`에서 각각 `long`, 4 Byte로 확인되어 Binding `Int32`로 확정하였다.\n'
+          if addition not in t:
+              t = replace_once(t, anchor, anchor + addition, 'radar openissue confirmed anchor')
+          t, n = re.subn(r'\n8\. \*\*RadarAISStatusReportType frame 크기 primitive type\*\*\n.*?(?=\n## 4\. 현재 상태)', '\n', t, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'radar issue8 removal expected 1 got {n}')
+          p.write_text(t, encoding='utf-8')
+
+          # NetworkAbstraction OpenIssues: close GeoSat primitive type TBD and renumber 2..8 -> 1..7.
+          p = Path('ProtocolXml/USV/NetworkAbstraction/NetworkAbstraction_OpenIssues.md')
+          t = p.read_text(encoding='utf-8')
+          anchor = '- 공용 PBIT/IBIT 요청 destination은 대상별 `System.Target.NetworkAbstraction.*` prepared composite로 변경하였다.\n'
+          addition = ('- `공용 구조체.csv`의 `GeoSatModulatorStatus` / `GeoSatDemodulatorStatus` 정의를 재확인하여 '
+                      '`outputLevel=UInt32`, `dataBW/dataRate=Float64`, `signalPower=Float32`, '
+                      '`cn/ber/bitRate/trafficRate=Float64`로 Binding 자료형을 확정하였다.\n')
+          if addition not in t:
+              t = replace_once(t, anchor, anchor + addition, 'network openissue confirmed anchor')
+          t, n = re.subn(r'\n1\. \*\*GeoSat 통신상태 8개 필드의 실제 DDS primitive type\*\*\n.*?(?=\n2\. \*\*)', '\n', t, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'network issue1 removal expected 1 got {n}')
+          for old in range(2, 9):
+              t = t.replace(f'\n{old}. **', f'\n{old-1}. **', 1)
+          t = t.replace('- `configureLBandComms`의 일부 `*.Raw` Semantic Profile과 GeoSat 수치 8개 `dataType`은 근거 부족 때문에 의도적으로 미확정 상태로 보존한다.\n',
+                        '- `configureLBandComms`의 일부 `*.Raw` Semantic Profile은 원문 논리 polarity 근거 부족 때문에 의도적으로 미확정 상태로 보존한다.\n')
+          t = t.replace('- 남은 8건은 사용자가 임의로 결정할 사항이 아니라 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.\n',
+                        '- 남은 7건은 사용자가 임의로 결정할 사항이 아니라 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.\n')
+          p.write_text(t, encoding='utf-8')
+
+          # Integrated audit: after these 10 fields, only PlatformController 419 remains in primitive datatype backlog.
+          p = Path('ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md')
+          t = p.read_text(encoding='utf-8')
+          t = t.replace('남은 primitive `dataType` 미지정은 총 **429건**', '남은 primitive `dataType` 미지정은 총 **419건**')
+          t = t.replace('| NavigationRadar | 2 | `frameWidth`, `frameHeight` 실제 IDL primitive type 재확인 필요 |',
+                        '| NavigationRadar | 0 | `항해레이더 정보처리 CSC.csv`에서 `frameWidth/frameHeight=long(4 Byte)` 확인 후 `Int32` 반영 |')
+          t = t.replace('| NetworkAbstraction | 8 | GeoSat `valid` 2개는 Boolean 확정; 나머지 수치 8개 primitive type 불명확 |',
+                        '| NetworkAbstraction | 0 | `공용 구조체.csv`에서 GeoSat 수치 8개 primitive type까지 확인 완료 |')
+          t = t.replace('| **합계** | **429** |  |', '| **합계** | **419** |  |')
+          t = t.replace('이 429건은 XSD 오류가 아니다.', '이 419건은 XSD 오류가 아니다.')
+          t = t.replace('- 총 미지정: 429건', '- 총 미지정: 419건')
+          p.write_text(t, encoding='utf-8')
+          PY
+      - name: Validate XSD and exact resolved types
+        shell: bash
+        run: |
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from lxml import etree
+          from pathlib import Path
+          ns={'u':'http://lignex1.com/mcmc2/umsSchema'}
+          schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          for path in [
+              'ProtocolXml/USV/NavigationRadar/NavigationRadarBinding.xml',
+              'ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionBinding.xml',
+          ]:
+              doc=etree.parse(path)
+              if not schema.validate(doc):
+                  for e in schema.error_log: print(e)
+                  raise SystemExit(f'XSD FAIL {path}')
+              print('XSD PASS', path)
+          expected={
+              'frameWidth':'Int32','frameHeight':'Int32',
+              'modulatorStatus.outputLevel':'UInt32','modulatorStatus.dataBW':'Float64','modulatorStatus.dataRate':'Float64',
+              'demodulatorStatus.signalPower':'Float32','demodulatorStatus.cn':'Float64','demodulatorStatus.ber':'Float64',
+              'demodulatorStatus.bitRate':'Float64','demodulatorStatus.trafficRate':'Float64',
+          }
+          found={}
+          for path in ['ProtocolXml/USV/NavigationRadar/NavigationRadarBinding.xml','ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionBinding.xml']:
+              root=etree.parse(path)
+              for e in root.xpath('//u:Field',namespaces=ns):
+                  n=e.get('name')
+                  if n in expected: found[n]=e.get('dataType')
+          print('RESOLVED', found)
+          if found != expected:
+              raise SystemExit(f'type mismatch: {found}')
+          # Confirm no converter reintroduced.
+          for path in Path('ProtocolXml/USV').glob('*/*Binding.xml'):
+              text=path.read_text(encoding='utf-8')
+              if 'converter=' in text:
+                  raise SystemExit(f'converter remains {path}')
+          print('converter PASS')
+          PY
+      - name: Commit resolved CSV datatypes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ProtocolXml/USV/NavigationRadar/NavigationRadarBinding.xml \
+                  ProtocolXml/USV/NavigationRadar/NavigationRadar_OpenIssues.md \
+                  ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionBinding.xml \
+                  ProtocolXml/USV/NetworkAbstraction/NetworkAbstraction_OpenIssues.md \
+                  ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Resolve Radar and GeoSat datatypes from CSV sources"
+          git push origin HEAD:feature/usv-semantic-binding-audit
