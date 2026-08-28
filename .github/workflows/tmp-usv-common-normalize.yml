@@ -1,0 +1,192 @@
+name: temporary normalize common USV semantic concepts
+
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+          fetch-depth: 0
+      - run: python -m pip install --quiet lxml
+      - name: Normalize common controls and replies
+        shell: bash
+        run: |
+          cat > /tmp/normalize.py <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re, sys
+
+          URI='http://lignex1.com/mcmc2/umsSchema'; NS={'u':URI}
+          devices=[
+            'AutonomousNavigation','CentralControl','ElectroOptical','ElectroOpticalProcessor',
+            'IntegratedNavigation','Lidar','NavigationCamera','NavigationRadar','NearContactDetection',
+            'NetworkAbstraction','PlatformController','RemoteFireControl','SensorFusion','SideScanSonar'
+          ]
+
+          def set_attr_in_start_tag(text, tag, keyattr, keyval, attr, value):
+              pat=re.compile(rf'<{tag}\b(?=[^>]*\b{re.escape(keyattr)}=(?P<q>["\']){re.escape(keyval)}(?P=q))[^>]*>', re.S)
+              m=pat.search(text)
+              if not m:
+                  raise RuntimeError(f'cannot find {tag} {keyattr}={keyval}')
+              old=m.group(0)
+              if re.search(rf'\b{re.escape(attr)}=["\'][^"\']*["\']',old):
+                  new=re.sub(rf'\b{re.escape(attr)}=["\'][^"\']*["\']',f'{attr}="{value}"',old,count=1)
+              else:
+                  if old.endswith('/>'):
+                      new=old[:-2]+f' {attr}="{value}"/>'
+                  else:
+                      new=old[:-1]+f' {attr}="{value}">'
+              return text[:m.start()]+new+text[m.end():]
+
+          def ensure_reply_status_result(text, bindref):
+              # locate Reply by bindRef. Expand self-closing reply or add Results only when absent.
+              startpat=re.compile(rf'<Reply\b(?=[^>]*\bbindRef=(["\']){re.escape(bindref)}\1)[^>]*>',re.S)
+              m=startpat.search(text)
+              if not m: raise RuntimeError(f'missing Semantic Reply {bindref}')
+              tag=m.group(0)
+              if tag.endswith('/>'):
+                  indent=text[text.rfind('\n',0,m.start())+1:m.start()]
+                  body='\n'+indent+'  <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>\n'+indent+'</Reply>'
+                  newtag=tag[:-2]+'>'
+                  return text[:m.start()]+newtag+body+text[m.end():]
+              end=text.find('</Reply>',m.end())
+              if end<0: raise RuntimeError(f'unclosed Semantic Reply {bindref}')
+              block=text[m.start():end+8]
+              if 'cdm="Control.Response.Status"' in block or "cdm='Control.Response.Status'" in block:
+                  return text
+              indent=text[text.rfind('\n',0,m.start())+1:m.start()]
+              insertion='\n'+indent+'  <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>'
+              return text[:end]+insertion+text[end:]
+
+          sx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          bx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          changed=[]
+          for dev in devices:
+              d=Path('ProtocolXml/USV')/dev
+              sp=d/f'{dev}Semantic.xml'; bp=d/f'{dev}Binding.xml'
+              sr=etree.parse(str(sp)); br=etree.parse(str(bp))
+              st=sp.read_text(); bt=bp.read_text()
+              oldst,oldbt=st,bt
+
+              controls={c.get('id'):c for c in sr.xpath('//u:ControlSpec',namespaces=NS)}
+              # Source-driven NetworkAbstraction has two integration controls and no restart.
+              integration_ids=[cid for cid in controls if cid=='startIntegration' or cid in ('startControlStationIntegration','startUsvIntegration')]
+              restart_ids=[cid for cid in controls if cid=='restartSystem']
+              pbit_ids=[cid for cid in controls if cid.lower().startswith('request') and 'pbit' in cid.lower()]
+              ibit_ids=[cid for cid in controls if cid.lower().startswith('request') and 'ibit' in cid.lower()]
+              for cid in integration_ids: st=set_attr_in_start_tag(st,'ControlSpec','id',cid,'cdm','Control.Integration.Start')
+              for cid in restart_ids: st=set_attr_in_start_tag(st,'ControlSpec','id',cid,'cdm','Control.System.Restart')
+              for cid in pbit_ids: st=set_attr_in_start_tag(st,'ControlSpec','id',cid,'cdm','Request.Health.PBIT')
+              for cid in ibit_ids: st=set_attr_in_start_tag(st,'ControlSpec','id',cid,'cdm','Request.Health.IBIT')
+
+              # Determine physical ACK reply IDs from Binding; all are the same processing-status concept.
+              ack_ids=[]
+              for r in br.xpath('//u:ControlBinding/u:Reply',namespaces=NS):
+                  ch=r.find(f'{{{URI}}}DDSChannel')
+                  if ch is not None and ch.get('typeName')=='CommandStatusReportType': ack_ids.append(r.get('semantic_id'))
+
+              # Determine actual PBIT/IBIT result Reply IDs from Semantic parent controls.
+              pbit_result_ids=[]; ibit_result_ids=[]; sem_required={}
+              for cid,c in controls.items():
+                  for r in c.xpath('./u:Reply',namespaces=NS):
+                      rid=r.get('bindRef'); sem_required[rid]=(r.get('required')=='true')
+                      if cid in pbit_ids and rid not in ack_ids: pbit_result_ids.append(rid)
+                      if cid in ibit_ids and rid not in ack_ids: ibit_result_ids.append(rid)
+
+              for rid in ack_ids:
+                  # only touch Semantic replies that exist in this spec
+                  if sr.xpath(f'//u:Reply[@bindRef="{rid}"]',namespaces=NS):
+                      st=set_attr_in_start_tag(st,'Reply','bindRef',rid,'cdm','Command.ProcessingStatus.Response')
+                      st=set_attr_in_start_tag(st,'Reply','bindRef',rid,'required','true')
+                      st=ensure_reply_status_result(st,rid)
+              for rid in pbit_result_ids:
+                  st=set_attr_in_start_tag(st,'Reply','bindRef',rid,'cdm','Request.Health.PBIT.Response')
+              for rid in ibit_result_ids:
+                  st=set_attr_in_start_tag(st,'Reply','bindRef',rid,'cdm','Request.Health.IBIT.Response')
+
+              # Binding required follows Semantic required=true. Never invent required where Semantic does not require it.
+              for rid,req in sem_required.items():
+                  if req and br.xpath(f'//u:Reply[@semantic_id="{rid}"]',namespaces=NS):
+                      bt=set_attr_in_start_tag(bt,'Reply','semantic_id',rid,'required','true')
+
+              # SideScanSonar legacy logical power states still carried raw 0/1 in Semantic ValueSetSpec.
+              if dev=='SideScanSonar':
+                  st=re.sub(r'<Value\s+cdm="PowerSupplyState\.Off">\s*0\s*</Value>', '<Value name="Off" cdm="PowerSupplyState.Off"/>', st)
+                  st=re.sub(r'<Value\s+cdm="PowerSupplyState\.On">\s*1\s*</Value>', '<Value name="On" cdm="PowerSupplyState.On"/>', st)
+
+              if st!=oldst:
+                  sp.write_text(st); changed.append(str(sp))
+              if bt!=oldbt:
+                  bp.write_text(bt); changed.append(str(bp))
+
+          # Validate and enforce integrated invariants.
+          failed=False
+          for dev in devices:
+              d=Path('ProtocolXml/USV')/dev; sp=d/f'{dev}Semantic.xml'; bp=d/f'{dev}Binding.xml'
+              sr=etree.parse(str(sp)); br=etree.parse(str(bp))
+              if not sx.validate(sr):
+                  failed=True; print('SEM XSD FAIL',dev); [print(x) for x in sx.error_log]
+              if not bx.validate(br):
+                  failed=True; print('BIND XSD FAIL',dev); [print(x) for x in bx.error_log]
+              # no converters
+              if bp.read_text().count('converter='):
+                  failed=True; print('CONVERTER REMAINS',dev)
+              # raw numeric values are prohibited only in logical ValueSet* nodes, not QuantityValueSetSpec.
+              bad=[]
+              for parent in sr.xpath('//u:ValueSetSpec|//u:ValueSetProfile|//u:ValueSetResult|//u:HealthStatusSetSpec',namespaces=NS):
+                  for v in parent.xpath('./u:Values/u:Value',namespaces=NS):
+                      if v.text and re.fullmatch(r'\s*[-+]?\d+(?:\.\d+)?\s*',v.text): bad.append((parent.get('id') or parent.get('name') or parent.get('cdm'),v.text.strip()))
+              if bad: failed=True; print('RAW LOGICAL ENUM',dev,bad)
+              # Control/Binding and Reply references.
+              cs={x.get('id') for x in sr.xpath('//u:ControlSpec',namespaces=NS)}; cb={x.get('semantic_id') for x in br.xpath('//u:ControlBinding',namespaces=NS)}
+              if cs!=cb: failed=True; print('CONTROL DIFF',dev,cs^cb)
+              rs={x.get('bindRef') for x in sr.xpath('//u:ControlSpec/u:Reply',namespaces=NS)}; rb={x.get('semantic_id') for x in br.xpath('//u:ControlBinding/u:Reply',namespaces=NS)}
+              if rs!=rb: failed=True; print('REPLY DIFF',dev,rs^rb)
+              # Common physical ACKs have common Semantic CDM and required=true.
+              for r in br.xpath('//u:ControlBinding/u:Reply',namespaces=NS):
+                  ch=r.find(f'{{{URI}}}DDSChannel')
+                  if ch is not None and ch.get('typeName')=='CommandStatusReportType':
+                      rid=r.get('semantic_id'); sem=sr.xpath(f'//u:Reply[@bindRef="{rid}"]',namespaces=NS)
+                      if len(sem)!=1 or sem[0].get('cdm')!='Command.ProcessingStatus.Response' or sem[0].get('required')!='true' or r.get('required')!='true':
+                          failed=True; print('ACK CONTRACT DIFF',dev,rid)
+              # common controls are common concepts; Network has no restart and multiple target-specific controls.
+              for c in sr.xpath('//u:ControlSpec',namespaces=NS):
+                  cid=c.get('id',''); low=cid.lower()
+                  expect=None
+                  if cid=='startIntegration' or cid in ('startControlStationIntegration','startUsvIntegration'): expect='Control.Integration.Start'
+                  elif cid=='restartSystem': expect='Control.System.Restart'
+                  elif low.startswith('request') and 'pbit' in low: expect='Request.Health.PBIT'
+                  elif low.startswith('request') and 'ibit' in low: expect='Request.Health.IBIT'
+                  if expect and c.get('cdm')!=expect: failed=True; print('COMMON CDM DIFF',dev,cid,c.get('cdm'),expect)
+              # PackedField integrity.
+              for pf in br.xpath('//u:PackedField',namespaces=NS):
+                  width=int(pf.get('width')); used=set()
+                  for bm in pf.xpath('./u:BitMember',namespaces=NS):
+                      off=int(bm.get('offset')); bw=int(bm.get('width','1'))
+                      if off+bw>width: failed=True; print('PACK OOR',dev,pf.get('name'),bm.get('name'))
+                      bits=set(range(off,off+bw))
+                      if used & bits: failed=True; print('PACK OVERLAP',dev,pf.get('name'),bm.get('name'))
+                      used |= bits
+          print('CHANGED FILES')
+          for x in changed: print(x)
+          if failed: raise SystemExit(1)
+          PY
+          python /tmp/normalize.py
+          git diff --check
+      - name: Commit normalization
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ProtocolXml/USV
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Normalize common USV control and reply semantics"
+          git push origin HEAD:feature/usv-semantic-binding-audit
