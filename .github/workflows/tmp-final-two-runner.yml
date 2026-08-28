@@ -1,0 +1,39 @@
+name: temporary run corrected final two audit
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - run: python -m pip install --quiet lxml
+      - name: Run corrected embedded audit script
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import textwrap, subprocess
+          s=Path('.github/workflows/tmp-final-two-apply.yml').read_text()
+          start=s.index("cat > /tmp/apply.py <<'PY'\n")+len("cat > /tmp/apply.py <<'PY'\n")
+          end=s.index("\n          PY\n", start)
+          code=textwrap.dedent(s[start:end])
+          code=code.replace("fixed=[x for x in cb if etree.QName(x).localname=='FixedField' and x.get('name','').startswith('destination.')]", "fixed=[x for x in cb if isinstance(x.tag,str) and etree.QName(x).localname=='FixedField' and x.get('name','').startswith('destination.')]")
+          code=code.replace("f={x.get('name'):x for x in rep if etree.QName(x).localname=='Field'}", "f={x.get('name'):x for x in rep if isinstance(x.tag,str) and etree.QName(x).localname=='Field'}")
+          Path('/tmp/apply.py').write_text(code)
+          subprocess.run(['python','/tmp/apply.py'],check=True)
+          PY
+      - name: Commit audited device files
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ProtocolXml/USV/NearContactDetection ProtocolXml/USV/AutonomousNavigation
+          git diff --cached --check
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Audit final RCU-connected USV semantic bindings"
+          git push origin HEAD:feature/usv-semantic-binding-audit
