@@ -20,6 +20,8 @@
 - RTCM `vaildRtcmDataSize`는 기존 합의대로 Semantic 0~256 byte를 유지하고 Binding의 물리 오탈자는 보존하였다. wire type은 Int32, `rtcmDataBuf`는 256-byte 배열로 선언하였다.
 - 기존 `BuildUSVMessageBase`, `UInt16` converter를 제거하였다.
 - 복합항법 CSCI 재심층 감사에서 `imuIbit2`의 `Bit 0?10 : Reserved`는 동일 UInt32 내 Bit11~31이 연속 정의되어 있어 `Bit 0~10 : Reserved`로, `dvlIbit2`의 `Bit 20?31 : Reserved`는 Bit0~19가 연속 정의되어 있어 `Bit 20~31 : Reserved`로 확정하였다. 두 `?`는 구간기호가 훼손된 원문/CSV 표기 결함으로 정리한다.
+- 2026-08-28 재업로드된 `복합항법장치 CSCI.csv` 전체를 현재 Semantic/Binding과 다시 대조하였다. 남은 항목 중 `integratedNavigationAidedSensor`는 key 0/1/2/4/8/16만, `ajAsStatus`는 Range 1~2 및 key 1/2만 직접 정의되어 조합/정상·동시감지 규칙은 추가 확인되지 않았다. `imuIbit2` 가속도계 온도는 Bit24~31 + LSB=1℃까지만, `idcTemperature/idcCpuLoad`는 Unit과 Range 셀의 단일 `0`만 존재하여 signedness/실제 범위를 더 확정할 수 없다. 따라서 기존 미해결 6건은 현 CSV로 추가 종료하지 않는다.
+- 같은 재검증에서 Binding 하단에 남아 있던 "reserved 범위가 모호하다"는 과거 주석이 OpenIssues의 해결 상태와 충돌함을 확인하여, Bit0~10/Bit20~31 Reserved 확정 상태로 주석을 동기화하였다.
 
 ## 3. Remaining TBD / Resolved — 미해결 6개
 
@@ -58,5 +60,5 @@
 ## 4. 현재 상태
 
 - 원통 직접 연동 범위의 Semantic/Binding 구조 정리와 복합항법 CSCI 재심층 감사까지 완료하였다.
-- reserved 구간 표기 2건은 32-bit 전체 bit 배치와 연속 정의를 근거로 해소하였다.
-- 미해결 6건은 사용자 정책 선택사항이 아니라 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.
+- reserved 구간 표기 2건은 32-bit 전체 bit 배치와 연속 정의를 근거로 해소하였으며 Binding 주석도 동일 상태로 동기화하였다.
+- 재업로드된 복합항법 CSCI 전체 재검증에서도 추가로 닫을 수 있는 항목은 확인되지 않았다. 미해결 6건은 추가 IDL/Adapter/운용 규칙 근거가 필요한 비차단 TBD이다.

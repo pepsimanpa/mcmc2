@@ -705,7 +705,7 @@
         </PackedField>
         <Field name="idcTemperature" cdm="Health.CNE.IBIT.IDC.Temperature" dataType="Float32"/>
         <Field name="idcCpuLoad" cdm="Health.CNE.IBIT.IDC.CpuLoad" dataType="Float32"/>
-        <!--imuIbit2의 Bit 0?10 및 dvlIbit2의 Bit 20?31 표기는 원문 자체가 모호하여 reserved 범위를 명시적으로 모델링하지 않는다.-->
+        <!--복합항법 CSCI 재심층 감사로 `?`는 구간기호 훼손으로 확정하였다: imuIbit2 Bit0~10, dvlIbit2 Bit20~31은 Reserved. 공통 규칙에 따라 Reserved bit는 Semantic Result/Binding BitMember로 노출하지 않는다.-->
       </Reply>
     </ControlBinding>
     <ControlBinding semantic_id="updateRtcmData">
