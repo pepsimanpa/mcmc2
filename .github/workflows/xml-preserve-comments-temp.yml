@@ -1,0 +1,224 @@
+name: Temporary XML Comment Preservation
+
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/xml-preserve-comments-temp.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+      - run: python -m pip install lxml
+      - name: Restore minimal-diff formatting and valid comments
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re, difflib, subprocess, sys
+
+          BASE='69b7e645bbf5ab0d85b2c3a2f50972c20b93e7d7'
+          files=[
+            'ProtocolXml/USV/NavigationRadar/NavigationRadarSemantic.xml',
+            'ProtocolXml/USV/NavigationRadar/NavigationRadarBinding.xml',
+            'ProtocolXml/USV/ElectroOptical/ElectroOpticalSemantic.xml',
+            'ProtocolXml/USV/ElectroOptical/ElectroOpticalBinding.xml',
+            'ProtocolXml/USV/PlatformController/PlatformControllerSemantic.xml',
+            'ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml',
+          ]
+          target_tags={
+            'TextConstantSpec','GroupSpec','ControlSpec','ProductStreamSpec',
+            'MonitorBinding','ControlBinding','ProductBinding'
+          }
+          invalid={
+            'NavigationRadar':[
+              'dstSubEquipmentID는 공용 식별자 규칙에 별도 정의가 없어 실제 송신 적용값 확인 필요',
+            ],
+            'ElectroOptical':[
+              'deg/s로 해석한다','deg/s로 해석','serializer 구현에서 적용',
+            ],
+            'PlatformController':[
+              '추후 확정한 뒤 추가한다','현재 Control에서 보류한다','OM 포함 여부/직접 HMI 경로',
+              '현재 수행 중인 IBIT Context','현재 수행 중인 PBIT Context',
+              '동일 시험의 중복/동시 요청은 허용하지 않는 운용',
+              'DestinationType: 선체제어장치 equipmentType/equipmentID/subEquipmentID 최종 값 확인 필요',
+              'DestinationType의 선체제어장치 equipmentID/subEquipmentID 최종 값은 TBD',
+              '실시간 추진제어 송신 Binding은 HMI 직접 제어 경로/OM 포함 여부 결정 후 추가한다',
+            ]
+          }
+
+          token_re=re.compile(r'<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<![^>]*>|</?[^>]+?>')
+          start_re=re.compile(r'<\s*([A-Za-z_][\w:.-]*)\b([^>]*)>')
+          end_re=re.compile(r'</\s*([A-Za-z_][\w:.-]*)\s*>')
+          attr_re=re.compile(r'\b(id|semantic_id)\s*=\s*["\']([^"\']+)["\']')
+
+          def spans(text):
+            out={}; stack=[]
+            for m in token_re.finditer(text):
+              tok=m.group(0)
+              if tok.startswith('<!--') or tok.startswith('<?') or tok.startswith('<!') and not tok.startswith('</'):
+                continue
+              em=end_re.fullmatch(tok)
+              if em:
+                if stack:
+                  ent=stack.pop()
+                  if ent['target']:
+                    out[ent['key']]=(ent['start'],m.end())
+                continue
+              sm=start_re.fullmatch(tok)
+              if not sm: continue
+              name=sm.group(1).split(':')[-1]
+              selfclose=tok.rstrip().endswith('/>')
+              am=attr_re.search(sm.group(2))
+              target=name in target_tags and am is not None
+              ent={'start':m.start(),'target':target,'key':(name,am.group(2)) if target else None}
+              if target and selfclose:
+                out[ent['key']]=(m.start(),m.end())
+              elif not selfclose:
+                stack.append(ent)
+            return out
+
+          def canon(s):
+            s=re.sub(r'<!--[\s\S]*?-->','',s)
+            s=re.sub(r'>\s+<','><',s.strip())
+            return s
+
+          def comments(s):
+            return [re.sub(r'\s+',' ',x.strip()) for x in re.findall(r'<!--([\s\S]*?)-->',s)]
+
+          def similar(a,b):
+            return difflib.SequenceMatcher(None,a,b).ratio() >= 0.48
+
+          def invalid_comment(device,c):
+            return any(p in c for p in invalid.get(device,[]))
+
+          def pretty_fragment(frag, base_indent=''):
+            s=frag.strip()
+            s=re.sub(r'>\s+<','><',s)
+            s=re.sub(r'><', '>\n<', s)
+            lines=[]; level=0
+            for raw in s.splitlines():
+              line=raw.strip()
+              if not line: continue
+              if line.startswith('</'): level=max(0,level-1)
+              lines.append(base_indent + '  '*level + line)
+              opens=len(re.findall(r'<(?!/|!|\?)[A-Za-z_][\w:.-]*\b[^>]*?(?<!/)>',line))
+              closes=len(re.findall(r'</[A-Za-z_][\w:.-]*\s*>',line))
+              level += max(0, opens-closes)
+            return '\n'.join(lines)
+
+          def restore_block(oldfrag, curfrag, device, indent):
+            if canon(oldfrag)==canon(curfrag):
+              return oldfrag
+            base=pretty_fragment(curfrag, indent)
+            oc=[c for c in comments(oldfrag) if not invalid_comment(device,c)]
+            cc=comments(base)
+            missing=[c for c in oc if not any(similar(c,x) for x in cc)]
+            if missing:
+              lines=base.splitlines()
+              ins=1
+              child_indent=indent+'  '
+              notes=[child_indent+'<!--'+c+'-->' for c in missing]
+              lines[ins:ins]=notes
+              base='\n'.join(lines)
+            return base
+
+          before={}
+          for fp in files:
+            p=Path(fp); cur=p.read_text(encoding='utf-8')
+            old=subprocess.check_output(['git','show',f'{BASE}:{fp}'],text=True)
+            device=p.parent.name
+            before[fp]=(len(cur.splitlines()),len(comments(cur)))
+            cs=spans(cur); os=spans(old)
+            reps=[]
+            for key,(a,b) in cs.items():
+              if key not in os: continue
+              oa,ob=os[key]
+              curfrag=cur[a:b]; oldfrag=old[oa:ob]
+              indent=re.match(r'[ \t]*',cur[cur.rfind('\n',0,a)+1:a]).group(0)
+              repl=restore_block(oldfrag,curfrag,device,indent)
+              if repl!=curfrag: reps.append((a,b,repl))
+            for a,b,r in sorted(reps,reverse=True): cur=cur[:a]+r+cur[b:]
+
+            # Restore valid legacy root-level/design comments not already represented.
+            fc=comments(cur)
+            missing=[]
+            for c in comments(old):
+              if invalid_comment(device,c): continue
+              if not any(similar(c,x) for x in fc): missing.append(c)
+            if missing:
+              # Insert after root opening tag, preserving all current root comments as well.
+              rootm=re.search(r'<(?:SensorSpec|SensorBinding|PlatformSpec|PlatformBinding)\b[^>]*>',cur)
+              if rootm:
+                ins='\n' + '\n'.join('  <!--'+c+'-->' for c in missing)
+                cur=cur[:rootm.end()]+ins+cur[rootm.end():]
+
+            # Drop only obsolete comments that may have survived in an unchanged legacy block.
+            def scrub(m):
+              c=re.sub(r'\s+',' ',m.group(1).strip())
+              return '' if invalid_comment(device,c) else m.group(0)
+            cur=re.sub(r'<!--([\s\S]*?)-->',scrub,cur)
+            cur=re.sub(r'\n{3,}','\n\n',cur)
+            if not cur.endswith('\n'): cur+='\n'
+            p.write_text(cur,encoding='utf-8')
+            print('STYLE',fp,'lines',before[fp][0],'->',len(cur.splitlines()),'comments',before[fp][1],'->',len(comments(cur)))
+
+          # Hard validation: XSD + xrefs + no converters + no Semantic numeric raw Values.
+          NS={'u':'http://lignex1.com/mcmc2/umsSchema'}
+          root=Path('ProtocolXml')
+          ss=etree.XMLSchema(etree.parse(str(root/'XSD/CommonSpecSchema.xsd')))
+          bs=etree.XMLSchema(etree.parse(str(root/'XSD/CommonBindingSchema.xsd')))
+          fail=[]
+          for d in ['NavigationRadar','PlatformController','ElectroOptical']:
+            sp=root/f'USV/{d}/{d}Semantic.xml'; bp=root/f'USV/{d}/{d}Binding.xml'
+            sd=etree.parse(str(sp)); bd=etree.parse(str(bp))
+            for p,doc,sch in [(sp,sd,ss),(bp,bd,bs)]:
+              ok=sch.validate(doc); print('XSD',p,'PASS' if ok else 'FAIL')
+              if not ok:
+                fail.append(str(p))
+                for e in sch.error_log: print(' XSDERR',e)
+            def aset(doc,x): return set(doc.xpath(x,namespaces=NS))
+            checks=[
+              ('Control',aset(sd,'//u:ControlSpec/@id'),aset(bd,'//u:ControlBinding/@semantic_id')),
+              ('Reply',aset(sd,'//u:Reply/@bindRef'),aset(bd,'//u:ControlBinding/u:Reply/@semantic_id')),
+              ('Monitor',aset(sd,'/u:*/*[local-name()="MonitorSpecs"]/*/@id'),aset(bd,'/u:*/*[local-name()="Monitors"]/u:MonitorBinding/@semantic_id')),
+              ('Product',aset(sd,'/u:*/*[local-name()="SensorProductSpecs"]/*/@id'),aset(bd,'/u:*/*[local-name()="SensorProducts"]/u:ProductBinding/@semantic_id'))]
+            for k,a,b in checks:
+              print('XREF',d,k,len(a),len(b),sorted(a-b),sorted(b-a))
+              if a!=b: fail.append(f'{d}:{k}')
+            if bd.xpath('//@converter'): fail.append(f'{d}:converter')
+            nums=[]
+            for v in sd.xpath('//u:Value',namespaces=NS):
+              t=(v.text or '').strip()
+              if re.fullmatch(r'[-+]?\d+(?:\.\d+)?',t): nums.append(t)
+            if nums: fail.append(f'{d}:semantic_raw')
+          print('FAIL',fail)
+          if fail: sys.exit(1)
+          PY
+          echo '--- DIFF STAT VS AUDIT BASE ---'
+          git diff --stat 69b7e645bbf5ab0d85b2c3a2f50972c20b93e7d7 -- ProtocolXml/USV/NavigationRadar ProtocolXml/USV/ElectroOptical ProtocolXml/USV/PlatformController
+          git diff --check
+      - name: Commit formatting/comment restoration
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/USV/NavigationRadar/NavigationRadarSemantic.xml \
+                  ProtocolXml/USV/NavigationRadar/NavigationRadarBinding.xml \
+                  ProtocolXml/USV/ElectroOptical/ElectroOpticalSemantic.xml \
+                  ProtocolXml/USV/ElectroOptical/ElectroOpticalBinding.xml \
+                  ProtocolXml/USV/PlatformController/PlatformControllerSemantic.xml \
+                  ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml
+          if git diff --cached --quiet; then
+            echo 'No style/comment changes needed'
+          else
+            git commit -m 'Restore audited XML formatting and valid comments'
+            git push origin HEAD:feature/usv-semantic-binding-audit
+          fi
