@@ -1,0 +1,141 @@
+name: temporary SSS CSV source audit
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Apply SSS source-confirmed semantic binding fixes
+        shell: python
+        run: |
+          from pathlib import Path
+
+          sem = Path('ProtocolXml/USV/SideScanSonar/SideScanSonarSemantic.xml')
+          bind = Path('ProtocolXml/USV/SideScanSonar/SideScanSonarBinding.xml')
+          issues = Path('ProtocolXml/USV/SideScanSonar/SideScanSonar_OpenIssues.md')
+          s = sem.read_text(encoding='utf-8')
+          b = bind.read_text(encoding='utf-8')
+          o = issues.read_text(encoding='utf-8')
+
+          def rep(text, old, new, count, label):
+              actual = text.count(old)
+              if actual != count:
+                  raise SystemExit(f'{label}: expected {count}, found {actual}')
+              return text.replace(old, new)
+
+          health_values = '''<Values>\n                  <Value name="Normal" cdm="Health.Normal"/>\n                  <Value name="Degraded" cdm="Health.Degraded"/>\n                  <Value name="Unavailable" cdm="Health.Unavailable"/>\n                  <Value name="NoResponse" cdm="Health.NoResponse"/>\n                </Values>'''
+          health_map = '''<ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>'''
+
+          # Source-confirmed total BIT status codes. Only fields whose own CSV row directly states 0/1/2/3 are mapped.
+          for name, prefix in [
+              ('towedSonarAssemblyTotalPBIT','Health.PBIT.SideScanSonar'),
+              ('towedSonarAssemblyTotalIBIT','Health.IBIT.SideScanSonar'),
+              ('towedSonarArrayTotalIBIT','Health.IBIT.SideScanSonar'),
+              ('sonarSignalProcessingEquipmentTotalIBIT','Health.IBIT.SideScanSonar'),
+              ('sonarImagingProcessingEquipmentTotalIBIT','Health.IBIT.SideScanSonar'),
+              ('hullMountedSonarTotalIBIT','Health.IBIT.SideScanSonar'),
+          ]:
+              cdm=f'{prefix}.{name}'
+              old=f'              <Result name="{name}" cdm="{cdm}"/>'
+              new=f'''              <ValueSetResult name="{name}" cdm="{cdm}">\n                {health_values}\n              </ValueSetResult>'''
+              s=rep(s,old,new,1,'semantic total '+name)
+              oldb=f'        <Field name="{name}" cdm="{cdm}" dataType="UInt8"/>'
+              newb=f'        <Field name="{name}" cdm="{cdm}" dataType="UInt8">{health_map}</Field>'
+              b=rep(b,oldb,newb,1,'binding total '+name)
+
+          # Source-confirmed abnormal/error bit flags. A set bit represents the named abnormal/error flag.
+          details = {
+            'launchAndRecoveryPowerDetail': [
+              ('input220VacError','input220VacError',0),('output220VacError','output220VacError',1),('output320VdcError','output320VdcError',2)],
+            'launchAndRecoveryLinkDetail': [
+              ('winchMotorDriverLinkError','winchMotorDriverLinkError',0),('recoveryLeftMotorDriverLinkError','recoveryLeftMotorDriverLinkError',1),('recoveryRightMotorDriverLinkError','recoveryRightMotorDriverLinkError',2),('usblVerticalActuatorLinkError','usblVerticalActuatorLinkError',3),('winchEncoderLinkError','winchEncoderLinkError',4),('loadCellLinkError','loadCellLinkError',5),('recoveryLeftEncoderLinkError','recoveryLeftEncoderLinkError',6),('recoveryRightEncoderLinkError','recoveryRightEncoderLinkError',7)],
+            'launchAndRecoveryOverCurrentDetail': [
+              ('winchMotorDriverOverCurrent','winchMotorDriverOverCurrent',0),('recoveryLeftMotorDriverOverCurrent','recoveryLeftMotorDriverOverCurrent',1),('recoveryRightMotorDriverOverCurrent','recoveryRightMotorDriverOverCurrent',2),('usblVerticalActuatorOverCurrent','usblVerticalActuatorOverCurrent',3)],
+            'launchAndRecoveryFunctionDetail': [
+              ('referenceTensionExceeded','referenceTensionExceeded',0),('controlCardUartError','controlCardUartError',1),('controlCardEthernetError','controlCardEthernetError',2),('controlCardMemoryError','controlCardMemoryError',3),('positionInformationLost','positionInformationLost',4)],
+            'towedSonarArrayDetail': [
+              ('muxCardVoltageAbnormal','muxCardVoltageAbnormal',0),('sssTxCardVoltageAbnormal','sssTxCardVoltageAbnormal',1)],
+            'sonarSignalProcessingEquipmentDetail': [
+              ('towedDemuxInterfaceCardVoltageAbnormal','towedDemuxInterfaceCardVoltageAbnormal',0),('towedSonarPowerSupplyCardVoltageAbnormal','towedSonarPowerSupplyCardVoltageAbnormal',1),('towedPowerSupplyCardVoltageAbnormal','towedPowerSupplyCardVoltageAbnormal',2),('towedPowerLineCommunicationCardVoltageAbnormal','towedPowerLineCommunicationCardVoltageAbnormal',3)],
+            'sonarImagingHealthDetail': [
+              ('powerSupplyCardPowerAbnormal','powerSupplyCardPowerAbnormal',0),('networkSwitchCardPowerAbnormal','networkSwitchCardPowerAbnormal',1),('sonarComputeProcessingCardPowerAbnormal','sonarComputeProcessingCardPowerAbnormal',2),('coolingFanAbnormal','coolingFanAbnormal',3)],
+            'hullMountedSonarDetail': [
+              ('hullMuxInterfaceCardVoltageAbnormal','hullMuxInterfaceCardVoltageAbnormal',0),('hullTxCardVoltageAbnormal','hullTxCardVoltageAbnormal',1)],
+          }
+          for field, members in details.items():
+              base=f'Health.IBIT.SideScanSonar.{field}'
+              old=f'              <Result name="{field}" cdm="{base}"/>'
+              body='\n'.join(f'                <BooleanResult name="{name}" cdm="{base}.{cdm}"/>' for name,cdm,_ in members)
+              new=f'''              <GroupResult name="{field}" cdm="{base}">\n{body}\n              </GroupResult>'''
+              s=rep(s,old,new,1,'semantic packed '+field)
+              oldb=f'        <Field name="{field}" cdm="{base}" dataType="UInt8"/>'
+              memb='\n'.join(f'          <BitMember name="{name}" cdm="{base}.{cdm}" offset="{off}"/>' for name,cdm,off in members)
+              newb=f'''        <PackedField name="{field}" width="8" defaultValue="0">\n{memb}\n        </PackedField>'''
+              b=rep(b,oldb,newb,1,'binding packed '+field)
+
+          # BackStop report raw values are directly defined in the source CSV: 0 stopped, 1 back-stop engaged complete, 2 return complete.
+          back_cdm='LaunchRecovery.Slide.BackStop.Response.slideBackStop'
+          old=f'            <Result name="slideBackStop" cdm="{back_cdm}"/>'
+          new=f'''            <ValueSetResult name="slideBackStop" cdm="{back_cdm}">\n              <Values>\n                <Value name="Stopped" cdm="LaunchRecovery.Slide.BackStop.State.Stopped"/>\n                <Value name="Engaged" cdm="LaunchRecovery.Slide.BackStop.State.Engaged"/>\n                <Value name="Returned" cdm="LaunchRecovery.Slide.BackStop.State.Returned"/>\n              </Values>\n            </ValueSetResult>'''
+          s=rep(s,old,new,3,'semantic BackStop')
+          oldb=f'        <Field name="slideBackStop" cdm="{back_cdm}" dataType="UInt8"/>'
+          newb=f'''        <Field name="slideBackStop" cdm="{back_cdm}" dataType="UInt8">\n          <ValueMap>\n            <Map cdm="LaunchRecovery.Slide.BackStop.State.Stopped" value="0"/>\n            <Map cdm="LaunchRecovery.Slide.BackStop.State.Engaged" value="1"/>\n            <Map cdm="LaunchRecovery.Slide.BackStop.State.Returned" value="2"/>\n          </ValueMap>\n        </Field>'''
+          b=rep(b,oldb,newb,3,'binding BackStop')
+
+          # Refresh stale audit notes. TVG is already source-confirmed and modeled; SoftwareGain/LPF remain unsupported by this CSV.
+          o=o.replace('`ReceiveProcessing.TVG.Mode(0~1)`, `ReceiveProcessing.SoftwareGain.Mode(0~2)`, `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 정확한 논리 명칭을 이번 근거에서 확정하지 못해 QuantityProfile을 임시 유지한다.',
+                      '`ReceiveProcessing.TVG.Mode`는 CSCI에서 `0=Off(TVG 미사용), 1=On`이 직접 확인되어 이미 Semantic ValueSet/Binding ValueMap으로 반영되어 있다. `ReceiveProcessing.SoftwareGain.Mode(0~2)`와 `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 이번 CSCI에 해당 모드 필드/코드 의미가 없어 QuantityProfile TBD를 유지한다.')
+          o=o.replace('`LanchAndRecoveryBackStopReportType.slideBackStop`, PBIT Total, IBIT Total/detail의 raw 의미는 기존 TBD를 유지한다.',
+                      '`LanchAndRecoveryBackStopReportType.slideBackStop`은 CSCI에서 `0=정지상태, 1=슬라이드 후퇴고정완료, 2=복귀완료`가 직접 확인되어 Semantic ValueSetResult/Binding ValueMap으로 반영하였다. PBIT/IBIT은 각 필드 자체에 직접 코드/bit 의미가 명시된 항목만 추가 논리화하고, 근거가 비어 있는 항목은 Raw/TBD를 유지한다.')
+          o=o.replace('설계를 막는 미해결 항목은 아니지만 원문 재확인이 필요한 핵심 TBD는 전원상태 5개 0/1 의미, TVG/SW Gain/LPF mode 논리명, PBIT/IBIT raw 상세 의미, BackStop 결과값 의미, commandID 없는 Result Report correlation, LastReceivedCommandID 동시성, dotted-path Adapter 규칙이다.',
+                      '설계를 막는 미해결 항목은 아니지만 원문 재확인이 필요한 핵심 TBD는 전원상태 5개 0/1 의미, SW Gain/LPF mode 논리명, 원문에서 코드/bit 의미가 비어 있는 PBIT/IBIT 항목, commandID 없는 Result Report correlation, LastReceivedCommandID 동시성, dotted-path Adapter 규칙이다.')
+          o=o.replace('- `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType`도 하나의 결과 Report Reply를 유지하고 실제 payload 필드를 Semantic Result로 노출한다. raw 0/1/2 등의 의미 매핑은 원문 재확인 전까지 보류한다.',
+                      '- `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType`도 하나의 결과 Report Reply를 유지한다. `LaunchReportType.launch`와 `LanchAndRecoveryBackStopReportType.slideBackStop`은 원문 raw 의미를 Semantic 논리값 + Binding ValueMap으로 반영했고, 나머지는 원문 직접 근거가 있는 경우에만 매핑한다.')
+          o=o.replace('### 4. IBIT 상세 bit 해석\n\n- 다수 IBIT detail octet은 비정상 bit flag이다.\n- 그러나 `sonarImagingProcessingEquipmentDetail`은 CSCI에서 보드/조립체 **장착 유무** bit flag로 정의되어 있다.\n- 따라서 모든 IBIT detail bit를 일괄적으로 `0=PASS / 1=FAIL` 또는 `0=정상 / 1=비정상`으로 해석하지 않는다. 필드별 원문 기준으로 후속 분석한다.',
+                      '### 4. IBIT 상세 bit 해석 — 부분 해결\n\n- CSCI가 `오류/비정상 비트플래그`로 직접 정의하고 각 bit 대상까지 명시한 8개 detail octet은 Binding `PackedField/BitMember`와 Semantic BooleanResult로 분해하였다.\n- `sonarImagingProcessingEquipmentDetail`은 보드/조립체 **장착 유무** bit flag이지만 0/1 polarity가 직접 명시되지 않아 Raw로 유지한다.\n- reserved bit와 polarity가 직접 확인되지 않은 항목은 계속 추정하지 않는다.')
+
+          sem.write_text(s,encoding='utf-8')
+          bind.write_text(b,encoding='utf-8')
+          issues.write_text(o,encoding='utf-8')
+      - name: Validate SSS and USV XML
+        run: |
+          python -m pip install -q lxml
+          python - <<'PY'
+          from lxml import etree
+          from pathlib import Path
+          sx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          bx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          sx.assertValid(etree.parse('ProtocolXml/USV/SideScanSonar/SideScanSonarSemantic.xml'))
+          bx.assertValid(etree.parse('ProtocolXml/USV/SideScanSonar/SideScanSonarBinding.xml'))
+          for p in Path('ProtocolXml/USV').glob('*/*Semantic.xml'): sx.assertValid(etree.parse(str(p)))
+          for p in Path('ProtocolXml/USV').glob('*/*Binding.xml'): bx.assertValid(etree.parse(str(p)))
+          print('ALL USV XSD PASS')
+          text=Path('ProtocolXml/USV/SideScanSonar/SideScanSonarBinding.xml').read_text(encoding='utf-8')
+          assert text.count('<PackedField name="launchAndRecoveryPowerDetail"') == 1
+          assert text.count('<PackedField name="launchAndRecoveryLinkDetail"') == 1
+          assert text.count('<PackedField name="launchAndRecoveryOverCurrentDetail"') == 1
+          assert text.count('<PackedField name="launchAndRecoveryFunctionDetail"') == 1
+          assert text.count('<PackedField name="towedSonarArrayDetail"') == 1
+          assert text.count('<PackedField name="sonarSignalProcessingEquipmentDetail"') == 1
+          assert text.count('<PackedField name="sonarImagingHealthDetail"') == 1
+          assert text.count('<PackedField name="hullMountedSonarDetail"') == 1
+          assert text.count('<Field name="sonarImagingProcessingEquipmentDetail"') == 1
+          assert text.count('LaunchRecovery.Slide.BackStop.State.Stopped') == 3
+          assert text.count('LaunchRecovery.Slide.BackStop.State.Engaged') == 3
+          assert text.count('LaunchRecovery.Slide.BackStop.State.Returned') == 3
+          assert 'converter=' not in text
+          print('SSS SOURCE AUDIT ASSERTIONS PASS')
+          PY
+      - name: Commit source audit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ProtocolXml/USV/SideScanSonar/SideScanSonarSemantic.xml ProtocolXml/USV/SideScanSonar/SideScanSonarBinding.xml ProtocolXml/USV/SideScanSonar/SideScanSonar_OpenIssues.md
+          git commit -m 'Resolve SSS CSV-grounded BIT and BackStop semantics'
+          git push origin HEAD:feature/usv-semantic-binding-audit
