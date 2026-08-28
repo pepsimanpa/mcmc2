@@ -120,12 +120,9 @@
         <PackedField name="rgbCameraSVM4Status" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView4.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView4.OperationNormal" offset="1" width="1"/></PackedField>
         <PackedField name="rgbCameraSVM5Status" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView5.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView5.OperationNormal" offset="1" width="1"/></PackedField>
         <PackedField name="rgbCameraSVM6Status" width="8" defaultValue="0"><BitMember name="powerNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView6.PowerNormal" offset="0" width="1"/><BitMember name="operationNormal" cdm="Health.NearContactDetection.IBIT.RGBCamera.SurroundView6.OperationNormal" offset="1" width="1"/></PackedField>
-        <!--SCDE IBIT의 장치별 상세 octet은 원문 bit-packed 값을 raw로 유지하며 임의의 bit extractor를 적용하지 않는다.-->
-        <!--powerManagingModuleStatus: Bit0=보드장비 전원 상태, Bit1~7 reserved.-->
-        <!--ecuComputing1~3ModuleStatus, t1Converter1~2ModuleStatus, ethernetHubStatus: Bit1=동작 상태, Bit0=전원 상태, Bit2~7 reserved.-->
-        <!--fourDImageRadar1Status: Bit1=동작 상태, Bit0=전원 상태, Bit2~7 reserved. 2~9번 필드는 원문에 개별 비트 설명이 없어 동일 구조를 임의 확정하지 않는다.-->
-        <!--rgbCameraContact1Status: Bit1=동작 상태, Bit0=전원 상태, Bit2~7 reserved. 2~9번은 원문에 개별 비트 설명이 없어 동일 구조를 임의 확정하지 않는다.-->
-        <!--rgbCameraSVM1Status: Bit1=동작 상태, Bit0=전원 상태, Bit2~7 reserved. 2~6번은 원문에 개별 비트 설명이 없어 동일 구조를 임의 확정하지 않는다.-->
+        <!--SCDE IBIT 상세 octet은 CSCI의 bit 정의를 PackedField로 가시화한다. 전원/동작 bit는 원문에 0=비정상, 1=정상이 직접 정의되어 Semantic BooleanResult에 연결한다.-->
+        <!--powerManagingModuleStatus: Bit0=전원 상태, Bit1~7 reserved. ECU1~3/T1 Converter1~2/Ethernet Hub: Bit0=전원, Bit1=동작, Bit2~7 reserved.-->
+        <!--반복 센서군은 첫 비고의 `4D 이미지 레이더#`, `RGB 카메라(접촉물)#`, `RGB 카메라(서라운드뷰)#` 표기가 특정 1번이 아닌 공통 placeholder이며 이후 행 공란은 병합셀 CSV export 패턴이다. 따라서 Radar1~9, Contact1~9, SVM1~6 전체에 Bit0=전원, Bit1=동작 규칙을 적용한다.-->
         <!--IBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하며, SCDE/Lidar IBIT Report는 실제 점검 결과 Reply로 처리한다.-->
       </Reply>
       <Reply semantic_id="requestIbitLidarResult" required="true">
@@ -141,10 +138,9 @@
         <PackedField name="lidar2Level" width="8" defaultValue="0"><BitMember name="Normal" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Normal" offset="0" width="1"/><BitMember name="Notice" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Notice" offset="1" width="1"/><BitMember name="Warning" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Warning" offset="2" width="1"/><BitMember name="Error" cdm="Health.NearContactDetection.Lidar2.IBIT.Level.Error" offset="3" width="1"/></PackedField>
         <PackedField name="lidar2SensorAction" width="8" defaultValue="0"><BitMember name="NoAction" cdm="Health.NearContactDetection.Lidar2.IBIT.SensorAction.NoAction" offset="0" width="1"/><BitMember name="Shutdown" cdm="Health.NearContactDetection.Lidar2.IBIT.SensorAction.Shutdown" offset="1" width="1"/><BitMember name="Restart" cdm="Health.NearContactDetection.Lidar2.IBIT.SensorAction.Restart" offset="2" width="1"/></PackedField>
         <Field name="lidar2ID" cdm="Health.NearContactDetection.Lidar2.IBIT.MappingID" dataType="UInt32"/>
-        <!--라이다 IBIT의 category/level/sensorAction은 원문 bit-packed 값을 raw로 유지한다.-->
+        <!--라이다 IBIT의 category/level/sensorAction은 원문 bit 위치를 PackedField로 분해한다. 각 bit의 동시 설정 가능 여부/우선순위는 원문에 없으므로 별도 운용 규칙을 만들지 않는다.-->
         <!--lidar#Category: Bit14 IO_CONNECTION, 13 CONFIG, 12 MOTOR_CONTROL, 11 WARMUP_ISSUE, 10 INTERNAL_FAULT, 9 UDP_CONNECT, 8 INPUT_VOLTAGE, 7 STARTUP, 6 UDP_TRANSMISSION, 5 ETHERNET_LINK_BAD, 4 INTERNAL_FW, 3 SHOT_LIMITING, 2 INTERNAL_COMM, 1 UNDERTEMP, 0 OVERTEMP; Bit15 reserved.-->
-        <!--lidar#Level: Bit3 Error, Bit2 Warning, Bit1 Notice, Bit0 Normal; Bit4~7 reserved.-->
-        <!--lidar#SensorAction: Bit2 RESTART, Bit1 SHUTDOWN, Bit0 No Action; Bit3~7 reserved.-->
+        <!--lidar#Level: Bit3 Error, Bit2 Warning, Bit1 Notice, Bit0 Normal; Bit4~7 reserved. lidar#SensorAction: Bit2 RESTART, Bit1 SHUTDOWN, Bit0 No Action; Bit3~7 reserved.-->
       </Reply>
       <!--IBIT 결과 Report에는 commandID가 없으므로 CommandStatusReport 외의 명시적 요청 상관관계를 임의로 추가하지 않는다.-->
     </ControlBinding>
