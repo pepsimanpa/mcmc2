@@ -20,9 +20,11 @@ new = '''9. **[RESOLVED] PlatformController Boolean wire 재감사**
    - Engine/WaterJet/BowThruster/Power/Battery/Generator/Environment/Wind/Fire/Leak/Flow/Stabilizer/Interceptor/SeaWaterConditioner/TowingDevice/SPCE IBIT와 CBIT/PBIT, Propulsion/ENV/Power HeartBeat, Distress/Wind/SeaWaterConditioner 상태를 원문 타입대로 반영하였다.
    - `vcuProcessorIBIT`, `vcuTmpProcessorIBIT`는 원문 `ProcessorIBIT` 복합 구조체이므로 primitive `dataType`을 부여하지 않는다.
    - 최종 감사에서 composite/system field를 제외한 primitive `dataType` 미지정은 0건이며 XSD 검증을 통과하였다.'''
-if old not in s:
+if old in s:
+    s = s.replace(old, new)
+elif new not in s:
     raise SystemExit('Platform OpenIssues target block not found')
-p.write_text(s.replace(old, new), encoding='utf-8')
+p.write_text(s, encoding='utf-8')
 
 p = Path('ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md')
 d = p.read_text(encoding='utf-8')
@@ -40,9 +42,10 @@ reps = [
      '### USV-COMMON-04 — 원문 부족 primitive wire dataType — **RESOLVED (2026-08-28)**\n\n- NavigationRadar 및 NetworkAbstraction의 잔여 type은 장치 CSCI/공용 구조체에서 확인하여 해결하였다.\n- PlatformController의 기존 미지정 항목은 `선체제어장치 CSCI.csv`를 message/type별로 전수 재감사하여 primitive type을 확정하였다.\n- 최종 primitive `dataType` 미지정: 0건. 복합 구조체에는 primitive type을 강제하지 않는다.')
 ]
 for a, b in reps:
-    if a not in d:
+    if a in d:
+        d = d.replace(a, b)
+    elif b not in d:
         raise SystemExit('Integrated audit target not found: ' + a[:100])
-    d = d.replace(a, b)
 if '419' in d:
     raise SystemExit('stale 419 remains in integrated audit')
 p.write_text(d, encoding='utf-8')
