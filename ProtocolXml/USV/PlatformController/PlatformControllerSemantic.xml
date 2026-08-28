@@ -15,115 +15,632 @@
 <PlatformSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd">
+  <!--PowerControlType의 장비별 bit 위치는 CSCI에서 직접 확정되지 않아 Binding에서 TBD로 남긴다.-->
+  <!--PowerControlType의 장비별 bit 위치는 CSCI에서 직접 확정되지 않아 Binding에서 TBD로 남긴다.-->
+  <!--PowerControlType의 장비별 bit 위치는 CSCI에서 직접 확정되지 않아 Binding에서 TBD로 남긴다.-->
+  <!--cctvMask의 relay별 bit 정의 및 전체 상태/부분 변경 의미는 TBD.-->
+  <!--ENVCommandType은 하나의 메시지에서 해수공조/온도/자동소화장치 4개 값을 함께 전달하므로 하나의 Control로 유지한다.-->
+  <!--CSCI는 ACK=O로 표기하지만 commandID 필드가 없어 CommandStatusReport Reply 연계는 TBD. seaWaterAirConditionerControl 값 의미도 TBD.-->
   <ConstantSpecs id="constant">
     <TextConstantSpec id="productName" name="제품명" cdm="Product.Name"><Value>PlatformController</Value></TextConstantSpec>
     <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description"><Value>선체제어장치 원격 제어·상태 인터페이스</Value></TextConstantSpec>
   </ConstantSpecs>
   <MonitorSpecs id="monitor">
-    <GroupSpec id="operationMode" name="선체제어장치 모드 상태" cdm="Platform.OperationMode">
-      <ValueSetSpec id="operationMode" name="운용 모드" cdm="Platform.OperationMode.Value"><Values>
-        <Value name="EmergencyStop" cdm="Platform.OperationMode.EmergencyStop"/>
-        <Value name="EmergencyReturn" cdm="Platform.OperationMode.EmergencyReturn"/>
-        <Value name="RemoteManual" cdm="Platform.OperationMode.RemoteManual"/>
-        <Value name="LocalManual" cdm="Platform.OperationMode.LocalManual"/>
-        <Value name="Autonomous" cdm="Platform.OperationMode.Autonomous"/>
-        <Value name="Standby" cdm="Platform.OperationMode.Standby"/>
-        <Value name="Maintenance" cdm="Platform.OperationMode.Maintenance"/>
-        <Value name="EmergencyAction" cdm="Platform.OperationMode.EmergencyAction"/>
-      </Values></ValueSetSpec>
+        <GroupSpec id="operationMode" name="선체제어장치 모드 상태" cdm="Platform.OperationMode">
+      <ValueSetSpec id="operationMode" name="운용 모드" cdm="Platform.OperationMode.Value">
+        <Values>
+          <Value name="EmergencyStop" cdm="Platform.OperationMode.EmergencyStop"/>
+          <Value name="EmergencyReturn" cdm="Platform.OperationMode.EmergencyReturn"/>
+          <Value name="RemoteManual" cdm="Platform.OperationMode.RemoteManual"/>
+          <Value name="LocalManual" cdm="Platform.OperationMode.LocalManual"/>
+          <Value name="Autonomous" cdm="Platform.OperationMode.Autonomous"/>
+          <Value name="Standby" cdm="Platform.OperationMode.Standby"/>
+          <Value name="Maintenance" cdm="Platform.OperationMode.Maintenance"/>
+          <Value name="EmergencyAction" cdm="Platform.OperationMode.EmergencyAction"/>
+        </Values>
+      </ValueSetSpec>
     </GroupSpec>
-    <GroupSpec id="propulsionCbitStatus" name="추진계통 CBIT 상태" cdm="Health.CBIT.propulsionCbitStatus">
-      <ValueSetSpec id="portEngineStatus" name="좌현 엔진 정상 작동 상태" cdm="Health.CBIT.portEngineStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="starboardEngineStatus" name="우현 엔진 정상 작동 상태" cdm="Health.CBIT.starboardEngineStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="portWaterjetStatus" name="좌현 워터젯 정상 작동 상태" cdm="Health.CBIT.portWaterjetStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="starboardWaterjetStatus" name="우현 워터젯 정상 작동 상태" cdm="Health.CBIT.starboardWaterjetStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="bowThrusterStatus" name="선수추력기 정상 작동 상태" cdm="Health.CBIT.bowThrusterStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
+        <GroupSpec id="propulsionCbitStatus" name="추진계통 CBIT 상태" cdm="Health.CBIT.propulsionCbitStatus">
+      <ValueSetSpec id="portEngineStatus" name="좌현 엔진 정상 작동 상태" cdm="Health.CBIT.portEngineStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="starboardEngineStatus" name="우현 엔진 정상 작동 상태" cdm="Health.CBIT.starboardEngineStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="portWaterjetStatus" name="좌현 워터젯 정상 작동 상태" cdm="Health.CBIT.portWaterjetStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="starboardWaterjetStatus" name="우현 워터젯 정상 작동 상태" cdm="Health.CBIT.starboardWaterjetStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="bowThrusterStatus" name="선수추력기 정상 작동 상태" cdm="Health.CBIT.bowThrusterStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
     </GroupSpec>
-    <GroupSpec id="electricalCbitStatus" name="전기계통 CBIT 상태" cdm="Health.CBIT.electricalCbitStatus">
-      <ValueSetSpec id="pduStatus" name="전원분배장치 정상 작동 상태" cdm="Health.CBIT.pduStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="batteryStatus" name="배터리 정상 작동 상태" cdm="Health.CBIT.batteryStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="portGeneratorStatus" name="좌현 발전기 정상 작동 상태" cdm="Health.CBIT.portGeneratorStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="starboardGeneratorStatus" name="우현 발전기 정상 작동 상태" cdm="Health.CBIT.starboardGeneratorStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
+        <GroupSpec id="electricalCbitStatus" name="전기계통 CBIT 상태" cdm="Health.CBIT.electricalCbitStatus">
+      <ValueSetSpec id="pduStatus" name="전원분배장치 정상 작동 상태" cdm="Health.CBIT.pduStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="batteryStatus" name="배터리 정상 작동 상태" cdm="Health.CBIT.batteryStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="portGeneratorStatus" name="좌현 발전기 정상 작동 상태" cdm="Health.CBIT.portGeneratorStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="starboardGeneratorStatus" name="우현 발전기 정상 작동 상태" cdm="Health.CBIT.starboardGeneratorStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
     </GroupSpec>
-    <GroupSpec id="subsystemCbitStatus" name="의장계통 CBIT 상태" cdm="Health.CBIT.subsystemCbitStatus">
-      <ValueSetSpec id="seaWaterAirConditionerStatus" name="해수공조장치 정상 작동 상태" cdm="Health.CBIT.seaWaterAirConditionerStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="towingDeviceStatus" name="피예인장치 정상 작동 상태" cdm="Health.CBIT.towingDeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
+        <GroupSpec id="subsystemCbitStatus" name="의장계통 CBIT 상태" cdm="Health.CBIT.subsystemCbitStatus">
+      <ValueSetSpec id="seaWaterAirConditionerStatus" name="해수공조장치 정상 작동 상태" cdm="Health.CBIT.seaWaterAirConditionerStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="towingDeviceStatus" name="피예인장치 정상 작동 상태" cdm="Health.CBIT.towingDeviceStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
     </GroupSpec>
-    <GroupSpec id="spceCbitStatus" name="선체제어장치 CBIT 상태" cdm="Health.CBIT.spceCbitStatus">
-      <ValueSetSpec id="spceStatus" name="선체제어장치 정상 작동 상태" cdm="Health.CBIT.spceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="vcuStatus" name="선체운용카드 정상 작동 상태" cdm="Health.CBIT.vcuStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="vcuTmpStatus" name="환경센서(선체운용이중화)카드 정상 작동 상태" cdm="Health.CBIT.vcuTmpStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
+        <GroupSpec id="spceCbitStatus" name="선체제어장치 CBIT 상태" cdm="Health.CBIT.spceCbitStatus">
+      <ValueSetSpec id="spceStatus" name="선체제어장치 정상 작동 상태" cdm="Health.CBIT.spceStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="vcuStatus" name="선체운용카드 정상 작동 상태" cdm="Health.CBIT.vcuStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="vcuTmpStatus" name="환경센서(선체운용이중화)카드 정상 작동 상태" cdm="Health.CBIT.vcuTmpStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
     </GroupSpec>
-    <GroupSpec id="accessoriesCbitStatus" name="보기계통 CBIT 상태" cdm="Health.CBIT.Accessories">
-      <ValueSetSpec id="environmentSensorDeviceStatus" name="환경센서처리기 정상 작동 상태" cdm="Health.CBIT.environmentSensorDeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="windSensorStatus" name="풍향풍속계 정상 작동 상태" cdm="Health.CBIT.windSensorStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="fireDetectorStatus" name="화재감지기 정상 작동 상태" cdm="Health.CBIT.fireDetectorStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="leakDetectorStatus" name="누수감지기 정상 작동 상태" cdm="Health.CBIT.leakDetectorStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="flowMeterStatus" name="유량측정기 정상 작동 상태" cdm="Health.CBIT.flowMeterStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="stabilizerStatus" name="횡동요저감장치 정상 작동 상태" cdm="Health.CBIT.stabilizerStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <ValueSetSpec id="interceptorStatus" name="인터셉터 정상 작동 상태" cdm="Health.CBIT.interceptorStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetSpec>
-      <BooleanSpec id="fireDetected" name="화재 감지" cdm="Health.CBIT.fireDetected"/><BooleanSpec id="leakDetected" name="누수 감지" cdm="Health.CBIT.leakDetected"/><BooleanSpec id="flowAnomalyDetected" name="유량 이상 감지" cdm="Health.CBIT.flowAnomalyDetected"/>
+        <GroupSpec id="accessoriesCbitStatus" name="보기계통 CBIT 상태" cdm="Health.CBIT.Accessories">
+      <ValueSetSpec id="environmentSensorDeviceStatus" name="환경센서처리기 정상 작동 상태" cdm="Health.CBIT.environmentSensorDeviceStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="windSensorStatus" name="풍향풍속계 정상 작동 상태" cdm="Health.CBIT.windSensorStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="fireDetectorStatus" name="화재감지기 정상 작동 상태" cdm="Health.CBIT.fireDetectorStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="leakDetectorStatus" name="누수감지기 정상 작동 상태" cdm="Health.CBIT.leakDetectorStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="flowMeterStatus" name="유량측정기 정상 작동 상태" cdm="Health.CBIT.flowMeterStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="stabilizerStatus" name="횡동요저감장치 정상 작동 상태" cdm="Health.CBIT.stabilizerStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="interceptorStatus" name="인터셉터 정상 작동 상태" cdm="Health.CBIT.interceptorStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Degraded" cdm="Health.Status.Degraded"/>
+          <Value name="Unavailable" cdm="Health.Status.Unavailable"/>
+          <Value name="NoResponse" cdm="Health.Status.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <BooleanSpec id="fireDetected" name="화재 감지" cdm="Health.CBIT.fireDetected"/>
+      <BooleanSpec id="leakDetected" name="누수 감지" cdm="Health.CBIT.leakDetected"/>
+      <BooleanSpec id="flowAnomalyDetected" name="유량 이상 감지" cdm="Health.CBIT.flowAnomalyDetected"/>
     </GroupSpec>
     <GroupSpec id="propulsionStatus" name="추진장치 상태" cdm="Platform.Propulsion.Status">
-      <QuantitySpec id="portAlternatorPotential" name="좌현 발전기 전압" cdm="Platform.Propulsion.Port.AlternatorVoltage"><Unit>V</Unit><Range min="-327.67" max="327.64"/><Resolution>0.01</Resolution></QuantitySpec>
-      <QuantitySpec id="starboardAlternatorPotential" name="우현 발전기 전압" cdm="Platform.Propulsion.Starboard.AlternatorVoltage"><Unit>V</Unit><Range min="-327.67" max="327.64"/><Resolution>0.01</Resolution></QuantitySpec>
-      <QuantitySpec id="portEngineTemperature" name="좌현 엔진 온도" cdm="Platform.Propulsion.Port.EngineTemperature"><Unit>K</Unit><Range min="0" max="655.32"/><Resolution>0.01</Resolution></QuantitySpec>
-      <QuantitySpec id="starboardEngineTemperature" name="우현 엔진 온도" cdm="Platform.Propulsion.Starboard.EngineTemperature"><Unit>K</Unit><Range min="0" max="655.32"/><Resolution>0.01</Resolution></QuantitySpec>
-      <QuantitySpec id="portTransOilTemperature" name="좌현 변속기 오일 온도" cdm="Platform.Propulsion.Port.TransmissionOilTemperature"><Unit>K</Unit><Range min="0" max="6553.2"/><Resolution>0.1</Resolution></QuantitySpec>
-      <QuantitySpec id="starboardTransOilTemperature" name="우현 변속기 오일 온도" cdm="Platform.Propulsion.Starboard.TransmissionOilTemperature"><Unit>K</Unit><Range min="0" max="6553.2"/><Resolution>0.1</Resolution></QuantitySpec>
-      <QuantitySpec id="fuelRemain" name="잔여 연료량" cdm="Platform.Fuel.Remaining"><Unit>percent</Unit><Range min="-3276.7" max="3276.4"/><Resolution>0.1</Resolution></QuantitySpec>
-      <QuantitySpec id="portCurrentRPM" name="현재 좌현 RPM" cdm="Platform.Propulsion.Port.RPM"><Unit>rpm</Unit><Range min="0" max="10000"/><Resolution>1</Resolution></QuantitySpec>
-      <QuantitySpec id="starboardCurrentRPM" name="현재 우현 RPM" cdm="Platform.Propulsion.Starboard.RPM"><Unit>rpm</Unit><Range min="0" max="10000"/><Resolution>1</Resolution></QuantitySpec>
-      <QuantitySpec id="portCurrentSteering" name="현재 좌현 steering" cdm="Platform.Propulsion.Port.Steering"><Unit>rad</Unit></QuantitySpec><QuantitySpec id="starboardCurrentSteering" name="현재 우현 steering" cdm="Platform.Propulsion.Starboard.Steering"><Unit>rad</Unit></QuantitySpec>
+      <QuantitySpec id="portAlternatorPotential" name="좌현 발전기 전압" cdm="Platform.Propulsion.Port.AlternatorVoltage">
+        <Unit>V</Unit>
+        <Range min="-327.67" max="327.64"/>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="starboardAlternatorPotential" name="우현 발전기 전압" cdm="Platform.Propulsion.Starboard.AlternatorVoltage">
+        <Unit>V</Unit>
+        <Range min="-327.67" max="327.64"/>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="portEngineTemperature" name="좌현 엔진 온도" cdm="Platform.Propulsion.Port.EngineTemperature">
+        <Unit>K</Unit>
+        <Range min="0" max="655.32"/>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="starboardEngineTemperature" name="우현 엔진 온도" cdm="Platform.Propulsion.Starboard.EngineTemperature">
+        <Unit>K</Unit>
+        <Range min="0" max="655.32"/>
+        <Resolution>0.01</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="portTransOilTemperature" name="좌현 변속기 오일 온도" cdm="Platform.Propulsion.Port.TransmissionOilTemperature">
+        <Unit>K</Unit>
+        <Range min="0" max="6553.2"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="starboardTransOilTemperature" name="우현 변속기 오일 온도" cdm="Platform.Propulsion.Starboard.TransmissionOilTemperature">
+        <Unit>K</Unit>
+        <Range min="0" max="6553.2"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="fuelRemain" name="잔여 연료량" cdm="Platform.Fuel.Remaining">
+        <Unit>percent</Unit>
+        <Range min="-3276.7" max="3276.4"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="portCurrentRPM" name="현재 좌현 RPM" cdm="Platform.Propulsion.Port.RPM">
+        <Unit>rpm</Unit>
+        <Range min="0" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="starboardCurrentRPM" name="현재 우현 RPM" cdm="Platform.Propulsion.Starboard.RPM">
+        <Unit>rpm</Unit>
+        <Range min="0" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="portCurrentSteering" name="현재 좌현 steering" cdm="Platform.Propulsion.Port.Steering">
+        <Unit>rad</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="starboardCurrentSteering" name="현재 우현 steering" cdm="Platform.Propulsion.Starboard.Steering">
+        <Unit>rad</Unit>
+      </QuantitySpec>
     </GroupSpec>
     <GroupSpec id="environmentStatus" name="환경센서 상태" cdm="Platform.Environment.Status">
-      <QuantitySpec id="flowMeter1Flow" name="유량측정기 1번 유량" cdm="Platform.Environment.flowMeter1Flow"><Unit>L/min</Unit><Range min="0" max="500"/></QuantitySpec><QuantitySpec id="flowMeter2Flow" name="유량측정기 2번 유량" cdm="Platform.Environment.flowMeter2Flow"><Unit>L/min</Unit><Range min="0" max="500"/></QuantitySpec><QuantitySpec id="flowMeter3Flow" name="유량측정기 3번 유량" cdm="Platform.Environment.flowMeter3Flow"><Unit>L/min</Unit><Range min="0" max="200"/></QuantitySpec><QuantitySpec id="flowMeter4Flow" name="유량측정기 4번 유량" cdm="Platform.Environment.flowMeter4Flow"><Unit>L/min</Unit><Range min="0" max="200"/></QuantitySpec>
-      <QuantitySpec id="leakSensor1Depth" name="누수감지기 1번 수심" cdm="Platform.Environment.leakSensor1Depth"><Unit>mWG</Unit><Range min="0" max="20"/></QuantitySpec><QuantitySpec id="leakSensor2Depth" name="누수감지기 2번 수심" cdm="Platform.Environment.leakSensor2Depth"><Unit>mWG</Unit><Range min="0" max="20"/></QuantitySpec><QuantitySpec id="leakSensor1Temperature" name="누수감지기 1번 온도" cdm="Platform.Environment.leakSensor1Temperature"><Unit>degC</Unit><Range min="0" max="20"/></QuantitySpec><QuantitySpec id="leakSensor2Temperature" name="누수감지기 2번 온도" cdm="Platform.Environment.leakSensor2Temperature"><Unit>degC</Unit><Range min="0" max="20"/></QuantitySpec>
-      <BooleanSpec id="fireSensor1Alarm" name="화재감지기 1번 알람" cdm="Platform.Environment.fireSensor1Alarm"/><BooleanSpec id="fireSensor2Alarm" name="화재감지기 2번 알람" cdm="Platform.Environment.fireSensor2Alarm"/><BooleanSpec id="fireSensor3Alarm" name="화재감지기 3번 알람" cdm="Platform.Environment.fireSensor3Alarm"/><BooleanSpec id="autoExtinguisher1Active" name="자동소화장치 1 작동" cdm="Platform.Environment.autoExtinguisher1Active"/><BooleanSpec id="autoExtinguisher2Active" name="자동소화장치 2 작동" cdm="Platform.Environment.autoExtinguisher2Active"/><BooleanSpec id="autoExtinguisher3Active" name="자동소화장치 3 작동" cdm="Platform.Environment.autoExtinguisher3Active"/><BooleanSpec id="autoExtinguisher4Active" name="자동소화장치 4 작동" cdm="Platform.Environment.autoExtinguisher4Active"/>
+      <QuantitySpec id="flowMeter1Flow" name="유량측정기 1번 유량" cdm="Platform.Environment.flowMeter1Flow">
+        <Unit>L/min</Unit>
+        <Range min="0" max="500"/>
+      </QuantitySpec>
+      <QuantitySpec id="flowMeter2Flow" name="유량측정기 2번 유량" cdm="Platform.Environment.flowMeter2Flow">
+        <Unit>L/min</Unit>
+        <Range min="0" max="500"/>
+      </QuantitySpec>
+      <QuantitySpec id="flowMeter3Flow" name="유량측정기 3번 유량" cdm="Platform.Environment.flowMeter3Flow">
+        <Unit>L/min</Unit>
+        <Range min="0" max="200"/>
+      </QuantitySpec>
+      <QuantitySpec id="flowMeter4Flow" name="유량측정기 4번 유량" cdm="Platform.Environment.flowMeter4Flow">
+        <Unit>L/min</Unit>
+        <Range min="0" max="200"/>
+      </QuantitySpec>
+      <QuantitySpec id="leakSensor1Depth" name="누수감지기 1번 수심" cdm="Platform.Environment.leakSensor1Depth">
+        <Unit>mWG</Unit>
+        <Range min="0" max="20"/>
+      </QuantitySpec>
+      <QuantitySpec id="leakSensor2Depth" name="누수감지기 2번 수심" cdm="Platform.Environment.leakSensor2Depth">
+        <Unit>mWG</Unit>
+        <Range min="0" max="20"/>
+      </QuantitySpec>
+      <QuantitySpec id="leakSensor1Temperature" name="누수감지기 1번 온도" cdm="Platform.Environment.leakSensor1Temperature">
+        <Unit>degC</Unit>
+        <Range min="0" max="20"/>
+      </QuantitySpec>
+      <QuantitySpec id="leakSensor2Temperature" name="누수감지기 2번 온도" cdm="Platform.Environment.leakSensor2Temperature">
+        <Unit>degC</Unit>
+        <Range min="0" max="20"/>
+      </QuantitySpec>
+      <BooleanSpec id="fireSensor1Alarm" name="화재감지기 1번 알람" cdm="Platform.Environment.fireSensor1Alarm"/>
+      <BooleanSpec id="fireSensor2Alarm" name="화재감지기 2번 알람" cdm="Platform.Environment.fireSensor2Alarm"/>
+      <BooleanSpec id="fireSensor3Alarm" name="화재감지기 3번 알람" cdm="Platform.Environment.fireSensor3Alarm"/>
+      <BooleanSpec id="autoExtinguisher1Active" name="자동소화장치 1 작동" cdm="Platform.Environment.autoExtinguisher1Active"/>
+      <BooleanSpec id="autoExtinguisher2Active" name="자동소화장치 2 작동" cdm="Platform.Environment.autoExtinguisher2Active"/>
+      <BooleanSpec id="autoExtinguisher3Active" name="자동소화장치 3 작동" cdm="Platform.Environment.autoExtinguisher3Active"/>
+      <BooleanSpec id="autoExtinguisher4Active" name="자동소화장치 4 작동" cdm="Platform.Environment.autoExtinguisher4Active"/>
     </GroupSpec>
-    <GroupSpec id="propulsionControlStatus" name="추진 제어 명령 상태" cdm="Platform.Propulsion.ControlStatus">
-      <ValueSetSpec id="targetControlState" name="목표 제어모드" cdm="Platform.Propulsion.ControlMode"><Values><Value name="Neutral" cdm="Platform.Propulsion.ControlMode.Neutral"/><Value name="CourseVelocity" cdm="Platform.Propulsion.ControlMode.CourseVelocity"/><Value name="RpmSteering" cdm="Platform.Propulsion.ControlMode.RpmSteering"/><Value name="Joystick" cdm="Platform.Propulsion.ControlMode.Joystick"/></Values></ValueSetSpec>
-      <QuantitySpec id="targetCourse" name="침로 목표 값" cdm="Platform.Propulsion.TargetCourse"><Unit>rad</Unit></QuantitySpec><QuantitySpec id="targetVelocity" name="속력 목표 값" cdm="Platform.Propulsion.TargetVelocity"><Unit>m/s</Unit></QuantitySpec>
-      <QuantitySpec id="portTargetSteering" name="좌현 스티어링 제어 목표 값" cdm="Platform.Propulsion.Port.TargetSteering"><Unit>0.0001</Unit><Range min="-10000" max="10000"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="starboardTargetSteering" name="우현 스티어링 제어 목표 값" cdm="Platform.Propulsion.Starboard.TargetSteering"><Unit>0.0001</Unit><Range min="-10000" max="10000"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="portTargetThrottle" name="좌현 스로틀 제어 목표 값" cdm="Platform.Propulsion.Port.TargetThrottle"><Unit>0.0001</Unit><Range min="-10000" max="10000"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="starboardTargetThrottle" name="우현 스로틀 제어 목표 값" cdm="Platform.Propulsion.Starboard.TargetThrottle"><Unit>0.0001</Unit><Range min="-10000" max="10000"/><Resolution>1</Resolution></QuantitySpec>
-      <QuantitySpec id="joystickXAxis" name="조이스틱 X 명령" cdm="Platform.Propulsion.Joystick.X"><Unit>0.01%</Unit><Range min="-10000" max="10000"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="joystickYAxis" name="조이스틱 Y 명령" cdm="Platform.Propulsion.Joystick.Y"><Unit>0.01%</Unit><Range min="-10000" max="10000"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="joystickZAxis" name="조이스틱 Z 명령" cdm="Platform.Propulsion.Joystick.Z"><Unit>0.01%</Unit><Range min="-10000" max="10000"/><Resolution>1</Resolution></QuantitySpec>
-      <QuantitySpec id="bowthrustTargetThrottle" name="선수추력기 목표 값" cdm="Platform.Propulsion.BowThruster.TargetThrottle"><Unit>0.01%</Unit></QuantitySpec><BooleanSpec id="bowthrustEnableCommand" name="선수추력기 Enable 상태" cdm="Platform.Propulsion.BowThruster.Enabled"/>
+        <GroupSpec id="propulsionControlStatus" name="추진 제어 명령 상태" cdm="Platform.Propulsion.ControlStatus">
+      <ValueSetSpec id="targetControlState" name="목표 제어모드" cdm="Platform.Propulsion.ControlMode">
+        <Values>
+          <Value name="Neutral" cdm="Platform.Propulsion.ControlMode.Neutral"/>
+          <Value name="CourseVelocity" cdm="Platform.Propulsion.ControlMode.CourseVelocity"/>
+          <Value name="RpmSteering" cdm="Platform.Propulsion.ControlMode.RpmSteering"/>
+          <Value name="Joystick" cdm="Platform.Propulsion.ControlMode.Joystick"/>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="targetCourse" name="침로 목표 값" cdm="Platform.Propulsion.TargetCourse">
+        <Unit>rad</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="targetVelocity" name="속력 목표 값" cdm="Platform.Propulsion.TargetVelocity">
+        <Unit>m/s</Unit>
+      </QuantitySpec>
+      <QuantitySpec id="portTargetSteering" name="좌현 스티어링 제어 목표 값" cdm="Platform.Propulsion.Port.TargetSteering">
+        <Unit>0.0001</Unit>
+        <Range min="-10000" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="starboardTargetSteering" name="우현 스티어링 제어 목표 값" cdm="Platform.Propulsion.Starboard.TargetSteering">
+        <Unit>0.0001</Unit>
+        <Range min="-10000" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="portTargetThrottle" name="좌현 스로틀 제어 목표 값" cdm="Platform.Propulsion.Port.TargetThrottle">
+        <Unit>0.0001</Unit>
+        <Range min="-10000" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="starboardTargetThrottle" name="우현 스로틀 제어 목표 값" cdm="Platform.Propulsion.Starboard.TargetThrottle">
+        <Unit>0.0001</Unit>
+        <Range min="-10000" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="joystickXAxis" name="조이스틱 X 명령" cdm="Platform.Propulsion.Joystick.X">
+        <Unit>0.01%</Unit>
+        <Range min="-10000" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="joystickYAxis" name="조이스틱 Y 명령" cdm="Platform.Propulsion.Joystick.Y">
+        <Unit>0.01%</Unit>
+        <Range min="-10000" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="joystickZAxis" name="조이스틱 Z 명령" cdm="Platform.Propulsion.Joystick.Z">
+        <Unit>0.01%</Unit>
+        <Range min="-10000" max="10000"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="bowthrustTargetThrottle" name="선수추력기 목표 값" cdm="Platform.Propulsion.BowThruster.TargetThrottle">
+        <Unit>0.01%</Unit>
+      </QuantitySpec>
+      <BooleanSpec id="bowthrustEnableCommand" name="선수추력기 Enable 상태" cdm="Platform.Propulsion.BowThruster.Enabled"/>
     </GroupSpec>
-    <GroupSpec id="powerStatus" name="전원 상태" cdm="Platform.Power.Status">
+        <GroupSpec id="powerStatus" name="전원 상태" cdm="Platform.Power.Status">
       <!--portONStatus bit 50~0은 CSCI가 장비별 의미를 명시한다. 상세 bit/wire 매핑은 Binding PackedField에서 선언한다.-->
-      <BooleanSpec id="pduPowerOn" name="전원분배장치 전원 상태" cdm="Platform.Power.pduPowerOn"/><BooleanSpec id="batteryAssemblyPowerOn" name="배터리 조립체 전원 상태" cdm="Platform.Power.batteryAssemblyPowerOn"/><BooleanSpec id="towedSonarPowerOn" name="예인형음탐기 전원 상태" cdm="Platform.Power.towedSonarPowerOn"/><BooleanSpec id="sonarSignalProcessorPowerOn" name="음탐기신호처리장치 전원 상태" cdm="Platform.Power.sonarSignalProcessorPowerOn"/><BooleanSpec id="sonarImageProcessorPowerOn" name="음탐기영상처리장치 전원 상태" cdm="Platform.Power.sonarImageProcessorPowerOn"/>
-      <BooleanSpec id="fanEngineRoomPowerOn" name="흡배기팬(기관실) 전원 상태" cdm="Platform.Power.fanEngineRoomPowerOn"/><BooleanSpec id="fanEquipmentRoomPowerOn" name="흡배기팬(장비실) 전원 상태" cdm="Platform.Power.fanEquipmentRoomPowerOn"/><BooleanSpec id="damperControllerPowerOn" name="댐퍼&amp;컨트롤러 전원 상태" cdm="Platform.Power.damperControllerPowerOn"/><BooleanSpec id="seaWaterAirConditionerPowerOn" name="해수공조장치 전원 상태" cdm="Platform.Power.seaWaterAirConditionerPowerOn"/><BooleanSpec id="seaWaterAirConditionerControllerPowerOn" name="해수공조장치 컨트롤러 전원 상태" cdm="Platform.Power.seaWaterAirConditionerControllerPowerOn"/>
-      <BooleanSpec id="interceptorPowerOn" name="인터셉터 전원 상태" cdm="Platform.Power.interceptorPowerOn"/><BooleanSpec id="bowThrusterBatteryChargerPowerOn" name="선수추력기용 배터리 충전 전원 상태" cdm="Platform.Power.bowThrusterBatteryChargerPowerOn"/><BooleanSpec id="stabilizerPowerOn" name="횡동요저감장치 전원 상태" cdm="Platform.Power.stabilizerPowerOn"/><BooleanSpec id="stabilizerControllerPowerOn" name="횡동요저감장치 컨트롤러 전원 상태" cdm="Platform.Power.stabilizerControllerPowerOn"/><BooleanSpec id="bilgePumpEngineRoomPowerOn" name="빌지펌프(기관실) 전원 상태" cdm="Platform.Power.bilgePumpEngineRoomPowerOn"/><BooleanSpec id="bilgePumpEquipmentRoomPowerOn" name="빌지펌프(장비실) 전원 상태" cdm="Platform.Power.bilgePumpEquipmentRoomPowerOn"/><BooleanSpec id="bilgePumpBowRoomPowerOn" name="빌지펌프(선수부) 전원 상태" cdm="Platform.Power.bilgePumpBowRoomPowerOn"/>
-      <BooleanSpec id="eoirPowerOn" name="전자광학장치 전원 상태" cdm="Platform.Power.eoirPowerOn"/><BooleanSpec id="contactInfoProcessorPowerOn" name="접촉물정보처리장치 전원 상태" cdm="Platform.Power.contactInfoProcessorPowerOn"/><BooleanSpec id="navigationRadarPowerOn" name="항해레이더 전원 상태" cdm="Platform.Power.navigationRadarPowerOn"/><BooleanSpec id="nearContactDetectorPowerOn" name="근거리접촉물탐지장치 전원 상태" cdm="Platform.Power.nearContactDetectorPowerOn"/><BooleanSpec id="navigationCameraPowerOn" name="운항용카메라장치 전원 상태" cdm="Platform.Power.navigationCameraPowerOn"/><BooleanSpec id="platformControllerPowerOn" name="선체제어장치 전원 상태" cdm="Platform.Power.platformControllerPowerOn"/><BooleanSpec id="centralControllerPowerOn" name="중앙통제장치 전원 상태" cdm="Platform.Power.centralControllerPowerOn"/>
-      <BooleanSpec id="navigationLightPowerOn" name="항해등 전원 상태" cdm="Platform.Power.navigationLightPowerOn"/><BooleanSpec id="hullLightPowerOn" name="선체등 전원 상태" cdm="Platform.Power.hullLightPowerOn"/><BooleanSpec id="steeringRoomLightPowerOn" name="내부등(조타실) 전원 상태" cdm="Platform.Power.steeringRoomLightPowerOn"/><BooleanSpec id="engineRoomLightPowerOn" name="내부등(기관실) 전원 상태" cdm="Platform.Power.engineRoomLightPowerOn"/><BooleanSpec id="externalLightPowerOn" name="외부등 전원 상태" cdm="Platform.Power.externalLightPowerOn"/><BooleanSpec id="warningLightPowerOn" name="경광등 전원 상태" cdm="Platform.Power.warningLightPowerOn"/><BooleanSpec id="decuTransceiverPowerOn" name="출입항보조통제장치 송수신기 전원 상태" cdm="Platform.Power.decuTransceiverPowerOn"/>
-      <BooleanSpec id="integratedNavigationPowerOn" name="복합항법장치 전원 상태" cdm="Platform.Power.integratedNavigationPowerOn"/><BooleanSpec id="aisTransceiverSetPowerOn" name="AIS 송수신용 세트 전원 상태" cdm="Platform.Power.aisTransceiverSetPowerOn"/><BooleanSpec id="aisReceiverSetPowerOn" name="AIS 수신전용 세트(DVL) 전원 상태" cdm="Platform.Power.aisReceiverSetPowerOn"/><BooleanSpec id="antiJammingAntennaPowerOn" name="항재밍안테나 전원 상태" cdm="Platform.Power.antiJammingAntennaPowerOn"/><BooleanSpec id="networkAbstractionPowerOn" name="네트워크추상화장치 전원 상태" cdm="Platform.Power.networkAbstractionPowerOn"/><BooleanSpec id="satelliteModemPowerOn" name="위성통신 모뎀 전원 상태" cdm="Platform.Power.satelliteModemPowerOn"/><BooleanSpec id="ethernetMainPowerOn" name="이더넷 스위치(주망) 전원 상태" cdm="Platform.Power.ethernetMainPowerOn"/><BooleanSpec id="ethernetBackupPowerOn" name="이더넷 스위치(비상망) 전원 상태" cdm="Platform.Power.ethernetBackupPowerOn"/><BooleanSpec id="wirelessCommPowerOn" name="무선통신장치 전원 상태" cdm="Platform.Power.wirelessCommPowerOn"/><BooleanSpec id="satelliteAcuPowerOn" name="위성통신 장치(ACU) 전원 상태" cdm="Platform.Power.satelliteAcuPowerOn"/><BooleanSpec id="encryptionDevicePowerOn" name="암호장비 전원 상태" cdm="Platform.Power.encryptionDevicePowerOn"/><BooleanSpec id="remoteWeaponControlPowerOn" name="원격사격통제장치 전원 상태" cdm="Platform.Power.remoteWeaponControlPowerOn"/><BooleanSpec id="torsionSensorPowerOn" name="비틀림 센서 전원 상태" cdm="Platform.Power.torsionSensorPowerOn"/><BooleanSpec id="vibrationSensorPowerOn" name="진동 센서 전원 상태" cdm="Platform.Power.vibrationSensorPowerOn"/><BooleanSpec id="vdrPowerOn" name="VDR 전원 상태" cdm="Platform.Power.vdrPowerOn"/><BooleanSpec id="voiceTransceiverPowerOn" name="음성송수신장치 전원 상태" cdm="Platform.Power.voiceTransceiverPowerOn"/><BooleanSpec id="environmentSignalProcessorPowerOn" name="환경센서 신호처리장치 전원 상태" cdm="Platform.Power.environmentSignalProcessorPowerOn"/><BooleanSpec id="towingDevicePowerOn" name="피예인장치 전원 상태" cdm="Platform.Power.towingDevicePowerOn"/><BooleanSpec id="commonPlatformWeaponPowerOn" name="공용플랫폼 무장 전원 상태" cdm="Platform.Power.commonPlatformWeaponPowerOn"/><BooleanSpec id="commonPlatformControllerPowerOn" name="공용플랫폼/제어장치 전원 상태" cdm="Platform.Power.commonPlatformControllerPowerOn"/>
-      <QuantitySpec id="pduTemp" name="전원분배장치 온도" cdm="Platform.Power.PDU.Temperature"><Unit>degC</Unit><Range min="-40" max="125"/><Resolution>1</Resolution></QuantitySpec>
-      <ValueSetSpec id="powerSourceStatus" name="전원 상태 정보" cdm="Platform.Power.Source"><Values><Value name="Battery" cdm="Platform.Power.Source.Battery"/><Value name="PDU" cdm="Platform.Power.Source.PDU"/></Values></ValueSetSpec>
-      <ValueSetSpec id="pduSourceStatus" name="전원 소스 정보" cdm="Platform.Power.PDU.Source"><Values><Value name="Generator" cdm="Platform.Power.PDU.Source.Generator"/><Value name="Shore" cdm="Platform.Power.PDU.Source.Shore"/></Values></ValueSetSpec>
-      <ValueSetSpec id="batteryChargeStatus" name="배터리 충방전 상태" cdm="Platform.Power.Battery.ChargeState"><Values><Value name="Standby" cdm="Platform.Power.Battery.Standby"/><Value name="Charging" cdm="Platform.Power.Battery.Charging"/><Value name="Discharging" cdm="Platform.Power.Battery.Discharging"/></Values></ValueSetSpec>
-      <ValueSetSpec id="batteryLevel" name="배터리 잔량 레벨" cdm="Platform.Power.Battery.Level"><Values><Value name="Level0" cdm="Platform.Power.Battery.Level.0"/><Value name="Level1" cdm="Platform.Power.Battery.Level.1"/><Value name="Level2" cdm="Platform.Power.Battery.Level.2"/><Value name="Level3" cdm="Platform.Power.Battery.Level.3"/><Value name="Level4" cdm="Platform.Power.Battery.Level.4"/><Value name="Level5" cdm="Platform.Power.Battery.Level.5"/></Values></ValueSetSpec>
-      <ValueSetSpec id="batteryFaultStatus" name="배터리 Fault 상태" cdm="Platform.Power.Battery.FaultStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Warning" cdm="Health.Status.Warning"/><Value name="Fault" cdm="Health.Status.Fault"/><Value name="Failure" cdm="Health.Status.Failure"/></Values></ValueSetSpec>
-      <QuantitySpec id="inputVS" name="전원분배장치 입력 전압" cdm="Platform.Power.PDU.InputVoltage"><Unit>Vac</Unit><Range min="0" max="300"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="inputCS" name="전원분배장치 입력 전류" cdm="Platform.Power.PDU.InputCurrent"><Unit>A</Unit><Range min="0" max="100"/><Resolution>1</Resolution></QuantitySpec><QuantitySpec id="batteryAssemblyVS" name="배터리조립체 전압" cdm="Platform.Power.Battery.Voltage"><Unit>V</Unit><Range min="0" max="500"/><Resolution>0.1</Resolution></QuantitySpec><QuantitySpec id="batteryAssemblyCS" name="배터리조립체 전류" cdm="Platform.Power.Battery.Current"><Unit>A</Unit><Range min="0" max="200"/><Resolution>1</Resolution></QuantitySpec>
+      <BooleanSpec id="pduPowerOn" name="전원분배장치 전원 상태" cdm="Platform.Power.pduPowerOn"/>
+      <BooleanSpec id="batteryAssemblyPowerOn" name="배터리 조립체 전원 상태" cdm="Platform.Power.batteryAssemblyPowerOn"/>
+      <BooleanSpec id="towedSonarPowerOn" name="예인형음탐기 전원 상태" cdm="Platform.Power.towedSonarPowerOn"/>
+      <BooleanSpec id="sonarSignalProcessorPowerOn" name="음탐기신호처리장치 전원 상태" cdm="Platform.Power.sonarSignalProcessorPowerOn"/>
+      <BooleanSpec id="sonarImageProcessorPowerOn" name="음탐기영상처리장치 전원 상태" cdm="Platform.Power.sonarImageProcessorPowerOn"/>
+      <BooleanSpec id="fanEngineRoomPowerOn" name="흡배기팬(기관실) 전원 상태" cdm="Platform.Power.fanEngineRoomPowerOn"/>
+      <BooleanSpec id="fanEquipmentRoomPowerOn" name="흡배기팬(장비실) 전원 상태" cdm="Platform.Power.fanEquipmentRoomPowerOn"/>
+      <BooleanSpec id="damperControllerPowerOn" name="댐퍼&amp;컨트롤러 전원 상태" cdm="Platform.Power.damperControllerPowerOn"/>
+      <BooleanSpec id="seaWaterAirConditionerPowerOn" name="해수공조장치 전원 상태" cdm="Platform.Power.seaWaterAirConditionerPowerOn"/>
+      <BooleanSpec id="seaWaterAirConditionerControllerPowerOn" name="해수공조장치 컨트롤러 전원 상태" cdm="Platform.Power.seaWaterAirConditionerControllerPowerOn"/>
+      <BooleanSpec id="interceptorPowerOn" name="인터셉터 전원 상태" cdm="Platform.Power.interceptorPowerOn"/>
+      <BooleanSpec id="bowThrusterBatteryChargerPowerOn" name="선수추력기용 배터리 충전 전원 상태" cdm="Platform.Power.bowThrusterBatteryChargerPowerOn"/>
+      <BooleanSpec id="stabilizerPowerOn" name="횡동요저감장치 전원 상태" cdm="Platform.Power.stabilizerPowerOn"/>
+      <BooleanSpec id="stabilizerControllerPowerOn" name="횡동요저감장치 컨트롤러 전원 상태" cdm="Platform.Power.stabilizerControllerPowerOn"/>
+      <BooleanSpec id="bilgePumpEngineRoomPowerOn" name="빌지펌프(기관실) 전원 상태" cdm="Platform.Power.bilgePumpEngineRoomPowerOn"/>
+      <BooleanSpec id="bilgePumpEquipmentRoomPowerOn" name="빌지펌프(장비실) 전원 상태" cdm="Platform.Power.bilgePumpEquipmentRoomPowerOn"/>
+      <BooleanSpec id="bilgePumpBowRoomPowerOn" name="빌지펌프(선수부) 전원 상태" cdm="Platform.Power.bilgePumpBowRoomPowerOn"/>
+      <BooleanSpec id="eoirPowerOn" name="전자광학장치 전원 상태" cdm="Platform.Power.eoirPowerOn"/>
+      <BooleanSpec id="contactInfoProcessorPowerOn" name="접촉물정보처리장치 전원 상태" cdm="Platform.Power.contactInfoProcessorPowerOn"/>
+      <BooleanSpec id="navigationRadarPowerOn" name="항해레이더 전원 상태" cdm="Platform.Power.navigationRadarPowerOn"/>
+      <BooleanSpec id="nearContactDetectorPowerOn" name="근거리접촉물탐지장치 전원 상태" cdm="Platform.Power.nearContactDetectorPowerOn"/>
+      <BooleanSpec id="navigationCameraPowerOn" name="운항용카메라장치 전원 상태" cdm="Platform.Power.navigationCameraPowerOn"/>
+      <BooleanSpec id="platformControllerPowerOn" name="선체제어장치 전원 상태" cdm="Platform.Power.platformControllerPowerOn"/>
+      <BooleanSpec id="centralControllerPowerOn" name="중앙통제장치 전원 상태" cdm="Platform.Power.centralControllerPowerOn"/>
+      <BooleanSpec id="navigationLightPowerOn" name="항해등 전원 상태" cdm="Platform.Power.navigationLightPowerOn"/>
+      <BooleanSpec id="hullLightPowerOn" name="선체등 전원 상태" cdm="Platform.Power.hullLightPowerOn"/>
+      <BooleanSpec id="steeringRoomLightPowerOn" name="내부등(조타실) 전원 상태" cdm="Platform.Power.steeringRoomLightPowerOn"/>
+      <BooleanSpec id="engineRoomLightPowerOn" name="내부등(기관실) 전원 상태" cdm="Platform.Power.engineRoomLightPowerOn"/>
+      <BooleanSpec id="externalLightPowerOn" name="외부등 전원 상태" cdm="Platform.Power.externalLightPowerOn"/>
+      <BooleanSpec id="warningLightPowerOn" name="경광등 전원 상태" cdm="Platform.Power.warningLightPowerOn"/>
+      <BooleanSpec id="decuTransceiverPowerOn" name="출입항보조통제장치 송수신기 전원 상태" cdm="Platform.Power.decuTransceiverPowerOn"/>
+      <BooleanSpec id="integratedNavigationPowerOn" name="복합항법장치 전원 상태" cdm="Platform.Power.integratedNavigationPowerOn"/>
+      <BooleanSpec id="aisTransceiverSetPowerOn" name="AIS 송수신용 세트 전원 상태" cdm="Platform.Power.aisTransceiverSetPowerOn"/>
+      <BooleanSpec id="aisReceiverSetPowerOn" name="AIS 수신전용 세트(DVL) 전원 상태" cdm="Platform.Power.aisReceiverSetPowerOn"/>
+      <BooleanSpec id="antiJammingAntennaPowerOn" name="항재밍안테나 전원 상태" cdm="Platform.Power.antiJammingAntennaPowerOn"/>
+      <BooleanSpec id="networkAbstractionPowerOn" name="네트워크추상화장치 전원 상태" cdm="Platform.Power.networkAbstractionPowerOn"/>
+      <BooleanSpec id="satelliteModemPowerOn" name="위성통신 모뎀 전원 상태" cdm="Platform.Power.satelliteModemPowerOn"/>
+      <BooleanSpec id="ethernetMainPowerOn" name="이더넷 스위치(주망) 전원 상태" cdm="Platform.Power.ethernetMainPowerOn"/>
+      <BooleanSpec id="ethernetBackupPowerOn" name="이더넷 스위치(비상망) 전원 상태" cdm="Platform.Power.ethernetBackupPowerOn"/>
+      <BooleanSpec id="wirelessCommPowerOn" name="무선통신장치 전원 상태" cdm="Platform.Power.wirelessCommPowerOn"/>
+      <BooleanSpec id="satelliteAcuPowerOn" name="위성통신 장치(ACU) 전원 상태" cdm="Platform.Power.satelliteAcuPowerOn"/>
+      <BooleanSpec id="encryptionDevicePowerOn" name="암호장비 전원 상태" cdm="Platform.Power.encryptionDevicePowerOn"/>
+      <BooleanSpec id="remoteWeaponControlPowerOn" name="원격사격통제장치 전원 상태" cdm="Platform.Power.remoteWeaponControlPowerOn"/>
+      <BooleanSpec id="torsionSensorPowerOn" name="비틀림 센서 전원 상태" cdm="Platform.Power.torsionSensorPowerOn"/>
+      <BooleanSpec id="vibrationSensorPowerOn" name="진동 센서 전원 상태" cdm="Platform.Power.vibrationSensorPowerOn"/>
+      <BooleanSpec id="vdrPowerOn" name="VDR 전원 상태" cdm="Platform.Power.vdrPowerOn"/>
+      <BooleanSpec id="voiceTransceiverPowerOn" name="음성송수신장치 전원 상태" cdm="Platform.Power.voiceTransceiverPowerOn"/>
+      <BooleanSpec id="environmentSignalProcessorPowerOn" name="환경센서 신호처리장치 전원 상태" cdm="Platform.Power.environmentSignalProcessorPowerOn"/>
+      <BooleanSpec id="towingDevicePowerOn" name="피예인장치 전원 상태" cdm="Platform.Power.towingDevicePowerOn"/>
+      <BooleanSpec id="commonPlatformWeaponPowerOn" name="공용플랫폼 무장 전원 상태" cdm="Platform.Power.commonPlatformWeaponPowerOn"/>
+      <BooleanSpec id="commonPlatformControllerPowerOn" name="공용플랫폼/제어장치 전원 상태" cdm="Platform.Power.commonPlatformControllerPowerOn"/>
+      <QuantitySpec id="pduTemp" name="전원분배장치 온도" cdm="Platform.Power.PDU.Temperature">
+        <Unit>degC</Unit>
+        <Range min="-40" max="125"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <ValueSetSpec id="powerSourceStatus" name="전원 상태 정보" cdm="Platform.Power.Source">
+        <Values>
+          <Value name="Battery" cdm="Platform.Power.Source.Battery"/>
+          <Value name="PDU" cdm="Platform.Power.Source.PDU"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="pduSourceStatus" name="전원 소스 정보" cdm="Platform.Power.PDU.Source">
+        <Values>
+          <Value name="Generator" cdm="Platform.Power.PDU.Source.Generator"/>
+          <Value name="Shore" cdm="Platform.Power.PDU.Source.Shore"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="batteryChargeStatus" name="배터리 충방전 상태" cdm="Platform.Power.Battery.ChargeState">
+        <Values>
+          <Value name="Standby" cdm="Platform.Power.Battery.Standby"/>
+          <Value name="Charging" cdm="Platform.Power.Battery.Charging"/>
+          <Value name="Discharging" cdm="Platform.Power.Battery.Discharging"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="batteryLevel" name="배터리 잔량 레벨" cdm="Platform.Power.Battery.Level">
+        <Values>
+          <Value name="Level0" cdm="Platform.Power.Battery.Level.0"/>
+          <Value name="Level1" cdm="Platform.Power.Battery.Level.1"/>
+          <Value name="Level2" cdm="Platform.Power.Battery.Level.2"/>
+          <Value name="Level3" cdm="Platform.Power.Battery.Level.3"/>
+          <Value name="Level4" cdm="Platform.Power.Battery.Level.4"/>
+          <Value name="Level5" cdm="Platform.Power.Battery.Level.5"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="batteryFaultStatus" name="배터리 Fault 상태" cdm="Platform.Power.Battery.FaultStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Status.Normal"/>
+          <Value name="Warning" cdm="Health.Status.Warning"/>
+          <Value name="Fault" cdm="Health.Status.Fault"/>
+          <Value name="Failure" cdm="Health.Status.Failure"/>
+        </Values>
+      </ValueSetSpec>
+      <QuantitySpec id="inputVS" name="전원분배장치 입력 전압" cdm="Platform.Power.PDU.InputVoltage">
+        <Unit>Vac</Unit>
+        <Range min="0" max="300"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="inputCS" name="전원분배장치 입력 전류" cdm="Platform.Power.PDU.InputCurrent">
+        <Unit>A</Unit>
+        <Range min="0" max="100"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="batteryAssemblyVS" name="배터리조립체 전압" cdm="Platform.Power.Battery.Voltage">
+        <Unit>V</Unit>
+        <Range min="0" max="500"/>
+        <Resolution>0.1</Resolution>
+      </QuantitySpec>
+      <QuantitySpec id="batteryAssemblyCS" name="배터리조립체 전류" cdm="Platform.Power.Battery.Current">
+        <Unit>A</Unit>
+        <Range min="0" max="200"/>
+        <Resolution>1</Resolution>
+      </QuantitySpec>
       <!--CSCI의 각 부하별 출력 전압/전류는 BindingOnly 물리 telemetry로 보존하며 CDM 세분화는 전역 후속 감사 대상으로 둔다.-->
     </GroupSpec>
-    <GroupSpec id="towingDeviceLockState" name="피예인장치 잠금 상태" cdm="Platform.TowingDevice.LockState"><ValueSetSpec id="towingDeviceLockControl" name="피예인장치 잠금 상태" cdm="Platform.TowingDevice.LockState.Value"><Values><Value name="Unlocked" cdm="Platform.TowingDevice.Unlocked"/><Value name="Locked" cdm="Platform.TowingDevice.Locked"/></Values></ValueSetSpec></GroupSpec>
-    <GroupSpec id="distressStatus" name="비상조난 상태" cdm="Platform.Distress.Status"><BooleanSpec id="engineFault" name="엔진 이상" cdm="Platform.Distress.engineFault"/><BooleanSpec id="propulsionFault" name="추진기 이상" cdm="Platform.Distress.propulsionFault"/><BooleanSpec id="fireDetected" name="화재 감지" cdm="Platform.Distress.fireDetected"/><BooleanSpec id="leakDetected" name="누수 감지" cdm="Platform.Distress.leakDetected"/><BooleanSpec id="flowAnomaly" name="유량 이상" cdm="Platform.Distress.flowAnomaly"/><BooleanSpec id="autonomousNavigationFault" name="자율운항카드 BIT 이상" cdm="Platform.Distress.autonomousNavigationFault"/><QuantitySpec id="latitude" name="위도" cdm="Platform.Distress.Position.Latitude"><Unit>deg</Unit><Range min="-90" max="90"/></QuantitySpec><QuantitySpec id="longitude" name="경도" cdm="Platform.Distress.Position.Longitude"><Unit>deg</Unit><Range min="-180" max="180"/></QuantitySpec><QuantitySpec id="altitude" name="함체 위치 고도" cdm="Platform.Distress.Position.Altitude"><Unit>m</Unit><Range min="0"/></QuantitySpec></GroupSpec>
-    <GroupSpec id="windStatus" name="풍향/풍속 정보" cdm="Environment.Wind.Status"><QuantitySpec id="relativeAverageDirection" name="선체 기준 상대 풍향 평균" cdm="Environment.Wind.Relative.Direction"><Unit>deg</Unit><Range min="0" max="359.9"/></QuantitySpec><QuantitySpec id="relativeAverageSpeed" name="선체 기준 상대풍속도 평균" cdm="Environment.Wind.Relative.Speed"><Unit>m/s</Unit><Range min="0" max="70"/></QuantitySpec><QuantitySpec id="trueAverageDirection" name="진북 기준 풍향 평균" cdm="Environment.Wind.True.Direction"><Unit>deg</Unit><Range min="0" max="359.9"/></QuantitySpec><QuantitySpec id="trueAverageSpeed" name="진북 기준 진풍 속도 평균" cdm="Environment.Wind.True.Speed"><Unit>m/s</Unit><Range min="0" max="70"/></QuantitySpec></GroupSpec>
-    <GroupSpec id="seaWaterConditionerStatus" name="해수공조장치 상태" cdm="Platform.Environment.SeaWaterConditioner.Status"><QuantitySpec id="seaWaterAirConditionerTemp" name="해수공조장치 온도" cdm="Platform.Environment.SeaWaterConditioner.Temperature"><Unit>degC</Unit></QuantitySpec></GroupSpec>
+        <GroupSpec id="towingDeviceLockState" name="피예인장치 잠금 상태" cdm="Platform.TowingDevice.LockState">
+      <ValueSetSpec id="towingDeviceLockControl" name="피예인장치 잠금 상태" cdm="Platform.TowingDevice.LockState.Value">
+        <Values>
+          <Value name="Unlocked" cdm="Platform.TowingDevice.Unlocked"/>
+          <Value name="Locked" cdm="Platform.TowingDevice.Locked"/>
+        </Values>
+      </ValueSetSpec>
+    </GroupSpec>
+    <GroupSpec id="distressStatus" name="비상조난 상태" cdm="Platform.Distress.Status">
+      <BooleanSpec id="engineFault" name="엔진 이상" cdm="Platform.Distress.engineFault"/>
+      <BooleanSpec id="propulsionFault" name="추진기 이상" cdm="Platform.Distress.propulsionFault"/>
+      <BooleanSpec id="fireDetected" name="화재 감지" cdm="Platform.Distress.fireDetected"/>
+      <BooleanSpec id="leakDetected" name="누수 감지" cdm="Platform.Distress.leakDetected"/>
+      <BooleanSpec id="flowAnomaly" name="유량 이상" cdm="Platform.Distress.flowAnomaly"/>
+      <BooleanSpec id="autonomousNavigationFault" name="자율운항카드 BIT 이상" cdm="Platform.Distress.autonomousNavigationFault"/>
+      <QuantitySpec id="latitude" name="위도" cdm="Platform.Distress.Position.Latitude">
+        <Unit>deg</Unit>
+        <Range min="-90" max="90"/>
+      </QuantitySpec>
+      <QuantitySpec id="longitude" name="경도" cdm="Platform.Distress.Position.Longitude">
+        <Unit>deg</Unit>
+        <Range min="-180" max="180"/>
+      </QuantitySpec>
+      <QuantitySpec id="altitude" name="함체 위치 고도" cdm="Platform.Distress.Position.Altitude">
+        <Unit>m</Unit>
+        <Range min="0"/>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="windStatus" name="풍향/풍속 정보" cdm="Environment.Wind.Status">
+      <QuantitySpec id="relativeAverageDirection" name="선체 기준 상대 풍향 평균" cdm="Environment.Wind.Relative.Direction">
+        <Unit>deg</Unit>
+        <Range min="0" max="359.9"/>
+      </QuantitySpec>
+      <QuantitySpec id="relativeAverageSpeed" name="선체 기준 상대풍속도 평균" cdm="Environment.Wind.Relative.Speed">
+        <Unit>m/s</Unit>
+        <Range min="0" max="70"/>
+      </QuantitySpec>
+      <QuantitySpec id="trueAverageDirection" name="진북 기준 풍향 평균" cdm="Environment.Wind.True.Direction">
+        <Unit>deg</Unit>
+        <Range min="0" max="359.9"/>
+      </QuantitySpec>
+      <QuantitySpec id="trueAverageSpeed" name="진북 기준 진풍 속도 평균" cdm="Environment.Wind.True.Speed">
+        <Unit>m/s</Unit>
+        <Range min="0" max="70"/>
+      </QuantitySpec>
+    </GroupSpec>
+    <GroupSpec id="seaWaterConditionerStatus" name="해수공조장치 상태" cdm="Platform.Environment.SeaWaterConditioner.Status">
+      <QuantitySpec id="seaWaterAirConditionerTemp" name="해수공조장치 온도" cdm="Platform.Environment.SeaWaterConditioner.Temperature">
+        <Unit>degC</Unit>
+      </QuantitySpec>
+    </GroupSpec>
   </MonitorSpecs>
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start"><Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec>
-    <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.Restart"><Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec>
+        <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
+      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>
+        <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.Restart">
+      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>
     <!--선체제어 PBIT/IBIT은 원 CSCI에서 여러 개의 서로 다른 물리 결과 메시지 타입으로 정의되어 있으므로 각 물리 결과 메시지당 하나의 Reply를 유지한다.-->
-    <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT"><Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"/><Reply bindRef="requestIbitEngineResult" cdm="Request.Health.IBIT.Engine.Response"/><Reply bindRef="requestIbitWaterJetResult" cdm="Request.Health.IBIT.WaterJet.Response"/><Reply bindRef="requestIbitBowThrusterResult" cdm="Request.Health.IBIT.BowThruster.Response"/><Reply bindRef="requestIbitPowerResult" cdm="Request.Health.IBIT.Power.Response"/><Reply bindRef="requestIbitBatteryResult" cdm="Request.Health.IBIT.Battery.Response"/><Reply bindRef="requestIbitGeneratorResult" cdm="Request.Health.IBIT.Generator.Response"/><Reply bindRef="requestIbitEnvironmentResult" cdm="Request.Health.IBIT.Environment.Response"/><Reply bindRef="requestIbitWindSensorResult" cdm="Request.Health.IBIT.WindSensor.Response"/><Reply bindRef="requestIbitFireDetectorResult" cdm="Request.Health.IBIT.FireDetector.Response"/><Reply bindRef="requestIbitLeakDetectorResult" cdm="Request.Health.IBIT.LeakDetector.Response"/><Reply bindRef="requestIbitFlowMeterResult" cdm="Request.Health.IBIT.FlowMeter.Response"/><Reply bindRef="requestIbitStabilizerResult" cdm="Request.Health.IBIT.Stabilizer.Response"/><Reply bindRef="requestIbitInterceptorResult" cdm="Request.Health.IBIT.Interceptor.Response"/><Reply bindRef="requestIbitSeaWaterConditionerResult" cdm="Request.Health.IBIT.SeaWaterConditioner.Response"/><Reply bindRef="requestIbitTowingDeviceResult" cdm="Request.Health.IBIT.TowingDevice.Response"/><Reply bindRef="requestIbitSPCEResult" cdm="Request.Health.IBIT.SPCE.Response"/></ControlSpec>
-    <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT"><Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"/><Reply bindRef="requestPbitPropulsionResult" cdm="Request.Health.PBIT.Propulsion.Response"/><Reply bindRef="requestPbitElectricalResult" cdm="Request.Health.PBIT.Electrical.Response"/><Reply bindRef="requestPbitAccessoriesResult" cdm="Request.Health.PBIT.Accessories.Response"/><Reply bindRef="requestPbitSubsystemResult" cdm="Request.Health.PBIT.Subsystem.Response"/><Reply bindRef="requestPbitSPCEResult" cdm="Request.Health.PBIT.SPCE.Response"/></ControlSpec>
-    <ControlSpec id="setEmergencyStopMode" name="비상정지 모드 설정" cdm="Control.Platform.OperationMode.EmergencyStop"><Reply bindRef="setEmergencyStopModeAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec><ControlSpec id="setEmergencyReturnMode" name="비상복귀 모드 설정" cdm="Control.Platform.OperationMode.EmergencyReturn"><Reply bindRef="setEmergencyReturnModeAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec><ControlSpec id="setRemoteManualMode" name="원격수동조작 모드 설정" cdm="Control.Platform.OperationMode.RemoteManual"><Reply bindRef="setRemoteManualModeAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec><ControlSpec id="setLocalManualMode" name="근거리수동조작 모드 설정" cdm="Control.Platform.OperationMode.LocalManual"><Reply bindRef="setLocalManualModeAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec><ControlSpec id="setAutonomousMode" name="자율운항 모드 설정" cdm="Control.Platform.OperationMode.Autonomous"><Reply bindRef="setAutonomousModeAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec><ControlSpec id="setStandbyMode" name="명령대기 모드 설정" cdm="Control.Platform.OperationMode.Standby"><Reply bindRef="setStandbyModeAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec><ControlSpec id="setMaintenanceMode" name="정비 모드 설정" cdm="Control.Platform.OperationMode.Maintenance"><Reply bindRef="setMaintenanceModeAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec><ControlSpec id="setEmergencyActionMode" name="비상조치 모드 설정" cdm="Control.Platform.OperationMode.EmergencyAction"><Reply bindRef="setEmergencyActionModeAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec>
-    <ControlSpec id="powerOnEquipment" name="장비 전원 ON" cdm="Control.Power.On"><Parameters><CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51"><ElementProfile cdm="Equipment.Identifier"><Profile cdm="Equipment.Identifier.Numeric"/></ElementProfile></CollectionProfile></Parameters><Reply bindRef="powerOnEquipmentAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec>
-    <ControlSpec id="powerOffEquipment" name="장비 전원 OFF" cdm="Control.Power.Off"><Parameters><CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51"><ElementProfile cdm="Equipment.Identifier"><Profile cdm="Equipment.Identifier.Numeric"/></ElementProfile></CollectionProfile></Parameters><Reply bindRef="powerOffEquipmentAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec>
-    <ControlSpec id="resetEquipmentPower" name="장비 전원 Reset" cdm="Control.Power.Reset"><Parameters><CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51"><ElementProfile cdm="Equipment.Identifier"><Profile cdm="Equipment.Identifier.Numeric"/></ElementProfile></CollectionProfile></Parameters><Reply bindRef="resetEquipmentPowerAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec>
-    <ControlSpec id="configureSurveillanceCameraPower" name="감시카메라 전원 설정" cdm="Control.Camera.Power.Configuration"><Parameters><Profile cdm="Equipment.Camera.Power.StateSet"/></Parameters><Reply bindRef="configureSurveillanceCameraPowerAck" cdm="Command.ProcessingStatus.Response" required="true"/></ControlSpec>
+        <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+      <Reply bindRef="requestIbitEngineResult" cdm="Request.Health.IBIT.Engine.Response"/>
+      <Reply bindRef="requestIbitWaterJetResult" cdm="Request.Health.IBIT.WaterJet.Response"/>
+      <Reply bindRef="requestIbitBowThrusterResult" cdm="Request.Health.IBIT.BowThruster.Response"/>
+      <Reply bindRef="requestIbitPowerResult" cdm="Request.Health.IBIT.Power.Response"/>
+      <Reply bindRef="requestIbitBatteryResult" cdm="Request.Health.IBIT.Battery.Response"/>
+      <Reply bindRef="requestIbitGeneratorResult" cdm="Request.Health.IBIT.Generator.Response"/>
+      <Reply bindRef="requestIbitEnvironmentResult" cdm="Request.Health.IBIT.Environment.Response"/>
+      <Reply bindRef="requestIbitWindSensorResult" cdm="Request.Health.IBIT.WindSensor.Response"/>
+      <Reply bindRef="requestIbitFireDetectorResult" cdm="Request.Health.IBIT.FireDetector.Response"/>
+      <Reply bindRef="requestIbitLeakDetectorResult" cdm="Request.Health.IBIT.LeakDetector.Response"/>
+      <Reply bindRef="requestIbitFlowMeterResult" cdm="Request.Health.IBIT.FlowMeter.Response"/>
+      <Reply bindRef="requestIbitStabilizerResult" cdm="Request.Health.IBIT.Stabilizer.Response"/>
+      <Reply bindRef="requestIbitInterceptorResult" cdm="Request.Health.IBIT.Interceptor.Response"/>
+      <Reply bindRef="requestIbitSeaWaterConditionerResult" cdm="Request.Health.IBIT.SeaWaterConditioner.Response"/>
+      <Reply bindRef="requestIbitTowingDeviceResult" cdm="Request.Health.IBIT.TowingDevice.Response"/>
+      <Reply bindRef="requestIbitSPCEResult" cdm="Request.Health.IBIT.SPCE.Response"/>
+    </ControlSpec>
+        <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+      <Reply bindRef="requestPbitPropulsionResult" cdm="Request.Health.PBIT.Propulsion.Response"/>
+      <Reply bindRef="requestPbitElectricalResult" cdm="Request.Health.PBIT.Electrical.Response"/>
+      <Reply bindRef="requestPbitAccessoriesResult" cdm="Request.Health.PBIT.Accessories.Response"/>
+      <Reply bindRef="requestPbitSubsystemResult" cdm="Request.Health.PBIT.Subsystem.Response"/>
+      <Reply bindRef="requestPbitSPCEResult" cdm="Request.Health.PBIT.SPCE.Response"/>
+    </ControlSpec>
+        <ControlSpec id="setEmergencyStopMode" name="비상정지 모드 설정" cdm="Control.Platform.OperationMode.EmergencyStop">
+      <Reply bindRef="setEmergencyStopModeAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>    <ControlSpec id="setEmergencyReturnMode" name="비상복귀 모드 설정" cdm="Control.Platform.OperationMode.EmergencyReturn">
+      <Reply bindRef="setEmergencyReturnModeAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>    <ControlSpec id="setRemoteManualMode" name="원격수동조작 모드 설정" cdm="Control.Platform.OperationMode.RemoteManual">
+      <Reply bindRef="setRemoteManualModeAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>    <ControlSpec id="setLocalManualMode" name="근거리수동조작 모드 설정" cdm="Control.Platform.OperationMode.LocalManual">
+      <Reply bindRef="setLocalManualModeAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>    <ControlSpec id="setAutonomousMode" name="자율운항 모드 설정" cdm="Control.Platform.OperationMode.Autonomous">
+      <Reply bindRef="setAutonomousModeAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>    <ControlSpec id="setStandbyMode" name="명령대기 모드 설정" cdm="Control.Platform.OperationMode.Standby">
+      <Reply bindRef="setStandbyModeAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>    <ControlSpec id="setMaintenanceMode" name="정비 모드 설정" cdm="Control.Platform.OperationMode.Maintenance">
+      <Reply bindRef="setMaintenanceModeAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>    <ControlSpec id="setEmergencyActionMode" name="비상조치 모드 설정" cdm="Control.Platform.OperationMode.EmergencyAction">
+      <Reply bindRef="setEmergencyActionModeAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>
+        <ControlSpec id="powerOnEquipment" name="장비 전원 ON" cdm="Control.Power.On">
+      <Parameters>
+        <CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
+          <ElementProfile cdm="Equipment.Identifier">
+            <Profile cdm="Equipment.Identifier.Numeric"/>
+          </ElementProfile>
+        </CollectionProfile>
+      </Parameters>
+      <Reply bindRef="powerOnEquipmentAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>
+        <ControlSpec id="powerOffEquipment" name="장비 전원 OFF" cdm="Control.Power.Off">
+      <Parameters>
+        <CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
+          <ElementProfile cdm="Equipment.Identifier">
+            <Profile cdm="Equipment.Identifier.Numeric"/>
+          </ElementProfile>
+        </CollectionProfile>
+      </Parameters>
+      <Reply bindRef="powerOffEquipmentAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>
+        <ControlSpec id="resetEquipmentPower" name="장비 전원 Reset" cdm="Control.Power.Reset">
+      <Parameters>
+        <CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
+          <ElementProfile cdm="Equipment.Identifier">
+            <Profile cdm="Equipment.Identifier.Numeric"/>
+          </ElementProfile>
+        </CollectionProfile>
+      </Parameters>
+      <Reply bindRef="resetEquipmentPowerAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>
+        <ControlSpec id="configureSurveillanceCameraPower" name="감시카메라 전원 설정" cdm="Control.Camera.Power.Configuration">
+      <Parameters>
+        <Profile cdm="Equipment.Camera.Power.StateSet"/>
+      </Parameters>
+      <Reply bindRef="configureSurveillanceCameraPowerAck" cdm="Command.ProcessingStatus.Response" required="true"/>
+    </ControlSpec>
     <!--ENVCommandType과 TowingDeviceControlType은 ACK=O이나 commandID가 없어 현재 CommandStatusReport Reply를 강제로 연결하지 않는다.-->
-    <ControlSpec id="configureEnvironmentSystem" name="환경센서 계통 제어" cdm="Control.Environment.Configuration"><Parameters><Profile cdm="Environment.SeaWaterAirConditioner.Control"/><QuantityProfile cdm="Environment.SeaWaterAirConditioner.TemperatureSetpoint"><Unit>degC</Unit></QuantityProfile><BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher1.Command"/><BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher2.Command"/><BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher3.Command"/><BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher4.Command"/></Parameters></ControlSpec>
-    <ControlSpec id="lockTowingDevice" name="피예인장치 잠금" cdm="Control.TowingDevice.Lock"/><ControlSpec id="unlockTowingDevice" name="피예인장치 잠금 해제" cdm="Control.TowingDevice.Unlock"/>
+        <ControlSpec id="configureEnvironmentSystem" name="환경센서 계통 제어" cdm="Control.Environment.Configuration">
+      <Parameters>
+        <Profile cdm="Environment.SeaWaterAirConditioner.Control"/>
+        <QuantityProfile cdm="Environment.SeaWaterAirConditioner.TemperatureSetpoint">
+          <Unit>degC</Unit>
+        </QuantityProfile>
+        <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher1.Command"/>
+        <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher2.Command"/>
+        <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher3.Command"/>
+        <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher4.Command"/>
+      </Parameters>
+    </ControlSpec>
+        <ControlSpec id="lockTowingDevice" name="피예인장치 잠금" cdm="Control.TowingDevice.Lock"/>    <ControlSpec id="unlockTowingDevice" name="피예인장치 잠금 해제" cdm="Control.TowingDevice.Unlock"/>
     <!--원격통제장치 CSCI: RUSV::C2::RCU::USVControlType, 10 Hz, ACK 없음. integratedTargetSteering/Throttle은 공용 구조체에서 현 프로젝트 미사용으로 표기되어 Semantic 입력에서는 제외한다.-->
     <ControlSpec id="controlPropulsion" name="실시간 추진 제어" cdm="Control.Platform.Propulsion.Realtime">
       <Parameters>

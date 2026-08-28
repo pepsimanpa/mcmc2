@@ -66,36 +66,65 @@
       <QuantitySpec id="contactNum" name="접촉물 개수" cdm="Contact.AIS.Count">
         <Unit>num</Unit>
       </QuantitySpec>
-      <!--공용 구조체 AISContactType의 일부 Range/Unavailable 셀은 열 정합성이 불명확하여 확인 가능한 타입·단위만 반영하고 수치 Range를 임의 보정하지 않는다.-->
+      <!--TBD: 공용 구조체 AISContactType의 Range 열은 일부 값의 정합성이 불명확하여 Semantic에는 타입/단위/명확한 특성만 반영하고 수치 Range를 임의 보정하지 않는다.-->
       <CollectionSpec id="contactTypeList" name="AIS 접촉물 목록" cdm="Contact.AIS.List" minOccurs="0" maxOccurs="256">
         <ElementSpec id="aisContact" name="AIS 접촉물" cdm="Contact.AIS.Item">
           <QuantitySpec id="contactID" name="접촉물 식별번호" cdm="Contact.Identifier"/>
           <QuantitySpec id="mmsi" name="선박고유식별번호" cdm="Contact.AIS.MMSI"/>
-          <QuantitySpec id="latitude" name="위도" cdm="Contact.Position.Latitude"><Unit>deg</Unit></QuantitySpec>
-          <QuantitySpec id="longitude" name="경도" cdm="Contact.Position.Longitude"><Unit>deg</Unit></QuantitySpec>
-          <QuantitySpec id="course" name="침로" cdm="Contact.Course"><Unit>deg</Unit></QuantitySpec>
-          <QuantitySpec id="speed" name="속력" cdm="Contact.Speed"><Unit>kts</Unit></QuantitySpec>
-          <QuantitySpec id="detectionRange" name="거리" cdm="Contact.Range"><Unit>m</Unit></QuantitySpec>
-          <QuantitySpec id="cpa" name="CPA" cdm="Contact.CPA"><Unit>m</Unit></QuantitySpec>
-          <QuantitySpec id="tcpa" name="TCPA" cdm="Contact.TCPA"><Unit>s</Unit></QuantitySpec>
-          <QuantitySpec id="collisionRisk" name="충돌위험도" cdm="Contact.CollisionRisk"><Unit>%</Unit></QuantitySpec>
-          <QuantitySpec id="heading" name="선수방위각" cdm="Contact.Heading"><Unit>deg</Unit><Resolution>0.1</Resolution></QuantitySpec>
-          <QuantitySpec id="rateOfTurn" name="선박 회전속도" cdm="Contact.RateOfTurn"><Unit>deg/min</Unit></QuantitySpec>
-          <TextSpec id="shipName" name="선박명" cdm="Contact.AIS.ShipName"><MaxLength>21</MaxLength></TextSpec>
+          <QuantitySpec id="latitude" name="위도" cdm="Contact.Position.Latitude">
+            <Unit>deg</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="longitude" name="경도" cdm="Contact.Position.Longitude">
+            <Unit>deg</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="course" name="침로" cdm="Contact.Course">
+            <Unit>deg</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="speed" name="속력" cdm="Contact.Speed">
+            <Unit>kts</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="detectionRange" name="거리" cdm="Contact.Range">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="cpa" name="CPA" cdm="Contact.CPA">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="tcpa" name="TCPA" cdm="Contact.TCPA">
+            <Unit>s</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="collisionRisk" name="충돌위험도" cdm="Contact.CollisionRisk">
+            <Unit>%</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="heading" name="선수방위각" cdm="Contact.Heading">
+            <Unit>deg</Unit>
+            <Resolution>0.1</Resolution>
+          </QuantitySpec>
+          <QuantitySpec id="rateOfTurn" name="선박 회전속도" cdm="Contact.RateOfTurn">
+            <Unit>deg/min</Unit>
+          </QuantitySpec>
+          <TextSpec id="shipName" name="선박명" cdm="Contact.AIS.ShipName">
+            <MaxLength>21</MaxLength>
+          </TextSpec>
           <QuantitySpec id="shipType" name="선박종류" cdm="Contact.AIS.ShipType"/>
-          <QuantitySpec id="shipLength" name="선박길이" cdm="Contact.Length"><Unit>m</Unit></QuantitySpec>
-          <QuantitySpec id="shipWidth" name="선박너비" cdm="Contact.Width"><Unit>m</Unit></QuantitySpec>
+          <QuantitySpec id="shipLength" name="선박길이" cdm="Contact.Length">
+            <Unit>m</Unit>
+          </QuantitySpec>
+          <QuantitySpec id="shipWidth" name="선박너비" cdm="Contact.Width">
+            <Unit>m</Unit>
+          </QuantitySpec>
         </ElementSpec>
       </CollectionSpec>
     </GroupSpec>
-    <GroupSpec id="radarStatus" name="항해레이더 상태" cdm="Radar.Status">
+        <GroupSpec id="radarStatus" name="항해레이더 상태" cdm="Radar.Status">
       <ValueSetSpec id="transmitStatus" name="레이더 송출 상태" cdm="Radar.Status.Transmit">
         <Values>
           <Value name="Standby" cdm="Radar.Transmit.Standby"/>
           <Value name="Transmit" cdm="Radar.Transmit.Transmit"/>
         </Values>
       </ValueSetSpec>
-      <QuantitySpec id="range" name="레이더 탐지거리" cdm="Radar.Status.Range"><Unit>m</Unit></QuantitySpec>
+      <QuantitySpec id="range" name="레이더 탐지거리" cdm="Radar.Status.Range">
+        <Unit>m</Unit>
+      </QuantitySpec>
       <ValueSetSpec id="messageTransmitStatus" name="레이더 메시지 출력 상태" cdm="Radar.Status.MessageTransmit">
         <Values>
           <Value name="Stop" cdm="MessageOutput.Stop"/>
@@ -104,7 +133,7 @@
       </ValueSetSpec>
       <!--radarMessageTransmitStatus의 '레이더 메시지'가 RadarContactReportType 등 DDS 정보 메시지 출력을 의미하는지 CSCI에서 명시되지 않으며 대응 별도 Control도 확인되지 않는다.-->
     </GroupSpec>
-    <GroupSpec id="radarVideoStatus" name="항해레이더 영상 송출 상태" cdm="Radar.Video.Status">
+        <GroupSpec id="radarVideoStatus" name="항해레이더 영상 송출 상태" cdm="Radar.Video.Status">
       <ValueSetSpec id="broadcastStatus" name="영상 송출 상태" cdm="Radar.Video.BroadcastStatus">
         <Values>
           <Value name="Stop" cdm="Streaming.Stop"/>
@@ -114,16 +143,18 @@
       <QuantitySpec id="frameWidth" name="프레임 너비" cdm="Radar.Video.Frame.Width"/>
       <QuantitySpec id="frameHeight" name="프레임 높이" cdm="Radar.Video.Frame.Height"/>
     </GroupSpec>
-    <GroupSpec id="aisStatus" name="AIS 상태" cdm="AIS.Status">
+        <GroupSpec id="aisStatus" name="AIS 상태" cdm="AIS.Status">
       <ValueSetSpec id="messageTransmitStatus" name="AIS 메시지 출력 상태" cdm="AIS.Status.MessageTransmit">
         <Values>
           <Value name="Standby" cdm="MessageOutput.Standby"/>
           <Value name="Transmit" cdm="MessageOutput.Transmit"/>
         </Values>
       </ValueSetSpec>
-      <QuantitySpec id="range" name="AIS 탐지거리" cdm="AIS.Status.Range"><Unit>m</Unit></QuantitySpec>
+      <QuantitySpec id="range" name="AIS 탐지거리" cdm="AIS.Status.Range">
+        <Unit>m</Unit>
+      </QuantitySpec>
     </GroupSpec>
-    <GroupSpec id="cipeCbitStatus" name="항해레이더 처리카드 CBIT 상태" cdm="Health.CBIT.CIPE">
+        <GroupSpec id="cipeCbitStatus" name="항해레이더 처리카드 CBIT 상태" cdm="Health.CBIT.CIPE">
       <ValueSetSpec id="cipeOperationalStatus" name="자율항해장비 연동 상태" cdm="Health.CIPE.EquipmentLink">
         <Values>
           <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/>
@@ -147,68 +178,162 @@
     </GroupSpec>
   </MonitorSpecs>
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
-      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+        <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
+      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
-    <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
-      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+        <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
+      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
-    <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
-      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+        <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
       <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
         <Results>
           <GroupResult name="cipeIbit" cdm="Health.IBIT.NavigationRadarProcessor">
-            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"><Values>
-              <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/><Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
-              <Value name="LidarConnected" cdm="Health.CIPE.Lidar.Connected"/><Value name="LidarDisconnected" cdm="Health.CIPE.Lidar.Disconnected"/>
-              <Value name="NearContactConnected" cdm="Health.CIPE.NearContact.Connected"/><Value name="NearContactDisconnected" cdm="Health.CIPE.NearContact.Disconnected"/>
-              <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/><Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
-            </Values></ValueSetResult>
-            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus"><Values>
-              <Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/>
-            </Values></ValueSetResult>
-            <QuantityResult name="cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature"><Unit>degC</Unit><Range min="20" max="100"/></QuantityResult>
-            <QuantityResult name="cpuLoad" cdm="Health.CIPE.Processor.CpuLoad"><Unit>percent</Unit><Range min="0" max="100"/></QuantityResult>
+            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+              <Values>
+                <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/>
+                <Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
+                <Value name="LidarConnected" cdm="Health.CIPE.Lidar.Connected"/>
+                <Value name="LidarDisconnected" cdm="Health.CIPE.Lidar.Disconnected"/>
+                <Value name="NearContactConnected" cdm="Health.CIPE.NearContact.Connected"/>
+                <Value name="NearContactDisconnected" cdm="Health.CIPE.NearContact.Disconnected"/>
+                <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
+                <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
+              </Values>
+            </ValueSetResult>
+            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+              <Values>
+                <Value name="Normal" cdm="Health.Normal"/>
+                <Value name="Degraded" cdm="Health.Degraded"/>
+                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                <Value name="NoResponse" cdm="Health.NoResponse"/>
+              </Values>
+            </ValueSetResult>
+            <QuantityResult name="cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature">
+              <Unit>degC</Unit>
+              <Range min="20" max="100"/>
+            </QuantityResult>
+            <QuantityResult name="cpuLoad" cdm="Health.CIPE.Processor.CpuLoad">
+              <Unit>percent</Unit>
+              <Range min="0" max="100"/>
+            </QuantityResult>
           </GroupResult>
         </Results>
       </Reply>
     </ControlSpec>
-    <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
-      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+        <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
       <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
         <Results>
           <GroupResult name="cipePbit" cdm="Health.PBIT.NavigationRadarProcessor">
-            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"><Values>
-              <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/><Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
-              <Value name="LidarConnected" cdm="Health.CIPE.Lidar.Connected"/><Value name="LidarDisconnected" cdm="Health.CIPE.Lidar.Disconnected"/>
-              <Value name="NearContactConnected" cdm="Health.CIPE.NearContact.Connected"/><Value name="NearContactDisconnected" cdm="Health.CIPE.NearContact.Disconnected"/>
-              <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/><Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
-            </Values></ValueSetResult>
-            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus"><Values>
-              <Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/>
-            </Values></ValueSetResult>
+            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+              <Values>
+                <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/>
+                <Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
+                <Value name="LidarConnected" cdm="Health.CIPE.Lidar.Connected"/>
+                <Value name="LidarDisconnected" cdm="Health.CIPE.Lidar.Disconnected"/>
+                <Value name="NearContactConnected" cdm="Health.CIPE.NearContact.Connected"/>
+                <Value name="NearContactDisconnected" cdm="Health.CIPE.NearContact.Disconnected"/>
+                <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
+                <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
+              </Values>
+            </ValueSetResult>
+            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+              <Values>
+                <Value name="Normal" cdm="Health.Normal"/>
+                <Value name="Degraded" cdm="Health.Degraded"/>
+                <Value name="Unavailable" cdm="Health.Unavailable"/>
+                <Value name="NoResponse" cdm="Health.NoResponse"/>
+              </Values>
+            </ValueSetResult>
           </GroupResult>
         </Results>
       </Reply>
     </ControlSpec>
-    <ControlSpec id="setRadarStandby" name="항해레이더 송출 대기 명령" cdm="Control.Radar.Transmit.Standby"><Reply bindRef="setRadarStandbyAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="startRadarTransmit" name="항해레이더 송출 명령" cdm="Control.Radar.Transmit.Start"><Reply bindRef="startRadarTransmitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="setRadarRange" name="항해레이더 탐지거리 설정" cdm="Control.Radar.Range.Set">
-      <!--RadarRangeControlType.setTargetRange은 octet으로 정의되어 있으나 값의 단위/범위/프리셋 변환 규칙이 원문에 없다. 상태 radarRange(long, m)를 근거로 임의 변환하지 않는다.-->
-      <Parameters><Profile cdm="Control.Radar.Range.CommandValue"/></Parameters>
-      <Reply bindRef="setRadarRangeAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+        <ControlSpec id="setRadarStandby" name="항해레이더 송출 대기 명령" cdm="Control.Radar.Transmit.Standby">
+      <Reply bindRef="setRadarStandbyAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
-    <ControlSpec id="startRadarVideoStreaming" name="항해레이더 영상 송출 시작" cdm="Control.Radar.Video.Start"><Reply bindRef="startRadarVideoStreamingAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="stopRadarVideoStreaming" name="항해레이더 영상 송출 중지" cdm="Control.Radar.Video.Stop"><Reply bindRef="stopRadarVideoStreamingAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="setAISMessageStandby" name="AIS 메시지 출력 대기" cdm="Control.AIS.MessageTransmit.Standby"><Reply bindRef="setAISMessageStandbyAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="startAISMessageTransmit" name="AIS 메시지 출력 시작" cdm="Control.AIS.MessageTransmit.Start"><Reply bindRef="startAISMessageTransmitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="setAISRange" name="AIS 탐지거리 설정" cdm="Control.AIS.Range.Set">
+        <ControlSpec id="startRadarTransmit" name="항해레이더 송출 명령" cdm="Control.Radar.Transmit.Start">
+      <Reply bindRef="startRadarTransmitAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+    </ControlSpec>
+        <ControlSpec id="setRadarRange" name="항해레이더 탐지거리 설정" cdm="Control.Radar.Range.Set">
+      <!--RadarRangeControlType.setTargetRange은 octet으로 정의되어 있으나 값의 단위/범위/프리셋 변환 규칙이 원문에 없다. 상태 radarRange(long, m)를 근거로 임의 변환하지 않는다.-->
+      <Parameters>
+        <Profile cdm="Control.Radar.Range.CommandValue"/>
+      </Parameters>
+      <Reply bindRef="setRadarRangeAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+    </ControlSpec>
+        <ControlSpec id="startRadarVideoStreaming" name="항해레이더 영상 송출 시작" cdm="Control.Radar.Video.Start">
+      <Reply bindRef="startRadarVideoStreamingAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+    </ControlSpec>
+        <ControlSpec id="stopRadarVideoStreaming" name="항해레이더 영상 송출 중지" cdm="Control.Radar.Video.Stop">
+      <Reply bindRef="stopRadarVideoStreamingAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+    </ControlSpec>
+        <ControlSpec id="setAISMessageStandby" name="AIS 메시지 출력 대기" cdm="Control.AIS.MessageTransmit.Standby">
+      <Reply bindRef="setAISMessageStandbyAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+    </ControlSpec>
+        <ControlSpec id="startAISMessageTransmit" name="AIS 메시지 출력 시작" cdm="Control.AIS.MessageTransmit.Start">
+      <Reply bindRef="startAISMessageTransmitAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
+    </ControlSpec>
+        <ControlSpec id="setAISRange" name="AIS 탐지거리 설정" cdm="Control.AIS.Range.Set">
       <!--AISRangeFilterControlType.setAISRange은 octet으로 정의되어 있으나 값의 단위/범위/프리셋 변환 규칙이 원문에 없다. 상태 aisRange(long, m)를 근거로 임의 변환하지 않는다.-->
-      <Parameters><Profile cdm="Control.AIS.Range.CommandValue"/></Parameters>
-      <Reply bindRef="setAISRangeAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Parameters>
+        <Profile cdm="Control.AIS.Range.CommandValue"/>
+      </Parameters>
+      <Reply bindRef="setAISRangeAck" cdm="Command.ProcessingStatus.Response" required="true">
+        <Results>
+          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+        </Results>
+      </Reply>
     </ControlSpec>
   </ControlSpecs>
   <SensorProductSpecs id="sensorProduct">
-    <ProductStreamSpec id="radarVideo" name="항해레이더 스트리밍 영상" cdm="ProductStream.Video.Radar"><ProductKind cdm="ProductKind.Video"/></ProductStreamSpec>
+    <ProductStreamSpec id="radarVideo" name="항해레이더 스트리밍 영상" cdm="ProductStream.Video.Radar">
+      <ProductKind cdm="ProductKind.Video"/>
+    </ProductStreamSpec>
   </SensorProductSpecs>
 </SensorSpec>
