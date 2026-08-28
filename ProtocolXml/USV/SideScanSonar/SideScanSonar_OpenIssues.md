@@ -87,7 +87,7 @@
 - PBIT와 IBIT은 각각 하나의 점검 결과 DDS 메시지이며, Semantic에서도 각각 `requestPbitResult`, `requestIbitResult` 한 개의 Reply를 유지한다. 메시지 내부 결과 필드는 하나의 `GroupResult` 아래 표현한다.
 - 38개 `CommandStatusReportType` ACK는 라우팅/상관관계 필드가 아니라 `commandStatusReport.status`만 Semantic Result로 노출한다. `dstEquipmentType`, `dstEquipmentID`, `commandID`는 Binding/Adapter 메타데이터로 유지한다.
 - `CommandStatusReport.status`의 원문 값(Executing/Pending/Failed/Reject/Canceled)은 확정되어 있으나, 세부 상태 CDM 명칭은 최종 CDM 감사까지 새로 만들지 않는다. 따라서 현재 Semantic은 `Control.Response.Status` 결과 존재만 선언한다.
-- `TSAPBITReportType`, `TSAIBITReportType` 내부 필드는 현재 Binding에 이미 존재하는 CDM을 그대로 Semantic Result에 재사용하며, Total 상태코드 및 IBIT detail bit의 raw 의미는 추가 추론하지 않는다.
+- `TSAPBITReportType`, `TSAIBITReportType` 내부 필드는 현재 Binding의 CDM을 Semantic Result에 재사용한다. 각 필드의 CSV 행에 `0=정상/1=기능저하/2=비가용/3=미응답` 또는 구체 bit 의미가 직접 기재된 항목은 ValueSetResult/PackedField로 논리화하고, 해당 행의 의미가 비어 있는 항목은 Raw로 유지한다.
 - `LaunchReportType`, `LanchAndRecoveryBackStopReportType`, `CommunicationLevelReportType`도 하나의 결과 Report Reply를 유지한다. `LaunchReportType.launch`와 `LanchAndRecoveryBackStopReportType.slideBackStop`은 원문 raw 의미를 Semantic 논리값 + Binding ValueMap으로 반영했고, 나머지는 원문 직접 근거가 있는 경우에만 매핑한다.
 - commandID가 없는 결과 Report의 요청-결과 correlation 방식은 기존 TBD를 유지한다.
 
@@ -111,7 +111,7 @@
 - Semantic/Binding Control은 `38↔38`, Reply는 `47↔47`이며 ID 연결도 일치한다.
 - 수동 USBL 명령은 `launch=0/1/2/3`(정지/진수/회수/원점복귀), USBL 작동은 `start=0/1`, 슬라이드는 `start=0/1/2/3`, 윈치는 `start=0/1/2`의 분리 Control + `FixedField` 구조를 유지한다. 이 값들은 사용자 선택 enum이 아니라 이미 행위별 Control로 분리되었으므로 FixedField가 적절하다.
 - USBL `motorSpeed(0~0.011 m/s)`, 슬라이드 `slideDeploy(0~2.15 m)`, 윈치 `winchDeploy(0~100 m)` 보조 필드는 정지/원점복귀를 포함한 각 원문 메시지 구조에서 유지한다. 원문에 무시/고정값 규칙이 없으므로 임의 제거하지 않는다.
-- 케이블 분리 `0/1`, 화면모드 `0/1`, 자동 진회수 명령 `0/1/2`, BackStop 현재 `0/1/2` FixedField 구조를 확인했다. BackStop 결과 Report의 raw 의미는 별도 TBD이다.
+- 케이블 분리 `0/1`, 화면모드 `0/1`, 자동 진회수 명령 `0/1/2`, BackStop 현재 `0/1/2` FixedField 구조를 확인했다. BackStop 결과 Report도 CSCI의 `0=정지상태 / 1=후퇴고정완료 / 2=복귀완료`를 ValueSetResult/ValueMap으로 확정하였다.
 - PBIT/IBIT은 각각 하나의 결과 Reply + 하나의 GroupResult이며 내부 필드는 각각 6개/62개이다.
 - SensorProduct 5종은 Semantic/Binding `5↔5`: SSS 압축, GapFiller 압축, 병합 압축, ObjectDetection2D, 진회수 카메라 RTP이다. ProductBinding은 스트림 채널/메시지 선택 구조이므로 `ContactTypeList.sonarType` 같은 payload 내부 분류 필드를 별도 Binding Field로 누락된 것으로 보지 않는다.
 - converter는 0건이고 primitive dataType 미지정은 0건이다. `usvHeader`, `destination` composite만 의도적으로 dataType이 없다.
