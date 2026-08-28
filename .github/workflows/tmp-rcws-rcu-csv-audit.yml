@@ -1,0 +1,80 @@
+name: temporary RCWS RCU CSV audit
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Apply RCU CSV grounded RCWS control fixes
+        shell: python
+        run: |
+          from pathlib import Path
+          bpath=Path('ProtocolXml/USV/RemoteFireControl/RemoteFireControlBinding.xml')
+          opath=Path('ProtocolXml/USV/RemoteFireControl/RemoteFireControl_OpenIssues.md')
+          b=bpath.read_text(encoding='utf-8')
+          o=opath.read_text(encoding='utf-8')
+
+          def rep(text, old, new, count, label):
+              n=text.count(old)
+              if n != count:
+                  raise SystemExit(f'{label}: expected {count}, found {n}')
+              return text.replace(old,new)
+
+          b=rep(b,
+            '      <Field name="stabilization" cdm="Control.RCWS.Menu.StabilizationToggleEvent" dataType="UInt8"/>',
+            '      <DerivedField name="stabilization" cdm="Control.RCWS.Menu.StabilizationToggleEvent" sourceField="Control.RCWS.Menu.StabilizationToggleEvent" dataType="UInt8"><SourceValueMap><Map sourceValue="false" value="0"/><Map sourceValue="true" value="1"/></SourceValueMap></DerivedField>',
+            1,'stabilization')
+          b=rep(b,
+            '      <Field name="initZeroing" cdm="Control.RCWS.Menu.InitializeZeroingAction" dataType="UInt8"/>',
+            '      <DerivedField name="initZeroing" cdm="Control.RCWS.Menu.InitializeZeroingAction" sourceField="Control.RCWS.Menu.InitializeZeroingAction" dataType="UInt8"><SourceValueMap><Map sourceValue="false" value="0"/><Map sourceValue="true" value="1"/></SourceValueMap></DerivedField>',
+            1,'initZeroing')
+
+          anchor='- RCWS IBIT detail 4개 octet은 CSCI의 bit 위치/대상 정의를 따라 PackedField로 분해하되, 0/1 polarity가 없어 bit별 Raw 의미로 유지하였다.\n'
+          addition='- 원격통제장치 CSCI의 `MenuConfigType`을 재대조하여 `stabilization(0=초기,1=토글)`과 `initZeroing(0=초기,1=영점초기화)`을 논리 Boolean 입력 + Binding `SourceValueMap(false→0,true→1)`으로 정리하였다. `stabilization`은 원문에 1 이후 0 초기화가 명시되지만 `initZeroing`에는 동일 문구가 없어 후자의 one-shot reset 정책은 TBD로 유지한다.\n'
+          if addition not in o:
+              o=rep(o,anchor,anchor+addition,1,'audit summary anchor')
+
+          old='''7. **`initZeroing` event reset 규칙**\n   - 0=초기, 1=영점 초기화는 원통 측 제어 원문에서 확인되나 1 송신 후 자동으로 0으로 초기화해야 하는지는 이번 RCWS CSCI에도 정의가 없다.'''
+          new='''7. **`initZeroing` one-shot reset 규칙**\n   - 원격통제장치 CSCI에서 wire 값 `0=초기, 1=영점 초기화`는 직접 확인되어 Binding `SourceValueMap(false→0,true→1)`으로 반영하였다.\n   - 바로 앞 `stabilization` 등 다른 이벤트 필드는 `1 이후 다시 0으로 초기화`가 명시되어 있지만 `initZeroing`에는 그 문구가 없다. 따라서 wire 인코딩은 확정하되, 송신 후 OM/UI가 자동으로 논리값을 false로 되돌려야 하는지는 TBD로 유지한다.'''
+          o=rep(o,old,new,1,'initZeroing issue')
+
+          status='- 이번 RCWS CSCI 재감사로 `firingMode`/`turningAngle` 2건은 해결하고 IBIT detail은 bit 위치/대상까지 정밀화하였다. 남은 9건은 추가 원통 제어 원문/IDL/Adapter/운용 규칙 근거가 필요한 비차단 TBD이다.'
+          status2='- RCWS/원격통제장치 CSCI 교차감사로 `firingMode`/`turningAngle` 2건은 해결하고 IBIT detail 및 Menu event wire 매핑을 정밀화하였다. 남은 9건은 추가 IDL/Adapter/운용 규칙 근거가 필요한 비차단 TBD이다.'
+          o=rep(o,status,status2,1,'status')
+
+          bpath.write_text(b,encoding='utf-8')
+          opath.write_text(o,encoding='utf-8')
+      - name: Validate all USV XML and RCWS mappings
+        run: |
+          python -m pip install -q lxml
+          python - <<'PY'
+          from lxml import etree
+          from pathlib import Path
+          sx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          bx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          sems=list(Path('ProtocolXml/USV').glob('*/*Semantic.xml'))
+          binds=list(Path('ProtocolXml/USV').glob('*/*Binding.xml'))
+          for p in sems: sx.assertValid(etree.parse(str(p)))
+          for p in binds: bx.assertValid(etree.parse(str(p)))
+          text=Path('ProtocolXml/USV/RemoteFireControl/RemoteFireControlBinding.xml').read_text(encoding='utf-8')
+          assert '<DerivedField name="stabilization"' in text
+          assert '<DerivedField name="initZeroing"' in text
+          assert text.count('sourceField="Control.RCWS.Menu.StabilizationToggleEvent"') == 1
+          assert text.count('sourceField="Control.RCWS.Menu.InitializeZeroingAction"') == 1
+          assert 'converter=' not in text
+          print(f'USV Semantic {len(sems)} PASS / Binding {len(binds)} PASS')
+          print('RCWS RCU CSV MAPPING ASSERTIONS PASS')
+          PY
+      - name: Commit RCU CSV audit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ProtocolXml/USV/RemoteFireControl/RemoteFireControlBinding.xml ProtocolXml/USV/RemoteFireControl/RemoteFireControl_OpenIssues.md
+          git commit -m 'Refine RCWS menu event mappings from RCU CSCI'
+          git push origin HEAD:feature/usv-semantic-binding-audit
