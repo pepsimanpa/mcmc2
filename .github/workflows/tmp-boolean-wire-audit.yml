@@ -1,45 +1,212 @@
-name: temporary Boolean wire audit
+name: temporary Boolean wire type migration
 on:
   push:
     branches: [feature/usv-semantic-binding-audit]
 permissions:
-  contents: read
+  contents: write
 jobs:
-  audit:
+  migrate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feature/usv-semantic-binding-audit
-      - name: Audit Boolean semantic to direct binding fields
+      - name: Apply Boolean wire type and documentation updates
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
-          import xml.etree.ElementTree as ET
-          ns='http://lignex1.com/mcmc2/umsSchema'
-          q=lambda x:f'{{{ns}}}{x}'
-          roots=['ProtocolXml/USV','ProtocolXml/AUV','ProtocolXml/MDV','ProtocolXml/EMDW']
-          for root in roots:
-              print('\n###', root)
-              for sp in Path(root).rglob('*Semantic.xml'):
-                  try: sroot=ET.parse(sp).getroot()
-                  except Exception: continue
-                  bools={e.get('cdm'):e.get('id') for e in sroot.iter(q('BooleanSpec')) if e.get('cdm')}
-                  bools.update({e.get('cdm'):'(profile)' for e in sroot.iter(q('BooleanProfile')) if e.get('cdm')})
-                  if not bools: continue
-                  print('SEM', sp, 'boolean_cdms=', len(bools))
-                  for bp in sp.parent.glob('*Binding.xml'):
-                      broot=ET.parse(bp).getroot()
-                      direct=[]; typed=[]
-                      for tag in ('Field','FixedField','DerivedField'):
-                          for e in broot.iter(q(tag)):
-                              c=e.get('cdm'); sf=e.get('sourceField')
-                              if c in bools or sf in bools:
-                                  item=(tag,e.get('name'),c,sf,e.get('dataType'))
-                                  (typed if e.get('dataType') else direct).append(item)
-                      if direct or typed:
-                          print(' BIND', bp)
-                          for x in direct: print('  MISSING', x)
-                          for x in typed: print('  TYPED', x)
+          import re
+
+          def read(path): return Path(path).read_text(encoding='utf-8')
+          def write(path, text): Path(path).write_text(text, encoding='utf-8')
+
+          # 1) Common Binding XSD: actual DDS/IDL boolean primitive support.
+          xsd_path='ProtocolXml/XSD/CommonBindingSchema.xsd'
+          t=read(xsd_path)
+          if '<xs:enumeration value="Boolean"/>' not in t:
+              needle='            <xs:enumeration value="Float64"/>\n'
+              assert needle in t, 'WireDataType insertion point not found'
+              t=t.replace(needle, needle+'            <xs:enumeration value="Boolean"/>\n', 1)
+              write(xsd_path,t)
+
+          def add_type(path, tag, name, cdm=None):
+              t=read(path)
+              look_name=rf'(?=[^>]*\bname="{re.escape(name)}")'
+              look_cdm='' if cdm is None else rf'(?=[^>]*\bcdm="{re.escape(cdm)}")'
+              pat=rf'(<{tag}\b{look_name}{look_cdm}[^>]*?)(/>)'
+              matches=list(re.finditer(pat,t))
+              assert len(matches)==1, f'{path}: expected one {tag} {name} {cdm}, got {len(matches)}'
+              m=matches[0]
+              head=m.group(1)
+              if 'dataType=' in head:
+                  assert 'dataType="Boolean"' in head, f'{path}: {name} already has non-Boolean type: {head}'
+                  return False
+              new=head+' dataType="Boolean"'+m.group(2)
+              t=t[:m.start()]+new+t[m.end():]
+              write(path,t)
+              return True
+
+          eo='ProtocolXml/USV/ElectroOptical/ElectroOpticalBinding.xml'
+          for name,cdm in [
+              ('statusEoirLock','EOIR.Tracking.Lock'),
+              ('referenceModeResult','Control.EOIR.Position.ReferenceTrueNorth'),
+              ('autoTrackingSetting','Control.EOIR.Tracking.AutoEnabled'),
+              ('swingFlagResult','Control.EOIR.Swing.Enabled'),
+              ('irSwitching','Control.EOIR.Video.IR.UseSWIR'),
+              ('eoirFlagResult','Control.EOIR.Zoom.UseMWIR'),
+              ('eoirFlagResult','Control.EOIR.Focus.UseMWIR'),
+              ('laserIlluminatorSetting','Control.EOIR.Illuminator.Disabled'),
+          ]: add_type(eo,'Field',name,cdm)
+
+          eop='ProtocolXml/USV/ElectroOpticalProcessor/ElectroOpticalProcessorBinding.xml'
+          add_type(eop,'FixedField','controlImageSave')
+          # Update now-obsolete comment without changing physical value.
+          t=read(eop)
+          t=t.replace('source IDL type은 boolean이나 CommonBindingSchema WireDataType에 Boolean이 없어 dataType은 임의 UInt8로 치환하지 않는다.',
+                      'source IDL type은 boolean이며 공통 WireDataType Boolean으로 직접 선언한다.')
+          write(eop,t)
+
+          pc='ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml'
+          for name,cdm in [
+              ('fireDetected','Health.CBIT.fireDetected'),
+              ('leakDetected','Health.CBIT.leakDetected'),
+              ('flowAnomalyDetected','Health.CBIT.flowAnomalyDetected'),
+              ('fireSensor1Alarm','Platform.Environment.fireSensor1Alarm'),
+              ('fireSensor2Alarm','Platform.Environment.fireSensor2Alarm'),
+              ('fireSensor3Alarm','Platform.Environment.fireSensor3Alarm'),
+              ('autoExtinguisher1Active','Platform.Environment.autoExtinguisher1Active'),
+              ('autoExtinguisher2Active','Platform.Environment.autoExtinguisher2Active'),
+              ('autoExtinguisher3Active','Platform.Environment.autoExtinguisher3Active'),
+              ('autoExtinguisher4Active','Platform.Environment.autoExtinguisher4Active'),
+          ]: add_type(pc,'Field',name,cdm)
+
+          nae='ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionBinding.xml'
+          add_type(nae,'Field','modulatorStatus.valid','Communication.GeoSat.Modulator.Valid')
+          add_type(nae,'Field','demodulatorStatus.valid','Communication.GeoSat.Demodulator.Valid')
+
+          # 2) Common design rule: semantic Boolean and physical Boolean are distinct questions.
+          rules='ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md'
+          t=read(rules)
+          marker='사용 가능한 기본 WireDataType은 XSD 정의를 따른다.\n'
+          addition='''\nDDS / IDL의 실제 primitive가 `boolean`인 경우 Binding은 `dataType="Boolean"`을 사용한다.\n\n단, Semantic의 `BooleanSpec` / `BooleanProfile`은 **논리 의미가 true/false라는 뜻일 뿐 wire primitive가 Boolean임을 의미하지 않는다.** 원문 wire가 octet/정수이면 해당 실제 정수 `dataType`과 `ValueMap`/`SourceValueMap`을 유지하고, packed bit이면 `PackedField / BitMember`, 정수 sentinel에서 파생되는 Boolean이면 원 정수 `dataType`과 `Sentinel / Normal`을 유지한다.\n\n예: MDV / EMDW의 `MissionPlan.CurrentWaypoint.Available`은 Semantic Boolean이지만 실제 wire는 `UInt16 currentWaypointIndex`의 `0xFFFF` sentinel에서 파생되므로 `dataType="Boolean"`으로 변경하지 않는다.\n'''
+          if 'DDS / IDL의 실제 primitive가 `boolean`인 경우 Binding은 `dataType="Boolean"`' not in t:
+              assert marker in t
+              t=t.replace(marker, marker+addition, 1)
+              write(rules,t)
+
+          # 3) Device OpenIssues: Boolean schema gap resolved, preserve other TBD numbering/context.
+          path='ProtocolXml/USV/ElectroOptical/ElectroOptical_OpenIssues.md'; t=read(path)
+          t=t.replace('## 3. Remaining TBD\n\n1. **DDS boolean의 Binding wire type 표현**', '## 3. Remaining TBD / Resolved\n\n1. **[RESOLVED] DDS boolean의 Binding wire type 표현**')
+          t=t.replace('   - 현재 `CommonBindingSchema.xsd/WireDataType`에는 Boolean이 없다.\n   - 실제 boolean을 `UInt8`로 임의 치환하지 않고 해당 필드는 dataType 미지정으로 보존한다.\n   - 향후 Boolean wire type 추가 또는 DDS boolean 공통 처리 규칙이 필요하다.',
+                      '   - `CommonBindingSchema.xsd/WireDataType`에 `Boolean`을 추가하였다.\n   - 원 CSCI/IDL primitive가 실제 `boolean`인 8개 직접 Field를 `dataType="Boolean"`으로 선언하였다.\n   - Semantic Boolean이라도 원 wire가 octet/bit/sentinel인 항목은 Boolean으로 강제 변경하지 않는다.')
+          write(path,t)
+
+          path='ProtocolXml/USV/ElectroOpticalProcessor/ElectroOpticalProcessor_OpenIssues.md'; t=read(path)
+          t=t.replace('## 3. Remaining TBD', '## 3. Remaining TBD / Resolved', 1)
+          t=t.replace('6. **`controlImageSave`의 boolean wire type 표현**', '6. **[RESOLVED] `controlImageSave`의 boolean wire type 표현**')
+          t=t.replace('   - 현재 `CommonBindingSchema.xsd`의 `WireDataType`에는 Boolean 항목이 없어 `dataType="UInt8"`로 임의 치환하지 않고 `FixedField value="1"`만 유지한다.\n   - 향후 Binding XSD에 Boolean wire type을 추가할지, DDS boolean은 별도 규칙으로 처리할지 전역 결정이 필요하다.',
+                      '   - 공통 `WireDataType`에 `Boolean`을 추가하고 `FixedField value="1" dataType="Boolean"`으로 명시하였다.\n   - UInt8로 임의 치환하지 않고 원 IDL primitive를 그대로 표현한다.')
+          write(path,t)
+
+          path='ProtocolXml/USV/PlatformController/PlatformController_OpenIssues.md'; t=read(path)
+          t=t.replace('## 3. Remaining TBD', '## 3. Remaining TBD / Resolved', 1)
+          t=t.replace('9. **DDS boolean wire type**', '9. **[RESOLVED] DDS boolean wire type**')
+          t=t.replace('   - 환경 Alarm/자동소화 상태 등 DDS boolean 필드가 존재하지만 현재 `CommonBindingSchema.xsd/WireDataType`에는 Boolean이 없다.\n   - 실제 boolean Field에 임의 `UInt8`을 강제하지 않은 항목이 남아 있다.',
+                      '   - 공통 `WireDataType`에 `Boolean`을 추가하였다.\n   - 원 CSCI/IDL에서 실제 DDS boolean으로 확인된 CBIT/환경상태 직접 Field 10개를 `dataType="Boolean"`으로 선언하였다.\n   - octet으로 정의된 ENV command와 bow-thruster enable 등은 기존 UInt8/SourceValueMap을 유지한다.')
+          write(path,t)
+
+          path='ProtocolXml/USV/NetworkAbstraction/NetworkAbstraction_OpenIssues.md'; t=read(path)
+          t=t.replace('1. **GeoSat 통신상태 10개 필드의 실제 DDS primitive type**', '1. **GeoSat 통신상태 8개 필드의 실제 DDS primitive type**')
+          t=t.replace('   - `modulatorStatus.valid`, `outputLevel`, `dataBW`, `dataRate`, `demodulatorStatus.valid`, `signalPower`, `cn`, `ber`, `bitRate`, `trafficRate`의 실제 IDL primitive type을 현재 근거만으로 안전하게 재확정하지 못했다.\n   - 단위/scale은 원문에 따라 유지하되 `dataType`은 임의 지정하지 않는다.',
+                      '   - `modulatorStatus.valid`와 `demodulatorStatus.valid`는 원 DDS/IDL boolean으로 확인되어 `dataType="Boolean"`으로 확정하였다.\n   - 남은 `outputLevel`, `dataBW`, `dataRate`, `signalPower`, `cn`, `ber`, `bitRate`, `trafficRate` 8개 수치 필드의 실제 IDL primitive type은 현재 근거만으로 안전하게 재확정하지 못했다.\n   - 단위/scale은 원문에 따라 유지하되 남은 8개 `dataType`은 임의 지정하지 않는다.')
+          t=t.replace('`configureLBandComms`의 일부 `*.Raw` Semantic Profile과 GeoSat 10개 `dataType`은 근거 부족 때문에 의도적으로 미확정 상태로 보존한다.',
+                      '`configureLBandComms`의 일부 `*.Raw` Semantic Profile과 GeoSat 수치 8개 `dataType`은 근거 부족 때문에 의도적으로 미확정 상태로 보존한다.')
+          write(path,t)
+
+          # 4) Integrated USV audit: close COMMON-02 and recalculate primitive gaps.
+          path='ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md'; t=read(path)
+          t=t.replace('남은 primitive `dataType` 미지정은 총 **450건**이다.', '남은 primitive `dataType` 미지정은 총 **429건**이다.')
+          t=t.replace('| ElectroOptical | 8 | 원 CSCI가 DDS `boolean`; 현 `WireDataType`에 Boolean 없음 |', '| ElectroOptical | 0 | 실제 DDS boolean 8개를 `dataType="Boolean"`으로 해결 |')
+          t=t.replace('| ElectroOpticalProcessor | 1 | `controlImageSave` DDS `boolean`; 동일 XSD 제약 |', '| ElectroOpticalProcessor | 0 | `controlImageSave`를 `dataType="Boolean"`으로 해결 |')
+          t=t.replace('| NetworkAbstraction | 10 | GeoSat 상태 상세 primitive type이 현재 근거에서 불명확 |', '| NetworkAbstraction | 8 | GeoSat `valid` 2개는 Boolean 확정; 나머지 수치 8개 primitive type 불명확 |')
+          t=t.replace('| PlatformController | 429 | 대형 legacy 상태/PBIT/IBIT 구조체의 원 CSCI/IDL primitive type 근거 부족 |', '| PlatformController | 419 | 실제 DDS boolean 10개 해결; 나머지 legacy 상태/PBIT/IBIT primitive type 근거 부족 |')
+          t=t.replace('| **합계** | **450** |  |', '| **합계** | **429** |  |')
+          t=t.replace('이 450건은 XSD 오류가 아니다.', '이 429건은 XSD 오류가 아니다.')
+          t=t.replace('특히 DDS `boolean`은 `UInt8`로 임의 치환하지 않는다.',
+                      'DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표현한다. Semantic Boolean이 octet/packed bit/sentinel에서 파생되는 경우에는 실제 wire 타입을 유지한다.')
+          t=t.replace('### USV-COMMON-02 — DDS Boolean wire type 표현\n\n- 대표 장치: ElectroOptical, ElectroOpticalProcessor, PlatformController\n- 원문 타입: `boolean`\n- 현재 `CommonBindingSchema.xsd/WireDataType`: Boolean 없음\n- 상태: XSD 또는 DDS boolean 공통 처리 규칙 필요',
+                      '### USV-COMMON-02 — DDS Boolean wire type 표현 — **RESOLVED (2026-08-28)**\n\n- 공통 `CommonBindingSchema.xsd/WireDataType`에 `Boolean` 추가\n- 실제 DDS/IDL boolean 직접 필드 21개 반영: ElectroOptical 8, ElectroOpticalProcessor 1, PlatformController 10, NetworkAbstraction 2\n- Semantic Boolean이라고 해서 자동으로 wire Boolean으로 변경하지 않는 규칙을 공통 설계문서에 명시\n- AUV / MDV / EMDW 교차 감사 결과 직접 wire Boolean 후보는 0개였으며, 기존 Boolean 의미는 packed bit 또는 numeric sentinel/파생 의미이므로 실제 wire 타입을 유지')
+          t=t.replace('- 총 미지정: 450건\n- Boolean schema gap 및 CSCI/IDL 근거 미확보 항목 포함', '- 총 미지정: 429건\n- Boolean schema gap은 해결되었고, 남은 항목은 CSCI/IDL primitive 근거 미확보 항목')
+          write(path,t)
           PY
+      - name: Validate all UMS XML against updated common schemas
+        shell: bash
+        run: |
+          python -m pip install --quiet lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import xml.etree.ElementTree as ET
+
+          spec_schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          bind_schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          roots=[Path('ProtocolXml/USV'),Path('ProtocolXml/AUV'),Path('ProtocolXml/MDV'),Path('ProtocolXml/EMDW')]
+          failed=[]; sc=bc=0
+          for root in roots:
+              for p in root.rglob('*Semantic.xml'):
+                  sc+=1
+                  doc=etree.parse(str(p))
+                  if not spec_schema.validate(doc): failed.append((str(p),str(spec_schema.error_log)))
+              for p in root.rglob('*Binding.xml'):
+                  bc+=1
+                  doc=etree.parse(str(p))
+                  if not bind_schema.validate(doc): failed.append((str(p),str(bind_schema.error_log)))
+          print('Semantic validated:',sc,'Binding validated:',bc)
+          if failed:
+              for p,e in failed: print('FAIL',p,e)
+              raise SystemExit(1)
+
+          ns='http://lignex1.com/mcmc2/umsSchema'; q=lambda x:f'{{{ns}}}{x}'
+          boolean_fields=[]
+          for root in roots:
+              for p in root.rglob('*Binding.xml'):
+                  r=ET.parse(p).getroot()
+                  for tag in ('Field','FixedField','DerivedField'):
+                      for e in r.iter(q(tag)):
+                          if e.get('dataType')=='Boolean': boolean_fields.append((str(p),tag,e.get('name'),e.get('cdm'),e.get('sourceField')))
+          print('dataType=Boolean count:',len(boolean_fields))
+          for x in boolean_fields: print(' BOOLEAN',x)
+          assert len(boolean_fields)==21, len(boolean_fields)
+
+          # No direct Boolean wire primitives are expected in AUV/MDV/EMDW current bindings.
+          assert not [x for x in boolean_fields if '/AUV/' in x[0] or '/MDV/' in x[0] or '/EMDW/' in x[0]]
+          # RCWS bool-like octets are physical UInt8 and must not be rewritten.
+          assert not [x for x in boolean_fields if '/RemoteFireControl/' in x[0]]
+
+          # Updated XSD must explicitly expose Boolean.
+          xsd=Path('ProtocolXml/XSD/CommonBindingSchema.xsd').read_text()
+          assert '<xs:enumeration value="Boolean"/>' in xsd
+          PY
+      - name: Commit Boolean migration
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ProtocolXml/XSD/CommonBindingSchema.xsd \
+                  ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md \
+                  ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md \
+                  ProtocolXml/USV/ElectroOptical/ElectroOpticalBinding.xml \
+                  ProtocolXml/USV/ElectroOptical/ElectroOptical_OpenIssues.md \
+                  ProtocolXml/USV/ElectroOpticalProcessor/ElectroOpticalProcessorBinding.xml \
+                  ProtocolXml/USV/ElectroOpticalProcessor/ElectroOpticalProcessor_OpenIssues.md \
+                  ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml \
+                  ProtocolXml/USV/PlatformController/PlatformController_OpenIssues.md \
+                  ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionBinding.xml \
+                  ProtocolXml/USV/NetworkAbstraction/NetworkAbstraction_OpenIssues.md
+          if git diff --cached --quiet; then
+            echo "No Boolean migration changes to commit"
+            exit 0
+          fi
+          git commit -m "Add Boolean wire type and resolve DDS boolean bindings"
+          git push origin HEAD:feature/usv-semantic-binding-audit
