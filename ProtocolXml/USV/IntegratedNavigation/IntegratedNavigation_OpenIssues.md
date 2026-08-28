@@ -19,8 +19,9 @@
 - PBIT/IBIT는 처리 ACK와 전용 결과 Reply를 분리하고 각 결과 메시지는 하나의 결과 그룹으로 유지하였다.
 - RTCM `vaildRtcmDataSize`는 기존 합의대로 Semantic 0~256 byte를 유지하고 Binding의 물리 오탈자는 보존하였다. wire type은 Int32, `rtcmDataBuf`는 256-byte 배열로 선언하였다.
 - 기존 `BuildUSVMessageBase`, `UInt16` converter를 제거하였다.
+- 복합항법 CSCI 재심층 감사에서 `imuIbit2`의 `Bit 0?10 : Reserved`는 동일 UInt32 내 Bit11~31이 연속 정의되어 있어 `Bit 0~10 : Reserved`로, `dvlIbit2`의 `Bit 20?31 : Reserved`는 Bit0~19가 연속 정의되어 있어 `Bit 20~31 : Reserved`로 확정하였다. 두 `?`는 구간기호가 훼손된 원문/CSV 표기 결함으로 정리한다.
 
-## 3. Remaining TBD
+## 3. Remaining TBD / Resolved — 미해결 6개
 
 1. **PBIT/IBIT Result correlation**
    - 요청에는 commandID가 있으나 CNEPBIT/CNEIBIT 결과에는 commandID가 없다.
@@ -34,13 +35,13 @@
    - 원문에는 1=GPS 항재밍 감지, 2=항기만 감지만 존재한다.
    - 정상상태 또는 두 상태 동시 발생 표현은 원문에서 확인되지 않는다.
 
-4. **`imuIbit2` reserved 범위 표기**
-   - 원문이 `Bit 0?10 : Reserved`로 기재되어 정확한 구간 표기 문자가 훼손되어 있다.
-   - 의미가 명확한 Bit 11 이상만 모델링하고 reserved 범위는 임의 확정하지 않는다.
+4. **[RESOLVED] `imuIbit2` reserved 범위 표기**
+   - 원문은 `Bit 0?10 : Reserved`로 기재되어 있으나 같은 UInt32에서 Bit11~15, Bit16~19, Bit20~23, Bit24~31이 연속적으로 모두 정의되어 있다.
+   - 따라서 남는 하위 11bit는 Bit0~10뿐이며 `?`는 구간기호 훼손으로 판단하여 Reserved 범위를 Bit0~10으로 확정한다. Reserved bit는 Semantic에 노출하지 않는다.
 
-5. **`dvlIbit2` reserved 범위 표기**
-   - 원문이 `Bit 20?31 : Reserved`로 기재되어 있다.
-   - 의미가 명확한 Bit 0~19만 모델링한다.
+5. **[RESOLVED] `dvlIbit2` reserved 범위 표기**
+   - 원문은 `Bit 20?31 : Reserved`로 기재되어 있으나 같은 UInt32에서 Bit0~19가 개별 의미로 연속 정의되어 있다.
+   - 따라서 나머지 상위 12bit는 Bit20~31이며 `?`는 구간기호 훼손으로 판단한다. Reserved bit는 Semantic에 노출하지 않는다.
 
 6. **IMU 가속도계 온도 signedness**
    - `imuIbit2` Bit24~31이 Accelerometer Temperature, LSB=1°C로 정의되지만 signed/unsigned 및 유효 범위가 없다.
@@ -56,5 +57,6 @@
 
 ## 4. 현재 상태
 
-- 원통 직접 연동 범위의 Semantic/Binding 구조 정리는 완료하였다.
-- 남은 8건은 사용자 정책 선택사항이 아니라 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.
+- 원통 직접 연동 범위의 Semantic/Binding 구조 정리와 복합항법 CSCI 재심층 감사까지 완료하였다.
+- reserved 구간 표기 2건은 32-bit 전체 bit 배치와 연속 정의를 근거로 해소하였다.
+- 미해결 6건은 사용자 정책 선택사항이 아니라 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.
