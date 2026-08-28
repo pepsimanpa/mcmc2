@@ -139,11 +139,11 @@
     <MonitorBinding semantic_id="powerState">
       <DDSChannel topicName="RUSV::MM::TSA::DetailSystemStatusType" typeName="DetailSystemStatusType"/>
       <Field name="usvHeader"/>
-      <Field name="towedSonarArrayPowerStatus" cdm="ElectricalState.Power.TowedSonarArray" dataType="UInt8"><ValueMap><Map cdm="PowerSupplyState.Off" value="0"/><Map cdm="PowerSupplyState.On" value="1"/></ValueMap></Field>
-      <Field name="ultraShortBaseLinePowerStatus" cdm="ElectricalState.Power.USBL" dataType="UInt8"><ValueMap><Map cdm="PowerSupplyState.Off" value="0"/><Map cdm="PowerSupplyState.On" value="1"/></ValueMap></Field>
-      <Field name="winchPowerStatus" cdm="ElectricalState.Power.Winch" dataType="UInt8"><ValueMap><Map cdm="PowerSupplyState.Off" value="0"/><Map cdm="PowerSupplyState.On" value="1"/></ValueMap></Field>
-      <Field name="recoveryUnitPowerStatus" cdm="ElectricalState.Power.RecoveryUnit" dataType="UInt8"><ValueMap><Map cdm="PowerSupplyState.Off" value="0"/><Map cdm="PowerSupplyState.On" value="1"/></ValueMap></Field>
-      <Field name="cameraPowerStatus" cdm="ElectricalState.Power.Camera" dataType="UInt8"><ValueMap><Map cdm="PowerSupplyState.Off" value="0"/><Map cdm="PowerSupplyState.On" value="1"/></ValueMap></Field>
+      <Field name="towedSonarArrayPowerStatus" cdm="ElectricalState.Power.TowedSonarArray" dataType="UInt8"/>
+      <Field name="ultraShortBaseLinePowerStatus" cdm="ElectricalState.Power.USBL" dataType="UInt8"/>
+      <Field name="winchPowerStatus" cdm="ElectricalState.Power.Winch" dataType="UInt8"/>
+      <Field name="recoveryUnitPowerStatus" cdm="ElectricalState.Power.RecoveryUnit" dataType="UInt8"/>
+      <Field name="cameraPowerStatus" cdm="ElectricalState.Power.Camera" dataType="UInt8"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="subsystemHealthStatus">
       <DDSChannel topicName="RUSV::SO::TSA::TSACBITReportType" typeName="TSACBITReportType"/>
