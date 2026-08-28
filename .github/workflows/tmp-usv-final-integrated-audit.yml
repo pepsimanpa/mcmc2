@@ -1,0 +1,74 @@
+name: temporary USV final integrated audit
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Validate and summarize USV XML
+        run: |
+          python -m pip install -q lxml
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import collections
+
+          sx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          bx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          sems=sorted(Path('ProtocolXml/USV').glob('*/*Semantic.xml'))
+          binds=sorted(Path('ProtocolXml/USV').glob('*/*Binding.xml'))
+          for p in sems: sx.assertValid(etree.parse(str(p)))
+          for p in binds: bx.assertValid(etree.parse(str(p)))
+
+          NS={'u':'http://lignex1.com/mcmc2/umsSchema'}
+          def n(root, expr): return len(root.xpath(expr, namespaces=NS))
+          packed=0; converter=0; booleans=collections.Counter(); result_replies=0
+          print('DEVICE|CONTROL|REPLY|MONITOR|PRODUCT|PACKED|BOOLEAN')
+          for sp,bp in zip(sems,binds):
+              sr=etree.parse(str(sp)); br=etree.parse(str(bp))
+              dev=sp.parent.name
+              controls=n(sr,'//u:ControlSpecs/*')
+              replies=n(sr,'//u:Reply')
+              monitors=n(sr,'//u:MonitorSpecs/*')
+              products=n(sr,'//u:SensorProductSpecs/*')
+              pcount=n(br,'//u:PackedField')
+              bcount=n(br,'//*[@dataType="Boolean"]')
+              packed+=pcount; booleans[dev]=bcount
+              text=bp.read_text(encoding='utf-8')
+              converter+=text.count('converter=')
+              print(f'{dev}|{controls}|{replies}|{monitors}|{products}|{pcount}|{bcount}')
+          print(f'TOTAL_SEMANTIC={len(sems)}')
+          print(f'TOTAL_BINDING={len(binds)}')
+          print(f'TOTAL_PACKED={packed}')
+          print(f'TOTAL_BOOLEAN={sum(booleans.values())}')
+          print(f'TOTAL_CONVERTER={converter}')
+          print('BOOLEAN_BY_DEVICE='+','.join(f'{k}:{v}' for k,v in booleans.items() if v))
+
+          # Structural ref checks.
+          errors=[]
+          for sp in sems:
+              dev=sp.parent.name; bp=sp.parent/(dev+'Binding.xml')
+              sr=etree.parse(str(sp)); br=etree.parse(str(bp))
+              sem_controls={x.get('id') for x in sr.xpath('//u:ControlSpecs/*',namespaces=NS)}
+              bind_controls={x.get('semantic_id') for x in br.xpath('//u:Controls/u:ControlBinding',namespaces=NS)}
+              if sem_controls != bind_controls: errors.append((dev,'control',sem_controls^bind_controls))
+              sem_mon={x.get('id') for x in sr.xpath('//u:MonitorSpecs/*',namespaces=NS)}
+              bind_mon={x.get('semantic_id') for x in br.xpath('//u:Monitors/u:MonitorBinding',namespaces=NS)}
+              if sem_mon != bind_mon: errors.append((dev,'monitor',sem_mon^bind_mon))
+              sem_prod={x.get('id') for x in sr.xpath('//u:SensorProductSpecs/*',namespaces=NS)}
+              bind_prod={x.get('semantic_id') for x in br.xpath('//u:SensorProducts/u:ProductBinding',namespaces=NS)}
+              if sem_prod != bind_prod: errors.append((dev,'product',sem_prod^bind_prod))
+              sem_reply={x.get('bindRef') for x in sr.xpath('//u:Reply',namespaces=NS)}
+              bind_reply={x.get('semantic_id') for x in br.xpath('//u:Reply',namespaces=NS)}
+              if sem_reply != bind_reply: errors.append((dev,'reply',sem_reply^bind_reply))
+          print('STRUCTURAL_REF_ERRORS='+str(len(errors)))
+          for e in errors: print('ERROR',e)
+          if errors or converter: raise SystemExit(1)
+          print('USV FINAL INTEGRATED VALIDATION PASS')
+          PY
