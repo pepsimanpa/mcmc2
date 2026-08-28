@@ -115,7 +115,7 @@
           <Map cdm="Health.NoResponse" value="3"/>
         </ValueMap>
       </Field>
-      <Field name="powerStatus"/>
+      <Field name="powerStatus" dataType="Int64"/>
     </MonitorBinding>
         <MonitorBinding semantic_id="accessoriesCbitStatus">
       <DDSChannel topicName="RUSV::SO::SPCE::AccessoriesCBITReportType" typeName="AccessoriesCBITReportType"/>
@@ -123,11 +123,11 @@
       <Field name="environmentSensorDeviceStatus" cdm="Health.CBIT.environmentSensorDeviceStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="windSensorStatus" cdm="Health.CBIT.windSensorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="fireDetectorStatus" cdm="Health.CBIT.fireDetectorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
-      <Field name="fireDetected" cdm="Health.CBIT.fireDetected" dataType="Boolean"/>
+      <Field name="fireDetected" cdm="Health.CBIT.fireDetected" dataType="UInt8"/>
       <Field name="leakDetectorStatus" cdm="Health.CBIT.leakDetectorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
-      <Field name="leakDetected" cdm="Health.CBIT.leakDetected" dataType="Boolean"/>
+      <Field name="leakDetected" cdm="Health.CBIT.leakDetected" dataType="UInt8"/>
       <Field name="flowMeterStatus" cdm="Health.CBIT.flowMeterStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
-      <Field name="flowAnomalyDetected" cdm="Health.CBIT.flowAnomalyDetected" dataType="Boolean"/>
+      <Field name="flowAnomalyDetected" cdm="Health.CBIT.flowAnomalyDetected" dataType="UInt8"/>
       <Field name="stabilizerStatus" cdm="Health.CBIT.stabilizerStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
       <Field name="interceptorStatus" cdm="Health.CBIT.interceptorStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
     </MonitorBinding>
@@ -147,39 +147,39 @@
     <MonitorBinding semantic_id="propulsionStatus">
       <DDSChannel topicName="RUSV::SO::SPCE::PropulsionHeartBeatReportType" typeName="PropulsionHeartBeatReportType"/>
       <Field name="usvHeader"/>
-      <Field name="portAlternatorPotential" cdm="Platform.Propulsion.Port.AlternatorVoltage"/>
-      <Field name="starboardAlternatorPotential" cdm="Platform.Propulsion.Starboard.AlternatorVoltage"/>
-      <Field name="portEngineTemperature" cdm="Platform.Propulsion.Port.EngineTemperature"/>
-      <Field name="starboardEngineTemperature" cdm="Platform.Propulsion.Starboard.EngineTemperature"/>
-      <Field name="portTransOilTemperature" cdm="Platform.Propulsion.Port.TransmissionOilTemperature"/>
-      <Field name="starboardTransOilTemperature" cdm="Platform.Propulsion.Starboard.TransmissionOilTemperature"/>
-      <Field name="fuelRemain" cdm="Platform.Fuel.Remaining"/>
-      <Field name="portCurrentRPM" cdm="Platform.Propulsion.Port.RPM"/>
-      <Field name="starboardCurrentRPM" cdm="Platform.Propulsion.Starboard.RPM"/>
-      <Field name="portCurrentSteering" cdm="Platform.Propulsion.Port.Steering"/>
-      <Field name="starboardCurrentSteering" cdm="Platform.Propulsion.Starboard.Steering"/>
+      <Field name="portAlternatorPotential" cdm="Platform.Propulsion.Port.AlternatorVoltage" dataType="Int16"/>
+      <Field name="starboardAlternatorPotential" cdm="Platform.Propulsion.Starboard.AlternatorVoltage" dataType="Int16"/>
+      <Field name="portEngineTemperature" cdm="Platform.Propulsion.Port.EngineTemperature" dataType="UInt16"/>
+      <Field name="starboardEngineTemperature" cdm="Platform.Propulsion.Starboard.EngineTemperature" dataType="UInt16"/>
+      <Field name="portTransOilTemperature" cdm="Platform.Propulsion.Port.TransmissionOilTemperature" dataType="UInt16"/>
+      <Field name="starboardTransOilTemperature" cdm="Platform.Propulsion.Starboard.TransmissionOilTemperature" dataType="UInt16"/>
+      <Field name="fuelRemain" cdm="Platform.Fuel.Remaining" dataType="Int16"/>
+      <Field name="portCurrentRPM" cdm="Platform.Propulsion.Port.RPM" dataType="UInt16"/>
+      <Field name="starboardCurrentRPM" cdm="Platform.Propulsion.Starboard.RPM" dataType="UInt16"/>
+      <Field name="portCurrentSteering" cdm="Platform.Propulsion.Port.Steering" dataType="Float32"/>
+      <Field name="starboardCurrentSteering" cdm="Platform.Propulsion.Starboard.Steering" dataType="Float32"/>
     </MonitorBinding>
     <!--cctvStateMask/environmentWarning의 bit 의미가 원문에서 충분히 확정되지 않아 raw BindingOnly로 유지한다.-->
     <MonitorBinding semantic_id="environmentStatus">
       <DDSChannel topicName="RUSV::EO::SPCE::ENVHeartBeatReportType" typeName="ENVHeartBeatReportType"/>
       <Field name="usvHeader"/>
-      <Field name="cctvStateMask"/>
-      <Field name="environmentWarning"/>
-      <Field name="flowMeter1Flow" cdm="Platform.Environment.flowMeter1Flow"/>
-      <Field name="flowMeter2Flow" cdm="Platform.Environment.flowMeter2Flow"/>
-      <Field name="flowMeter3Flow" cdm="Platform.Environment.flowMeter3Flow"/>
-      <Field name="flowMeter4Flow" cdm="Platform.Environment.flowMeter4Flow"/>
-      <Field name="leakSensor1Depth" cdm="Platform.Environment.leakSensor1Depth"/>
-      <Field name="leakSensor2Depth" cdm="Platform.Environment.leakSensor2Depth"/>
-      <Field name="leakSensor1Temperature" cdm="Platform.Environment.leakSensor1Temperature"/>
-      <Field name="leakSensor2Temperature" cdm="Platform.Environment.leakSensor2Temperature"/>
-      <Field name="fireSensor1Alarm" cdm="Platform.Environment.fireSensor1Alarm" dataType="Boolean"/>
-      <Field name="fireSensor2Alarm" cdm="Platform.Environment.fireSensor2Alarm" dataType="Boolean"/>
-      <Field name="fireSensor3Alarm" cdm="Platform.Environment.fireSensor3Alarm" dataType="Boolean"/>
-      <Field name="autoExtinguisher1Active" cdm="Platform.Environment.autoExtinguisher1Active" dataType="Boolean"/>
-      <Field name="autoExtinguisher2Active" cdm="Platform.Environment.autoExtinguisher2Active" dataType="Boolean"/>
-      <Field name="autoExtinguisher3Active" cdm="Platform.Environment.autoExtinguisher3Active" dataType="Boolean"/>
-      <Field name="autoExtinguisher4Active" cdm="Platform.Environment.autoExtinguisher4Active" dataType="Boolean"/>
+      <Field name="cctvStateMask" dataType="UInt8"/>
+      <Field name="environmentWarning" dataType="UInt8"/>
+      <Field name="flowMeter1Flow" cdm="Platform.Environment.flowMeter1Flow" dataType="UInt16"/>
+      <Field name="flowMeter2Flow" cdm="Platform.Environment.flowMeter2Flow" dataType="UInt16"/>
+      <Field name="flowMeter3Flow" cdm="Platform.Environment.flowMeter3Flow" dataType="UInt16"/>
+      <Field name="flowMeter4Flow" cdm="Platform.Environment.flowMeter4Flow" dataType="UInt16"/>
+      <Field name="leakSensor1Depth" cdm="Platform.Environment.leakSensor1Depth" dataType="Float32"/>
+      <Field name="leakSensor2Depth" cdm="Platform.Environment.leakSensor2Depth" dataType="Float32"/>
+      <Field name="leakSensor1Temperature" cdm="Platform.Environment.leakSensor1Temperature" dataType="Float32"/>
+      <Field name="leakSensor2Temperature" cdm="Platform.Environment.leakSensor2Temperature" dataType="Float32"/>
+      <Field name="fireSensor1Alarm" cdm="Platform.Environment.fireSensor1Alarm" dataType="UInt8"/>
+      <Field name="fireSensor2Alarm" cdm="Platform.Environment.fireSensor2Alarm" dataType="UInt8"/>
+      <Field name="fireSensor3Alarm" cdm="Platform.Environment.fireSensor3Alarm" dataType="UInt8"/>
+      <Field name="autoExtinguisher1Active" cdm="Platform.Environment.autoExtinguisher1Active" dataType="UInt8"/>
+      <Field name="autoExtinguisher2Active" cdm="Platform.Environment.autoExtinguisher2Active" dataType="UInt8"/>
+      <Field name="autoExtinguisher3Active" cdm="Platform.Environment.autoExtinguisher3Active" dataType="UInt8"/>
+      <Field name="autoExtinguisher4Active" cdm="Platform.Environment.autoExtinguisher4Active" dataType="UInt8"/>
     </MonitorBinding>
         <MonitorBinding semantic_id="propulsionControlStatus">
       <!--공용 구조체 비고상 현 프로젝트 미사용 필드도 원본 구조 보존을 위해 BindingOnly로 유지.-->
@@ -265,115 +265,115 @@
         <BitMember name="commonPlatformWeaponPowerOn" cdm="Platform.Power.commonPlatformWeaponPowerOn" offset="1"/>
         <BitMember name="commonPlatformControllerPowerOn" cdm="Platform.Power.commonPlatformControllerPowerOn" offset="0"/>
       </PackedField>
-      <Field name="pduTemp" cdm="Platform.Power.PDU.Temperature"/>
-      <Field name="powerSourceStatus" cdm="Platform.Power.Source"><ValueMap><Map cdm="Platform.Power.Source.Battery" value="0"/><Map cdm="Platform.Power.Source.PDU" value="1"/></ValueMap></Field>
-      <Field name="pduSourceStatus" cdm="Platform.Power.PDU.Source"><ValueMap><Map cdm="Platform.Power.PDU.Source.Generator" value="0"/><Map cdm="Platform.Power.PDU.Source.Shore" value="1"/></ValueMap></Field>
-      <Field name="batteryChargeStatus" cdm="Platform.Power.Battery.ChargeState"><ValueMap><Map cdm="Platform.Power.Battery.Standby" value="0"/><Map cdm="Platform.Power.Battery.Charging" value="1"/><Map cdm="Platform.Power.Battery.Discharging" value="2"/></ValueMap></Field>
-      <Field name="batteryLevel" cdm="Platform.Power.Battery.Level"><ValueMap><Map cdm="Platform.Power.Battery.Level.0" value="0"/><Map cdm="Platform.Power.Battery.Level.1" value="1"/><Map cdm="Platform.Power.Battery.Level.2" value="2"/><Map cdm="Platform.Power.Battery.Level.3" value="3"/><Map cdm="Platform.Power.Battery.Level.4" value="4"/><Map cdm="Platform.Power.Battery.Level.5" value="5"/></ValueMap></Field>
-      <Field name="batteryFaultStatus" cdm="Platform.Power.Battery.FaultStatus"><ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Warning" value="1"/><Map cdm="Health.Status.Fault" value="2"/><Map cdm="Health.Status.Failure" value="3"/></ValueMap></Field>
-      <Field name="inputVS" cdm="Platform.Power.PDU.InputVoltage"/>
-      <Field name="inputCS" cdm="Platform.Power.PDU.InputCurrent"/>
-      <Field name="batteryAssemblyVS" cdm="Platform.Power.Battery.Voltage"/>
-      <Field name="batteryAssemblyCS" cdm="Platform.Power.Battery.Current"/>
+      <Field name="pduTemp" cdm="Platform.Power.PDU.Temperature" dataType="UInt8"/>
+      <Field name="powerSourceStatus" cdm="Platform.Power.Source" dataType="UInt8"><ValueMap><Map cdm="Platform.Power.Source.Battery" value="0"/><Map cdm="Platform.Power.Source.PDU" value="1"/></ValueMap></Field>
+      <Field name="pduSourceStatus" cdm="Platform.Power.PDU.Source" dataType="UInt8"><ValueMap><Map cdm="Platform.Power.PDU.Source.Generator" value="0"/><Map cdm="Platform.Power.PDU.Source.Shore" value="1"/></ValueMap></Field>
+      <Field name="batteryChargeStatus" cdm="Platform.Power.Battery.ChargeState" dataType="UInt8"><ValueMap><Map cdm="Platform.Power.Battery.Standby" value="0"/><Map cdm="Platform.Power.Battery.Charging" value="1"/><Map cdm="Platform.Power.Battery.Discharging" value="2"/></ValueMap></Field>
+      <Field name="batteryLevel" cdm="Platform.Power.Battery.Level" dataType="UInt8"><ValueMap><Map cdm="Platform.Power.Battery.Level.0" value="0"/><Map cdm="Platform.Power.Battery.Level.1" value="1"/><Map cdm="Platform.Power.Battery.Level.2" value="2"/><Map cdm="Platform.Power.Battery.Level.3" value="3"/><Map cdm="Platform.Power.Battery.Level.4" value="4"/><Map cdm="Platform.Power.Battery.Level.5" value="5"/></ValueMap></Field>
+      <Field name="batteryFaultStatus" cdm="Platform.Power.Battery.FaultStatus" dataType="UInt8"><ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Warning" value="1"/><Map cdm="Health.Status.Fault" value="2"/><Map cdm="Health.Status.Failure" value="3"/></ValueMap></Field>
+      <Field name="inputVS" cdm="Platform.Power.PDU.InputVoltage" dataType="UInt16"/>
+      <Field name="inputCS" cdm="Platform.Power.PDU.InputCurrent" dataType="UInt16"/>
+      <Field name="batteryAssemblyVS" cdm="Platform.Power.Battery.Voltage" dataType="UInt16"/>
+      <Field name="batteryAssemblyCS" cdm="Platform.Power.Battery.Current" dataType="UInt16"/>
       <!--각 부하별 출력 V/I는 직접 DDS 구조 보존을 위해 BindingOnly로 유지한다.-->
-      <Field name="tsadVS"/>
-      <Field name="tsadCS"/>
-      <Field name="ssdVS"/>
-      <Field name="ssdCS"/>
-      <Field name="sidVS"/>
-      <Field name="sidCS"/>
-      <Field name="fanEngineRoomVS"/>
-      <Field name="fanEngineRoomCS"/>
-      <Field name="fanEquipRoomVS"/>
-      <Field name="fanEquipRoomCS"/>
-      <Field name="damperAndContVS"/>
-      <Field name="damperAndContCS"/>
-      <Field name="seaWaterAirConditionerVS"/>
-      <Field name="seaWaterAirConditionerCS"/>
-      <Field name="seaWaterAirConditionerContVS"/>
-      <Field name="seaWaterAirConditionerContCS"/>
-      <Field name="interceptorVS"/>
-      <Field name="interceptorCS"/>
-      <Field name="bowThrustVS"/>
-      <Field name="bowThrustCS"/>
-      <Field name="stabilizerVS"/>
-      <Field name="stabilizerCS"/>
-      <Field name="stabilizerContVS"/>
-      <Field name="stabilizerContCS"/>
-      <Field name="pumpEngineRoomVS"/>
-      <Field name="pumpEngineRoomCS"/>
-      <Field name="pumpEquipRoomVS"/>
-      <Field name="pumpEquipRoomCS"/>
-      <Field name="pumpBowRoomVS"/>
-      <Field name="pumpBowRoomCS"/>
-      <Field name="eoirVS"/>
-      <Field name="eoirCS"/>
-      <Field name="cipeVS"/>
-      <Field name="cipeCS"/>
-      <Field name="radarVS"/>
-      <Field name="radarCS"/>
-      <Field name="scdeVS"/>
-      <Field name="scdeCS"/>
-      <Field name="ccdVS"/>
-      <Field name="ccdCS"/>
-      <Field name="spceVS"/>
-      <Field name="spceCS"/>
-      <Field name="mceVS"/>
-      <Field name="mceCS"/>
-      <Field name="lightNavigationVS"/>
-      <Field name="lightNavigationCS"/>
-      <Field name="lightHullVS"/>
-      <Field name="lightHullCS"/>
-      <Field name="lightSteeringRoomVS"/>
-      <Field name="lightSteeringRoomCS"/>
-      <Field name="lightEngineRoomVS"/>
-      <Field name="lightEngineRoomCS"/>
-      <Field name="lightExternalVS"/>
-      <Field name="lightExternalCS"/>
-      <Field name="lightWarningVS"/>
-      <Field name="lightWarningCS"/>
-      <Field name="decuVS"/>
-      <Field name="decuCS"/>
-      <Field name="cneVS"/>
-      <Field name="cneCS"/>
-      <Field name="aisTxRxSetVS"/>
-      <Field name="aisTxRxSetCS"/>
-      <Field name="aisRxSetVS"/>
-      <Field name="aisRxSetCS"/>
-      <Field name="antiJammingAntennaVS"/>
-      <Field name="antiJammingAntennaCS"/>
-      <Field name="naeVS"/>
-      <Field name="naeCS"/>
-      <Field name="satelliteModemVS"/>
-      <Field name="satelliteModemCS"/>
-      <Field name="ethernetMainVS"/>
-      <Field name="ethernetMainCS"/>
-      <Field name="ethernetBackupVS"/>
-      <Field name="ethernetBackupCS"/>
-      <Field name="wceVS"/>
-      <Field name="wceCS"/>
-      <Field name="acuVS"/>
-      <Field name="acuCS"/>
-      <Field name="encryptionDeviceVS"/>
-      <Field name="encryptionDeviceCS"/>
-      <Field name="rcwsVS"/>
-      <Field name="rcwsCS"/>
-      <Field name="torsionVS"/>
-      <Field name="torsionCS"/>
-      <Field name="vibrationVS"/>
-      <Field name="vibrationCS"/>
-      <Field name="vdrVS"/>
-      <Field name="vdrCS"/>
-      <Field name="voiceTransceiverVS"/>
-      <Field name="voiceTransceiverCS"/>
-      <Field name="envVS"/>
-      <Field name="envCS"/>
-      <Field name="towingDeviceVS"/>
-      <Field name="towingDeviceCS"/>
-      <Field name="commonDeviceVS"/>
-      <Field name="commonDeviceCS"/>
-      <Field name="commonContVS"/>
-      <Field name="commonContCS"/>
+      <Field name="tsadVS" dataType="UInt16"/>
+      <Field name="tsadCS" dataType="UInt16"/>
+      <Field name="ssdVS" dataType="UInt16"/>
+      <Field name="ssdCS" dataType="UInt16"/>
+      <Field name="sidVS" dataType="UInt16"/>
+      <Field name="sidCS" dataType="UInt16"/>
+      <Field name="fanEngineRoomVS" dataType="UInt16"/>
+      <Field name="fanEngineRoomCS" dataType="UInt16"/>
+      <Field name="fanEquipRoomVS" dataType="UInt16"/>
+      <Field name="fanEquipRoomCS" dataType="UInt16"/>
+      <Field name="damperAndContVS" dataType="UInt16"/>
+      <Field name="damperAndContCS" dataType="UInt16"/>
+      <Field name="seaWaterAirConditionerVS" dataType="UInt16"/>
+      <Field name="seaWaterAirConditionerCS" dataType="UInt16"/>
+      <Field name="seaWaterAirConditionerContVS" dataType="UInt16"/>
+      <Field name="seaWaterAirConditionerContCS" dataType="UInt16"/>
+      <Field name="interceptorVS" dataType="UInt16"/>
+      <Field name="interceptorCS" dataType="UInt16"/>
+      <Field name="bowThrustVS" dataType="UInt16"/>
+      <Field name="bowThrustCS" dataType="UInt16"/>
+      <Field name="stabilizerVS" dataType="UInt16"/>
+      <Field name="stabilizerCS" dataType="UInt16"/>
+      <Field name="stabilizerContVS" dataType="UInt16"/>
+      <Field name="stabilizerContCS" dataType="UInt16"/>
+      <Field name="pumpEngineRoomVS" dataType="UInt16"/>
+      <Field name="pumpEngineRoomCS" dataType="UInt16"/>
+      <Field name="pumpEquipRoomVS" dataType="UInt16"/>
+      <Field name="pumpEquipRoomCS" dataType="UInt16"/>
+      <Field name="pumpBowRoomVS" dataType="UInt16"/>
+      <Field name="pumpBowRoomCS" dataType="UInt16"/>
+      <Field name="eoirVS" dataType="UInt16"/>
+      <Field name="eoirCS" dataType="UInt16"/>
+      <Field name="cipeVS" dataType="UInt16"/>
+      <Field name="cipeCS" dataType="UInt16"/>
+      <Field name="radarVS" dataType="UInt16"/>
+      <Field name="radarCS" dataType="UInt16"/>
+      <Field name="scdeVS" dataType="UInt16"/>
+      <Field name="scdeCS" dataType="UInt16"/>
+      <Field name="ccdVS" dataType="UInt16"/>
+      <Field name="ccdCS" dataType="UInt16"/>
+      <Field name="spceVS" dataType="UInt16"/>
+      <Field name="spceCS" dataType="UInt16"/>
+      <Field name="mceVS" dataType="UInt16"/>
+      <Field name="mceCS" dataType="UInt16"/>
+      <Field name="lightNavigationVS" dataType="UInt16"/>
+      <Field name="lightNavigationCS" dataType="UInt16"/>
+      <Field name="lightHullVS" dataType="UInt16"/>
+      <Field name="lightHullCS" dataType="UInt16"/>
+      <Field name="lightSteeringRoomVS" dataType="UInt16"/>
+      <Field name="lightSteeringRoomCS" dataType="UInt16"/>
+      <Field name="lightEngineRoomVS" dataType="UInt16"/>
+      <Field name="lightEngineRoomCS" dataType="UInt16"/>
+      <Field name="lightExternalVS" dataType="UInt16"/>
+      <Field name="lightExternalCS" dataType="UInt16"/>
+      <Field name="lightWarningVS" dataType="UInt16"/>
+      <Field name="lightWarningCS" dataType="UInt16"/>
+      <Field name="decuVS" dataType="UInt16"/>
+      <Field name="decuCS" dataType="UInt16"/>
+      <Field name="cneVS" dataType="UInt16"/>
+      <Field name="cneCS" dataType="UInt16"/>
+      <Field name="aisTxRxSetVS" dataType="UInt16"/>
+      <Field name="aisTxRxSetCS" dataType="UInt16"/>
+      <Field name="aisRxSetVS" dataType="UInt16"/>
+      <Field name="aisRxSetCS" dataType="UInt16"/>
+      <Field name="antiJammingAntennaVS" dataType="UInt16"/>
+      <Field name="antiJammingAntennaCS" dataType="UInt16"/>
+      <Field name="naeVS" dataType="UInt16"/>
+      <Field name="naeCS" dataType="UInt16"/>
+      <Field name="satelliteModemVS" dataType="UInt16"/>
+      <Field name="satelliteModemCS" dataType="UInt16"/>
+      <Field name="ethernetMainVS" dataType="UInt16"/>
+      <Field name="ethernetMainCS" dataType="UInt16"/>
+      <Field name="ethernetBackupVS" dataType="UInt16"/>
+      <Field name="ethernetBackupCS" dataType="UInt16"/>
+      <Field name="wceVS" dataType="UInt16"/>
+      <Field name="wceCS" dataType="UInt16"/>
+      <Field name="acuVS" dataType="UInt16"/>
+      <Field name="acuCS" dataType="UInt16"/>
+      <Field name="encryptionDeviceVS" dataType="UInt16"/>
+      <Field name="encryptionDeviceCS" dataType="UInt16"/>
+      <Field name="rcwsVS" dataType="UInt16"/>
+      <Field name="rcwsCS" dataType="UInt16"/>
+      <Field name="torsionVS" dataType="UInt16"/>
+      <Field name="torsionCS" dataType="UInt16"/>
+      <Field name="vibrationVS" dataType="UInt16"/>
+      <Field name="vibrationCS" dataType="UInt16"/>
+      <Field name="vdrVS" dataType="UInt16"/>
+      <Field name="vdrCS" dataType="UInt16"/>
+      <Field name="voiceTransceiverVS" dataType="UInt16"/>
+      <Field name="voiceTransceiverCS" dataType="UInt16"/>
+      <Field name="envVS" dataType="UInt16"/>
+      <Field name="envCS" dataType="UInt16"/>
+      <Field name="towingDeviceVS" dataType="UInt16"/>
+      <Field name="towingDeviceCS" dataType="UInt16"/>
+      <Field name="commonDeviceVS" dataType="UInt16"/>
+      <Field name="commonDeviceCS" dataType="UInt16"/>
+      <Field name="commonContVS" dataType="UInt16"/>
+      <Field name="commonContCS" dataType="UInt16"/>
     </MonitorBinding>
         <MonitorBinding semantic_id="towingDeviceLockState">
       <DDSChannel topicName="RUSV::EO::SPCE::TowingDeviceControlType" typeName="TowingDeviceControlType"/>
@@ -396,22 +396,22 @@
         <BitMember name="flowAnomaly" cdm="Platform.Distress.flowAnomaly" offset="4"/>
         <BitMember name="autonomousNavigationFault" cdm="Platform.Distress.autonomousNavigationFault" offset="5"/>
       </PackedField>
-      <Field name="latitude" cdm="Platform.Distress.Position.Latitude"/>
-      <Field name="longitude" cdm="Platform.Distress.Position.Longitude"/>
-      <Field name="altitude" cdm="Platform.Distress.Position.Altitude"/>
+      <Field name="latitude" cdm="Platform.Distress.Position.Latitude" dataType="Float64"/>
+      <Field name="longitude" cdm="Platform.Distress.Position.Longitude" dataType="Float64"/>
+      <Field name="altitude" cdm="Platform.Distress.Position.Altitude" dataType="Float64"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="windStatus">
       <DDSChannel topicName="RUSV::SA::SPCE::WindReportType" typeName="WindReportType"/>
       <Field name="usvHeader"/>
-      <Field name="relativeAverageDirection" cdm="Environment.Wind.Relative.Direction"/>
-      <Field name="relativeAverageSpeed" cdm="Environment.Wind.Relative.Speed"/>
-      <Field name="trueAverageDirection" cdm="Environment.Wind.True.Direction"/>
-      <Field name="trueAverageSpeed" cdm="Environment.Wind.True.Speed"/>
+      <Field name="relativeAverageDirection" cdm="Environment.Wind.Relative.Direction" dataType="Float64"/>
+      <Field name="relativeAverageSpeed" cdm="Environment.Wind.Relative.Speed" dataType="Float64"/>
+      <Field name="trueAverageDirection" cdm="Environment.Wind.True.Direction" dataType="Float64"/>
+      <Field name="trueAverageSpeed" cdm="Environment.Wind.True.Speed" dataType="Float64"/>
     </MonitorBinding>
     <MonitorBinding semantic_id="seaWaterConditionerStatus">
       <DDSChannel topicName="RUSV::EO::SPCE::SeaWaterConditionerStatusReportType" typeName="SeaWaterConditionerStatusReportType"/>
       <Field name="usvHeader"/>
-      <Field name="seaWaterAirConditionerTemp" cdm="Platform.Environment.SeaWaterConditioner.Temperature"/>
+      <Field name="seaWaterAirConditionerTemp" cdm="Platform.Environment.SeaWaterConditioner.Temperature" dataType="Float32"/>
     </MonitorBinding>
   </Monitors>
   <Controls semantic_id="control">
@@ -461,321 +461,321 @@
       <Reply semantic_id="requestIbitEngineResult">
         <DDSChannel topicName="RUSV::SO::SPCE::EngineIBITReportType" typeName="EngineIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="engineStatus"/>
-        <Field name="portEngineOilPressure"/>
-        <Field name="portEngineOilTemperature"/>
-        <Field name="portEngineTemperature"/>
-        <Field name="portAlternatorPotential"/>
-        <Field name="portFuelRate"/>
-        <Field name="portTotalEngineHours"/>
-        <Field name="portCoolantPressure"/>
-        <Field name="portFuelPressure"/>
-        <Field name="portEngineState1"/>
-        <Field name="portEngineState2"/>
-        <Field name="portEngineLoad"/>
-        <Field name="portEngineTorque"/>
-        <Field name="portTransGear"/>
-        <Field name="portTransOilPressure"/>
-        <Field name="portTransOilTemperature"/>
-        <Field name="starboardEngineOilPressure"/>
-        <Field name="starboardEngineOilTemperature"/>
-        <Field name="starboardEngineTemperature"/>
-        <Field name="starboardAlternatorPotential"/>
-        <Field name="starboardFuelRate"/>
-        <Field name="starboardTotalEngineHours"/>
-        <Field name="starboardCoolantPressure"/>
-        <Field name="starboardFuelPressure"/>
-        <Field name="starboardEngineState1"/>
-        <Field name="starboardEngineState2"/>
-        <Field name="starboardEngineLoad"/>
-        <Field name="starboardEngineTorque"/>
-        <Field name="starboardTransGear"/>
-        <Field name="starboardTransOilPressure"/>
-        <Field name="starboardTransOilTemperature"/>
+        <Field name="engineStatus" dataType="UInt8"/>
+        <Field name="portEngineOilPressure" dataType="UInt16"/>
+        <Field name="portEngineOilTemperature" dataType="UInt16"/>
+        <Field name="portEngineTemperature" dataType="UInt16"/>
+        <Field name="portAlternatorPotential" dataType="Int16"/>
+        <Field name="portFuelRate" dataType="Int16"/>
+        <Field name="portTotalEngineHours" dataType="UInt64"/>
+        <Field name="portCoolantPressure" dataType="UInt16"/>
+        <Field name="portFuelPressure" dataType="UInt16"/>
+        <Field name="portEngineState1" dataType="UInt16"/>
+        <Field name="portEngineState2" dataType="UInt16"/>
+        <Field name="portEngineLoad" dataType="UInt8"/>
+        <Field name="portEngineTorque" dataType="UInt8"/>
+        <Field name="portTransGear" dataType="UInt8"/>
+        <Field name="portTransOilPressure" dataType="UInt16"/>
+        <Field name="portTransOilTemperature" dataType="UInt16"/>
+        <Field name="starboardEngineOilPressure" dataType="UInt16"/>
+        <Field name="starboardEngineOilTemperature" dataType="UInt16"/>
+        <Field name="starboardEngineTemperature" dataType="UInt16"/>
+        <Field name="starboardAlternatorPotential" dataType="Int16"/>
+        <Field name="starboardFuelRate" dataType="Int16"/>
+        <Field name="starboardTotalEngineHours" dataType="UInt64"/>
+        <Field name="starboardCoolantPressure" dataType="UInt16"/>
+        <Field name="starboardFuelPressure" dataType="UInt16"/>
+        <Field name="starboardEngineState1" dataType="UInt16"/>
+        <Field name="starboardEngineState2" dataType="UInt16"/>
+        <Field name="starboardEngineLoad" dataType="UInt8"/>
+        <Field name="starboardEngineTorque" dataType="UInt8"/>
+        <Field name="starboardTransGear" dataType="UInt8"/>
+        <Field name="starboardTransOilPressure" dataType="UInt16"/>
+        <Field name="starboardTransOilTemperature" dataType="UInt16"/>
       </Reply>
       <Reply semantic_id="requestIbitWaterJetResult">
         <DDSChannel topicName="RUSV::SO::SPCE::WaterJetIBITReportType" typeName="WaterJetIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="portWaterjetStatus"/>
-        <Field name="portFailToSafe"/>
-        <Field name="portNoClutchFeedback"/>
-        <Field name="portHydOilLevelLow"/>
-        <Field name="portHydTemperatureHigh"/>
-        <Field name="portHydPressureLow"/>
-        <Field name="portLubOilLevelLow"/>
-        <Field name="portLubOilPressureLow"/>
-        <Field name="portHydLubSensorError"/>
-        <Field name="portBucketNotInSetpoint"/>
-        <Field name="portBucketFeedbackOutOfSpan"/>
-        <Field name="portNozzleNotInSetPoint"/>
-        <Field name="portNozzleFeedbackSensorError"/>
-        <Field name="starboardWaterjetStatus"/>
-        <Field name="starboardFailToSafe"/>
-        <Field name="starboardNoClutchFeedback"/>
-        <Field name="starboardHydOilLevelLow"/>
-        <Field name="starboardHydTemperatureHigh"/>
-        <Field name="starboardHydPressureLow"/>
-        <Field name="starboardLubOilLevelLow"/>
-        <Field name="starboardLubOilPressureLow"/>
-        <Field name="starboardHydLubSensorError"/>
-        <Field name="starboardBucketNotInSetpoint"/>
-        <Field name="starboardBucketFeedbackOutOfSpan"/>
-        <Field name="starboardNozzleNotInSetPoint"/>
-        <Field name="starboardNozzleFeedbackSensorError"/>
+        <Field name="portWaterjetStatus" dataType="UInt8"/>
+        <Field name="portFailToSafe" dataType="UInt8"/>
+        <Field name="portNoClutchFeedback" dataType="UInt8"/>
+        <Field name="portHydOilLevelLow" dataType="UInt8"/>
+        <Field name="portHydTemperatureHigh" dataType="UInt8"/>
+        <Field name="portHydPressureLow" dataType="UInt8"/>
+        <Field name="portLubOilLevelLow" dataType="UInt8"/>
+        <Field name="portLubOilPressureLow" dataType="UInt8"/>
+        <Field name="portHydLubSensorError" dataType="UInt8"/>
+        <Field name="portBucketNotInSetpoint" dataType="UInt8"/>
+        <Field name="portBucketFeedbackOutOfSpan" dataType="UInt8"/>
+        <Field name="portNozzleNotInSetPoint" dataType="UInt8"/>
+        <Field name="portNozzleFeedbackSensorError" dataType="UInt8"/>
+        <Field name="starboardWaterjetStatus" dataType="UInt8"/>
+        <Field name="starboardFailToSafe" dataType="UInt8"/>
+        <Field name="starboardNoClutchFeedback" dataType="UInt8"/>
+        <Field name="starboardHydOilLevelLow" dataType="UInt8"/>
+        <Field name="starboardHydTemperatureHigh" dataType="UInt8"/>
+        <Field name="starboardHydPressureLow" dataType="UInt8"/>
+        <Field name="starboardLubOilLevelLow" dataType="UInt8"/>
+        <Field name="starboardLubOilPressureLow" dataType="UInt8"/>
+        <Field name="starboardHydLubSensorError" dataType="UInt8"/>
+        <Field name="starboardBucketNotInSetpoint" dataType="UInt8"/>
+        <Field name="starboardBucketFeedbackOutOfSpan" dataType="UInt8"/>
+        <Field name="starboardNozzleNotInSetPoint" dataType="UInt8"/>
+        <Field name="starboardNozzleFeedbackSensorError" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitBowThrusterResult">
         <DDSChannel topicName="RUSV::SO::SPCE::BowThrusterIBITReportType" typeName="BowThrusterIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="bowThrusterStatus"/>
-        <Field name="bowThrusterMotorError"/>
-        <Field name="bowThrusterRetractState"/>
-        <Field name="bowThrusterTemperature"/>
-        <Field name="bowThrusterMotorCurrent"/>
-        <Field name="bowThrusterMotorOperationTime"/>
+        <Field name="bowThrusterStatus" dataType="UInt8"/>
+        <Field name="bowThrusterMotorError" dataType="UInt8"/>
+        <Field name="bowThrusterRetractState" dataType="UInt8"/>
+        <Field name="bowThrusterTemperature" dataType="UInt16"/>
+        <Field name="bowThrusterMotorCurrent" dataType="UInt8"/>
+        <Field name="bowThrusterMotorOperationTime" dataType="UInt16"/>
       </Reply>
       <Reply semantic_id="requestIbitPowerResult">
         <DDSChannel topicName="RUSV::SO::SPCE::PowerIBITReportType" typeName="PowerIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="pduStatus"/>
-        <Field name="powerStatus"/>
-        <Field name="inputVS"/>
-        <Field name="inputCS"/>
-        <Field name="batteryAssemblyVS"/>
-        <Field name="batteryAssemblyCS"/>
-        <Field name="tsadVS"/>
-        <Field name="tsadCS"/>
-        <Field name="ssdVS"/>
-        <Field name="ssdCS"/>
-        <Field name="sidVS"/>
-        <Field name="sidCS"/>
-        <Field name="fanEngineRoomVS"/>
-        <Field name="fanEngineRoomCS"/>
-        <Field name="fanEquipRoomVS"/>
-        <Field name="fanEquipRoomCS"/>
-        <Field name="damperAndContVS"/>
-        <Field name="damperAndContCS"/>
-        <Field name="seaWaterAirConditionerVS"/>
-        <Field name="seaWaterAirConditionerCS"/>
-        <Field name="seaWaterAirConditionerContVS"/>
-        <Field name="seaWaterAirConditionerContCS"/>
-        <Field name="interceptorVS"/>
-        <Field name="interceptorCS"/>
-        <Field name="bowThrustVS"/>
-        <Field name="bowThrustCS"/>
-        <Field name="stabilizerVS"/>
-        <Field name="stabilizerCS"/>
-        <Field name="stabilizerContVS"/>
-        <Field name="stabilizerContCS"/>
-        <Field name="pumpEngineRoomVS"/>
-        <Field name="pumpEngineRoomCS"/>
-        <Field name="pumpEquipRoomVS"/>
-        <Field name="pumpEquipRoomCS"/>
-        <Field name="pumpBowRoomVS"/>
-        <Field name="pumpBowRoomCS"/>
-        <Field name="eoirVS"/>
-        <Field name="eoirCS"/>
-        <Field name="cipeVS"/>
-        <Field name="cipeCS"/>
-        <Field name="radarVS"/>
-        <Field name="radarCS"/>
-        <Field name="scdeVS"/>
-        <Field name="scdeCS"/>
-        <Field name="ccdVS"/>
-        <Field name="ccdCS"/>
-        <Field name="spceVS"/>
-        <Field name="spceCS"/>
-        <Field name="mceVS"/>
-        <Field name="mceCS"/>
-        <Field name="lightNavigationVS"/>
-        <Field name="lightNavigationCS"/>
-        <Field name="lightHullVS"/>
-        <Field name="lightHullCS"/>
-        <Field name="lightSteeringRoomVS"/>
-        <Field name="lightSteeringRoomCS"/>
-        <Field name="lightEngineRoomVS"/>
-        <Field name="lightEngineRoomCS"/>
-        <Field name="lightExternalVS"/>
-        <Field name="lightExternalCS"/>
-        <Field name="lightWarningVS"/>
-        <Field name="lightWarningCS"/>
-        <Field name="decuVS"/>
-        <Field name="decuCS"/>
-        <Field name="cneVS"/>
-        <Field name="cneCS"/>
-        <Field name="aisTxRxSetVS"/>
-        <Field name="aisTxRxSetCS"/>
-        <Field name="aisRxSetVS"/>
-        <Field name="aisRxSetCS"/>
-        <Field name="antiJammingAntennaVS"/>
-        <Field name="antiJammingAntennaCS"/>
-        <Field name="naeVS"/>
-        <Field name="naeCS"/>
-        <Field name="satelliteModemVS"/>
-        <Field name="satelliteModemCS"/>
-        <Field name="ethernetMainVS"/>
-        <Field name="ethernetMainCS"/>
-        <Field name="ethernetBackupVS"/>
-        <Field name="ethernetBackupCS"/>
-        <Field name="wceVS"/>
-        <Field name="wceCS"/>
-        <Field name="acuVS"/>
-        <Field name="acuCS"/>
-        <Field name="encryptionDeviceVS"/>
-        <Field name="encryptionDeviceCS"/>
-        <Field name="rcwsVS"/>
-        <Field name="rcwsCS"/>
-        <Field name="torsionVS"/>
-        <Field name="torsionCS"/>
-        <Field name="vibrationVS"/>
-        <Field name="vibrationCS"/>
-        <Field name="vdrVS"/>
-        <Field name="vdrCS"/>
-        <Field name="voiceTransceiverVS"/>
-        <Field name="voiceTransceiverCS"/>
-        <Field name="envVS"/>
-        <Field name="envCS"/>
-        <Field name="towingDeviceVS"/>
-        <Field name="towingDeviceCS"/>
-        <Field name="commonDeviceVS"/>
-        <Field name="commonDeviceCS"/>
-        <Field name="commonContVS"/>
-        <Field name="commonContCS"/>
+        <Field name="pduStatus" dataType="UInt8"/>
+        <Field name="powerStatus" dataType="UInt64"/>
+        <Field name="inputVS" dataType="UInt16"/>
+        <Field name="inputCS" dataType="UInt16"/>
+        <Field name="batteryAssemblyVS" dataType="UInt16"/>
+        <Field name="batteryAssemblyCS" dataType="UInt16"/>
+        <Field name="tsadVS" dataType="UInt16"/>
+        <Field name="tsadCS" dataType="UInt16"/>
+        <Field name="ssdVS" dataType="UInt16"/>
+        <Field name="ssdCS" dataType="UInt16"/>
+        <Field name="sidVS" dataType="UInt16"/>
+        <Field name="sidCS" dataType="UInt16"/>
+        <Field name="fanEngineRoomVS" dataType="UInt16"/>
+        <Field name="fanEngineRoomCS" dataType="UInt16"/>
+        <Field name="fanEquipRoomVS" dataType="UInt16"/>
+        <Field name="fanEquipRoomCS" dataType="UInt16"/>
+        <Field name="damperAndContVS" dataType="UInt16"/>
+        <Field name="damperAndContCS" dataType="UInt16"/>
+        <Field name="seaWaterAirConditionerVS" dataType="UInt16"/>
+        <Field name="seaWaterAirConditionerCS" dataType="UInt16"/>
+        <Field name="seaWaterAirConditionerContVS" dataType="UInt16"/>
+        <Field name="seaWaterAirConditionerContCS" dataType="UInt16"/>
+        <Field name="interceptorVS" dataType="UInt16"/>
+        <Field name="interceptorCS" dataType="UInt16"/>
+        <Field name="bowThrustVS" dataType="UInt16"/>
+        <Field name="bowThrustCS" dataType="UInt16"/>
+        <Field name="stabilizerVS" dataType="UInt16"/>
+        <Field name="stabilizerCS" dataType="UInt16"/>
+        <Field name="stabilizerContVS" dataType="UInt16"/>
+        <Field name="stabilizerContCS" dataType="UInt16"/>
+        <Field name="pumpEngineRoomVS" dataType="UInt16"/>
+        <Field name="pumpEngineRoomCS" dataType="UInt16"/>
+        <Field name="pumpEquipRoomVS" dataType="UInt16"/>
+        <Field name="pumpEquipRoomCS" dataType="UInt16"/>
+        <Field name="pumpBowRoomVS" dataType="UInt16"/>
+        <Field name="pumpBowRoomCS" dataType="UInt16"/>
+        <Field name="eoirVS" dataType="UInt16"/>
+        <Field name="eoirCS" dataType="UInt16"/>
+        <Field name="cipeVS" dataType="UInt16"/>
+        <Field name="cipeCS" dataType="UInt16"/>
+        <Field name="radarVS" dataType="UInt16"/>
+        <Field name="radarCS" dataType="UInt16"/>
+        <Field name="scdeVS" dataType="UInt16"/>
+        <Field name="scdeCS" dataType="UInt16"/>
+        <Field name="ccdVS" dataType="UInt16"/>
+        <Field name="ccdCS" dataType="UInt16"/>
+        <Field name="spceVS" dataType="UInt16"/>
+        <Field name="spceCS" dataType="UInt16"/>
+        <Field name="mceVS" dataType="UInt16"/>
+        <Field name="mceCS" dataType="UInt16"/>
+        <Field name="lightNavigationVS" dataType="UInt16"/>
+        <Field name="lightNavigationCS" dataType="UInt16"/>
+        <Field name="lightHullVS" dataType="UInt16"/>
+        <Field name="lightHullCS" dataType="UInt16"/>
+        <Field name="lightSteeringRoomVS" dataType="UInt16"/>
+        <Field name="lightSteeringRoomCS" dataType="UInt16"/>
+        <Field name="lightEngineRoomVS" dataType="UInt16"/>
+        <Field name="lightEngineRoomCS" dataType="UInt16"/>
+        <Field name="lightExternalVS" dataType="UInt16"/>
+        <Field name="lightExternalCS" dataType="UInt16"/>
+        <Field name="lightWarningVS" dataType="UInt16"/>
+        <Field name="lightWarningCS" dataType="UInt16"/>
+        <Field name="decuVS" dataType="UInt16"/>
+        <Field name="decuCS" dataType="UInt16"/>
+        <Field name="cneVS" dataType="UInt16"/>
+        <Field name="cneCS" dataType="UInt16"/>
+        <Field name="aisTxRxSetVS" dataType="UInt16"/>
+        <Field name="aisTxRxSetCS" dataType="UInt16"/>
+        <Field name="aisRxSetVS" dataType="UInt16"/>
+        <Field name="aisRxSetCS" dataType="UInt16"/>
+        <Field name="antiJammingAntennaVS" dataType="UInt16"/>
+        <Field name="antiJammingAntennaCS" dataType="UInt16"/>
+        <Field name="naeVS" dataType="UInt16"/>
+        <Field name="naeCS" dataType="UInt16"/>
+        <Field name="satelliteModemVS" dataType="UInt16"/>
+        <Field name="satelliteModemCS" dataType="UInt16"/>
+        <Field name="ethernetMainVS" dataType="UInt16"/>
+        <Field name="ethernetMainCS" dataType="UInt16"/>
+        <Field name="ethernetBackupVS" dataType="UInt16"/>
+        <Field name="ethernetBackupCS" dataType="UInt16"/>
+        <Field name="wceVS" dataType="UInt16"/>
+        <Field name="wceCS" dataType="UInt16"/>
+        <Field name="acuVS" dataType="UInt16"/>
+        <Field name="acuCS" dataType="UInt16"/>
+        <Field name="encryptionDeviceVS" dataType="UInt16"/>
+        <Field name="encryptionDeviceCS" dataType="UInt16"/>
+        <Field name="rcwsVS" dataType="UInt16"/>
+        <Field name="rcwsCS" dataType="UInt16"/>
+        <Field name="torsionVS" dataType="UInt16"/>
+        <Field name="torsionCS" dataType="UInt16"/>
+        <Field name="vibrationVS" dataType="UInt16"/>
+        <Field name="vibrationCS" dataType="UInt16"/>
+        <Field name="vdrVS" dataType="UInt16"/>
+        <Field name="vdrCS" dataType="UInt16"/>
+        <Field name="voiceTransceiverVS" dataType="UInt16"/>
+        <Field name="voiceTransceiverCS" dataType="UInt16"/>
+        <Field name="envVS" dataType="UInt16"/>
+        <Field name="envCS" dataType="UInt16"/>
+        <Field name="towingDeviceVS" dataType="UInt16"/>
+        <Field name="towingDeviceCS" dataType="UInt16"/>
+        <Field name="commonDeviceVS" dataType="UInt16"/>
+        <Field name="commonDeviceCS" dataType="UInt16"/>
+        <Field name="commonContVS" dataType="UInt16"/>
+        <Field name="commonContCS" dataType="UInt16"/>
       </Reply>
       <Reply semantic_id="requestIbitBatteryResult">
         <DDSChannel topicName="RUSV::SO::SPCE::BatteryIBITReportType" typeName="BatteryIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="batteryOperationMode"/>
-        <Field name="batteryChargeMode"/>
-        <Field name="batteryMaxModuleTemp"/>
-        <Field name="batteryMinModuleTemp"/>
-        <Field name="batteryAvgModuleTemp"/>
-        <Field name="maxModulePos"/>
-        <Field name="minModulePos"/>
-        <Field name="moduleStatus1"/>
-        <Field name="moduleStatus2"/>
-        <Field name="moduleStatus3"/>
+        <Field name="batteryOperationMode" dataType="UInt8"/>
+        <Field name="batteryChargeMode" dataType="UInt8"/>
+        <Field name="batteryMaxModuleTemp" dataType="UInt8"/>
+        <Field name="batteryMinModuleTemp" dataType="UInt8"/>
+        <Field name="batteryAvgModuleTemp" dataType="UInt8"/>
+        <Field name="maxModulePos" dataType="UInt8"/>
+        <Field name="minModulePos" dataType="UInt8"/>
+        <Field name="moduleStatus1" dataType="UInt8"/>
+        <Field name="moduleStatus2" dataType="UInt8"/>
+        <Field name="moduleStatus3" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitGeneratorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::GeneratorIBITReportType" typeName="GeneratorIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="portGeneratorStatus"/>
-        <Field name="portGeneratorACLevel"/>
-        <Field name="portOperatingHours"/>
-        <Field name="portGeneratorAPhaseACFrequency"/>
-        <Field name="portGeneratorAPhaseRealPower"/>
-        <Field name="portGeneratorAPhaseReactivePower"/>
-        <Field name="portSystemState"/>
-        <Field name="portDelay"/>
-        <Field name="portErrorCode"/>
-        <Field name="portSystemBatteryVoltage"/>
-        <Field name="portUnacknowledgedWarnings"/>
-        <Field name="portActiveWarnings"/>
-        <Field name="portConfigurationBits"/>
-        <Field name="portTemperatureWinding"/>
-        <Field name="portTemperatureExhaust"/>
-        <Field name="portTemperatureMCU"/>
-        <Field name="starboardGeneratorStatus"/>
-        <Field name="starboardGeneratorACLevel"/>
-        <Field name="starboardOperatingHours"/>
-        <Field name="starboardGeneratorAPhaseACFrequency"/>
-        <Field name="starboardGeneratorAPhaseRealPower"/>
-        <Field name="starboardGeneratorAPhaseReactivePower"/>
-        <Field name="starboardSystemState"/>
-        <Field name="starboardDelay"/>
-        <Field name="starboardErrorCode"/>
-        <Field name="starboardSystemBatteryVoltage"/>
-        <Field name="starboardUnacknowledgedWarnings"/>
-        <Field name="starboardActiveWarnings"/>
-        <Field name="starboardConfigurationBits"/>
-        <Field name="starboardTemperatureWinding"/>
-        <Field name="starboardTemperatureExhaust"/>
-        <Field name="starboardTemperatureMCU"/>
+        <Field name="portGeneratorStatus" dataType="UInt8"/>
+        <Field name="portGeneratorACLevel" dataType="UInt8"/>
+        <Field name="portOperatingHours" dataType="UInt32"/>
+        <Field name="portGeneratorAPhaseACFrequency" dataType="UInt16"/>
+        <Field name="portGeneratorAPhaseRealPower" dataType="Int32"/>
+        <Field name="portGeneratorAPhaseReactivePower" dataType="Int32"/>
+        <Field name="portSystemState" dataType="UInt8"/>
+        <Field name="portDelay" dataType="UInt8"/>
+        <Field name="portErrorCode" dataType="UInt8"/>
+        <Field name="portSystemBatteryVoltage" dataType="UInt16"/>
+        <Field name="portUnacknowledgedWarnings" dataType="UInt8"/>
+        <Field name="portActiveWarnings" dataType="UInt8"/>
+        <Field name="portConfigurationBits" dataType="UInt8"/>
+        <Field name="portTemperatureWinding" dataType="UInt8"/>
+        <Field name="portTemperatureExhaust" dataType="UInt8"/>
+        <Field name="portTemperatureMCU" dataType="UInt8"/>
+        <Field name="starboardGeneratorStatus" dataType="UInt8"/>
+        <Field name="starboardGeneratorACLevel" dataType="UInt8"/>
+        <Field name="starboardOperatingHours" dataType="UInt32"/>
+        <Field name="starboardGeneratorAPhaseACFrequency" dataType="UInt16"/>
+        <Field name="starboardGeneratorAPhaseRealPower" dataType="Int32"/>
+        <Field name="starboardGeneratorAPhaseReactivePower" dataType="Int32"/>
+        <Field name="starboardSystemState" dataType="UInt8"/>
+        <Field name="starboardDelay" dataType="UInt8"/>
+        <Field name="starboardErrorCode" dataType="UInt8"/>
+        <Field name="starboardSystemBatteryVoltage" dataType="UInt16"/>
+        <Field name="starboardUnacknowledgedWarnings" dataType="UInt8"/>
+        <Field name="starboardActiveWarnings" dataType="UInt8"/>
+        <Field name="starboardConfigurationBits" dataType="UInt8"/>
+        <Field name="starboardTemperatureWinding" dataType="UInt8"/>
+        <Field name="starboardTemperatureExhaust" dataType="UInt8"/>
+        <Field name="starboardTemperatureMCU" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitEnvironmentResult">
         <DDSChannel topicName="RUSV::SO::SPCE::EnvironmentIBITReportType" typeName="EnvironmentIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="environmentSensorDeviceStatus"/>
+        <Field name="environmentSensorDeviceStatus" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitWindSensorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::WindSensorIBITReportType" typeName="WindSensorIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="windSensorStatus"/>
+        <Field name="windSensorStatus" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitFireDetectorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::FireDetectorIBITReportType" typeName="FireDetectorIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="fireDetectorStatus"/>
-        <Field name="fireDetected"/>
+        <Field name="fireDetectorStatus" dataType="UInt8"/>
+        <Field name="fireDetected" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitLeakDetectorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::LeakDetectorIBITReportType" typeName="LeakDetectorIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="leakDetectorStatus"/>
-        <Field name="leakDetected"/>
+        <Field name="leakDetectorStatus" dataType="UInt8"/>
+        <Field name="leakDetected" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitFlowMeterResult">
         <DDSChannel topicName="RUSV::SO::SPCE::FlowMeterIBITReportType" typeName="FlowMeterIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="flowMeterStatus"/>
-        <Field name="flowAnomalyDetected"/>
+        <Field name="flowMeterStatus" dataType="UInt8"/>
+        <Field name="flowAnomalyDetected" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitStabilizerResult">
         <DDSChannel topicName="RUSV::SO::SPCE::StabilizerIBITReportType" typeName="StabilizerIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="stabilizerStatus"/>
-        <Field name="stabilizerCurrentMode"/>
-        <Field name="stabilizerFault"/>
-        <Field name="boatRollAngle"/>
-        <Field name="flywheelSpeed"/>
-        <Field name="seakeeperAngle"/>
-        <Field name="current"/>
-        <Field name="enclosure"/>
-        <Field name="batteryLevel"/>
-        <Field name="batteryVoltage"/>
-        <Field name="driveTemp"/>
+        <Field name="stabilizerStatus" dataType="UInt8"/>
+        <Field name="stabilizerCurrentMode" dataType="UInt8"/>
+        <Field name="stabilizerFault" dataType="UInt8"/>
+        <Field name="boatRollAngle" dataType="Int16"/>
+        <Field name="flywheelSpeed" dataType="UInt16"/>
+        <Field name="seakeeperAngle" dataType="Int16"/>
+        <Field name="current" dataType="UInt8"/>
+        <Field name="enclosure" dataType="UInt16"/>
+        <Field name="batteryLevel" dataType="UInt8"/>
+        <Field name="batteryVoltage" dataType="UInt8"/>
+        <Field name="driveTemp" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitInterceptorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::InterceptorIBITReportType" typeName="InterceptorIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="interceptorStatus"/>
-        <Field name="inCommand"/>
-        <Field name="autoTrim"/>
-        <Field name="coordTurn"/>
-        <Field name="autoList"/>
-        <Field name="targetLIST"/>
-        <Field name="zeroSpeedState"/>
-        <Field name="zeroSpeedMode"/>
-        <Field name="portPosition"/>
-        <Field name="starboardPosition"/>
-        <Field name="portDemandPosition"/>
-        <Field name="starboardDemandPosition"/>
-        <Field name="portAutoDemandPosition"/>
-        <Field name="starboardAutoDemandPosition"/>
+        <Field name="interceptorStatus" dataType="UInt8"/>
+        <Field name="inCommand" dataType="UInt8"/>
+        <Field name="autoTrim" dataType="UInt8"/>
+        <Field name="coordTurn" dataType="UInt8"/>
+        <Field name="autoList" dataType="UInt8"/>
+        <Field name="targetLIST" dataType="Float32"/>
+        <Field name="zeroSpeedState" dataType="UInt8"/>
+        <Field name="zeroSpeedMode" dataType="UInt8"/>
+        <Field name="portPosition" dataType="UInt8"/>
+        <Field name="starboardPosition" dataType="UInt8"/>
+        <Field name="portDemandPosition" dataType="UInt8"/>
+        <Field name="starboardDemandPosition" dataType="UInt8"/>
+        <Field name="portAutoDemandPosition" dataType="UInt8"/>
+        <Field name="starboardAutoDemandPosition" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitSeaWaterConditionerResult">
         <DDSChannel topicName="RUSV::SO::SPCE::SeaWaterConditionerIBITReportType" typeName="SeaWaterConditionerIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="seaWaterAirConditionerStatus"/>
-        <Field name="seawaterFlowSensorStatus"/>
-        <Field name="strainerBlockageDetectStatus"/>
+        <Field name="seaWaterAirConditionerStatus" dataType="UInt8"/>
+        <Field name="seawaterFlowSensorStatus" dataType="UInt8"/>
+        <Field name="strainerBlockageDetectStatus" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitTowingDeviceResult">
         <DDSChannel topicName="RUSV::SO::SPCE::TowingDeviceIBITReportType" typeName="TowingDeviceIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="towingDeviceStatus"/>
-        <Field name="towingDeviceOverVoltageStatus"/>
-        <Field name="towingDeviceLowVoltageStatus"/>
-        <Field name="towingDeviceOverCurrentStatus"/>
-        <Field name="towingDeviceCardErrorStatus"/>
-        <Field name="towingDeviceActuatorErrorStatus"/>
+        <Field name="towingDeviceStatus" dataType="UInt8"/>
+        <Field name="towingDeviceOverVoltageStatus" dataType="UInt8"/>
+        <Field name="towingDeviceLowVoltageStatus" dataType="UInt8"/>
+        <Field name="towingDeviceOverCurrentStatus" dataType="UInt8"/>
+        <Field name="towingDeviceCardErrorStatus" dataType="UInt8"/>
+        <Field name="towingDeviceActuatorErrorStatus" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestIbitSPCEResult">
         <DDSChannel topicName="RUSV::SO::SPCE::SPCEIBITReportType" typeName="SPCEIBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="spceStatus"/>
-        <Field name="vcuStatus"/>
+        <Field name="spceStatus" dataType="UInt8"/>
+        <Field name="vcuStatus" dataType="UInt8"/>
         <Field name="vcuProcessorIBIT"/>
-        <Field name="vcuTmpStatus"/>
+        <Field name="vcuTmpStatus" dataType="UInt8"/>
         <Field name="vcuTmpProcessorIBIT"/>
       </Reply>
     </ControlBinding>
@@ -795,47 +795,47 @@
       <Reply semantic_id="requestPbitPropulsionResult">
         <DDSChannel topicName="RUSV::SO::SPCE::PropulsionPBITReportType" typeName="PropulsionPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="portEngineStatus"/>
-        <Field name="starboardEngineStatus"/>
-        <Field name="portWaterjetStatus"/>
-        <Field name="starboardWaterjetStatus"/>
-        <Field name="bowThrustertStatus"/>
+        <Field name="portEngineStatus" dataType="UInt8"/>
+        <Field name="starboardEngineStatus" dataType="UInt8"/>
+        <Field name="portWaterjetStatus" dataType="UInt8"/>
+        <Field name="starboardWaterjetStatus" dataType="UInt8"/>
+        <Field name="bowThrustertStatus" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestPbitElectricalResult">
         <DDSChannel topicName="RUSV::SO::SPCE::ElectricalPBITReportType" typeName="ElectricalPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="pduStatus"/>
-        <Field name="batteryStatus"/>
-        <Field name="portGeneratorStatus"/>
-        <Field name="starboardGeneratorStatus"/>
-        <Field name="powerStatus"/>
+        <Field name="pduStatus" dataType="UInt8"/>
+        <Field name="batteryStatus" dataType="UInt8"/>
+        <Field name="portGeneratorStatus" dataType="UInt8"/>
+        <Field name="starboardGeneratorStatus" dataType="UInt8"/>
+        <Field name="powerStatus" dataType="UInt64"/>
       </Reply>
       <Reply semantic_id="requestPbitAccessoriesResult">
         <DDSChannel topicName="RUSV::SO::SPCE::AccessoriesPBITReportType" typeName="AccessoriesPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="environmentSensorDeviceStatus"/>
-        <Field name="windSensorStatus"/>
-        <Field name="fireDetectorStatus"/>
-        <Field name="fireDetected"/>
-        <Field name="leakDetectorStatus"/>
-        <Field name="leakDetected"/>
-        <Field name="flowMeterStatus"/>
-        <Field name="flowAnomalyDetected"/>
-        <Field name="stabilizerStatus"/>
-        <Field name="interceptorStatus"/>
+        <Field name="environmentSensorDeviceStatus" dataType="UInt8"/>
+        <Field name="windSensorStatus" dataType="UInt8"/>
+        <Field name="fireDetectorStatus" dataType="UInt8"/>
+        <Field name="fireDetected" dataType="UInt8"/>
+        <Field name="leakDetectorStatus" dataType="UInt8"/>
+        <Field name="leakDetected" dataType="UInt8"/>
+        <Field name="flowMeterStatus" dataType="UInt8"/>
+        <Field name="flowAnomalyDetected" dataType="UInt8"/>
+        <Field name="stabilizerStatus" dataType="UInt8"/>
+        <Field name="interceptorStatus" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestPbitSubsystemResult">
         <DDSChannel topicName="RUSV::SO::SPCE::SubsystemPBITReportType" typeName="SubsystemPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="seaWaterAirConditionerStatus"/>
-        <Field name="towingDeviceStatus"/>
+        <Field name="seaWaterAirConditionerStatus" dataType="UInt8"/>
+        <Field name="towingDeviceStatus" dataType="UInt8"/>
       </Reply>
       <Reply semantic_id="requestPbitSPCEResult">
         <DDSChannel topicName="RUSV::SO::SPCE::SPCEPBITReportType" typeName="SPCEPBITReportType"/>
         <Field name="usvHeader"/>
-        <Field name="spceStatus"/>
-        <Field name="vcuStatus"/>
-        <Field name="vcuTmpStatus"/>
+        <Field name="spceStatus" dataType="UInt8"/>
+        <Field name="vcuStatus" dataType="UInt8"/>
+        <Field name="vcuTmpStatus" dataType="UInt8"/>
       </Reply>
     </ControlBinding>
         <ControlBinding semantic_id="setEmergencyStopMode">
