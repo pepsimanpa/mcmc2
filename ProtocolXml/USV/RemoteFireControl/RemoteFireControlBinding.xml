@@ -149,20 +149,42 @@
         <Field name="drivingIBIT" cdm="Health.RCWS.Driving" dataType="UInt8">
           <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
-        <Field name="drivingIBIT_Detail" cdm="Health.RCWS.Driving.IBIT.Detail.Raw" dataType="UInt8"/>
+        <PackedField name="drivingIBIT_Detail" width="8" defaultValue="0">
+          <BitMember name="horizontalMotorIBIT" cdm="Health.RCWS.Driving.IBIT.Detail.Bit0.Raw" offset="0"/>
+          <BitMember name="verticalMorotIBIT" cdm="Health.RCWS.Driving.IBIT.Detail.Bit1.Raw" offset="1"/>
+          <BitMember name="reloadMotorIBIT" cdm="Health.RCWS.Driving.IBIT.Detail.Bit2.Raw" offset="2"/>
+          <BitMember name="inertialMeasurementUnitCommunicationIBIT" cdm="Health.RCWS.Driving.IBIT.Detail.Bit3.Raw" offset="3"/>
+        </PackedField>
         <Field name="surveillanceIBIT" cdm="Health.RCWS.Surveillance" dataType="UInt8">
           <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
-        <Field name="surveillanceIBIT_Detail" cdm="Health.RCWS.Surveillance.IBIT.Detail.Raw" dataType="UInt8"/>
+        <PackedField name="surveillanceIBIT_Detail" width="8" defaultValue="0">
+          <BitMember name="dayCameraIBIT" cdm="Health.RCWS.Surveillance.IBIT.Detail.Bit0.Raw" offset="0"/>
+          <BitMember name="nightWideAngleCameraIBIT" cdm="Health.RCWS.Surveillance.IBIT.Detail.Bit1.Raw" offset="1"/>
+          <BitMember name="nighttelephotoCameraIBIT" cdm="Health.RCWS.Surveillance.IBIT.Detail.Bit2.Raw" offset="2"/>
+          <BitMember name="distanceMeasurementIBIT" cdm="Health.RCWS.Surveillance.IBIT.Detail.Bit3.Raw" offset="3"/>
+          <BitMember name="atmosphericPressureIBIT" cdm="Health.RCWS.Surveillance.IBIT.Detail.Bit4.Raw" offset="4"/>
+          <BitMember name="surveillanceTemperatureIBIT" cdm="Health.RCWS.Surveillance.IBIT.Detail.Bit5.Raw" offset="5"/>
+        </PackedField>
         <Field name="strikeIBIT" cdm="Health.RCWS.Strike" dataType="UInt8">
           <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
-        <Field name="strikeIBIT_Detail" cdm="Health.RCWS.Strike.IBIT.Detail.Raw" dataType="UInt8"/>
+        <PackedField name="strikeIBIT_Detail" width="8" defaultValue="0">
+          <BitMember name="autoReloadAssemblyIBIT" cdm="Health.RCWS.Strike.IBIT.Detail.Bit0.Raw" offset="0"/>
+          <BitMember name="fireAssemblyIBIT" cdm="Health.RCWS.Strike.IBIT.Detail.Bit1.Raw" offset="1"/>
+          <BitMember name="weaponControlBoardIBIT" cdm="Health.RCWS.Strike.IBIT.Detail.Bit2.Raw" offset="2"/>
+        </PackedField>
         <Field name="controlIBIT" cdm="Health.RCWS.Control" dataType="UInt8">
           <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
-        <Field name="controlIBIT_Detail" cdm="Health.RCWS.Control.IBIT.Detail.Raw" dataType="UInt8"/>
-        <!--IBIT Detail raw bit 정의: driving Bit0=선회모터, Bit1=고각모터, Bit2=급탄모터, Bit3=관성센서 통신; surveillance Bit0=주간카메라, Bit1=야간(협각)카메라, Bit2=야간(광각)카메라, Bit3=거리측정기, Bit4=기압, Bit5=감시조립체 온도; strike Bit0=자동장전조립체 통신, Bit1=격발조립체, Bit2=무장제어보드; control Bit0=통합제어기, Bit1=통합제어기전원, Bit2=사격통제보드, Bit3=통신제어보드, Bit4=구동제어보드. 원문은 각 bit의 0/1 정상/이상 극성을 별도로 명시하지 않아 raw octet으로 유지한다.-->
+        <PackedField name="controlIBIT_Detail" width="8" defaultValue="0">
+          <BitMember name="controlAssemblyIBIT" cdm="Health.RCWS.Control.IBIT.Detail.Bit0.Raw" offset="0"/>
+          <BitMember name="controlPowerIBIT" cdm="Health.RCWS.Control.IBIT.Detail.Bit1.Raw" offset="1"/>
+          <BitMember name="fireControlBoardIBIT" cdm="Health.RCWS.Control.IBIT.Detail.Bit2.Raw" offset="2"/>
+          <BitMember name="communicationControlBoardIBIT" cdm="Health.RCWS.Control.IBIT.Detail.Bit3.Raw" offset="3"/>
+          <BitMember name="driveControlBoardIBIT" cdm="Health.RCWS.Control.IBIT.Detail.Bit4.Raw" offset="4"/>
+        </PackedField>
+        <!--IBIT Detail은 CSCI가 bit 위치와 점검 대상을 직접 명시하므로 PackedField로 분해한다. 다만 각 bit의 0/1 정상/이상 polarity는 직접 정의되지 않아 ValueMap/Boolean 의미는 부여하지 않고 bit별 Raw로 유지한다. surveillance Bit1/2는 symbolic name(wideAngle/telephoto)과 한글 설명(협각/광각)이 서로 충돌하므로 이름 자체만 보존한다.-->
       </Reply>
       <!--IBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하고 RCWSIBITReportType은 실제 점검 결과 Reply로 처리한다. 결과 Report에는 commandID가 없다.-->
     </ControlBinding>
