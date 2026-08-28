@@ -1,0 +1,129 @@
+name: Temporary XML Minimal Diff
+
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/xml-minimal-diff-temp.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  minimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+      - run: python -m pip install lxml
+      - name: Restore unchanged fine-grained fragments
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re, subprocess, difflib, sys
+          BASE='69b7e645bbf5ab0d85b2c3a2f50972c20b93e7d7'
+          files=[
+            'ProtocolXml/USV/NavigationRadar/NavigationRadarSemantic.xml',
+            'ProtocolXml/USV/NavigationRadar/NavigationRadarBinding.xml',
+            'ProtocolXml/USV/ElectroOptical/ElectroOpticalSemantic.xml',
+            'ProtocolXml/USV/ElectroOptical/ElectroOpticalBinding.xml',
+            'ProtocolXml/USV/PlatformController/PlatformControllerSemantic.xml',
+            'ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml']
+          targets={'TextConstantSpec','GroupSpec','QuantitySpec','ValueSetSpec','BooleanSpec','TextSpec','CollectionSpec','ElementSpec','ControlSpec','Reply','QuantityProfile','ValueSetProfile','BooleanProfile','Profile','GroupResult','QuantityResult','ValueSetResult','Result','ProductStreamSpec','MonitorBinding','ControlBinding','Field','FixedField','DerivedField','ArrayField','Element','PackedField','BitMember','ProductBinding'}
+          context_tags={'GroupSpec','CollectionSpec','ElementSpec','ControlSpec','Reply','MonitorBinding','ControlBinding','ArrayField','Element','PackedField','ProductBinding'}
+          token_re=re.compile(r'<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<![^>]*>|</?[^>]+?>')
+          start_re=re.compile(r'<\s*([A-Za-z_][\w:.-]*)\b([^>]*)>')
+          end_re=re.compile(r'</\s*([A-Za-z_][\w:.-]*)\s*>')
+          def attrs(s): return dict(re.findall(r'([A-Za-z_][\w:.-]*)\s*=\s*["\']([^"\']*)["\']',s))
+          def ident(tag,a):
+            for k in ('id','semantic_id','bindRef','name','cdm','sourceField'):
+              if a.get(k): return (tag,k,a[k])
+            return None
+          def scan(text):
+            out={}; stack=[]; ctx=[]
+            for m in token_re.finditer(text):
+              tok=m.group(0)
+              if tok.startswith('<!--') or tok.startswith('<?') or (tok.startswith('<!') and not tok.startswith('</')): continue
+              em=end_re.fullmatch(tok)
+              if em:
+                if stack:
+                  ent=stack.pop()
+                  if ent['ctx_added']: ctx.pop()
+                  if ent['key'] is not None: out.setdefault(ent['key'],[]).append((ent['start'],m.end()))
+                continue
+              sm=start_re.fullmatch(tok)
+              if not sm: continue
+              tag=sm.group(1).split(':')[-1]; a=attrs(sm.group(2)); ii=ident(tag,a); selfclose=tok.rstrip().endswith('/>')
+              key=tuple(ctx+[ii]) if tag in targets and ii else None
+              if key is not None and selfclose: out.setdefault(key,[]).append((m.start(),m.end()))
+              elif not selfclose:
+                add=tag in context_tags and ii is not None
+                stack.append({'start':m.start(),'key':key,'ctx_added':add})
+                if add: ctx.append(ii)
+            return out
+          def canon(s):
+            s=re.sub(r'<!--[\s\S]*?-->','',s)
+            return re.sub(r'>\s+<','><',s.strip())
+          def comm(s): return [re.sub(r'\s+',' ',x.strip()) for x in re.findall(r'<!--([\s\S]*?)-->',s)]
+          def sim(a,b): return difflib.SequenceMatcher(None,a,b).ratio()>=0.48
+          def total_diff():
+            o=subprocess.check_output(['git','diff','--numstat',BASE,'--',*files],text=True)
+            total=0
+            for ln in o.splitlines():
+              a,d,*_=ln.split('\t');
+              if a.isdigit(): total+=int(a)
+              if d.isdigit(): total+=int(d)
+            return total
+          before=total_diff(); print('DIFF_TOTAL_BEFORE',before)
+          for fp in files:
+            p=Path(fp); cur=p.read_text(); old=subprocess.check_output(['git','show',f'{BASE}:{fp}'],text=True)
+            cs=scan(cur); os=scan(old); cand=[]
+            for k,cv in cs.items():
+              ov=os.get(k)
+              if not ov or len(cv)!=1 or len(ov)!=1: continue
+              a,b=cv[0]; oa,ob=ov[0]; cf=cur[a:b]; of=old[oa:ob]
+              if canon(cf)!=canon(of): continue
+              # Never discard a current-only design comment.
+              cc,oc=comm(cf),comm(of)
+              if any(not any(sim(c,x) for x in oc) for c in cc): continue
+              if cf!=of: cand.append((a,b,oa,ob))
+            # choose maximal non-overlapping unchanged fragments
+            cand.sort(key=lambda x:(x[1]-x[0]),reverse=True); sel=[]
+            for c in cand:
+              a,b,_,_=c
+              if any(sa<=a and b<=sb for sa,sb,_,_ in sel): continue
+              sel.append(c)
+            for a,b,oa,ob in sorted(sel,reverse=True): cur=cur[:a]+old[oa:ob]+cur[b:]
+            p.write_text(cur)
+            print('RESTORED',fp,len(sel))
+          # Validate before accepting candidate.
+          NS={'u':'http://lignex1.com/mcmc2/umsSchema'}; root=Path('ProtocolXml')
+          ss=etree.XMLSchema(etree.parse(str(root/'XSD/CommonSpecSchema.xsd'))); bs=etree.XMLSchema(etree.parse(str(root/'XSD/CommonBindingSchema.xsd'))); fail=[]
+          for d in ['NavigationRadar','PlatformController','ElectroOptical']:
+            sp=root/f'USV/{d}/{d}Semantic.xml'; bp=root/f'USV/{d}/{d}Binding.xml'; sd=etree.parse(str(sp)); bd=etree.parse(str(bp))
+            if not ss.validate(sd): fail.append(str(sp))
+            if not bs.validate(bd): fail.append(str(bp))
+            def aset(doc,x): return set(doc.xpath(x,namespaces=NS))
+            for a,b in [
+              (aset(sd,'//u:ControlSpec/@id'),aset(bd,'//u:ControlBinding/@semantic_id')),
+              (aset(sd,'//u:Reply/@bindRef'),aset(bd,'//u:ControlBinding/u:Reply/@semantic_id')),
+              (aset(sd,'/u:*/*[local-name()="MonitorSpecs"]/*/@id'),aset(bd,'/u:*/*[local-name()="Monitors"]/u:MonitorBinding/@semantic_id')),
+              (aset(sd,'/u:*/*[local-name()="SensorProductSpecs"]/*/@id'),aset(bd,'/u:*/*[local-name()="SensorProducts"]/u:ProductBinding/@semantic_id'))]:
+              if a!=b: fail.append(d+'-xref')
+            if bd.xpath('//@converter'): fail.append(d+'-converter')
+          after=total_diff(); print('DIFF_TOTAL_AFTER',after,'FAIL',fail)
+          if fail or after>before:
+            subprocess.check_call(['git','checkout','--',*files]); print('CANDIDATE_REVERTED');
+            if fail: sys.exit(1)
+          PY
+          git diff --check
+          git diff --stat 69b7e645bbf5ab0d85b2c3a2f50972c20b93e7d7 -- ProtocolXml/USV/NavigationRadar ProtocolXml/USV/ElectroOptical ProtocolXml/USV/PlatformController
+      - name: Commit reduced diff
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/USV/NavigationRadar/NavigationRadarSemantic.xml ProtocolXml/USV/NavigationRadar/NavigationRadarBinding.xml ProtocolXml/USV/ElectroOptical/ElectroOpticalSemantic.xml ProtocolXml/USV/ElectroOptical/ElectroOpticalBinding.xml ProtocolXml/USV/PlatformController/PlatformControllerSemantic.xml ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml
+          if git diff --cached --quiet; then echo 'No further diff reduction'; else git commit -m 'Minimize audited XML textual diff'; git push origin HEAD:feature/usv-semantic-binding-audit; fi
