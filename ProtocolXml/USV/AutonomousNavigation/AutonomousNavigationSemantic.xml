@@ -509,12 +509,11 @@
         </QuantityProfile>
         <ValueSetProfile cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
         <QuantityProfile cdm="Autonomy.Mission.Record.TimeLimit">
-          <Unit>s</Unit>
           <Range min="0" max="14400"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
       </Parameters>
-      <!--searchingRange wire raw 3750~15000은 Semantic 37.5~150.0 m(0.01 m resolution)로 해석한다. timeLimit은 seconds로 정의한다.-->
+      <!--searchingRange wire raw 3750~15000은 원문 비고의 20M/150M 운용범위를 근거로 Semantic 37.5~150.0 m(0.01 m resolution)로 해석한다. timeLimit은 0~14400 범위만 확정되며 공용 구조체 Unit 열이 `-`이므로 단위를 추정하지 않는다.-->
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 6을 Binding에서 설정한다.-->
       <Reply bindRef="recordUnderwaterReconnaissanceMissionAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
       <Reply bindRef="recordUnderwaterReconnaissanceMissionRecordAck" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance.RecordEcho" required="true"><Results><GroupResult name="recordEcho" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance.RecordEcho"/></Results></Reply>
