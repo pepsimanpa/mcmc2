@@ -1,0 +1,72 @@
+name: temporary restore SSS power status mapping TBD
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - run: python -m pip install --quiet lxml
+      - name: Remove unsupported inferred status maps and validate
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re
+          p=Path('ProtocolXml/USV/SideScanSonar/SideScanSonarBinding.xml')
+          text=p.read_text()
+          cdms=['ElectricalState.Power.TowedSonarArray','ElectricalState.Power.USBL','ElectricalState.Power.Winch','ElectricalState.Power.RecoveryUnit','ElectricalState.Power.Camera']
+          for c in cdms:
+              pat=re.compile(rf'<Field\b(?=[^>]*\bcdm="{re.escape(c)}")[^>]*>\s*<ValueMap>\s*<Map cdm="PowerSupplyState\.Off" value="0"/>\s*<Map cdm="PowerSupplyState\.On" value="1"/>\s*</ValueMap>\s*</Field>',re.S)
+              ms=list(pat.finditer(text))
+              if len(ms)!=1: raise RuntimeError(f'expected one inferred map for {c}, got {len(ms)}')
+              m=ms[0]; start=m.group(0).split('>')[0]+'/>'
+              text=text[:m.start()]+start+text[m.end():]
+          p.write_text(text)
+
+          U='http://lignex1.com/mcmc2/umsSchema'; N={'u':U}
+          devs=['AutonomousNavigation','CentralControl','ElectroOptical','ElectroOpticalProcessor','IntegratedNavigation','Lidar','NavigationCamera','NavigationRadar','NearContactDetection','NetworkAbstraction','PlatformController','RemoteFireControl','SensorFusion','SideScanSonar']
+          sx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd')); bx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          no_map=[]; mismatch=[]; failed=False
+          for d in devs:
+              q=Path('ProtocolXml/USV')/d; s=etree.parse(str(q/f'{d}Semantic.xml')); b=etree.parse(str(q/f'{d}Binding.xml'))
+              if not sx.validate(s) or not bx.validate(b): failed=True; print('XSD FAIL',d)
+              sem={}
+              for x in s.xpath('//u:ValueSetSpec|//u:ValueSetProfile|//u:ValueSetResult|//u:HealthStatusSetSpec',namespaces=N):
+                  c=x.get('cdm'); vals={v.get('cdm') for v in x.xpath('./u:Values/u:Value',namespaces=N) if v.get('cdm')}
+                  if c and vals: sem.setdefault(c,[]).append(vals)
+              for x in b.xpath('//u:Field[@cdm]|//u:DerivedField[@cdm]|//u:BitMember[@cdm]',namespaces=N):
+                  c=x.get('cdm')
+                  if c not in sem: continue
+                  vm=x.find(f'{{{U}}}ValueMap'); sm=x.find(f'{{{U}}}SourceValueMap')
+                  if vm is None:
+                      if sm is None: no_map.append((d,c,x.get('name')))
+                  else:
+                      vals={m.get('cdm') for m in vm.findall(f'{{{U}}}Map') if m.get('cdm')}
+                      if not any(vals==z for z in sem[c]): mismatch.append((d,c,x.get('name')))
+          expected={('SideScanSonar',c,n) for c,n in [
+              ('ElectricalState.Power.TowedSonarArray','towedSonarArrayPowerStatus'),
+              ('ElectricalState.Power.USBL','ultraShortBaseLinePowerStatus'),
+              ('ElectricalState.Power.Winch','winchPowerStatus'),
+              ('ElectricalState.Power.RecoveryUnit','recoveryUnitPowerStatus'),
+              ('ElectricalState.Power.Camera','cameraPowerStatus')]}
+          print('INTENTIONAL_UNMAPPED',no_map)
+          print('MISMATCH',mismatch)
+          if set(no_map)!=expected or mismatch: failed=True
+          if failed: raise SystemExit(1)
+          PY
+          git diff --check
+      - name: Commit SSS TBD correction
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ProtocolXml/USV/SideScanSonar/SideScanSonarBinding.xml
+          git commit -m "Keep SSS power status raw mapping as source TBD"
+          git push origin HEAD:feature/usv-semantic-binding-audit
