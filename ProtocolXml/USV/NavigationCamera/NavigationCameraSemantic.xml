@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
-  <!--운항용카메라장치(Navigation Camera) Semantic 명세: 원격통제장치 CSCI ↔ 운항용카메라장치 CSCI 직접 연동 기준.-->
-  <!--직접 RCU 연동 대상: 원격 전시 RTP 영상, 영상정보분석결과, CBIT, PBIT/IBIT 결과, 공통 명령 ACK, 연동/재시작/PBIT/IBIT 및 영상 전시 송출 명령. 중앙통제 전용 운항기록 EO/IR RTP는 제외한다.-->
-  <!--설계 결정: CCDDisplayModeControl.displayMode는 Bit0=EO, Bit1=IR, Bit2=화질로 분리하여 Semantic 파라미터 3개로 노출하고 Binding/Adapter에서 1-byte 값으로 packing한다.-->
-  <!--설계 결정: 카메라 상태 코드의 1=기능저하는 원문 IBIT에서 '미사용'으로 명시되어 있으므로 Semantic 유효값은 0=정상, 2=비가용, 3=미응답으로 정의한다.-->
-  <!--설계 결정: imageObjectDetectionCnt가 0~255이므로 객체탐지 Collection 최대 개수를 255로 적용한다. 원문 sequence 자체에는 별도 상한이 명시되어 있지 않다.-->
+            xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd">
+  <!--운항용카메라장치 Semantic: 원격통제장치(RCU)와의 직접 연동만 포함한다.-->
+  <!--중앙통제 전용 운항기록 EO/IR RTP는 범위에서 제외한다.-->
+  <!--상태 코드 1=기능저하는 원본 IBIT에서 미사용으로 명시되어 Semantic 유효 상태에서 제외한다.-->
+  <!--IBIT 상세 octet은 비트 위치는 있으나 0/1 polarity 또는 카메라 2~8 상세 의미가 불완전하여 Raw 결과로 유지한다.-->
   <ConstantSpecs id="constant">
-    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
-      <Value>NavigationCamera</Value>
-    </TextConstantSpec>
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name"><Value>NavigationCamera</Value></TextConstantSpec>
     <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
       <Value>운항용카메라 원격 전시 영상, 영상 객체탐지 결과, 상태 감시 및 원격 제어 인터페이스</Value>
     </TextConstantSpec>
@@ -19,137 +16,95 @@
   <MonitorSpecs id="monitor">
     <GroupSpec id="objectDetectionResults" name="운항용카메라 영상정보분석결과" cdm="Sensor.NavigationCamera.ObjectDetection">
       <ValueSetSpec id="panoViewType" name="파노라마 영상 뷰" cdm="Sensor.NavigationCamera.Panorama.ViewType">
-        <Values>
-          <Value cdm="Sensor.NavigationCamera.Panorama.ViewType.EOFull">0</Value>
-        </Values>
+        <Values><Value name="EOFull" cdm="Sensor.NavigationCamera.Panorama.ViewType.EOFull"/></Values>
       </ValueSetSpec>
-      <QuantitySpec id="imageWidth" name="이미지 너비" cdm="Image.Width">
-        <Unit>pixel</Unit>
-        <Range min="0" max="65535"/>
-        <Resolution>1</Resolution>
-      </QuantitySpec>
-      <QuantitySpec id="imageHeight" name="이미지 높이" cdm="Image.Height">
-        <Unit>pixel</Unit>
-        <Range min="0" max="65535"/>
-        <Resolution>1</Resolution>
-      </QuantitySpec>
-      <QuantitySpec id="imageObjectDetectionCnt" name="객체 탐지 결과 개수" cdm="Sensor.NavigationCamera.ObjectDetection.Count">
-        <Unit>num</Unit>
-        <Range min="0" max="255"/>
-        <Resolution>1</Resolution>
-      </QuantitySpec>
+      <QuantitySpec id="imageWidth" name="이미지 너비" cdm="Image.Width"><Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec>
+      <QuantitySpec id="imageHeight" name="이미지 높이" cdm="Image.Height"><Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec>
+      <QuantitySpec id="imageObjectDetectionCnt" name="객체 탐지 결과 개수" cdm="Sensor.NavigationCamera.ObjectDetection.Count"><Unit>num</Unit><Range min="0" max="255"/><Resolution>1</Resolution></QuantitySpec>
       <CollectionSpec id="imageObjectDetection2DSeq" name="객체 탐지 결과 목록" cdm="Sensor.NavigationCamera.ObjectDetection.List" minOccurs="0" maxOccurs="255">
         <ElementSpec id="objectDetection" name="객체 탐지 결과" cdm="Sensor.NavigationCamera.ObjectDetection.Item">
           <ValueSetSpec id="classID" name="객체 분류" cdm="Sensor.NavigationCamera.ObjectDetection.Class">
             <Values>
-              <Value cdm="Sensor.NavigationCamera.ObjectDetection.Class.PatrolVessel">0</Value>
-              <Value cdm="Sensor.NavigationCamera.ObjectDetection.Class.NorthKoreanCargoShip">1</Value>
-              <Value cdm="Sensor.NavigationCamera.ObjectDetection.Class.FlagOfConvenienceShip">2</Value>
-              <Value cdm="Sensor.NavigationCamera.ObjectDetection.Class.Warship">3</Value>
-              <Value cdm="Sensor.NavigationCamera.ObjectDetection.Class.FishingShip">4</Value>
-              <Value cdm="Sensor.NavigationCamera.ObjectDetection.Class.CargoShip">5</Value>
-              <Value cdm="Sensor.NavigationCamera.ObjectDetection.Class.Ferry">6</Value>
-              <Value cdm="Sensor.NavigationCamera.ObjectDetection.Class.UnidentifiedShip">7</Value>
+              <Value name="PatrolVessel" cdm="Sensor.NavigationCamera.ObjectDetection.Class.PatrolVessel"/>
+              <Value name="NorthKoreanCargoShip" cdm="Sensor.NavigationCamera.ObjectDetection.Class.NorthKoreanCargoShip"/>
+              <Value name="FlagOfConvenienceShip" cdm="Sensor.NavigationCamera.ObjectDetection.Class.FlagOfConvenienceShip"/>
+              <Value name="Warship" cdm="Sensor.NavigationCamera.ObjectDetection.Class.Warship"/>
+              <Value name="FishingShip" cdm="Sensor.NavigationCamera.ObjectDetection.Class.FishingShip"/>
+              <Value name="CargoShip" cdm="Sensor.NavigationCamera.ObjectDetection.Class.CargoShip"/>
+              <Value name="Ferry" cdm="Sensor.NavigationCamera.ObjectDetection.Class.Ferry"/>
+              <Value name="UnidentifiedShip" cdm="Sensor.NavigationCamera.ObjectDetection.Class.UnidentifiedShip"/>
             </Values>
           </ValueSetSpec>
-          <QuantitySpec id="confidence" name="객체 분류 확률" cdm="Sensor.NavigationCamera.ObjectDetection.Confidence">
-            <Unit>%</Unit>
-            <Range min="0" max="100"/>
-            <Resolution>1</Resolution>
-          </QuantitySpec>
-          <QuantitySpec id="bboxTopLeftX" name="Bounding Box 좌상단 X" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.TopLeft.X">
-            <Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution>
-          </QuantitySpec>
-          <QuantitySpec id="bboxTopLeftY" name="Bounding Box 좌상단 Y" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.TopLeft.Y">
-            <Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution>
-          </QuantitySpec>
-          <QuantitySpec id="bboxBottomRightX" name="Bounding Box 우하단 X" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.BottomRight.X">
-            <Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution>
-          </QuantitySpec>
-          <QuantitySpec id="bboxBottomRightY" name="Bounding Box 우하단 Y" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.BottomRight.Y">
-            <Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution>
-          </QuantitySpec>
-          <QuantitySpec id="bboxWidth" name="Bounding Box 너비" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.Width">
-            <Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution>
-          </QuantitySpec>
-          <QuantitySpec id="bboxHeight" name="Bounding Box 높이" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.Height">
-            <Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution>
-          </QuantitySpec>
-          <QuantitySpec id="relativeAngle" name="객체 상대각" cdm="Sensor.NavigationCamera.ObjectDetection.RelativeAngle">
-            <Unit>rad</Unit>
-            <Range min="-3.141592653589793" max="3.141592653589793"/>
-          </QuantitySpec>
+          <QuantitySpec id="confidence" name="객체 분류 확률" cdm="Sensor.NavigationCamera.ObjectDetection.Confidence"><Unit>%</Unit><Range min="0" max="100"/><Resolution>1</Resolution></QuantitySpec>
+          <QuantitySpec id="bboxTopLeftX" name="Bounding Box 좌상단 X" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.TopLeft.X"><Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec>
+          <QuantitySpec id="bboxTopLeftY" name="Bounding Box 좌상단 Y" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.TopLeft.Y"><Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec>
+          <QuantitySpec id="bboxBottomRightX" name="Bounding Box 우하단 X" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.BottomRight.X"><Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec>
+          <QuantitySpec id="bboxBottomRightY" name="Bounding Box 우하단 Y" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.BottomRight.Y"><Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec>
+          <QuantitySpec id="bboxWidth" name="Bounding Box 너비" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.Width"><Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec>
+          <QuantitySpec id="bboxHeight" name="Bounding Box 높이" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.Height"><Unit>pixel</Unit><Range min="0" max="65535"/><Resolution>1</Resolution></QuantitySpec>
+          <!--원본 공용 구조체 Range는 -PI~+PI이며 XSD Range가 decimal만 허용하여 근사값을 넣지 않는다.-->
+          <QuantitySpec id="relativeAngle" name="객체 상대각" cdm="Sensor.NavigationCamera.ObjectDetection.RelativeAngle"><Unit>rad</Unit></QuantitySpec>
         </ElementSpec>
       </CollectionSpec>
-      <QuantitySpec id="odFPS" name="객체 탐지 FPS" cdm="Sensor.NavigationCamera.ObjectDetection.FPS">
-        <Unit>num</Unit>
-        <Range min="0" max="255"/>
-        <Resolution>1</Resolution>
-      </QuantitySpec>
+      <QuantitySpec id="odFPS" name="객체 탐지 FPS" cdm="Sensor.NavigationCamera.ObjectDetection.FPS"><Unit>num</Unit><Range min="0" max="255"/><Resolution>1</Resolution></QuantitySpec>
     </GroupSpec>
 
     <GroupSpec id="ccdCbitStatus" name="운항용카메라장치 CBIT 상태" cdm="Health.CBIT.NavigationCamera">
-      <ValueSetSpec id="statusCCD" name="운항용카메라장치 상태" cdm="Health.NavigationCamera.Overall">
-        <Values><Value cdm="Health.Normal">0</Value><Value cdm="Health.Unavailable">2</Value><Value cdm="Health.NoResponse">3</Value></Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="statusPowerBoard" name="전원용 회로카드조립체 상태" cdm="Health.NavigationCamera.PowerBoard">
-        <Values><Value cdm="Health.Normal">0</Value><Value cdm="Health.Unavailable">2</Value><Value cdm="Health.NoResponse">3</Value></Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="statusEOMuxingBoard" name="주간 MUX 회로카드조립체 상태" cdm="Health.NavigationCamera.EOMuxBoard">
-        <Values><Value cdm="Health.Normal">0</Value><Value cdm="Health.Unavailable">2</Value><Value cdm="Health.NoResponse">3</Value></Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="statusIRMuxingBoard" name="열상 MUX 회로카드조립체 상태" cdm="Health.NavigationCamera.IRMuxBoard">
-        <Values><Value cdm="Health.Normal">0</Value><Value cdm="Health.Unavailable">2</Value><Value cdm="Health.NoResponse">3</Value></Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="statusEOProcessingBoard" name="주간영상처리 회로카드조립체 상태" cdm="Health.NavigationCamera.EOProcessingBoard">
-        <Values><Value cdm="Health.Normal">0</Value><Value cdm="Health.Unavailable">2</Value><Value cdm="Health.NoResponse">3</Value></Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="statusIRProcessingBoard" name="열상영상처리 회로카드조립체 상태" cdm="Health.NavigationCamera.IRProcessingBoard">
-        <Values><Value cdm="Health.Normal">0</Value><Value cdm="Health.Unavailable">2</Value><Value cdm="Health.NoResponse">3</Value></Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="statusEO" name="주간 카메라 조립체 상태" cdm="Health.NavigationCamera.EOAssembly">
-        <Values><Value cdm="Health.Normal">0</Value><Value cdm="Health.Unavailable">2</Value><Value cdm="Health.NoResponse">3</Value></Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="statusIR" name="열상 카메라 조립체 상태" cdm="Health.NavigationCamera.IRAssembly">
-        <Values><Value cdm="Health.Normal">0</Value><Value cdm="Health.Unavailable">2</Value><Value cdm="Health.NoResponse">3</Value></Values>
-      </ValueSetSpec>
-      <!--원문 IBIT에 1=기능저하 코드가 표기되지만 '(기능저하 미사용)'으로 명시되어 있어 1은 유효값으로 노출하지 않는다. PBIT/CBIT의 동일 상태 계열에도 같은 설계 결정을 적용한다.-->
+      <ValueSetSpec id="statusCCD" name="운항용카메라장치 상태" cdm="Health.NavigationCamera.Overall"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetSpec>
+      <ValueSetSpec id="statusPowerBoard" name="전원용 회로카드조립체 상태" cdm="Health.NavigationCamera.PowerBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetSpec>
+      <ValueSetSpec id="statusEOMuxingBoard" name="주간 MUX 회로카드조립체 상태" cdm="Health.NavigationCamera.EOMuxBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetSpec>
+      <ValueSetSpec id="statusIRMuxingBoard" name="열상 MUX 회로카드조립체 상태" cdm="Health.NavigationCamera.IRMuxBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetSpec>
+      <ValueSetSpec id="statusEOProcessingBoard" name="주간영상처리 회로카드조립체 상태" cdm="Health.NavigationCamera.EOProcessingBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetSpec>
+      <ValueSetSpec id="statusIRProcessingBoard" name="열상영상처리 회로카드조립체 상태" cdm="Health.NavigationCamera.IRProcessingBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetSpec>
+      <ValueSetSpec id="statusEO" name="주간 카메라 조립체 상태" cdm="Health.NavigationCamera.EOAssembly"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetSpec>
+      <ValueSetSpec id="statusIR" name="열상 카메라 조립체 상태" cdm="Health.NavigationCamera.IRAssembly"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetSpec>
     </GroupSpec>
   </MonitorSpecs>
 
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="운항용카메라장치 연동 개시" cdm="Control.NavigationCamera.Integration.Start">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
-    </ControlSpec>
-    <ControlSpec id="restartSystem" name="운항용카메라장치 시스템 재시작" cdm="Control.NavigationCamera.System.Restart">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
-    </ControlSpec>
+    <ControlSpec id="startIntegration" name="운항용카메라장치 연동 개시" cdm="Control.NavigationCamera.Integration.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
+    <ControlSpec id="restartSystem" name="운항용카메라장치 시스템 재시작" cdm="Control.NavigationCamera.System.Restart"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
     <ControlSpec id="requestPbit" name="운항용카메라장치 PBIT 요청" cdm="Request.Health.PBIT.NavigationCamera">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response"/>
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true"><Results><GroupResult name="navigationCameraPbit" cdm="Health.PBIT.NavigationCamera">
+        <ValueSetResult name="statusCCD" cdm="Health.NavigationCamera.Overall"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusPowerBoard" cdm="Health.NavigationCamera.PowerBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusEOMuxingBoard" cdm="Health.NavigationCamera.EOMuxBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusIRMuxingBoard" cdm="Health.NavigationCamera.IRMuxBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusEOProcessingBoard" cdm="Health.NavigationCamera.EOProcessingBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusIRProcessingBoard" cdm="Health.NavigationCamera.IRProcessingBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusEO" cdm="Health.NavigationCamera.EOAssembly"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusIR" cdm="Health.NavigationCamera.IRAssembly"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+      </GroupResult></Results></Reply>
     </ControlSpec>
     <ControlSpec id="requestIbit" name="운항용카메라장치 IBIT 요청" cdm="Request.Health.IBIT.NavigationCamera">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response"/>
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true"><Results><GroupResult name="navigationCameraIbit" cdm="Health.IBIT.NavigationCamera">
+        <ValueSetResult name="statusCCD" cdm="Health.NavigationCamera.Overall"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusPowerBoard" cdm="Health.NavigationCamera.PowerBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusEOMuxingBoard" cdm="Health.NavigationCamera.EOMuxBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusIRMuxingBoard" cdm="Health.NavigationCamera.IRMuxBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusEOProcessingBoard" cdm="Health.NavigationCamera.EOProcessingBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusIRProcessingBoard" cdm="Health.NavigationCamera.IRProcessingBoard"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusEO" cdm="Health.NavigationCamera.EOAssembly"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <ValueSetResult name="statusIR" cdm="Health.NavigationCamera.IRAssembly"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult>
+        <Result name="statusCCDDetail" cdm="Health.NavigationCamera.IBIT.OverallDetail.Raw"/><Result name="statusPowerBoardDetail" cdm="Health.NavigationCamera.IBIT.PowerBoardDetail.Raw"/><Result name="statusEOMuxingBoardDetail" cdm="Health.NavigationCamera.IBIT.EOMuxBoardDetail.Raw"/><Result name="statusIRMuxingBoardDetail" cdm="Health.NavigationCamera.IBIT.IRMuxBoardDetail.Raw"/><Result name="statusEOProcessingBoardDetail" cdm="Health.NavigationCamera.IBIT.EOProcessingBoardDetail.Raw"/><Result name="statusIRProcessingBoardDetail" cdm="Health.NavigationCamera.IBIT.IRProcessingBoardDetail.Raw"/>
+        <Result name="statusEO1Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera1.Detail.Raw"/><Result name="statusEO2Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera2.Detail.Raw"/><Result name="statusEO3Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera3.Detail.Raw"/><Result name="statusEO4Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera4.Detail.Raw"/><Result name="statusEO5Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera5.Detail.Raw"/><Result name="statusEO6Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera6.Detail.Raw"/><Result name="statusEO7Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera7.Detail.Raw"/><Result name="statusEO8Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera8.Detail.Raw"/>
+        <Result name="statusIR1Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera1.Detail.Raw"/><Result name="statusIR2Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera2.Detail.Raw"/><Result name="statusIR3Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera3.Detail.Raw"/><Result name="statusIR4Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera4.Detail.Raw"/><Result name="statusIR5Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera5.Detail.Raw"/><Result name="statusIR6Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera6.Detail.Raw"/><Result name="statusIR7Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera7.Detail.Raw"/><Result name="statusIR8Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera8.Detail.Raw"/>
+      </GroupResult></Results></Reply>
     </ControlSpec>
     <ControlSpec id="configureDisplayMode" name="운항용카메라 영상 전시 송출 설정" cdm="Control.NavigationCamera.DisplayMode.Configure">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <BooleanProfile cdm="Control.NavigationCamera.Display.EO"/>
-        <BooleanProfile cdm="Control.NavigationCamera.Display.IR"/>
-        <BooleanProfile cdm="Control.NavigationCamera.Display.Quality"/>
+        <ValueSetProfile cdm="Control.NavigationCamera.Display.EO.Mode"><Values><Value name="Off" cdm="Control.NavigationCamera.Display.EO.Off"/><Value name="On" cdm="Control.NavigationCamera.Display.EO.On"/></Values></ValueSetProfile>
+        <ValueSetProfile cdm="Control.NavigationCamera.Display.IR.Mode"><Values><Value name="Off" cdm="Control.NavigationCamera.Display.IR.Off"/><Value name="On" cdm="Control.NavigationCamera.Display.IR.On"/></Values></ValueSetProfile>
+        <ValueSetProfile cdm="Control.NavigationCamera.Display.Quality.Mode"><Values><Value name="Normal" cdm="Control.NavigationCamera.Display.Quality.Normal"/><Value name="Low" cdm="Control.NavigationCamera.Display.Quality.Low"/></Values></ValueSetProfile>
       </Parameters>
-      <!--EO: false=OFF/true=ON, IR: false=OFF/true=ON, 화질: false=Normal/true=Low. 물리 메시지에서는 각각 displayMode Bit0/Bit1/Bit2의 0/1로 packing한다. 원격통제장치 CSV의 ACK 여부는 X이므로 Reply를 두지 않는다.-->
+      <!--원본 ACK=X. displayMode Bit0=EO, Bit1=IR, Bit2=화질이며 물리 packing은 Binding이 담당한다.-->
     </ControlSpec>
   </ControlSpecs>
 
-  <SensorProductSpecs id="sensorProduct">
-    <ProductStreamSpec id="navigationCameraVideo" name="원격통제소 전시용 영상정보" cdm="ProductStream.Video.NavigationCamera">
-      <ProductKind cdm="ProductKind.Video"/>
-    </ProductStreamSpec>
-  </SensorProductSpecs>
+  <SensorProductSpecs id="sensorProduct"><ProductStreamSpec id="navigationCameraVideo" name="원격통제소 전시용 영상정보" cdm="ProductStream.Video.NavigationCamera"><ProductKind cdm="ProductKind.Video"/></ProductStreamSpec></SensorProductSpecs>
 </SensorSpec>
