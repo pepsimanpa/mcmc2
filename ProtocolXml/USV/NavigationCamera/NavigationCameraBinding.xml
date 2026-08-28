@@ -1,191 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonBindingSchema.xsd">
+               xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonBindingSchema.xsd">
   <!--운항용카메라장치 Binding: 운항용카메라 CSCI + 원격통제장치 CSCI 직접 연동 기준.-->
-  <!--공용 식별자 규칙: SurfaceDetection=0x03, NavCameraDevice=0x07, 별도 세부장비 ID 없음 → dstSubEquipmentID=0x00.-->
-  <!--원격통제소 전시용 RTP만 SensorProduct로 포함하며 중앙통제 전용 운항기록 EO/IR RTP는 제외한다.-->
+  <!--공용 목적지는 OM/Adapter가 System.Target.NavigationCamera로 준비한다.-->
+  <!--중앙통제 전용 운항기록 EO/IR RTP는 제외하고 원격통제소 전시용 RTP만 포함한다.-->
   <Monitors semantic_id="monitor">
     <MonitorBinding semantic_id="objectDetectionResults">
       <DDSChannel topicName="RUSV::SA::CCD::PanoImageObjectDetection2DSeqReportType" typeName="PanoImageObjectDetection2DSeqReportType"/>
       <Field name="usvHeader"/>
-      <Field name="panoViewType" cdm="Sensor.NavigationCamera.Panorama.ViewType"/>
-      <Field name="imageWidth" cdm="Image.Width"/>
-      <Field name="imageHeight" cdm="Image.Height"/>
-      <Field name="imageObjectDetectionCnt" cdm="Sensor.NavigationCamera.ObjectDetection.Count"/>
-      <ArrayField name="imageObjectDetection2DSeq" cdm="Sensor.NavigationCamera.ObjectDetection.List" minOccurs="0" maxOccurs="255">
-        <Element name="objectDetection" cdm="Sensor.NavigationCamera.ObjectDetection.Item">
-          <Field name="classID" cdm="Sensor.NavigationCamera.ObjectDetection.Class"/>
-          <Field name="confidence" cdm="Sensor.NavigationCamera.ObjectDetection.Confidence"/>
-          <Field name="bbox2D.topLeftX" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.TopLeft.X"/>
-          <Field name="bbox2D.topLeftY" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.TopLeft.Y"/>
-          <Field name="bbox2D.bottomRightX" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.BottomRight.X"/>
-          <Field name="bbox2D.bottomRightY" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.BottomRight.Y"/>
-          <Field name="bbox2D.bboxWidth" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.Width"/>
-          <Field name="bbox2D.bboxHeight" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.Height"/>
-          <Field name="relativeAngle" cdm="Sensor.NavigationCamera.ObjectDetection.RelativeAngle"/>
-        </Element>
-      </ArrayField>
-      <Field name="odFPS" cdm="Sensor.NavigationCamera.ObjectDetection.FPS"/>
-      <!--원문 sequence에는 최대 개수가 명시되지 않으나 imageObjectDetectionCnt 범위 0~255에 따라 maxOccurs=255를 적용한다.-->
+      <Field name="panoViewType" cdm="Sensor.NavigationCamera.Panorama.ViewType" dataType="UInt8"><ValueMap><Map cdm="Sensor.NavigationCamera.Panorama.ViewType.EOFull" value="0"/></ValueMap></Field>
+      <Field name="imageWidth" cdm="Image.Width" dataType="UInt16"/><Field name="imageHeight" cdm="Image.Height" dataType="UInt16"/><Field name="imageObjectDetectionCnt" cdm="Sensor.NavigationCamera.ObjectDetection.Count" dataType="UInt8"/>
+      <ArrayField name="imageObjectDetection2DSeq" cdm="Sensor.NavigationCamera.ObjectDetection.List" minOccurs="0" maxOccurs="255"><Element name="objectDetection" cdm="Sensor.NavigationCamera.ObjectDetection.Item">
+        <Field name="classID" cdm="Sensor.NavigationCamera.ObjectDetection.Class" dataType="UInt8"><ValueMap><Map cdm="Sensor.NavigationCamera.ObjectDetection.Class.PatrolVessel" value="0"/><Map cdm="Sensor.NavigationCamera.ObjectDetection.Class.NorthKoreanCargoShip" value="1"/><Map cdm="Sensor.NavigationCamera.ObjectDetection.Class.FlagOfConvenienceShip" value="2"/><Map cdm="Sensor.NavigationCamera.ObjectDetection.Class.Warship" value="3"/><Map cdm="Sensor.NavigationCamera.ObjectDetection.Class.FishingShip" value="4"/><Map cdm="Sensor.NavigationCamera.ObjectDetection.Class.CargoShip" value="5"/><Map cdm="Sensor.NavigationCamera.ObjectDetection.Class.Ferry" value="6"/><Map cdm="Sensor.NavigationCamera.ObjectDetection.Class.UnidentifiedShip" value="7"/></ValueMap></Field>
+        <Field name="confidence" cdm="Sensor.NavigationCamera.ObjectDetection.Confidence" dataType="UInt8"/><Field name="bbox2D.topLeftX" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.TopLeft.X" dataType="UInt16"/><Field name="bbox2D.topLeftY" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.TopLeft.Y" dataType="UInt16"/><Field name="bbox2D.bottomRightX" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.BottomRight.X" dataType="UInt16"/><Field name="bbox2D.bottomRightY" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.BottomRight.Y" dataType="UInt16"/><Field name="bbox2D.bboxWidth" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.Width" dataType="UInt16"/><Field name="bbox2D.bboxHeight" cdm="Sensor.NavigationCamera.ObjectDetection.BBox.Height" dataType="UInt16"/><Field name="relativeAngle" cdm="Sensor.NavigationCamera.ObjectDetection.RelativeAngle" dataType="Float32"/>
+      </Element></ArrayField>
+      <Field name="odFPS" cdm="Sensor.NavigationCamera.ObjectDetection.FPS" dataType="UInt8"/>
     </MonitorBinding>
-
-    <MonitorBinding semantic_id="ccdCbitStatus">
-      <DDSChannel topicName="RUSV::SO::CCD::CCDCBITReportType" typeName="CCDCBITReportType"/>
-      <Field name="usvHeader"/>
-      <Field name="statusCCD" cdm="Health.NavigationCamera.Overall"/>
-      <Field name="statusPowerBoard" cdm="Health.NavigationCamera.PowerBoard"/>
-      <Field name="statusEOMuxingBoard" cdm="Health.NavigationCamera.EOMuxBoard"/>
-      <Field name="statusIRMuxingBoard" cdm="Health.NavigationCamera.IRMuxBoard"/>
-      <Field name="statusEOProcessingBoard" cdm="Health.NavigationCamera.EOProcessingBoard"/>
-      <Field name="statusIRProcessingBoard" cdm="Health.NavigationCamera.IRProcessingBoard"/>
-      <Field name="statusEO" cdm="Health.NavigationCamera.EOAssembly"/>
-      <Field name="statusIR" cdm="Health.NavigationCamera.IRAssembly"/>
-      <!--Semantic 유효 상태는 0=정상, 2=비가용, 3=미응답. 1=기능저하는 원문 IBIT에서 미사용으로 명시됨.-->
+    <MonitorBinding semantic_id="ccdCbitStatus"><DDSChannel topicName="RUSV::SO::CCD::CCDCBITReportType" typeName="CCDCBITReportType"/><Field name="usvHeader"/>
+      <Field name="statusCCD" cdm="Health.NavigationCamera.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusPowerBoard" cdm="Health.NavigationCamera.PowerBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusEOMuxingBoard" cdm="Health.NavigationCamera.EOMuxBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIRMuxingBoard" cdm="Health.NavigationCamera.IRMuxBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusEOProcessingBoard" cdm="Health.NavigationCamera.EOProcessingBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIRProcessingBoard" cdm="Health.NavigationCamera.IRProcessingBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusEO" cdm="Health.NavigationCamera.EOAssembly" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIR" cdm="Health.NavigationCamera.IRAssembly" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
     </MonitorBinding>
   </Monitors>
-
   <Controls semantic_id="control">
-    <ControlBinding semantic_id="startIntegration">
-      <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x07"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
-      <Reply semantic_id="startIntegrationAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CCD::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
+    <ControlBinding semantic_id="startIntegration"><DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><DerivedField name="destination" sourceField="System.Target.NavigationCamera"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="startIntegrationAck" required="true"><DDSChannel topicName="RUSV::C2::CCD::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="restartSystem"><DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><DerivedField name="destination" sourceField="System.Target.NavigationCamera"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><Reply semantic_id="restartSystemAck" required="true"><DDSChannel topicName="RUSV::C2::CCD::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply></ControlBinding>
+    <ControlBinding semantic_id="requestPbit"><DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><DerivedField name="destination" sourceField="System.Target.NavigationCamera"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <Reply semantic_id="requestPbitAck" required="true"><DDSChannel topicName="RUSV::C2::CCD::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply>
+      <Reply semantic_id="requestPbitResult" required="true"><DDSChannel topicName="RUSV::SO::CCD::CCDPBITReportType" typeName="CCDPBITReportType"/><Field name="usvHeader"/><Field name="statusCCD" cdm="Health.NavigationCamera.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusPowerBoard" cdm="Health.NavigationCamera.PowerBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusEOMuxingBoard" cdm="Health.NavigationCamera.EOMuxBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIRMuxingBoard" cdm="Health.NavigationCamera.IRMuxBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusEOProcessingBoard" cdm="Health.NavigationCamera.EOProcessingBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIRProcessingBoard" cdm="Health.NavigationCamera.IRProcessingBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusEO" cdm="Health.NavigationCamera.EOAssembly" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIR" cdm="Health.NavigationCamera.IRAssembly" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field></Reply>
+    </ControlBinding>
+    <ControlBinding semantic_id="requestIbit"><DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><DerivedField name="destination" sourceField="System.Target.NavigationCamera"/><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
+      <Reply semantic_id="requestIbitAck" required="true"><DDSChannel topicName="RUSV::C2::CCD::CommandStatusReportType" typeName="CommandStatusReportType"/><Field name="usvHeader"/><Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/><Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/><Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/><Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/></Reply>
+      <Reply semantic_id="requestIbitResult" required="true"><DDSChannel topicName="RUSV::SO::CCD::CCDIBITReportType" typeName="CCDIBITReportType"/><Field name="usvHeader"/>
+        <Field name="statusCCD" cdm="Health.NavigationCamera.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusCCDDetail" cdm="Health.NavigationCamera.IBIT.OverallDetail.Raw" dataType="UInt8"/><Field name="statusPowerBoard" cdm="Health.NavigationCamera.PowerBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusPowerBoardDetail" cdm="Health.NavigationCamera.IBIT.PowerBoardDetail.Raw" dataType="UInt8"/><Field name="statusEOMuxingBoard" cdm="Health.NavigationCamera.EOMuxBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusEOMuxingBoardDetail" cdm="Health.NavigationCamera.IBIT.EOMuxBoardDetail.Raw" dataType="UInt8"/><Field name="statusIRMuxingBoard" cdm="Health.NavigationCamera.IRMuxBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIRMuxingBoardDetail" cdm="Health.NavigationCamera.IBIT.IRMuxBoardDetail.Raw" dataType="UInt8"/><Field name="statusEOProcessingBoard" cdm="Health.NavigationCamera.EOProcessingBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusEOProcessingBoardDetail" cdm="Health.NavigationCamera.IBIT.EOProcessingBoardDetail.Raw" dataType="UInt8"/><Field name="statusIRProcessingBoard" cdm="Health.NavigationCamera.IRProcessingBoard" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIRProcessingBoardDetail" cdm="Health.NavigationCamera.IBIT.IRProcessingBoardDetail.Raw" dataType="UInt8"/><Field name="statusEO" cdm="Health.NavigationCamera.EOAssembly" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
+        <Field name="statusEO1Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera1.Detail.Raw" dataType="UInt8"/><Field name="statusEO2Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera2.Detail.Raw" dataType="UInt8"/><Field name="statusEO3Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera3.Detail.Raw" dataType="UInt8"/><Field name="statusEO4Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera4.Detail.Raw" dataType="UInt8"/><Field name="statusEO5Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera5.Detail.Raw" dataType="UInt8"/><Field name="statusEO6Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera6.Detail.Raw" dataType="UInt8"/><Field name="statusEO7Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera7.Detail.Raw" dataType="UInt8"/><Field name="statusEO8Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera8.Detail.Raw" dataType="UInt8"/>
+        <Field name="statusIR" cdm="Health.NavigationCamera.IRAssembly" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field><Field name="statusIR1Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera1.Detail.Raw" dataType="UInt8"/><Field name="statusIR2Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera2.Detail.Raw" dataType="UInt8"/><Field name="statusIR3Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera3.Detail.Raw" dataType="UInt8"/><Field name="statusIR4Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera4.Detail.Raw" dataType="UInt8"/><Field name="statusIR5Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera5.Detail.Raw" dataType="UInt8"/><Field name="statusIR6Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera6.Detail.Raw" dataType="UInt8"/><Field name="statusIR7Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera7.Detail.Raw" dataType="UInt8"/><Field name="statusIR8Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera8.Detail.Raw" dataType="UInt8"/>
+        <!--상세 octet은 원문 비트 polarity 또는 카메라 2~8 설명이 불완전하여 raw로 유지한다.-->
       </Reply>
     </ControlBinding>
-
-    <ControlBinding semantic_id="restartSystem">
-      <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x07"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
-      <Reply semantic_id="restartSystemAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CCD::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-    </ControlBinding>
-
-    <ControlBinding semantic_id="requestPbit">
-      <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x07"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
-      <Reply semantic_id="requestPbitAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CCD::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-      <Reply semantic_id="requestPbitResult">
-        <DDSChannel topicName="RUSV::SO::CCD::CCDPBITReportType" typeName="CCDPBITReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="statusCCD" cdm="Health.NavigationCamera.Overall"/>
-        <Field name="statusPowerBoard" cdm="Health.NavigationCamera.PowerBoard"/>
-        <Field name="statusEOMuxingBoard" cdm="Health.NavigationCamera.EOMuxBoard"/>
-        <Field name="statusIRMuxingBoard" cdm="Health.NavigationCamera.IRMuxBoard"/>
-        <Field name="statusEOProcessingBoard" cdm="Health.NavigationCamera.EOProcessingBoard"/>
-        <Field name="statusIRProcessingBoard" cdm="Health.NavigationCamera.IRProcessingBoard"/>
-        <Field name="statusEO" cdm="Health.NavigationCamera.EOAssembly"/>
-        <Field name="statusIR" cdm="Health.NavigationCamera.IRAssembly"/>
-        <!--PBIT 결과에는 commandID가 없어 CommandStatusReport와 같은 명시적 요청 상관관계를 임의로 추가하지 않는다.-->
-      </Reply>
-    </ControlBinding>
-
-    <ControlBinding semantic_id="requestIbit">
-      <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <FixedField name="destination.dstEquipmentType" value="0x03"/>
-      <FixedField name="destination.dstEquipmentID" value="0x07"/>
-      <FixedField name="destination.dstSubEquipmentID" value="0x00"/>
-      <Reply semantic_id="requestIbitAck" required="true">
-        <DDSChannel topicName="RUSV::C2::CCD::CommandStatusReportType" typeName="CommandStatusReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType"/>
-        <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID"/>
-        <Field name="commandStatusReport.status" cdm="Control.Response.Status"/>
-        <Field name="commandID" cdm="Message.Correlation.NumericID"/>
-      </Reply>
-      <Reply semantic_id="requestIbitResult">
-        <DDSChannel topicName="RUSV::SO::CCD::CCDIBITReportType" typeName="CCDIBITReportType"/>
-        <Field name="usvHeader"/>
-        <Field name="statusCCD" cdm="Health.NavigationCamera.Overall"/>
-        <Field name="statusCCDDetail" cdm="Health.NavigationCamera.IBIT.OverallDetail.Raw"/>
-        <Field name="statusPowerBoard" cdm="Health.NavigationCamera.PowerBoard"/>
-        <Field name="statusPowerBoardDetail" cdm="Health.NavigationCamera.IBIT.PowerBoardDetail.Raw"/>
-        <Field name="statusEOMuxingBoard" cdm="Health.NavigationCamera.EOMuxBoard"/>
-        <Field name="statusEOMuxingBoardDetail" cdm="Health.NavigationCamera.IBIT.EOMuxBoardDetail.Raw"/>
-        <Field name="statusIRMuxingBoard" cdm="Health.NavigationCamera.IRMuxBoard"/>
-        <Field name="statusIRMuxingBoardDetail" cdm="Health.NavigationCamera.IBIT.IRMuxBoardDetail.Raw"/>
-        <Field name="statusEOProcessingBoard" cdm="Health.NavigationCamera.EOProcessingBoard"/>
-        <Field name="statusEOProcessingBoardDetail" cdm="Health.NavigationCamera.IBIT.EOProcessingBoardDetail.Raw"/>
-        <Field name="statusIRProcessingBoard" cdm="Health.NavigationCamera.IRProcessingBoard"/>
-        <Field name="statusIRProcessingBoardDetail" cdm="Health.NavigationCamera.IBIT.IRProcessingBoardDetail.Raw"/>
-        <Field name="statusEO" cdm="Health.NavigationCamera.EOAssembly"/>
-        <Field name="statusEO1Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera1.Detail.Raw"/>
-        <Field name="statusEO2Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera2.Detail.Raw"/>
-        <Field name="statusEO3Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera3.Detail.Raw"/>
-        <Field name="statusEO4Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera4.Detail.Raw"/>
-        <Field name="statusEO5Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera5.Detail.Raw"/>
-        <Field name="statusEO6Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera6.Detail.Raw"/>
-        <Field name="statusEO7Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera7.Detail.Raw"/>
-        <Field name="statusEO8Detail" cdm="Health.NavigationCamera.IBIT.EO.Camera8.Detail.Raw"/>
-        <Field name="statusIR" cdm="Health.NavigationCamera.IRAssembly"/>
-        <Field name="statusIR1Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera1.Detail.Raw"/>
-        <Field name="statusIR2Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera2.Detail.Raw"/>
-        <Field name="statusIR3Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera3.Detail.Raw"/>
-        <Field name="statusIR4Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera4.Detail.Raw"/>
-        <Field name="statusIR5Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera5.Detail.Raw"/>
-        <Field name="statusIR6Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera6.Detail.Raw"/>
-        <Field name="statusIR7Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera7.Detail.Raw"/>
-        <Field name="statusIR8Detail" cdm="Health.NavigationCamera.IBIT.IR.Camera8.Detail.Raw"/>
-        <!--상세 BIT 필드는 원문 octet을 raw로 유지하며 임의의 bit extractor를 적용하지 않는다.-->
-        <!--statusCCDDetail: Bit5=IR 카메라 상태, Bit4=EO 카메라 상태, Bit3=IR 영상처리 전원, Bit2=EO 영상처리 전원, Bit1=입력전원, Bit0=전원용 보드 가용 상태. Bit6~7 reserved.-->
-        <!--statusPowerBoardDetail: Bit0=입력전원 상태, Bit1~7 reserved.-->
-        <!--statusEOMuxingBoardDetail/statusIRMuxingBoardDetail: Bit1=카메라 통신, Bit0=해당 MUX 보드 상태, Bit2~7 reserved.-->
-        <!--statusEOProcessingBoardDetail/statusIRProcessingBoardDetail: Bit1=MUX 통신, Bit0=해당 영상처리 보드 상태, Bit2~7 reserved.-->
-        <!--statusEO1Detail: Bit3=통신, Bit2=ISP, Bit1=센서, Bit0=가용 상태. statusEO2~8Detail은 원문에 개별 비트 설명이 없으므로 동일 구조를 임의 확정하지 않는다.-->
-        <!--statusIR1Detail: Bit3=셔터, Bit2=보드 온도, Bit1=센서, Bit0=가용 상태. statusIR2~8Detail은 원문에 개별 비트 설명이 없으므로 동일 구조를 임의 확정하지 않는다.-->
-        <!--IBIT 결과에는 commandID가 없어 명시적 요청 상관관계는 CommandStatusReport에서만 수행한다.-->
-      </Reply>
-    </ControlBinding>
-
-    <ControlBinding semantic_id="configureDisplayMode">
-      <DDSChannel topicName="RUSV::C2::RCU::CCDDisplayModeControlType" typeName="CCDDisplayModeControlType"/>
-      <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase" converter="BuildUSVMessageBase"/>
-      <!--Semantic의 EO/IR/화질 3개 값을 displayMode Bit0/Bit1/Bit2로 packing한다. sourceField는 Adapter가 참조할 Semantic CDM 목록을 '|'로 연결한 표현이다.-->
-      <DerivedField name="ccdDisplayModeControlStatus.displayMode"
-                    cdm="Control.NavigationCamera.DisplayMode.Packed"
-                    sourceField="Control.NavigationCamera.Display.EO|Control.NavigationCamera.Display.IR|Control.NavigationCamera.Display.Quality"
-                    converter="PackNavigationCameraDisplayMode"/>
-      <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" converter="UInt16"/>
-      <!--Bit0 EO: 0=OFF/1=ON, Bit1 IR: 0=OFF/1=ON, Bit2 Quality: 0=Normal/1=Low. Bit3~7은 reserved이나 원문에 송신 시 초기값 규칙이 없어 Semantic 입력으로 노출하지 않으며, reserved bit 처리 규칙은 Adapter/IDL 확인 전까지 TBD이다. 원격통제 CSV ACK=X이므로 Reply 없음.-->
-    </ControlBinding>
+    <ControlBinding semantic_id="configureDisplayMode"><DDSChannel topicName="RUSV::C2::RCU::CCDDisplayModeControlType" typeName="CCDDisplayModeControlType"/><DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/><PackedField name="ccdDisplayModeControlStatus.displayMode" width="8" defaultValue="0"><BitMember name="eoDisplay" cdm="Control.NavigationCamera.Display.EO.Mode" offset="0" width="1"><ValueMap><Map cdm="Control.NavigationCamera.Display.EO.Off" value="0"/><Map cdm="Control.NavigationCamera.Display.EO.On" value="1"/></ValueMap></BitMember><BitMember name="irDisplay" cdm="Control.NavigationCamera.Display.IR.Mode" offset="1" width="1"><ValueMap><Map cdm="Control.NavigationCamera.Display.IR.Off" value="0"/><Map cdm="Control.NavigationCamera.Display.IR.On" value="1"/></ValueMap></BitMember><BitMember name="quality" cdm="Control.NavigationCamera.Display.Quality.Mode" offset="2" width="1"><ValueMap><Map cdm="Control.NavigationCamera.Display.Quality.Normal" value="0"/><Map cdm="Control.NavigationCamera.Display.Quality.Low" value="1"/></ValueMap></BitMember></PackedField><DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/><!--Bit3~7 reserved는 defaultValue=0으로 송신한다. 원본 ACK=X이므로 Reply 없음.--></ControlBinding>
   </Controls>
-
-  <SensorProducts semantic_id="sensorProduct">
-    <ProductBinding semantic_id="navigationCameraVideo">
-      <!--원격통제소 전시용 영상: RTP, 30 Hz. IP/UDP/RTP Header와 Payload packetization 상세는 CSCI에 있으나 현재 RTPChannel 명세는 스트림 식별만 표현한다.-->
-      <RTPChannel/>
-    </ProductBinding>
-  </SensorProducts>
+  <SensorProducts semantic_id="sensorProduct"><ProductBinding semantic_id="navigationCameraVideo"><RTPChannel/></ProductBinding></SensorProducts>
 </SensorBinding>
