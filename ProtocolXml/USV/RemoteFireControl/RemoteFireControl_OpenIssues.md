@@ -1,0 +1,73 @@
+# RemoteFireControl Semantic/Binding 감사 및 Open Issues
+
+## 1. 범위
+
+- 대상 경계: 원격통제장치(RCU) ↔ 원격사격통제장치 CSCI(RCWS).
+- 근거: `원격사격통제장치 CSCI.csv`, `원격통제장치 CSCI.csv`, `공용 구조체.csv`, `공용 규칙.csv`, `공용 식별자 규칙.csv`.
+- 중앙통제장치 전용 상태/녹화 RTP 등 원통 직접 접점이 아닌 연동은 제외한다.
+- RCU 직접 RTP 영상은 SensorProduct로 유지한다.
+
+## 2. 이번 감사에서 확정/반영
+
+- 공용 식별자는 `Weapon=0x07 / RemoteFireControlSystem=0x01 / subEquipment=0x00`이다.
+- 공용 Control destination은 `System.Target.RemoteFireControl`로 OM/Adapter가 준비한다.
+- 원통 직접 Control 14개, Reply 20개, Monitor 3개, SensorProduct 1개를 대조하였다.
+- RCWS CBIT/PBIT/상세 상태의 raw enum 숫자를 Semantic에서 제거하고 Binding `ValueMap`으로 이동하였다.
+- 구동 자동지향, 카메라 종류, 수동 선보상 방향, Trigger mode, 사격/장전 mode, 메뉴 속도단계/SystemAction을 논리 `ValueSetProfile` + Binding `ValueMap`으로 정리하였다.
+- 이벤트/Boolean 제어는 `SourceValueMap`으로 declarative 변환하였다.
+- MenuConfig의 `displayIRW/displayIRT/patrolMode/calTrajectory`는 원문 송신 의미가 상태값과 반대이므로 `false→1 / true→0` SourceValueMap으로 기존 반전 converter를 대체하였다.
+- `EOIRAimConfigType.commandID`는 원문 특수 규칙에 따라 `System.Communication.LastReceivedCommandID`를 그대로 계승한다.
+- 원문 근거가 확인되는 RCWS primitive `dataType`을 보강하였으며 의도적 composite를 제외한 누락은 0건이다.
+- 기존 `BuildUSVMessageBase`, `UInt16`, `BooleanToInverted01` converter를 제거하였다.
+- PBIT/IBIT 및 CIPE/EOIR 지향·거리측정·메뉴 결과는 각 실제 물리 결과 메시지별 단일 Reply 구조를 유지하였다.
+
+## 3. Remaining TBD
+
+1. **`firingMode` raw 2/3 의미**
+   - 원문 Range는 0~3이나 직접 정의된 값은 0=안전, 1=사격뿐이다.
+   - 2/3의 의미가 확인되기 전까지 Semantic/ValueMap에 포함하지 않는다.
+
+2. **`turningAngle` 원문 Range 표기 이상**
+   - 원문 Range가 `0~360-180~180` 형태로 중첩/오염되어 있다.
+   - 실제 허용 선회각 범위는 원 CSCI/IDL 재확인이 필요하다.
+
+3. **ControlPanel joystick raw 값 ↔ 각도 변환**
+   - `height`/`turn`은 물리 raw long 0~65535로 정의되어 있고 비고에는 조이스틱 가동범위 -20~+20 deg가 기재되어 있다.
+   - raw 값과 각도의 변환 공식/중립값이 정의되지 않아 Semantic은 raw 입력 계약을 유지한다.
+
+4. **IBIT detail bitfield의 논리 해석**
+   - `drivingIBIT_Detail`, `surveillanceIBIT_Detail`, `strikeIBIT_Detail` 등은 세부 bitfield이다.
+   - bit별 polarity/상태 의미가 완전히 확정된 원본 근거가 확보되기 전까지 Reply 결과를 임의 분해하지 않고 Binding raw detail로 유지한다.
+
+5. **PBIT/IBIT Result correlation**
+   - 공용 요청에는 commandID가 있으나 전용 PBIT/IBIT 결과 Report에는 동일 commandID가 없다.
+   - CommandStatus ACK 이후 전용 결과를 어느 요청과 연결하는지 런타임 규칙 확인이 필요하다.
+
+6. **전용 결과 Report correlation**
+   - `CIPEAimStatusType`, `EOIRAimStatusType`, `DistanceMeasureReportType`, `MenuStatusType`에는 요청 commandID와 직접 연결할 식별자가 없다.
+   - 동시/연속 요청 시 결과 correlation 규칙 확인이 필요하다.
+
+7. **거리측정 특수값**
+   - `targetDistance`: 0=Unknown, 1~4000=m 유효값이다.
+   - UInt16의 4001~65535 값은 의미가 정의되지 않았다.
+   - Sentinel/Invalid를 최종 Semantic 공통 모델에서 어떻게 노출할지는 전역 후속 감사 대상이다.
+
+8. **No-driving zone -30 특수값 적용 범위**
+   - 원문은 `noDrivingZone1`에 -30 deg 설정 시 해당 구동제한구역을 설정하지 않는다고 명시한다.
+   - 동일 규칙이 zone2~12에도 적용되는지는 명시되지 않아 확대 적용하지 않는다.
+
+9. **`initZeroing` event reset 규칙**
+   - 0=초기, 1=영점 초기화는 확인되나 1 송신 후 자동으로 0으로 초기화해야 하는지 명시되지 않았다.
+
+10. **Menu SystemAction과 공용 Restart 중복**
+   - `SystemAction`: 0=None, 1=Shutdown, 2=Reboot가 원문에 존재하며 `2=Reboot`는 공용 `SystemRebootControlType`과 기능적으로 중복된다.
+   - 두 기능의 운용 우선순위/사용 조건은 원문 추가 확인 대상이며 현재는 둘 다 보존한다.
+
+11. **물리 오탈자 보존**
+   - 원문 `ControlPanalConfigType`, `cipeAming` 등은 실제 DDS/IDL 정합성을 위해 Binding 물리 이름을 그대로 유지한다.
+   - 실제 IDL에서 교정된 철자를 사용하는지는 IDL 확보 시 재확인한다.
+
+## 4. 현재 상태
+
+- 원통 직접 연동 범위의 Semantic/Binding 구조 정리와 선언형 변환은 완료하였다.
+- 남은 11건은 사용자 정책 선택사항이 아니라 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.
