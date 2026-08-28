@@ -1,140 +1,105 @@
-name: temporary PlatformController datatype migration
+name: temporary PlatformController final audit
 on:
   push:
     branches: [feature/usv-semantic-binding-audit]
 permissions:
   contents: write
 jobs:
-  migrate:
+  finalize:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feature/usv-semantic-binding-audit
-      - name: Apply CSCI-confirmed primitive datatypes
+      - name: Update audit documents
         shell: python
         run: |
           import re
-          p='ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml'
-          text=open(p,encoding='utf-8').read()
+          p='ProtocolXml/USV/PlatformController/PlatformController_OpenIssues.md'
+          s=open(p,encoding='utf-8').read()
+          old='''9. **[RESOLVED] DDS boolean wire type**
+   - 공통 `WireDataType`에 `Boolean`을 추가하였다.
+   - 원 CSCI/IDL에서 실제 DDS boolean으로 확인된 CBIT/환경상태 직접 Field 10개를 `dataType="Boolean"`으로 선언하였다.
+   - octet으로 정의된 ENV command와 bow-thruster enable 등은 기존 UInt8/SourceValueMap을 유지한다.
 
-          def expected(ctx, n):
-              # Composite/system fields are not primitive WireDataType targets.
-              if n in {'usvHeader','destination','vcuProcessorIBIT','vcuTmpProcessorIBIT'}:
-                  return None
+10. **일부 선체 상태/IBIT 상세 primitive dataType**
+   - 선체제어 CSCI의 대형 상태/IBIT 구조체 중 현재 확보 근거에서 primitive type을 직접 재확인하지 못한 필드는 BindingOnly 또는 dataType 미지정으로 유지한다.
+   - 전역 primitive dataType 감사 시 원 선체제어 CSCI/IDL을 기준으로 추가 보강해야 한다.'''
+          new='''9. **[RESOLVED] PlatformController Boolean wire 재감사**
+   - `선체제어장치 CSCI.csv`를 직접 재확인한 결과 PlatformController 원문에는 primitive `boolean` 필드가 없다.
+   - 기존에 `Boolean`으로 선언했던 `fireDetected`, `leakDetected`, `flowAnomalyDetected`, `fireSensor1~3Alarm`, `autoExtinguisher1~4Active` 10개는 모두 원문 `octet`이므로 `UInt8`로 정정하였다.
+   - 이 필드들의 Semantic Boolean 의미는 유지하되, wire primitive type은 원문 `octet`을 따른다.
 
-              if ctx in {'PropulsionCBITReportType','PropulsionPBITReportType','AccessoriesCBITReportType','AccessoriesPBITReportType','SubsystemCBITReportType','SubsystemPBITReportType','SPCECBITReportType','SPCEPBITReportType'}:
-                  return 'UInt8'
-              if ctx=='ElectricalCBITReportType':
-                  return 'Int64' if n=='powerStatus' else 'UInt8'
-              if ctx=='ElectricalPBITReportType':
-                  return 'UInt64' if n=='powerStatus' else 'UInt8'
+10. **[RESOLVED] 선체 상태/PBIT/IBIT primitive dataType 전수 감사**
+   - `선체제어장치 CSCI.csv`의 각 DDS message/type별 필드 정의를 기준으로 기존 미지정 primitive field의 `dataType`을 전수 보강하였다.
+   - Engine/WaterJet/BowThruster/Power/Battery/Generator/Environment/Wind/Fire/Leak/Flow/Stabilizer/Interceptor/SeaWaterConditioner/TowingDevice/SPCE IBIT와 CBIT/PBIT, Propulsion/ENV/Power HeartBeat, Distress/Wind/SeaWaterConditioner 상태를 원문 타입대로 반영하였다.
+   - `vcuProcessorIBIT`, `vcuTmpProcessorIBIT`는 원문 `ProcessorIBIT` 복합 구조체이므로 primitive `dataType`을 부여하지 않는다.
+   - 최종 감사에서 composite/system field를 제외한 primitive `dataType` 미지정은 0건이며 XSD 검증을 통과하였다.'''
+          if old not in s: raise SystemExit('Platform OpenIssues target block not found')
+          s=s.replace(old,new)
+          open(p,'w',encoding='utf-8').write(s)
 
-              if ctx=='EngineIBITReportType':
-                  if n=='engineStatus' or n.endswith(('EngineLoad','EngineTorque','TransGear')): return 'UInt8'
-                  if n.endswith('TotalEngineHours'): return 'UInt64'
-                  if n.endswith('AlternatorPotential') or n.endswith('FuelRate'): return 'Int16'
-                  return 'UInt16'
-              if ctx=='WaterJetIBITReportType': return 'UInt8'
-              if ctx=='BowThrusterIBITReportType':
-                  return 'UInt16' if n in {'bowThrusterTemperature','bowThrusterMotorOperationTime'} else 'UInt8'
-              if ctx=='PowerIBITReportType':
-                  if n=='pduStatus': return 'UInt8'
-                  if n=='powerStatus': return 'UInt64'
-                  return 'UInt16'
-              if ctx=='BatteryIBITReportType': return 'UInt8'
-              if ctx=='GeneratorIBITReportType':
-                  if n.endswith('OperatingHours'): return 'UInt32'
-                  if n.endswith(('GeneratorAPhaseACFrequency','SystemBatteryVoltage')): return 'UInt16'
-                  if n.endswith(('GeneratorAPhaseRealPower','GeneratorAPhaseReactivePower')): return 'Int32'
-                  return 'UInt8'
-              if ctx in {'EnvironmentIBITReportType','WindSensorIBITReportType','FireDetectorIBITReportType','LeakDetectorIBITReportType','FlowMeterIBITReportType','SeaWaterConditionerIBITReportType','TowingDeviceIBITReportType'}:
-                  return 'UInt8'
-              if ctx=='StabilizerIBITReportType':
-                  if n in {'boatRollAngle','seakeeperAngle'}: return 'Int16'
-                  if n in {'flywheelSpeed','enclosure'}: return 'UInt16'
-                  return 'UInt8'
-              if ctx=='InterceptorIBITReportType':
-                  return 'Float32' if n=='targetLIST' else 'UInt8'
-              if ctx=='SPCEIBITReportType': return 'UInt8'
-
-              if ctx=='PropulsionHeartBeatReportType':
-                  if n.endswith('AlternatorPotential') or n=='fuelRemain': return 'Int16'
-                  if n.endswith('CurrentSteering'): return 'Float32'
-                  return 'UInt16'
-              if ctx=='ENVHeartBeatReportType':
-                  if n in {'cctvStateMask','environmentWarning'} or n.startswith('fireSensor') or n.startswith('autoExtinguisher'): return 'UInt8'
-                  if n.startswith('flowMeter'): return 'UInt16'
-                  if n.startswith('leakSensor'): return 'Float32'
-              if ctx=='PowerHeartBeatReportType':
-                  if n in {'portONStatus','starboardONStatus'}: return 'UInt64'
-                  if n in {'pduTemp','powerSourceStatus','pduSourceStatus','batteryChargeStatus','batteryLevel','batteryFaultStatus'}: return 'UInt8'
-                  return 'UInt16'
-              if ctx=='DistressReportType' and n in {'latitude','longitude','altitude'}: return 'Float64'
-              if ctx=='WindReportType': return 'Float64'
-              if ctx=='SeaWaterConditionerStatusReportType': return 'Float32'
-              return None
-
-          out=[]; ctx=None; changes=[]
-          for line in text.splitlines(True):
-              ch=re.search(r'<DDSChannel\b[^>]*\btypeName="([^"]+)"',line)
-              if ch: ctx=ch.group(1)
-              # Only the opening Field/FixedField/DerivedField tag is modified.
-              fm=re.search(r'<(Field|FixedField|DerivedField)\b[^>]*>',line)
-              if fm:
-                  full=fm.group(0)
-                  nm=re.search(r'\bname="([^"]+)"',full)
-                  if nm:
-                      name=nm.group(1); leaf=name.split('.')[-1]
-                      want=expected(ctx,leaf)
-                      if want:
-                          dm=re.search(r'\bdataType="([^"]+)"',full)
-                          old=dm.group(1) if dm else None
-                          if old!=want:
-                              if dm:
-                                  new=re.sub(r'\bdataType="[^"]+"',f'dataType="{want}"',full,count=1)
-                              elif full.endswith('/>'):
-                                  new=full[:-2]+f' dataType="{want}"/>'
-                              else:
-                                  new=full[:-1]+f' dataType="{want}">'
-                              line=line[:fm.start()]+new+line[fm.end():]
-                              changes.append((ctx,name,old,want))
-              out.append(line)
-          open(p,'w',encoding='utf-8',newline='').write(''.join(out))
-          print('CHANGES',len(changes))
-          print('BOOLEAN_TO_UINT8',sum(1 for x in changes if x[2]=='Boolean' and x[3]=='UInt8'))
-
-          import xml.etree.ElementTree as ET
-          ns='{http://lignex1.com/mcmc2/umsSchema}'
-          root=ET.parse(p).getroot()
-          booleans=[]; unresolved=[]
-          allowed_untyped={'usvHeader','destination','vcuProcessorIBIT','vcuTmpProcessorIBIT'}
-          for el in root.iter():
-              tag=el.tag.split('}')[-1]
-              if tag not in {'Field','FixedField','DerivedField'}: continue
-              name=el.get('name','')
-              if el.get('dataType')=='Boolean': booleans.append(name)
-              if not el.get('dataType') and name not in allowed_untyped:
-                  unresolved.append(name)
-          print('PLATFORM_BOOLEAN_COUNT',len(booleans),booleans)
-          print('UNTYPED_NONCOMPOSITE',len(unresolved),unresolved)
-          if booleans: raise SystemExit('PlatformController CSCI has no primitive boolean fields')
-          if unresolved: raise SystemExit('non-composite Field remains without dataType')
-      - name: XSD validate
+          p='ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md'
+          d=open(p,encoding='utf-8').read()
+          reps={
+            '실제 DDS/IDL boolean 직접 필드 21개 반영: ElectroOptical 8, ElectroOpticalProcessor 1, PlatformController 10, NetworkAbstraction 2':
+            '실제 DDS/IDL boolean 직접 필드 11개 반영: ElectroOptical 8, ElectroOpticalProcessor 1, NetworkAbstraction 2. PlatformController는 원 CSCI 재감사에서 직접 boolean 0개로 확인되어 기존 10개를 UInt8(octet)로 정정',
+            '최종 감사에서 `usvHeader` / `destination` composite를 제외하고 남은 primitive `dataType` 미지정은 총 **419건**이다.':
+            '최종 감사에서 `usvHeader` / `destination` 및 `ProcessorIBIT` 같은 composite를 제외하고 남은 primitive `dataType` 미지정은 총 **0건**이다.',
+            '| PlatformController | 419 | 실제 DDS boolean 10개 해결; 나머지 legacy 상태/PBIT/IBIT primitive type 근거 부족 |':
+            '| PlatformController | 0 | `선체제어장치 CSCI.csv` 전수 재확인으로 상태/PBIT/IBIT/Heartbeat primitive type 반영; 기존 Boolean 10개는 원문 octet에 따라 UInt8로 정정 |',
+            '| **합계** | **419** |  |':'| **합계** | **0** |  |',
+            '이 419건은 XSD 오류가 아니다. 현재 XSD에서 `dataType` 속성 자체는 선택적이다.\n\n다만 프로젝트 설계 규칙상 확인 가능한 primitive type은 선언해야 하므로, **추가 CSCI / IDL 근거 확보 후 보강할 공통 후속항목**으로 관리한다.':
+            '현재 14개 USV 장치의 source-confirmed primitive field는 모두 `dataType`이 선언되었다. `usvHeader`, `destination`, `ProcessorIBIT` 등 복합 구조체는 primitive `WireDataType` 대상이 아니므로 예외로 유지한다.',
+            '### USV-COMMON-04 — 원문 부족 primitive wire dataType\n\n- 총 미지정: 419건\n- Boolean schema gap은 해결되었고, 남은 항목은 CSCI/IDL primitive 근거 미확보 항목\n- 원문 없이 추정하여 채우지 않는다.':
+            '### USV-COMMON-04 — 원문 부족 primitive wire dataType — **RESOLVED (2026-08-28)**\n\n- NavigationRadar 및 NetworkAbstraction의 잔여 type은 장치 CSCI/공용 구조체에서 확인하여 해결하였다.\n- PlatformController 419건은 `선체제어장치 CSCI.csv`를 message/type별로 전수 재감사하여 primitive type을 확정하였다.\n- 최종 primitive `dataType` 미지정: 0건. 복합 구조체에는 primitive type을 강제하지 않는다.'
+          }
+          for a,b in reps.items():
+              if a not in d: raise SystemExit('Integrated audit target not found: '+a[:80])
+              d=d.replace(a,b)
+          if '419' in d: raise SystemExit('stale 419 remains in integrated audit')
+          open(p,'w',encoding='utf-8').write(d)
+      - name: Validate all USV XML and datatype audit
         run: |
           python -m pip install -q lxml
           python - <<'PY'
           from lxml import etree
-          schema=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
-          doc=etree.parse('ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml')
-          schema.assertValid(doc)
-          print('XSD PASS')
+          from pathlib import Path
+          import re
+          sx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd'))
+          bx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          sem=list(Path('ProtocolXml/USV').glob('*/*Semantic.xml'))
+          bind=list(Path('ProtocolXml/USV').glob('*/*Binding.xml'))
+          for p in sem: sx.assertValid(etree.parse(str(p)))
+          for p in bind: bx.assertValid(etree.parse(str(p)))
+          print('XSD PASS semantic',len(sem),'binding',len(bind))
+          txt=''.join(p.read_text(encoding='utf-8') for p in bind)
+          print('CONVERTER_COUNT',len(re.findall(r'converter=',txt)))
+          if re.search(r'converter=',txt): raise SystemExit('converter reintroduced')
+
+          p=Path('ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml')
+          root=etree.parse(str(p)).getroot()
+          ns='{http://lignex1.com/mcmc2/umsSchema}'
+          allowed={'usvHeader','destination','vcuProcessorIBIT','vcuTmpProcessorIBIT'}
+          missing=[]; bools=[]; composites=[]
+          for el in root.iter():
+              tag=etree.QName(el).localname
+              if tag not in {'Field','FixedField','DerivedField'}: continue
+              n=el.get('name','')
+              if el.get('dataType')=='Boolean': bools.append(n)
+              if not el.get('dataType'):
+                  if n in allowed: composites.append(n)
+                  else: missing.append(n)
+          print('PLATFORM_PRIMITIVE_MISSING',len(missing),missing)
+          print('PLATFORM_DIRECT_BOOLEAN',len(bools),bools)
+          print('PLATFORM_UNTYPED_COMPOSITE_SYSTEM',len(composites))
+          if missing or bools: raise SystemExit('Platform datatype audit failed')
           PY
-      - name: Commit migration
+      - name: Commit audit docs
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add ProtocolXml/USV/PlatformController/PlatformControllerBinding.xml
-          if git diff --cached --quiet; then echo 'No changes'; exit 0; fi
-          git commit -m 'Resolve PlatformController primitive datatypes from CSCI'
+          git add ProtocolXml/USV/PlatformController/PlatformController_OpenIssues.md ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md
+          if git diff --cached --quiet; then echo 'No documentation changes'; exit 0; fi
+          git commit -m 'Finalize PlatformController source datatype audit'
           git push origin HEAD:feature/usv-semantic-binding-audit
