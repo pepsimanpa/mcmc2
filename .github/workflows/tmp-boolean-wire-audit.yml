@@ -1,0 +1,47 @@
+name: temporary Boolean wire audit
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Audit Boolean semantic to direct binding fields
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          NS={'u':'http://lignex1.com/mcmc2/umsSchema'}
+          roots=['ProtocolXml/USV','ProtocolXml/AUV','ProtocolXml/MDV','ProtocolXml/EMDW']
+          for root in roots:
+              print('\n###', root)
+              sems=list(Path(root).rglob('*Semantic.xml'))
+              for sp in sems:
+                  try: sroot=etree.parse(str(sp)).getroot()
+                  except Exception: continue
+                  bools={e.get('cdm'):e.get('id') for e in sroot.xpath('.//u:BooleanSpec',namespaces=NS) if e.get('cdm')}
+                  bools.update({e.get('cdm'): '(profile)' for e in sroot.xpath('.//u:BooleanProfile',namespaces=NS) if e.get('cdm')})
+                  if not bools: continue
+                  print('SEM', sp, 'boolean_cdms=', len(bools))
+                  # bindings in same directory (AUV may have multiple bindings)
+                  for bp in sp.parent.glob('*Binding.xml'):
+                      broot=etree.parse(str(bp)).getroot()
+                      direct=[]
+                      typed=[]
+                      for e in broot.xpath('.//u:Field|.//u:FixedField|.//u:DerivedField',namespaces=NS):
+                          c=e.get('cdm')
+                          sf=e.get('sourceField')
+                          if c in bools or sf in bools:
+                              item=(e.tag.split('}')[-1],e.get('name'),c,sf,e.get('dataType'))
+                              (typed if e.get('dataType') else direct).append(item)
+                      if direct or typed:
+                          print(' BIND', bp)
+                          for x in direct: print('  MISSING', x)
+                          for x in typed: print('  TYPED', x)
+          PY
