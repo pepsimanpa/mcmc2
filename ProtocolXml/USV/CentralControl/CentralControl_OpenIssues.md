@@ -25,8 +25,9 @@
 - `AuthorityControl.destination`이 3-byte `DestinationType`인 것은 확정되지만 각 command별 실제 값 결정 규칙은 확인되지 않아 BindingOnly/TBD로 유지한다.
 - `voiceRxControl`은 필드명/설명이 '음성수신명령'인데 비고의 raw 1 설명은 '송신'으로 적혀 있다. 현재는 raw `UInt8`만 보존하고 논리 `ValueMap`은 만들지 않는다.
 - 기존 `MonitorBindingDDS/ControlBindingDDS/Channel` → 공통 `MonitorBinding/ControlBinding/DDSChannel`, CommandStatus 처리상태, OperationMode 0~7 독립 Control, Authority command 0~4 독립 Control, Wireless Preset PackedField, VHF/Volume/Squelch/영상분배 구조는 원문 재대조 후 그대로 유지한다.
+- 중앙통제 CSCI 재심층 감사에서 `ControlCommandReportType` field 행의 `#REF!`는 동일 메시지 DDS 헤더 행의 Topic/Type과 직접 정의된 `controlCommand` payload로 복원 가능함을 확인하여 인터페이스 TBD에서 제외하였다.
 
-## 3. 중앙통제 고유 Remaining TBD — 8개
+## 3. 중앙통제 고유 Remaining TBD / Resolved — 미해결 7개
 
 1. **AuthorityControl destination / 비사용 필드 초기화 규칙**
    - `destination`의 물리 구조가 `DestinationType(3 bytes)`인 것은 확정이다.
@@ -56,9 +57,9 @@
    - 필드명/설명은 '음성수신명령'이나 비고는 `0=중지, 1=송신`이다.
    - raw 0/1은 보존하되 raw 1의 논리 의미를 `Receive/Enable/Transmit` 중 하나로 추정하지 않는다.
 
-7. **`ControlCommandReportType` 원본 `#REF!`**
-   - `controlCommand` 필드와 값 의미(0=USV, 1=고정형, 2=이동형, 3=출입항, 4=정비용 노트북)는 식별 가능하다.
-   - 주변 source/type 셀의 `#REF!`는 원본 결함으로 남는다.
+7. **[RESOLVED] `ControlCommandReportType` 원본 `#REF!`**
+   - field 행의 Topic/Type 위치에는 `#REF!`가 남아 있지만, 동일 메시지 블록의 DDS 헤더 행에 Topic `RUSV::C2::MCE::ControlCommandReportType`이 직접 기재되어 있고 Type은 CSV 줄바꿈으로 분리된 `ControlComman` + `dReportType`을 이어 `ControlCommandReportType`으로 식별할 수 있다.
+   - `controlCommand` 필드도 `octet`이며 0=USV, 1=고정형, 2=이동형, 3=출입항, 4=정비용 노트북이 직접 정의되어 있다. 현재 Binding의 Topic/Type/ValueMap은 이 근거와 일치하므로 `#REF!`는 인터페이스 미확정이 아니라 CSV export/셀 참조 결함으로 종료한다.
 
 8. **`operationalStateUSV` 2~7 의미**
    - 원문 Range는 0~7이나 직접 확인된 의미는 0=정상, 1=비정상 경고뿐이다.
@@ -74,4 +75,4 @@
 - 중앙통제 Semantic/Binding의 구조 방향은 원문과 정합한다.
 - HeartBeat 하위 4개 enum raw code 미확정 이슈는 이번 원문 재검토로 **해소**하였다.
 - 원문 직접 근거가 있는 primitive `dataType`, ValueMap, ProcessorIBIT 범위, Semantic 논리명 보강을 반영하였다.
-- 남은 8개 항목은 설계자가 임의 결정할 사항이 아니라 추가 원문/IDL/구현 근거가 필요한 비차단 TBD이다.
+- 중앙통제 CSCI 재심층 감사로 `ControlCommandReportType #REF!`는 CSV export 결함으로 해소하였다. 미해결 7개 항목은 설계자가 임의 결정할 사항이 아니라 추가 원문/IDL/구현 근거가 필요한 비차단 TBD이다.
