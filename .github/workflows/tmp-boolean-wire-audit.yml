@@ -16,30 +16,28 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          from lxml import etree
-          NS={'u':'http://lignex1.com/mcmc2/umsSchema'}
+          import xml.etree.ElementTree as ET
+          ns='http://lignex1.com/mcmc2/umsSchema'
+          q=lambda x:f'{{{ns}}}{x}'
           roots=['ProtocolXml/USV','ProtocolXml/AUV','ProtocolXml/MDV','ProtocolXml/EMDW']
           for root in roots:
               print('\n###', root)
-              sems=list(Path(root).rglob('*Semantic.xml'))
-              for sp in sems:
-                  try: sroot=etree.parse(str(sp)).getroot()
+              for sp in Path(root).rglob('*Semantic.xml'):
+                  try: sroot=ET.parse(sp).getroot()
                   except Exception: continue
-                  bools={e.get('cdm'):e.get('id') for e in sroot.xpath('.//u:BooleanSpec',namespaces=NS) if e.get('cdm')}
-                  bools.update({e.get('cdm'): '(profile)' for e in sroot.xpath('.//u:BooleanProfile',namespaces=NS) if e.get('cdm')})
+                  bools={e.get('cdm'):e.get('id') for e in sroot.iter(q('BooleanSpec')) if e.get('cdm')}
+                  bools.update({e.get('cdm'):'(profile)' for e in sroot.iter(q('BooleanProfile')) if e.get('cdm')})
                   if not bools: continue
                   print('SEM', sp, 'boolean_cdms=', len(bools))
-                  # bindings in same directory (AUV may have multiple bindings)
                   for bp in sp.parent.glob('*Binding.xml'):
-                      broot=etree.parse(str(bp)).getroot()
-                      direct=[]
-                      typed=[]
-                      for e in broot.xpath('.//u:Field|.//u:FixedField|.//u:DerivedField',namespaces=NS):
-                          c=e.get('cdm')
-                          sf=e.get('sourceField')
-                          if c in bools or sf in bools:
-                              item=(e.tag.split('}')[-1],e.get('name'),c,sf,e.get('dataType'))
-                              (typed if e.get('dataType') else direct).append(item)
+                      broot=ET.parse(bp).getroot()
+                      direct=[]; typed=[]
+                      for tag in ('Field','FixedField','DerivedField'):
+                          for e in broot.iter(q(tag)):
+                              c=e.get('cdm'); sf=e.get('sourceField')
+                              if c in bools or sf in bools:
+                                  item=(tag,e.get('name'),c,sf,e.get('dataType'))
+                                  (typed if e.get('dataType') else direct).append(item)
                       if direct or typed:
                           print(' BIND', bp)
                           for x in direct: print('  MISSING', x)
