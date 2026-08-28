@@ -1,0 +1,435 @@
+name: Temporary Lidar Network RCWS Refine
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/xml-refine-lidar-network-rcws-temp.yml']
+permissions:
+  contents: write
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+      - run: python -m pip install lxml
+      - name: Refine XML declaratively
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re, copy, sys
+
+          NSURI='http://lignex1.com/mcmc2/umsSchema'
+          NS={'u':NSURI}
+          Q=lambda x:f'{{{NSURI}}}{x}'
+          XSI='{http://www.w3.org/2001/XMLSchema-instance}schemaLocation'
+          root=Path('ProtocolXml')
+          devices=['Lidar','NetworkAbstraction','RemoteFireControl']
+
+          def own_indent(e):
+              t=e.tail or ''
+              if '\n' in t: return t.rsplit('\n',1)[1]
+              p=e.getparent()
+              if p is None: return ''
+              pt=p.text or ''
+              if '\n' in pt: return pt.rsplit('\n',1)[1][:-2] if len(pt.rsplit('\n',1)[1])>=2 else ''
+              return '  '
+
+          def add_child(parent, child):
+              oi=own_indent(parent)
+              ci=oi+'  '
+              if len(parent)==0 and not (parent.text or '').strip(): parent.text='\n'+ci
+              elif len(parent)>0:
+                  last=parent[-1]
+                  if last.tail is None: last.tail='\n'+ci
+              child.tail='\n'+oi
+              parent.append(child)
+
+          def val_name(cdm):
+              parts=cdm.split('.')
+              last=parts[-1] if parts else 'Value'
+              if re.fullmatch(r'\d+',last):
+                  last=(parts[-2] if len(parts)>1 else 'Value')+last
+              return last.replace('-','_') or 'Value'
+
+          # Capture numeric semantic maps before removing raw values.
+          sem_maps={}
+          for d in devices:
+              sp=root/f'USV/{d}/{d}Semantic.xml'
+              tree=etree.parse(str(sp)); r=tree.getroot()
+              r.set(XSI, f'{NSURI} ../../XSD/CommonSpecSchema.xsd')
+              maps={}
+              for vs in tree.xpath('//u:ValueSetSpec',namespaces=NS):
+                  c=vs.get('cdm')
+                  if not c: continue
+                  vals=[]
+                  for v in vs.xpath('./u:Values/u:Value',namespaces=NS):
+                      txt=(v.text or '').strip()
+                      if txt and re.fullmatch(r'[-+]?\d+(?:\.\d+)?',txt) and v.get('cdm'):
+                          vals.append((val_name(v.get('cdm')),v.get('cdm'),txt))
+                  if vals: maps[c]=vals
+              sem_maps[d]=maps
+              # Semantic raw numeric enum -> logical name/cdm.
+              for v in tree.xpath('//u:Value',namespaces=NS):
+                  txt=(v.text or '').strip()
+                  c=v.get('cdm')
+                  if txt and c and re.fullmatch(r'[-+]?\d+(?:\.\d+)?',txt):
+                      if v.get('name') is None: v.set('name',val_name(c))
+                      v.text=None
+              tree.write(str(sp),encoding='UTF-8',xml_declaration=True,pretty_print=False)
+
+          # Explicit logical control enums that had generic Profile semantics.
+          control_maps={
+            'NetworkAbstraction':{
+              'Communication.Channel.Identifier':[
+                ('Wireless','Communication.Channel.Wireless','0'),('Satellite','Communication.Channel.Satellite','1')],
+            },
+            'RemoteFireControl':{
+              'Control.RCWS.Driving.AutoOrientationAction':[
+                ('Initial','Control.RCWS.Driving.AutoOrientationAction.Initial','0'),
+                ('AutoAim','Control.RCWS.Driving.AutoOrientationAction.AutoAim','1'),
+                ('SaveCurrentAngle','Control.RCWS.Driving.AutoOrientationAction.SaveCurrentAngle','2')],
+              'Control.RCWS.Camera.Type':[
+                ('Day','Control.RCWS.Camera.Type.Day','0'),('IRWide','Control.RCWS.Camera.Type.IRWide','1'),('IRTele','Control.RCWS.Camera.Type.IRTele','2')],
+              'Control.RCWS.Contact.ManualLead.HorizontalChange':[
+                ('Initial','Control.RCWS.Contact.ManualLead.HorizontalChange.Initial','0'),('Right','Control.RCWS.Contact.ManualLead.HorizontalChange.Right','1'),('Left','Control.RCWS.Contact.ManualLead.HorizontalChange.Left','2')],
+              'Control.RCWS.Contact.ManualLead.VerticalChange':[
+                ('Initial','Control.RCWS.Contact.ManualLead.VerticalChange.Initial','0'),('Up','Control.RCWS.Contact.ManualLead.VerticalChange.Up','1'),('Down','Control.RCWS.Contact.ManualLead.VerticalChange.Down','2')],
+              'Control.RCWS.Weapon.TriggerMode':[
+                ('FullAuto','Weapon.RCWS.TriggerMode.FullAuto','0'),('Single','Weapon.RCWS.TriggerMode.Single','1'),('ThreeRoundBurst','Weapon.RCWS.TriggerMode.ThreeRoundBurst','2'),('FiveRoundBurst','Weapon.RCWS.TriggerMode.FiveRoundBurst','3'),('TenRoundBurst','Weapon.RCWS.TriggerMode.TenRoundBurst','4')],
+              'Control.RCWS.ControlPanel.FiringMode':[
+                ('Safe','Weapon.RCWS.FiringMode.Safe','0'),('Fire','Weapon.RCWS.FiringMode.Fire','1')],
+              'Control.RCWS.ControlPanel.BulletLoadingMode':[
+                ('RemoteControl','Weapon.RCWS.BulletLoadingMode.RemoteControl','0'),('Maintenance','Weapon.RCWS.BulletLoadingMode.Maintenance','1')],
+              'Control.RCWS.Menu.SpeedLevel':[
+                ('Low','Weapon.RCWS.Menu.SpeedLevel.Low','0'),('Medium','Weapon.RCWS.Menu.SpeedLevel.Medium','1'),('High','Weapon.RCWS.Menu.SpeedLevel.High','2'),('Max','Weapon.RCWS.Menu.SpeedLevel.Max','3')],
+              'Control.RCWS.Menu.SystemAction':[
+                ('None','Control.RCWS.Menu.SystemAction.None','0'),('Shutdown','Control.RCWS.Menu.SystemAction.Shutdown','1'),('Reboot','Control.RCWS.Menu.SystemAction.Reboot','2')],
+            }
+          }
+
+          def replace_profile_with_valueset(spath, mapping):
+              tree=etree.parse(str(spath))
+              changed=False
+              for p in tree.xpath('//u:Profile',namespaces=NS):
+                  c=p.get('cdm')
+                  if c not in mapping: continue
+                  n=etree.Element(Q('ValueSetProfile')); n.set('cdm',c)
+                  vals=etree.SubElement(n,Q('Values'))
+                  for name,cdm,raw in mapping[c]:
+                      v=etree.SubElement(vals,Q('Value')); v.set('name',name); v.set('cdm',cdm)
+                  n.tail=p.tail
+                  p.getparent().replace(p,n); changed=True
+              if changed: tree.write(str(spath),encoding='UTF-8',xml_declaration=True,pretty_print=False)
+
+          for d,m in control_maps.items():
+              replace_profile_with_valueset(root/f'USV/{d}/{d}Semantic.xml',m)
+
+          # Semantic helper inventories after profile conversion.
+          sem_info={}
+          for d in devices:
+              tree=etree.parse(str(root/f'USV/{d}/{d}Semantic.xml'))
+              vals={}
+              for vs in tree.xpath('//u:ValueSetSpec',namespaces=NS):
+                  c=vs.get('cdm'); arr=[]
+                  if c:
+                      for v in vs.xpath('./u:Values/u:Value',namespaces=NS):
+                          if v.get('cdm'): arr.append((v.get('name') or val_name(v.get('cdm')),v.get('cdm')))
+                      if arr: vals[c]=arr
+              # add control maps as logical enum contracts
+              for c,arr in control_maps.get(d,{}).items(): vals[c]=[(a,b) for a,b,_ in arr]
+              qty={}
+              for q in tree.xpath('//u:QuantitySpec',namespaces=NS):
+                  c=q.get('cdm')
+                  if c and c not in qty: qty[c]=q
+              bools=set(tree.xpath('//u:BooleanSpec/@cdm',namespaces=NS))
+              sem_info[d]=(vals,qty,bools)
+
+          def add_valuemap(e, arr):
+              if e.find(Q('ValueMap')) is not None: return
+              vm=etree.Element(Q('ValueMap'))
+              for item in arr:
+                  if len(item)==3: name,cdm,raw=item
+                  else: continue
+                  m=etree.SubElement(vm,Q('Map')); m.set('cdm',cdm); m.set('value',str(raw))
+              add_child(e,vm)
+
+          def replace_with_packed(e,offset,width,arr):
+              p=e.getparent(); idx=p.index(e)
+              pf=etree.Element(Q('PackedField')); pf.set('name',e.get('name')); pf.set('width','8'); pf.set('defaultValue','0')
+              bm=etree.Element(Q('BitMember')); bm.set('name',e.get('name')+'Value');
+              if e.get('cdm'): bm.set('cdm',e.get('cdm'))
+              bm.set('offset',str(offset)); bm.set('width',str(width))
+              vm=etree.Element(Q('ValueMap'))
+              for _,cdm,raw in arr:
+                  m=etree.SubElement(vm,Q('Map')); m.set('cdm',cdm); m.set('value',str(raw))
+              bm.append(vm); pf.append(bm); pf.tail=e.tail
+              oi=own_indent(e); pf.text='\n'+oi+'  '; bm.text='\n'+oi+'    '; vm.tail='\n'+oi+'  '; bm.tail='\n'+oi
+              p[idx]=pf
+              return pf
+
+          # Prepared destination source names for common targeted commands.
+          destinations={
+            'Lidar': {k:'System.Target.Lidar' for k in ['startIntegration','restartSystem','requestIbit','requestPbit']},
+            'RemoteFireControl': {k:'System.Target.RemoteFireControl' for k in ['startIntegration','restartSystem','requestIbit','requestPbit']},
+            'NetworkAbstraction': {
+              'startControlStationIntegration':'System.Target.NetworkAbstraction.ControlStation',
+              'startUsvIntegration':'System.Target.NetworkAbstraction.USV',
+              'requestNetworkIntegrationControlStationPbit':'System.Target.NetworkAbstraction.ControlStation',
+              'requestNetworkIntegrationUsvPbit':'System.Target.NetworkAbstraction.USV',
+              'requestNetworkIntegrationControlStationIbit':'System.Target.NetworkAbstraction.ControlStation',
+              'requestNetworkIntegrationUsvIbit':'System.Target.NetworkAbstraction.USV',
+              'requestLBandControlStationGroupPbit':'System.Target.NetworkAbstraction.LBandControlStationGroup',
+              'requestLBandControlStationGroupIbit':'System.Target.NetworkAbstraction.LBandControlStationGroup',
+              'requestLBandTerminalPbit':'System.Target.NetworkAbstraction.LBandTerminal',
+              'requestLBandTerminalIbit':'System.Target.NetworkAbstraction.LBandTerminal',
+              'requestAuxControlPbit':'System.Target.NetworkAbstraction.AuxControl',
+              'requestAuxControlIbit':'System.Target.NetworkAbstraction.AuxControl',
+              'requestGeoSatControlStationPbit':'System.Target.NetworkAbstraction.GeoSatControlStation',
+              'requestGeoSatControlStationIbit':'System.Target.NetworkAbstraction.GeoSatControlStation',
+              'requestGeoSatUsvPbit':'System.Target.NetworkAbstraction.GeoSatUSV',
+              'requestGeoSatUsvIbit':'System.Target.NetworkAbstraction.GeoSatUSV',
+            }
+          }
+
+          # RCWS outgoing BooleanProfile CDMs: declarative false/true -> 0/1.
+          rcws_bool_control={
+            'Control.RCWS.Driving.ProtectedModeEvent','Control.RCWS.Camera.ZoomInEvent','Control.RCWS.Camera.ZoomOutEvent',
+            'Control.RCWS.Contact.SelectEvent','Control.RCWS.Contact.LeftEvent','Control.RCWS.Contact.RightEvent',
+            'Control.RCWS.Contact.ManualLeadCompensationToggleEvent','Control.RCWS.Contact.CrossHairInitializeEvent','Control.RCWS.Contact.DistanceMeasureEvent',
+            'Control.RCWS.Weapon.BackStopEvent','Control.RCWS.ControlPanel.AutoDetectToggleEvent','Control.RCWS.ControlPanel.ObjectTrackingToggleEvent',
+            'Control.RCWS.ControlPanel.BackStopEvent','Control.RCWS.ControlPanel.AutoReloadEvent','Control.RCWS.ControlPanel.EmergencyStop',
+            'Control.RCWS.Fire.Enabled','Control.RCWS.Menu.Stabilization.ToggleEvent','Control.RCWS.Menu.ZeroingMode.Enabled',
+            'Control.RCWS.Menu.ZeroingInitializeEvent','Control.RCWS.Menu.OverlayLOS.Enabled'
+          }
+
+          def replace_field_bool_source(e,inverted=False):
+              if e.tag==Q('DerivedField'):
+                  e.attrib.pop('converter',None); e.set('dataType','UInt8')
+                  if not e.get('sourceField'): e.set('sourceField',e.get('cdm'))
+                  if e.find(Q('SourceValueMap')) is None:
+                      svm=etree.Element(Q('SourceValueMap'))
+                      for sv,wv in [('false','1' if inverted else '0'),('true','0' if inverted else '1')]:
+                          m=etree.SubElement(svm,Q('Map')); m.set('sourceValue',sv); m.set('value',wv)
+                      add_child(e,svm)
+                  return e
+              p=e.getparent(); idx=p.index(e)
+              n=etree.Element(Q('DerivedField'))
+              for k,v in e.attrib.items():
+                  if k!='converter': n.set(k,v)
+              n.set('sourceField',e.get('cdm')); n.set('dataType','UInt8')
+              svm=etree.Element(Q('SourceValueMap'))
+              for sv,wv in [('false','1' if inverted else '0'),('true','0' if inverted else '1')]:
+                  m=etree.SubElement(svm,Q('Map')); m.set('sourceValue',sv); m.set('value',wv)
+              n.append(svm); n.tail=e.tail
+              p[idx]=n; return n
+
+          def assign_network_type(e):
+              name=e.get('name') or ''; c=e.get('cdm') or ''
+              if name=='usvHeader' or name=='destination': return
+              if name=='commandID': e.set('dataType','UInt16'); return
+              if name.startswith('commandStatusReport.'):
+                  e.set('dataType','UInt8'); return
+              if name=='sourceIP': e.set('dataType','UInt8'); e.set('length','256'); e.set('format','string'); return
+              if name=='targetPort' or name=='intraNetworkStatus' or name=='commsChannelID': e.set('dataType','UInt8'); return
+              if '.Position.Latitude' in c or '.Position.Longitude' in c or '.Position.Altitude' in c:
+                  e.set('dataType','Float64'); return
+              if c.endswith('.Throughput'):
+                  e.set('dataType','UInt8'); return
+              if c.endswith('.StatusText'):
+                  e.set('dataType','UInt8'); e.set('length','21'); e.set('format','string'); return
+              if c=='Health.AuxControl.Transceiver.IBIT.Detail.Raw': e.set('dataType','UInt16'); return
+              # GeoSat modem telemetry numeric primitive types are not restated here unless converter/type is directly known.
+              if c.startswith('Communication.GeoSat.'):
+                  return
+              # Network/LBand/Aux/GeoSat health/status/control payloads are octet in source CSCI/common structs.
+              if (c.startswith('Health.') or c.startswith('Communication.LBand.') or c.startswith('Communication.Network.') or c.startswith('Cyber.Threat.')):
+                  e.set('dataType','UInt8'); return
+              # Physical control names in LBandCommsControlType are all octet.
+              if any(x in name for x in ['networkID','netSet','handoverMode','output','comFA','topology','resource','debug','fa','amc']):
+                  e.set('dataType','UInt8'); return
+
+          rcws_int16_names={'intervalFullAuto','intervalSingle','interval3Burst','interval5Burst','interval10Burst','zeroingX','zeroingY','irwLosX','irwLosY','irtLosX','irtLosY'}
+          rcws_uint16_names={'firingCount','targetDistance','reloadingCount','patrolModeAngle'}
+          rcws_int32_names={'height','turn','contactID','targetID','eoirHeight','eoirTurn'}
+          rcws_float_names={'turningAngle','elevationAngle','cameraFOV'}
+          def assign_rcws_type(e):
+              name=e.get('name') or ''; c=e.get('cdm') or ''
+              if name=='usvHeader' or name=='destination': return
+              if name=='commandID': e.set('dataType','UInt16'); return
+              if name.startswith('commandStatusReport.'): e.set('dataType','UInt8'); return
+              if name in rcws_int16_names or re.match(r'eoLos\d+[XY]$',name): e.set('dataType','Int16'); return
+              if name in rcws_uint16_names: e.set('dataType','UInt16'); return
+              if name in rcws_int32_names: e.set('dataType','Int32'); return
+              if name in rcws_float_names or re.match(r'no(?:Driving|Firing)Zone\d+$',name): e.set('dataType','Float32'); return
+              if name in {'statusDistance'}: e.set('dataType','UInt16'); return
+              if name.endswith('_Detail'): e.set('dataType','UInt8'); return
+              if c.startswith('Health.RCWS.') or c.startswith('Weapon.RCWS.') or c.startswith('Control.RCWS.'):
+                  # Menu angle/LOS scalar exceptions
+                  if any(k in c for k in ['NoDrivingZone','NoFiringZone']): e.set('dataType','Float32'); return
+                  if any(k in c for k in ['EOLos','IRWLos','IRTLos','Interval']): e.set('dataType','Int16'); return
+                  if any(k in c for k in ['ReloadingCount','PatrolModeAngle','Distance']): e.set('dataType','UInt16'); return
+                  if any(k in c for k in ['ElevationAngle','TraverseAngle','MainFOV']): e.set('dataType','Float32'); return
+                  if c.endswith('TargetID'): e.set('dataType','Int32'); return
+                  e.set('dataType','UInt8'); return
+
+          def assign_lidar_type(e):
+              name=e.get('name') or ''; c=e.get('cdm') or ''
+              if name=='usvHeader' or name=='destination': return
+              if name=='commandID': e.set('dataType','UInt16'); return
+              if name.startswith('commandStatusReport.'): e.set('dataType','UInt8'); return
+              if name=='contactNum': e.set('dataType','Int32'); return
+              if name=='id': e.set('dataType','UInt32'); return
+              if name in {'boxHeight','boxWidth','boxLength','relativePositionX','relativePositionY','relativePositionZ','relativeAzimuth'}: e.set('dataType','Float64'); return
+              if 'cipeOperationalStatus' in name or name.endswith('operationalStatus'): e.set('dataType','UInt8'); return
+              if name.endswith('cpuTemperature') or name.endswith('cpuLoad'): e.set('dataType','Float64'); return
+
+          # Update Binding files.
+          for d in devices:
+              bp=root/f'USV/{d}/{d}Binding.xml'
+              tree=etree.parse(str(bp)); r=tree.getroot(); r.set(XSI,f'{NSURI} ../../XSD/CommonBindingSchema.xsd')
+              maps=sem_maps[d]
+              explicit=control_maps.get(d,{})
+
+              # Replace fixed DestinationType components with one prepared composite for applicable controls.
+              for cb in tree.xpath('//u:ControlBinding',namespaces=NS):
+                  sid=cb.get('semantic_id'); src=destinations.get(d,{}).get(sid)
+                  if src:
+                      fixed=[x for x in cb if x.tag==Q('FixedField') and (x.get('name') or '').startswith('destination.')]
+                      if fixed:
+                          first=min(cb.index(x) for x in fixed); tail=fixed[-1].tail
+                          for x in fixed: cb.remove(x)
+                          df=etree.Element(Q('DerivedField')); df.set('name','destination'); df.set('sourceField',src); df.tail=tail
+                          cb.insert(first,df)
+
+              # Converters -> declarative constructs.
+              for e in list(tree.xpath('//*[@converter]')):
+                  conv=e.get('converter')
+                  if conv=='BuildUSVMessageBase': e.attrib.pop('converter',None)
+                  elif conv=='UInt16': e.attrib.pop('converter',None); e.set('dataType','UInt16')
+                  elif conv=='MultiplyBy0.1': e.attrib.pop('converter',None); e.set('dataType','UInt8'); e.set('scale','10')
+                  elif conv=='MultiplyBy1000': e.attrib.pop('converter',None); e.set('scale','0.001')
+                  elif conv=='MultiplyBy1000000': e.attrib.pop('converter',None); e.set('scale','0.000001')
+                  elif conv in ('Mask0x03','ShiftRight6Mask0x03'):
+                      c=e.get('cdm'); arr=maps.get(c)
+                      if not arr: raise RuntimeError(f'No semantic map for packed converter {d} {e.get("name")} {c}')
+                      replace_with_packed(e,0 if conv=='Mask0x03' else 6,2,arr)
+                  elif conv=='BooleanToInverted01': replace_field_bool_source(e,True)
+                  else: raise RuntimeError(f'Unhandled converter {d}: {conv} {e.get("name")}')
+
+              # Explicit logical enum maps and maps captured from monitor Semantic.
+              for e in tree.xpath('//u:Field|//u:DerivedField',namespaces=NS):
+                  c=e.get('cdm')
+                  arr3=None
+                  if c in maps: arr3=maps[c]
+                  elif c in explicit: arr3=explicit[c]
+                  if arr3 and e.tag!=Q('PackedField'):
+                      if e.get('dataType') is None: e.set('dataType','UInt8')
+                      add_valuemap(e,arr3)
+
+              # RCWS normal BooleanProfile controls: SourceValueMap false/true -> 0/1.
+              if d=='RemoteFireControl':
+                  for e in list(tree.xpath('//u:ControlBinding/u:Field|//u:ControlBinding/u:DerivedField',namespaces=NS)):
+                      if e.get('cdm') in rcws_bool_control and e.get('converter') is None:
+                          replace_field_bool_source(e,False)
+
+              # Primitive type assignment.
+              for e in tree.xpath('//u:Field|//u:FixedField|//u:DerivedField',namespaces=NS):
+                  if e.get('dataType') is not None: continue
+                  if d=='Lidar': assign_lidar_type(e)
+                  elif d=='NetworkAbstraction': assign_network_type(e)
+                  else: assign_rcws_type(e)
+              tree.write(str(bp),encoding='UTF-8',xml_declaration=True,pretty_print=False)
+
+          # Add semantic Reply Results from Binding contracts while keeping one Reply per physical result message.
+          def copy_quantity_contract(src,dst):
+              for tag in ['Unit','Range','Resolution']:
+                  x=src.find(Q(tag)) if src is not None else None
+                  if x is not None: dst.append(copy.deepcopy(x))
+
+          for d in devices:
+              sp=root/f'USV/{d}/{d}Semantic.xml'; bp=root/f'USV/{d}/{d}Binding.xml'
+              st=etree.parse(str(sp)); bt=etree.parse(str(bp)); vals,qty,bools=sem_info[d]
+              br={x.get('semantic_id'):x for x in bt.xpath('//u:ControlBinding/u:Reply',namespaces=NS)}
+              for rep in st.xpath('//u:Reply',namespaces=NS):
+                  if rep.find(Q('Results')) is not None: continue
+                  rid=rep.get('bindRef'); b=br.get(rid)
+                  if b is None: continue
+                  rep.set('required',rep.get('required') or 'true')
+                  fields=[x for x in b if x.tag in (Q('Field'),Q('DerivedField'),Q('PackedField'))]
+                  if rid.endswith('Ack'):
+                      fields=[x for x in fields if x.get('cdm')=='Control.Response.Status']
+                  else:
+                      fields=[x for x in fields if x.get('cdm') and not x.get('cdm').endswith('.Raw') and not x.get('cdm').startswith('Control.Response.Destination') and x.get('cdm')!='Message.Correlation.NumericID']
+                  # Lidar IBIT CPU fields are logical quantities even though not monitor specs.
+                  res=etree.Element(Q('Results'))
+                  for f in fields:
+                      c=f.get('cdm'); name=f.get('name') or c.split('.')[-1]
+                      if c in vals:
+                          rr=etree.SubElement(res,Q('ValueSetResult')); rr.set('name',name); rr.set('cdm',c)
+                          vv=etree.SubElement(rr,Q('Values'))
+                          for n,vc in vals[c]:
+                              v=etree.SubElement(vv,Q('Value')); v.set('name',n); v.set('cdm',vc)
+                      elif c in bools:
+                          rr=etree.SubElement(res,Q('BooleanResult')); rr.set('name',name); rr.set('cdm',c)
+                      elif c in qty:
+                          rr=etree.SubElement(res,Q('QuantityResult')); rr.set('name',name); rr.set('cdm',c); copy_quantity_contract(qty[c],rr)
+                      elif d=='Lidar' and c=='Health.CIPE.Processor.CpuTemperature':
+                          rr=etree.SubElement(res,Q('QuantityResult')); rr.set('name',name); rr.set('cdm',c); etree.SubElement(rr,Q('Unit')).text='degC'; rg=etree.SubElement(rr,Q('Range')); rg.set('min','20'); rg.set('max','100')
+                      elif d=='Lidar' and c=='Health.CIPE.Processor.CpuLoad':
+                          rr=etree.SubElement(res,Q('QuantityResult')); rr.set('name',name); rr.set('cdm',c); etree.SubElement(rr,Q('Unit')).text='percent'; rg=etree.SubElement(rr,Q('Range')); rg.set('min','0'); rg.set('max','100')
+                      else:
+                          rr=etree.SubElement(res,Q('Result')); rr.set('name',name); rr.set('cdm',c)
+                  if len(res): add_child(rep,res)
+              st.write(str(sp),encoding='UTF-8',xml_declaration=True,pretty_print=False)
+
+          # Hard validation.
+          spec_schema=etree.XMLSchema(etree.parse(str(root/'XSD/CommonSpecSchema.xsd')))
+          bind_schema=etree.XMLSchema(etree.parse(str(root/'XSD/CommonBindingSchema.xsd')))
+          fail=[]
+          for d in devices:
+              sp=root/f'USV/{d}/{d}Semantic.xml'; bp=root/f'USV/{d}/{d}Binding.xml'
+              sd=etree.parse(str(sp)); bd=etree.parse(str(bp))
+              for p,doc,sch in [(sp,sd,spec_schema),(bp,bd,bind_schema)]:
+                  ok=sch.validate(doc); print('XSD',p,'PASS' if ok else 'FAIL')
+                  if not ok:
+                      fail.append(str(p))
+                      for er in sch.error_log: print(' XSDERR',er)
+              def aset(doc,x): return set(doc.xpath(x,namespaces=NS))
+              checks=[('Control',aset(sd,'//u:ControlSpec/@id'),aset(bd,'//u:ControlBinding/@semantic_id')),('Reply',aset(sd,'//u:Reply/@bindRef'),aset(bd,'//u:ControlBinding/u:Reply/@semantic_id')),('Monitor',aset(sd,'/u:*/*[local-name()="MonitorSpecs"]/*/@id'),aset(bd,'/u:*/*[local-name()="Monitors"]/u:MonitorBinding/@semantic_id')),('Product',aset(sd,'/u:*/*[local-name()="SensorProductSpecs"]/*/@id'),aset(bd,'/u:*/*[local-name()="SensorProducts"]/u:ProductBinding/@semantic_id'))]
+              for k,a,b in checks:
+                  print('XREF',d,k,len(a),len(b),'missing',sorted(a-b),'extra',sorted(b-a))
+                  if a!=b: fail.append(f'{d}:{k}')
+              conv=bd.xpath('//@converter'); print('CONVERTER',d,len(conv),conv)
+              if conv: fail.append(f'{d}:converter')
+              nums=[]
+              for v in sd.xpath('//u:Value',namespaces=NS):
+                  t=(v.text or '').strip()
+                  if re.fullmatch(r'[-+]?\d+(?:\.\d+)?',t): nums.append(t)
+              print('SEMANTIC_RAW_ENUM',d,len(nums))
+              if nums: fail.append(f'{d}:raw')
+              miss=[]
+              for x in bd.xpath('//u:Field|//u:FixedField|//u:DerivedField',namespaces=NS):
+                  if x.get('dataType') is None and x.get('name') not in {'usvHeader','destination'}:
+                      miss.append((x.get('name'),x.get('cdm')))
+              print('MISSING_DATATYPE',d,len(miss),miss[:80])
+              # Missing types remain permitted only where physical GeoSat boolean/numeric IDL is not safely inferable.
+              if d in ('Lidar','RemoteFireControl') and miss: fail.append(f'{d}:datatype')
+          print('FAIL',fail)
+          if fail: sys.exit(1)
+          PY
+          git diff --check
+      - name: Commit audited XML
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/USV/Lidar ProtocolXml/USV/NetworkAbstraction ProtocolXml/USV/RemoteFireControl
+          if git diff --cached --quiet; then
+            echo 'No XML changes'
+          else
+            git commit -m 'Refine Lidar Network RCWS semantic binding'
+            git push origin HEAD:feature/usv-semantic-binding-audit
+          fi
