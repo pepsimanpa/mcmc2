@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<CommSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+<CommSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd">
   <!--네트워크추상화장치 Semantic: 네트워크추상화장치 CSCI + 원격통제장치 CSCI + 공용 구조체/식별자 규칙 기반-->
   <!--범위는 원격통제장치 CSCI ↔ 네트워크추상화장치 CSCI 직접 연동에 한정한다. 원격통제장치로 직접 전달되지 않는 USV L-Band 링크상태/Aux 링크상태 등은 제외한다.-->
   <!--BIT 세부 bit-packed 필드는 기존 XSD를 확장하지 않고 raw 값으로 유지한다. 단, L-Band OverallBIT.operation은 결정사항에 따라 Bit7~6을 0/1/2 운용상태로 정규화한다.-->
@@ -14,8 +14,8 @@
   <MonitorSpecs id="monitor">
     <ValueSetSpec id="intraNetworkStatus" name="체계망 활성 경로" cdm="Communication.Network.Redundancy.ActivePath">
       <Values>
-        <Value cdm="Communication.Network.Path.Emergency">0</Value>
-        <Value cdm="Communication.Network.Path.Primary">1</Value>
+        <Value cdm="Communication.Network.Path.Emergency" name="Emergency"/>
+        <Value cdm="Communication.Network.Path.Primary" name="Primary"/>
       </Values>
     </ValueSetSpec>
     <!--IntraNetworkStatusType의 commandID는 원본 설명상 생성 주체와 Source가 불일치하므로 Semantic 운용값에는 노출하지 않고 Binding 물리 필드로만 유지한다.-->
@@ -23,9 +23,9 @@
       <!--threatCode 원문은 Bit1~0을 사용하며 00/01/10만 정의한다. 11(3)은 미정의이므로 ValueSet에서 제외한다.-->
       <ValueSetSpec id="threatType" name="위협 종류" cdm="Cyber.Threat.Type">
         <Values>
-          <Value cdm="Cyber.Threat.Type.UnauthorizedDeviceAccess">0</Value>
-          <Value cdm="Cyber.Threat.Type.UnauthorizedPortServiceAccess">1</Value>
-          <Value cdm="Cyber.Threat.Type.SuspectedDoS">2</Value>
+          <Value cdm="Cyber.Threat.Type.UnauthorizedDeviceAccess" name="UnauthorizedDeviceAccess"/>
+          <Value cdm="Cyber.Threat.Type.UnauthorizedPortServiceAccess" name="UnauthorizedPortServiceAccess"/>
+          <Value cdm="Cyber.Threat.Type.SuspectedDoS" name="SuspectedDoS"/>
         </Values>
       </ValueSetSpec>
       <TextSpec id="sourceIp" name="공격자 IP" cdm="Cyber.Threat.SourceIP">
@@ -37,34 +37,34 @@
     <GroupSpec id="networkIntegrationCbitStatus" name="네트워크추상화장치 CBIT 상태" cdm="Health.NetworkAbstraction.CBIT">
       <ValueSetSpec id="overallStatus" name="종합 상태" cdm="Health.NetworkAbstraction.Overall.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.NoResponse">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="mccStatus" name="주제어카드 상태" cdm="Health.NetworkAbstraction.MCC.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.NoResponse">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="ddcStatus" name="DDS회로카드 상태" cdm="Health.NetworkAbstraction.DDC.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.NoResponse">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="nmcStatus" name="상태감시/안티탬퍼링유닛 상태" cdm="Health.NetworkAbstraction.NMC.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.NoResponse">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -381,65 +381,65 @@
       <!--operation은 원본 LBandDeviceOverallBIT의 Bit7~6(00 정상/01 제한/10 불가)을 0/1/2로 추출하여 Semantic 운용상태로 정규화한다.-->
       <ValueSetSpec id="terminalOperation" name="USV 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Terminal.OperationalStatus">
         <Values>
-          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
-          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
-          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+          <Value cdm="Communication.LBand.Operation.Normal" name="Normal"/>
+          <Value cdm="Communication.LBand.Operation.Degraded" name="Degraded"/>
+          <Value cdm="Communication.LBand.Operation.Unavailable" name="Unavailable"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="terminalOverallStatus" name="USV 무선통신장치 종합 상태" cdm="Health.LBand.Terminal.DeviceStatus">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="terminalReferenceControlStatus" name="USV 무선통신장치 기준통제반 상태" cdm="Health.LBand.Terminal.ReferenceControl.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="terminalModem1Status" name="USV 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Terminal.Modem1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="terminalModem2Status" name="USV 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Terminal.Modem2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="terminalRfModule1Status" name="USV 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Terminal.RFModule1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="terminalRfModule2Status" name="USV 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Terminal.RFModule2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="terminalPowerStatus" name="USV 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Terminal.Power.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -447,395 +447,395 @@
       <!--통제소 1대와 중계소 5대가 하나의 DDS 보고에 포함된다. operation은 각 구조체의 Bit7~6을 0/1/2로 정규화한다.-->
       <ValueSetSpec id="controlStationOperation" name="통제소 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.ControlStation.OperationalStatus">
         <Values>
-          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
-          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
-          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+          <Value cdm="Communication.LBand.Operation.Normal" name="Normal"/>
+          <Value cdm="Communication.LBand.Operation.Degraded" name="Degraded"/>
+          <Value cdm="Communication.LBand.Operation.Unavailable" name="Unavailable"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="controlStationOverallStatus" name="통제소 무선통신장치 종합 상태" cdm="Health.LBand.ControlStation.DeviceStatus">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="controlStationReferenceControlStatus" name="통제소 무선통신장치 기준통제반 상태" cdm="Health.LBand.ControlStation.ReferenceControl.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="controlStationModem1Status" name="통제소 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.ControlStation.Modem1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="controlStationModem2Status" name="통제소 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.ControlStation.Modem2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="controlStationRfModule1Status" name="통제소 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.ControlStation.RFModule1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="controlStationRfModule2Status" name="통제소 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.ControlStation.RFModule2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="controlStationPowerStatus" name="통제소 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.ControlStation.Power.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater1Operation" name="중계소1 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater1.OperationalStatus">
         <Values>
-          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
-          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
-          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+          <Value cdm="Communication.LBand.Operation.Normal" name="Normal"/>
+          <Value cdm="Communication.LBand.Operation.Degraded" name="Degraded"/>
+          <Value cdm="Communication.LBand.Operation.Unavailable" name="Unavailable"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater1OverallStatus" name="중계소1 무선통신장치 종합 상태" cdm="Health.LBand.Repeater1.DeviceStatus">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater1ReferenceControlStatus" name="중계소1 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater1.ReferenceControl.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater1Modem1Status" name="중계소1 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater1.Modem1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater1Modem2Status" name="중계소1 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater1.Modem2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater1RfModule1Status" name="중계소1 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater1.RFModule1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater1RfModule2Status" name="중계소1 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater1.RFModule2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater1PowerStatus" name="중계소1 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater1.Power.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater2Operation" name="중계소2 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater2.OperationalStatus">
         <Values>
-          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
-          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
-          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+          <Value cdm="Communication.LBand.Operation.Normal" name="Normal"/>
+          <Value cdm="Communication.LBand.Operation.Degraded" name="Degraded"/>
+          <Value cdm="Communication.LBand.Operation.Unavailable" name="Unavailable"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater2OverallStatus" name="중계소2 무선통신장치 종합 상태" cdm="Health.LBand.Repeater2.DeviceStatus">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater2ReferenceControlStatus" name="중계소2 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater2.ReferenceControl.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater2Modem1Status" name="중계소2 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater2.Modem1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater2Modem2Status" name="중계소2 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater2.Modem2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater2RfModule1Status" name="중계소2 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater2.RFModule1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater2RfModule2Status" name="중계소2 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater2.RFModule2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater2PowerStatus" name="중계소2 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater2.Power.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater3Operation" name="중계소3 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater3.OperationalStatus">
         <Values>
-          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
-          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
-          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+          <Value cdm="Communication.LBand.Operation.Normal" name="Normal"/>
+          <Value cdm="Communication.LBand.Operation.Degraded" name="Degraded"/>
+          <Value cdm="Communication.LBand.Operation.Unavailable" name="Unavailable"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater3OverallStatus" name="중계소3 무선통신장치 종합 상태" cdm="Health.LBand.Repeater3.DeviceStatus">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater3ReferenceControlStatus" name="중계소3 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater3.ReferenceControl.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater3Modem1Status" name="중계소3 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater3.Modem1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater3Modem2Status" name="중계소3 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater3.Modem2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater3RfModule1Status" name="중계소3 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater3.RFModule1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater3RfModule2Status" name="중계소3 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater3.RFModule2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater3PowerStatus" name="중계소3 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater3.Power.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater4Operation" name="중계소4 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater4.OperationalStatus">
         <Values>
-          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
-          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
-          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+          <Value cdm="Communication.LBand.Operation.Normal" name="Normal"/>
+          <Value cdm="Communication.LBand.Operation.Degraded" name="Degraded"/>
+          <Value cdm="Communication.LBand.Operation.Unavailable" name="Unavailable"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater4OverallStatus" name="중계소4 무선통신장치 종합 상태" cdm="Health.LBand.Repeater4.DeviceStatus">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater4ReferenceControlStatus" name="중계소4 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater4.ReferenceControl.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater4Modem1Status" name="중계소4 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater4.Modem1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater4Modem2Status" name="중계소4 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater4.Modem2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater4RfModule1Status" name="중계소4 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater4.RFModule1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater4RfModule2Status" name="중계소4 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater4.RFModule2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater4PowerStatus" name="중계소4 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater4.Power.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater5Operation" name="중계소5 무선통신장치 무선통신 운용 상태" cdm="Health.LBand.Repeater5.OperationalStatus">
         <Values>
-          <Value cdm="Communication.LBand.Operation.Normal">0</Value>
-          <Value cdm="Communication.LBand.Operation.Degraded">1</Value>
-          <Value cdm="Communication.LBand.Operation.Unavailable">2</Value>
+          <Value cdm="Communication.LBand.Operation.Normal" name="Normal"/>
+          <Value cdm="Communication.LBand.Operation.Degraded" name="Degraded"/>
+          <Value cdm="Communication.LBand.Operation.Unavailable" name="Unavailable"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater5OverallStatus" name="중계소5 무선통신장치 종합 상태" cdm="Health.LBand.Repeater5.DeviceStatus">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater5ReferenceControlStatus" name="중계소5 무선통신장치 기준통제반 상태" cdm="Health.LBand.Repeater5.ReferenceControl.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater5Modem1Status" name="중계소5 무선통신장치 모뎀반#1 상태" cdm="Health.LBand.Repeater5.Modem1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater5Modem2Status" name="중계소5 무선통신장치 모뎀반#2 상태" cdm="Health.LBand.Repeater5.Modem2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater5RfModule1Status" name="중계소5 무선통신장치 RF모듈#1 상태" cdm="Health.LBand.Repeater5.RFModule1.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater5RfModule2Status" name="중계소5 무선통신장치 RF모듈#2 상태" cdm="Health.LBand.Repeater5.RFModule2.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="repeater5PowerStatus" name="중계소5 무선통신장치 전원공급모듈 상태" cdm="Health.LBand.Repeater5.Power.Status">
         <Values>
-          <Value cdm="Health.Status.Normal">0</Value>
-          <Value cdm="Health.Status.Degraded">1</Value>
-          <Value cdm="Health.Status.Unavailable">2</Value>
-          <Value cdm="Health.Status.Disconnected">3</Value>
+          <Value cdm="Health.Status.Normal" name="Normal"/>
+          <Value cdm="Health.Status.Degraded" name="Degraded"/>
+          <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
     <ValueSetSpec id="auxControlDeviceCbitStatus" name="출입항보조통제장치 송수신기 CBIT 상태" cdm="Health.AuxControl.Transceiver.Status">
       <Values>
-        <Value cdm="Health.Status.Normal">0</Value>
-        <Value cdm="Health.Status.Unavailable">2</Value>
-        <Value cdm="Health.Status.Disconnected">3</Value>
+        <Value cdm="Health.Status.Normal" name="Normal"/>
+        <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+        <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
       </Values>
     </ValueSetSpec>
     <ValueSetSpec id="geoSatDeviceCbitStatus" name="고궤도 위성통신장치 CBIT 상태" cdm="Health.GeoSat.Device.Status">
       <Values>
-        <Value cdm="Health.Status.Normal">0</Value>
-        <Value cdm="Health.Status.Unavailable">2</Value>
-        <Value cdm="Health.Status.Disconnected">3</Value>
+        <Value cdm="Health.Status.Normal" name="Normal"/>
+        <Value cdm="Health.Status.Unavailable" name="Unavailable"/>
+        <Value cdm="Health.Status.Disconnected" name="Disconnected"/>
       </Values>
     </ValueSetSpec>
   </MonitorSpecs>
@@ -843,25 +843,33 @@
     <!--IntegrationControlType은 동일 DDS를 사용하되 DestinationType의 dstSubEquipmentID로 통제소 NAE(0x01)와 USV NAE(0x02)를 구분한다. 실제 운용에서 각각 별도로 연동 개시하므로 Semantic Control도 대상별로 분리한다.-->
     <ControlSpec id="startControlStationIntegration" name="통제소 네트워크추상화장치 연동 개시 명령" cdm="Control.Integration.Start">
       <Target cdm="Communication.NetworkAbstraction.Identifier.Numeric"/>
-      <Reply bindRef="startControlStationIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="startControlStationIntegrationAck" cdm="Control.CommandStatus.Response" required="true">
+      <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="startUsvIntegration" name="USV 네트워크추상화장치 연동 개시 명령" cdm="Control.Integration.Start">
       <Target cdm="Communication.NetworkAbstraction.Identifier.Numeric"/>
-      <Reply bindRef="startUsvIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="startUsvIntegrationAck" cdm="Control.CommandStatus.Response" required="true">
+      <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="addCommsChannel" name="통신 링크 추가" cdm="Control.Communication.Channel.Add">
       <!--commsChannelID 원본 Range는 0~2이나 정의된 값은 0=무선, 1=위성뿐이다. 값 2는 미정의이므로 Semantic 유효값에 포함하지 않는다. 추가 명령에는 현재 사용하지 않는 ID를 지정한다.-->
       <Parameters>
-        <Profile cdm="Communication.Channel.Identifier"/>
+        <ValueSetProfile cdm="Communication.Channel.Identifier"><Values><Value name="Wireless" cdm="Communication.Channel.Wireless"/><Value name="Satellite" cdm="Communication.Channel.Satellite"/></Values></ValueSetProfile>
       </Parameters>
-      <Reply bindRef="addCommsChannelAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="addCommsChannelAck" cdm="Control.CommandStatus.Response" required="true">
+      <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="deleteCommsChannel" name="통신 링크 삭제" cdm="Control.Communication.Channel.Delete">
       <!--commsChannelID는 0=무선, 1=위성만 정의하며 원본 Range의 2는 의미 미정의로 제외한다.-->
       <Parameters>
-        <Profile cdm="Communication.Channel.Identifier"/>
+        <ValueSetProfile cdm="Communication.Channel.Identifier"><Values><Value name="Wireless" cdm="Communication.Channel.Wireless"/><Value name="Satellite" cdm="Communication.Channel.Satellite"/></Values></ValueSetProfile>
       </Parameters>
-      <Reply bindRef="deleteCommsChannelAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="deleteCommsChannelAck" cdm="Control.CommandStatus.Response" required="true">
+      <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="configureLBandComms" name="무선통신장치 네트워크 설정" cdm="Control.Communication.LBand.Configuration">
       <!--LBandCommsControlType은 통제국/단말기2/중계기5의 전체 설정 스냅샷(66B)을 한 번에 전달하므로 하나의 Control로 유지한다.-->
@@ -923,80 +931,136 @@
     <ControlSpec id="requestNetworkIntegrationControlStationPbit" name="네트워크추상화장치 PBIT 요청(통제소)" cdm="Request.Health.PBIT.NetworkAbstraction.ControlStation">
       <!--Result 메시지에는 subEquipmentID/commandID가 없어 0x01/0x02 결과의 명시적 식별 방법은 원본 인터페이스 확인 필요(TBD).-->
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestNetworkIntegrationControlStationPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestNetworkIntegrationControlStationPbitResult" cdm="Request.Health.PBIT.NetworkAbstraction.ControlStation.Response"/>
+      <Reply bindRef="requestNetworkIntegrationControlStationPbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestNetworkIntegrationControlStationPbitResult" cdm="Request.Health.PBIT.NetworkAbstraction.ControlStation.Response" required="true">
+      <Results><ValueSetResult name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestNetworkIntegrationUsvPbit" name="네트워크추상화장치 PBIT 요청(USV)" cdm="Request.Health.PBIT.NetworkAbstraction.USV">
       <!--추후 USV측 NAE 점검 요청을 고려하여 SubEquipmentID 0x02 Control을 별도 정의한다. Result 대상 식별은 TBD.-->
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestNetworkIntegrationUsvPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestNetworkIntegrationUsvPbitResult" cdm="Request.Health.PBIT.NetworkAbstraction.USV.Response"/>
+      <Reply bindRef="requestNetworkIntegrationUsvPbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestNetworkIntegrationUsvPbitResult" cdm="Request.Health.PBIT.NetworkAbstraction.USV.Response" required="true">
+      <Results><ValueSetResult name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDevicePBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestLBandControlStationGroupPbit" name="무선통신장치 PBIT 요청(통제소/중계소)" cdm="Request.Health.PBIT.LBand.ControlStationGroup">
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestLBandControlStationGroupPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestLBandControlStationGroupPbitResult" cdm="Request.Health.PBIT.LBand.ControlStationGroup.Response"/>
+      <Reply bindRef="requestLBandControlStationGroupPbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestLBandControlStationGroupPbitResult" cdm="Request.Health.PBIT.LBand.ControlStationGroup.Response" required="true">
+      <Results><ValueSetResult name="lBandControlStationDevicePBIT.overallStatus" cdm="Health.LBand.ControlStation.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDevicePBIT.referenceControlStatus" cdm="Health.LBand.ControlStation.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDevicePBIT.modem1Status" cdm="Health.LBand.ControlStation.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDevicePBIT.modem2Status" cdm="Health.LBand.ControlStation.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDevicePBIT.rfmodule1Status" cdm="Health.LBand.ControlStation.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDevicePBIT.rfmodule2Status" cdm="Health.LBand.ControlStation.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDevicePBIT.powerStatus" cdm="Health.LBand.ControlStation.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1PBIT.overallStatus" cdm="Health.LBand.Repeater1.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1PBIT.referenceControlStatus" cdm="Health.LBand.Repeater1.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1PBIT.modem1Status" cdm="Health.LBand.Repeater1.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1PBIT.modem2Status" cdm="Health.LBand.Repeater1.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1PBIT.rfmodule1Status" cdm="Health.LBand.Repeater1.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1PBIT.rfmodule2Status" cdm="Health.LBand.Repeater1.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1PBIT.powerStatus" cdm="Health.LBand.Repeater1.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2PBIT.overallStatus" cdm="Health.LBand.Repeater2.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2PBIT.referenceControlStatus" cdm="Health.LBand.Repeater2.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2PBIT.modem1Status" cdm="Health.LBand.Repeater2.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2PBIT.modem2Status" cdm="Health.LBand.Repeater2.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2PBIT.rfmodule1Status" cdm="Health.LBand.Repeater2.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2PBIT.rfmodule2Status" cdm="Health.LBand.Repeater2.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2PBIT.powerStatus" cdm="Health.LBand.Repeater2.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3PBIT.overallStatus" cdm="Health.LBand.Repeater3.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3PBIT.referenceControlStatus" cdm="Health.LBand.Repeater3.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3PBIT.modem1Status" cdm="Health.LBand.Repeater3.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3PBIT.modem2Status" cdm="Health.LBand.Repeater3.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3PBIT.rfmodule1Status" cdm="Health.LBand.Repeater3.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3PBIT.rfmodule2Status" cdm="Health.LBand.Repeater3.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3PBIT.powerStatus" cdm="Health.LBand.Repeater3.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4PBIT.overallStatus" cdm="Health.LBand.Repeater4.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4PBIT.referenceControlStatus" cdm="Health.LBand.Repeater4.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4PBIT.modem1Status" cdm="Health.LBand.Repeater4.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4PBIT.modem2Status" cdm="Health.LBand.Repeater4.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4PBIT.rfmodule1Status" cdm="Health.LBand.Repeater4.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4PBIT.rfmodule2Status" cdm="Health.LBand.Repeater4.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4PBIT.powerStatus" cdm="Health.LBand.Repeater4.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5PBIT.overallStatus" cdm="Health.LBand.Repeater5.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5PBIT.referenceControlStatus" cdm="Health.LBand.Repeater5.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5PBIT.modem1Status" cdm="Health.LBand.Repeater5.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5PBIT.modem2Status" cdm="Health.LBand.Repeater5.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5PBIT.rfmodule1Status" cdm="Health.LBand.Repeater5.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5PBIT.rfmodule2Status" cdm="Health.LBand.Repeater5.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5PBIT.powerStatus" cdm="Health.LBand.Repeater5.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestLBandTerminalPbit" name="무선통신장치 PBIT 요청(USV)" cdm="Request.Health.PBIT.LBand.Terminal">
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestLBandTerminalPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestLBandTerminalPbitResult" cdm="Request.Health.PBIT.LBand.Terminal.Response"/>
+      <Reply bindRef="requestLBandTerminalPbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestLBandTerminalPbitResult" cdm="Request.Health.PBIT.LBand.Terminal.Response" required="true">
+      <Results><ValueSetResult name="lBandTerminalDevicePBIT.overallStatus" cdm="Health.LBand.Terminal.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDevicePBIT.referenceControlStatus" cdm="Health.LBand.Terminal.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDevicePBIT.modem1Status" cdm="Health.LBand.Terminal.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDevicePBIT.modem2Status" cdm="Health.LBand.Terminal.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDevicePBIT.rfmodule1Status" cdm="Health.LBand.Terminal.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDevicePBIT.rfmodule2Status" cdm="Health.LBand.Terminal.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDevicePBIT.powerStatus" cdm="Health.LBand.Terminal.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestAuxControlPbit" name="출입항보조통제장치 송수신기 PBIT 요청" cdm="Request.Health.PBIT.AuxControl.Transceiver">
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestAuxControlPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestAuxControlPbitResult" cdm="Request.Health.PBIT.AuxControl.Transceiver.Response"/>
+      <Reply bindRef="requestAuxControlPbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestAuxControlPbitResult" cdm="Request.Health.PBIT.AuxControl.Transceiver.Response" required="true">
+      <Results><ValueSetResult name="auxControlDevicePBIT" cdm="Health.AuxControl.Transceiver.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestGeoSatControlStationPbit" name="고궤도 위성통신장치 PBIT 요청(통제소)" cdm="Request.Health.PBIT.GeoSat.ControlStation">
       <!--GeoSat PBIT Result에 subEquipmentID/commandID가 없어 0x21/0x22 결과의 명시적 식별 방법은 원본 인터페이스 확인 필요(TBD).-->
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestGeoSatControlStationPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestGeoSatControlStationPbitResult" cdm="Request.Health.PBIT.GeoSat.ControlStation.Response"/>
+      <Reply bindRef="requestGeoSatControlStationPbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestGeoSatControlStationPbitResult" cdm="Request.Health.PBIT.GeoSat.ControlStation.Response" required="true">
+      <Results><ValueSetResult name="geoSatDevicePBIT" cdm="Health.GeoSat.Device.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestGeoSatUsvPbit" name="고궤도 위성통신장치 PBIT 요청(USV)" cdm="Request.Health.PBIT.GeoSat.USV">
       <!--통제소/USV 대상별 Control 분리 원칙에 따라 SubEquipmentID 0x22를 별도 정의한다. Result 대상 식별은 TBD.-->
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestGeoSatUsvPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestGeoSatUsvPbitResult" cdm="Request.Health.PBIT.GeoSat.USV.Response"/>
+      <Reply bindRef="requestGeoSatUsvPbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestGeoSatUsvPbitResult" cdm="Request.Health.PBIT.GeoSat.USV.Response" required="true">
+      <Results><ValueSetResult name="geoSatDevicePBIT" cdm="Health.GeoSat.Device.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestNetworkIntegrationControlStationIbit" name="네트워크추상화장치 IBIT 요청(통제소)" cdm="Request.Health.IBIT.NetworkAbstraction.ControlStation">
       <!--Result 메시지에는 subEquipmentID/commandID가 없어 0x01/0x02 결과의 명시적 식별 방법은 원본 인터페이스 확인 필요(TBD).-->
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestNetworkIntegrationControlStationIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestNetworkIntegrationControlStationIbitResult" cdm="Request.Health.IBIT.NetworkAbstraction.ControlStation.Response"/>
+      <Reply bindRef="requestNetworkIntegrationControlStationIbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestNetworkIntegrationControlStationIbitResult" cdm="Request.Health.IBIT.NetworkAbstraction.ControlStation.Response" required="true">
+      <Results><ValueSetResult name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestNetworkIntegrationUsvIbit" name="네트워크추상화장치 IBIT 요청(USV)" cdm="Request.Health.IBIT.NetworkAbstraction.USV">
       <!--추후 USV측 NAE 점검 요청을 고려하여 SubEquipmentID 0x02 Control을 별도 정의한다. Result 대상 식별은 TBD.-->
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestNetworkIntegrationUsvIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestNetworkIntegrationUsvIbitResult" cdm="Request.Health.IBIT.NetworkAbstraction.USV.Response"/>
+      <Reply bindRef="requestNetworkIntegrationUsvIbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestNetworkIntegrationUsvIbitResult" cdm="Request.Health.IBIT.NetworkAbstraction.USV.Response" required="true">
+      <Results><ValueSetResult name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.mccStatus" cdm="Health.NetworkAbstraction.MCC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.ddcStatus" cdm="Health.NetworkAbstraction.DDC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult><ValueSetResult name="networkIntegrationDeviceIBIT.nmcStatus" cdm="Health.NetworkAbstraction.NMC.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="NoResponse" cdm="Health.Status.NoResponse"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestLBandControlStationGroupIbit" name="무선통신장치 IBIT 요청(통제소/중계소)" cdm="Request.Health.IBIT.LBand.ControlStationGroup">
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestLBandControlStationGroupIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestLBandControlStationGroupIbitResult" cdm="Request.Health.IBIT.LBand.ControlStationGroup.Response"/>
+      <Reply bindRef="requestLBandControlStationGroupIbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestLBandControlStationGroupIbitResult" cdm="Request.Health.IBIT.LBand.ControlStationGroup.Response" required="true">
+      <Results><ValueSetResult name="lBandControlStationDeviceIBIT.operation" cdm="Health.LBand.ControlStation.OperationalStatus"><Values><Value name="Normal" cdm="Communication.LBand.Operation.Normal"/><Value name="Degraded" cdm="Communication.LBand.Operation.Degraded"/><Value name="Unavailable" cdm="Communication.LBand.Operation.Unavailable"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDeviceIBIT.overallStatus" cdm="Health.LBand.ControlStation.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDeviceIBIT.referenceControlStatus" cdm="Health.LBand.ControlStation.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDeviceIBIT.modem1Status" cdm="Health.LBand.ControlStation.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDeviceIBIT.modem2Status" cdm="Health.LBand.ControlStation.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDeviceIBIT.rfmodule1Status" cdm="Health.LBand.ControlStation.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDeviceIBIT.rfmodule2Status" cdm="Health.LBand.ControlStation.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandControlStationDeviceIBIT.powerStatus" cdm="Health.LBand.ControlStation.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1IBIT.operation" cdm="Health.LBand.Repeater1.OperationalStatus"><Values><Value name="Normal" cdm="Communication.LBand.Operation.Normal"/><Value name="Degraded" cdm="Communication.LBand.Operation.Degraded"/><Value name="Unavailable" cdm="Communication.LBand.Operation.Unavailable"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1IBIT.overallStatus" cdm="Health.LBand.Repeater1.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1IBIT.referenceControlStatus" cdm="Health.LBand.Repeater1.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1IBIT.modem1Status" cdm="Health.LBand.Repeater1.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1IBIT.modem2Status" cdm="Health.LBand.Repeater1.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1IBIT.rfmodule1Status" cdm="Health.LBand.Repeater1.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1IBIT.rfmodule2Status" cdm="Health.LBand.Repeater1.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice1IBIT.powerStatus" cdm="Health.LBand.Repeater1.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2IBIT.operation" cdm="Health.LBand.Repeater2.OperationalStatus"><Values><Value name="Normal" cdm="Communication.LBand.Operation.Normal"/><Value name="Degraded" cdm="Communication.LBand.Operation.Degraded"/><Value name="Unavailable" cdm="Communication.LBand.Operation.Unavailable"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2IBIT.overallStatus" cdm="Health.LBand.Repeater2.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2IBIT.referenceControlStatus" cdm="Health.LBand.Repeater2.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2IBIT.modem1Status" cdm="Health.LBand.Repeater2.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2IBIT.modem2Status" cdm="Health.LBand.Repeater2.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2IBIT.rfmodule1Status" cdm="Health.LBand.Repeater2.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2IBIT.rfmodule2Status" cdm="Health.LBand.Repeater2.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice2IBIT.powerStatus" cdm="Health.LBand.Repeater2.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3IBIT.operation" cdm="Health.LBand.Repeater3.OperationalStatus"><Values><Value name="Normal" cdm="Communication.LBand.Operation.Normal"/><Value name="Degraded" cdm="Communication.LBand.Operation.Degraded"/><Value name="Unavailable" cdm="Communication.LBand.Operation.Unavailable"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3IBIT.overallStatus" cdm="Health.LBand.Repeater3.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3IBIT.referenceControlStatus" cdm="Health.LBand.Repeater3.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3IBIT.modem1Status" cdm="Health.LBand.Repeater3.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3IBIT.modem2Status" cdm="Health.LBand.Repeater3.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3IBIT.rfmodule1Status" cdm="Health.LBand.Repeater3.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3IBIT.rfmodule2Status" cdm="Health.LBand.Repeater3.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice3IBIT.powerStatus" cdm="Health.LBand.Repeater3.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4IBIT.operation" cdm="Health.LBand.Repeater4.OperationalStatus"><Values><Value name="Normal" cdm="Communication.LBand.Operation.Normal"/><Value name="Degraded" cdm="Communication.LBand.Operation.Degraded"/><Value name="Unavailable" cdm="Communication.LBand.Operation.Unavailable"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4IBIT.overallStatus" cdm="Health.LBand.Repeater4.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4IBIT.referenceControlStatus" cdm="Health.LBand.Repeater4.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4IBIT.modem1Status" cdm="Health.LBand.Repeater4.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4IBIT.modem2Status" cdm="Health.LBand.Repeater4.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4IBIT.rfmodule1Status" cdm="Health.LBand.Repeater4.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4IBIT.rfmodule2Status" cdm="Health.LBand.Repeater4.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice4IBIT.powerStatus" cdm="Health.LBand.Repeater4.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5IBIT.operation" cdm="Health.LBand.Repeater5.OperationalStatus"><Values><Value name="Normal" cdm="Communication.LBand.Operation.Normal"/><Value name="Degraded" cdm="Communication.LBand.Operation.Degraded"/><Value name="Unavailable" cdm="Communication.LBand.Operation.Unavailable"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5IBIT.overallStatus" cdm="Health.LBand.Repeater5.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5IBIT.referenceControlStatus" cdm="Health.LBand.Repeater5.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5IBIT.modem1Status" cdm="Health.LBand.Repeater5.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5IBIT.modem2Status" cdm="Health.LBand.Repeater5.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5IBIT.rfmodule1Status" cdm="Health.LBand.Repeater5.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5IBIT.rfmodule2Status" cdm="Health.LBand.Repeater5.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandRepeaterDevice5IBIT.powerStatus" cdm="Health.LBand.Repeater5.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestLBandTerminalIbit" name="무선통신장치 IBIT 요청(USV)" cdm="Request.Health.IBIT.LBand.Terminal">
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestLBandTerminalIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestLBandTerminalIbitResult" cdm="Request.Health.IBIT.LBand.Terminal.Response"/>
+      <Reply bindRef="requestLBandTerminalIbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestLBandTerminalIbitResult" cdm="Request.Health.IBIT.LBand.Terminal.Response" required="true">
+      <Results><ValueSetResult name="lBandTerminalDeviceIBIT.operation" cdm="Health.LBand.Terminal.OperationalStatus"><Values><Value name="Normal" cdm="Communication.LBand.Operation.Normal"/><Value name="Degraded" cdm="Communication.LBand.Operation.Degraded"/><Value name="Unavailable" cdm="Communication.LBand.Operation.Unavailable"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDeviceIBIT.overallStatus" cdm="Health.LBand.Terminal.DeviceStatus"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDeviceIBIT.referenceControlStatus" cdm="Health.LBand.Terminal.ReferenceControl.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDeviceIBIT.modem1Status" cdm="Health.LBand.Terminal.Modem1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDeviceIBIT.modem2Status" cdm="Health.LBand.Terminal.Modem2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDeviceIBIT.rfmodule1Status" cdm="Health.LBand.Terminal.RFModule1.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDeviceIBIT.rfmodule2Status" cdm="Health.LBand.Terminal.RFModule2.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult><ValueSetResult name="lBandTerminalDeviceIBIT.powerStatus" cdm="Health.LBand.Terminal.Power.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Degraded" cdm="Health.Status.Degraded"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestAuxControlIbit" name="출입항보조통제장치 송수신기 IBIT 요청" cdm="Request.Health.IBIT.AuxControl.Transceiver">
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestAuxControlIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestAuxControlIbitResult" cdm="Request.Health.IBIT.AuxControl.Transceiver.Response"/>
+      <Reply bindRef="requestAuxControlIbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestAuxControlIbitResult" cdm="Request.Health.IBIT.AuxControl.Transceiver.Response" required="true">
+      <Results><ValueSetResult name="auxControlDeviceStatus" cdm="Health.AuxControl.Transceiver.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestGeoSatControlStationIbit" name="고궤도 위성통신장치 IBIT 요청(통제소)" cdm="Request.Health.IBIT.GeoSat.ControlStation">
       <!--GeoSat IBIT Result에 subEquipmentID/commandID가 없어 0x21/0x22 결과의 명시적 식별 방법은 원본 인터페이스 확인 필요(TBD).-->
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestGeoSatControlStationIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestGeoSatControlStationIbitResult" cdm="Request.Health.IBIT.GeoSat.ControlStation.Response"/>
+      <Reply bindRef="requestGeoSatControlStationIbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestGeoSatControlStationIbitResult" cdm="Request.Health.IBIT.GeoSat.ControlStation.Response" required="true">
+      <Results><ValueSetResult name="geoSatDeviceStatus" cdm="Health.GeoSat.Device.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestGeoSatUsvIbit" name="고궤도 위성통신장치 IBIT 요청(USV)" cdm="Request.Health.IBIT.GeoSat.USV">
       <!--통제소/USV 대상별 Control 분리 원칙에 따라 SubEquipmentID 0x22를 별도 정의한다. Result 대상 식별은 TBD.-->
       <Target cdm="Communication.Equipment.Identifier.Numeric"/>
-      <Reply bindRef="requestGeoSatUsvIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestGeoSatUsvIbitResult" cdm="Request.Health.IBIT.GeoSat.USV.Response"/>
+      <Reply bindRef="requestGeoSatUsvIbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestGeoSatUsvIbitResult" cdm="Request.Health.IBIT.GeoSat.USV.Response" required="true">
+      <Results><ValueSetResult name="geoSatDeviceStatus" cdm="Health.GeoSat.Device.Status"><Values><Value name="Normal" cdm="Health.Status.Normal"/><Value name="Unavailable" cdm="Health.Status.Unavailable"/><Value name="Disconnected" cdm="Health.Status.Disconnected"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
   </ControlSpecs>
 </CommSpec>

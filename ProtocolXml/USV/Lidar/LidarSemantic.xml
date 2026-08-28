@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd">
   <!--라이다 정보처리장치 Semantic: 라이다 정보처리 CSC + 원격통제장치 CSCI + 공용 구조체/식별자 규칙 기반-->
   <!--TransferIntraNetworkStatusType은 운항용카메라장치 CSCI 전용 전달 메시지이므로 원격통제장치 직접 연동 Semantic 대상에서 제외한다.-->
   <ConstantSpecs id="constant">
@@ -53,16 +53,16 @@
       <!--라이다 정보처리 CSC Semantic에서는 공용 CIPE 상태값 중 라이다에 해당하는 20/23만 노출한다.-->
       <ValueSetSpec id="cipeOperationalStatus" name="라이다 연동 상태" cdm="Health.CIPE.EquipmentLink">
         <Values>
-          <Value cdm="Health.CIPE.Lidar.Connected">20</Value>
-          <Value cdm="Health.CIPE.Lidar.Disconnected">23</Value>
+          <Value cdm="Health.CIPE.Lidar.Connected" name="Connected"/>
+          <Value cdm="Health.CIPE.Lidar.Disconnected" name="Disconnected"/>
         </Values>
       </ValueSetSpec>
       <ValueSetSpec id="operationalStatus" name="처리카드 정상 작동 여부" cdm="Health.CIPE.OperationalStatus">
         <Values>
-          <Value cdm="Health.Normal">0</Value>
-          <Value cdm="Health.Degraded">1</Value>
-          <Value cdm="Health.Unavailable">2</Value>
-          <Value cdm="Health.NoResponse">3</Value>
+          <Value cdm="Health.Normal" name="Normal"/>
+          <Value cdm="Health.Degraded" name="Degraded"/>
+          <Value cdm="Health.Unavailable" name="Unavailable"/>
+          <Value cdm="Health.NoResponse" name="NoResponse"/>
         </Values>
       </ValueSetSpec>
     </GroupSpec>
@@ -71,21 +71,33 @@
   <ControlSpecs id="control">
     <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="startIntegrationAck" cdm="Control.CommandStatus.Response" required="true">
+      <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true"/>
+      <Reply bindRef="restartSystemAck" cdm="Control.CommandStatus.Response" required="true">
+      <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response"/>
+      <Reply bindRef="requestIbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
+      <Results><ValueSetResult name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"><Values><Value name="Connected" cdm="Health.CIPE.Lidar.Connected"/><Value name="Disconnected" cdm="Health.CIPE.Lidar.Disconnected"/></Values></ValueSetResult><ValueSetResult name="cipeIBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><QuantityResult name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature"><Unit>degC</Unit><Range min="20" max="100"/></QuantityResult><QuantityResult name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.CIPE.Processor.CpuLoad"><Unit>percent</Unit><Range min="0" max="100"/></QuantityResult></Results>
+    </Reply>
     </ControlSpec>
     <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true"/>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response"/>
+      <Reply bindRef="requestPbitAck" cdm="Control.CommandStatus.Response" required="true">
+        <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
+      </Reply>
+      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
+      <Results><ValueSetResult name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"><Values><Value name="Connected" cdm="Health.CIPE.Lidar.Connected"/><Value name="Disconnected" cdm="Health.CIPE.Lidar.Disconnected"/></Values></ValueSetResult><ValueSetResult name="cipePBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results>
+    </Reply>
     </ControlSpec>
   </ControlSpecs>
 </SensorSpec>
