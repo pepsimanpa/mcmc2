@@ -317,7 +317,7 @@ SideScanSonar의 다음 상태 필드는 Semantic 논리 상태가 존재하지�
 
 ## 11. PackedField 최종 감사
 
-14개 장치 Binding 전체의 `PackedField`는 총 **65개**이다.
+14개 장치 Binding 전체의 `PackedField`는 총 **111개**이다. 최근 EOIR/운항용카메라/근거리접촉물/RCWS/SSS 재심층 감사에서 source-confirmed bitfield를 추가 분해한 결과를 반영한 최신 수치다.
 
 검사 결과:
 
@@ -386,76 +386,54 @@ DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표�
 
 ---
 
-## 14. 공통 OpenIssue 통합 ID
+## 14. 공통 OpenIssue 최종 통합
 
-장치별 `*_OpenIssues.md`는 원문 근거와 장치 세부 맥락을 보존하기 위해 삭제하지 않는다.
+장치별 `*_OpenIssues.md`의 세부 근거는 유지하고, 반복되는 근본원인은 다음 master 문서에서 최종 통합 관리한다.
 
-다만 여러 장치에 반복되는 문제는 아래 공통 ID를 master tracking 항목으로 사용한다.
+`ProtocolXml/Docs/USV_OpenIssues_Consolidated_20260828.md`
 
-### USV-COMMON-01 — PBIT / IBIT 비동기 결과 correlation
+Active common master issue는 총 **10개**다.
 
-- 적용 범위: 14개 전 장치
-- 실제 결과 Reply: 61개
-- 결과 Reply의 commandID: 0개
-- 상태: 추가 Adapter / runtime correlation 규칙 필요
+- `USV-COMMON-01`: PBIT/IBIT 비동기 Result correlation
+- `USV-COMMON-03`: Result source routing / one-request multi-result fan-out
+- `USV-COMMON-05`: count 필드 ↔ sequence 실제 길이 일치/오류 처리
+- `USV-COMMON-06`: `-PI~+PI` 같은 symbolic Range의 CommonSpecSchema 표현
+- `USV-COMMON-07`: 공용 CIPE `cipeOperationalStatus` producer/subset 의미
+- `USV-COMMON-08`: nested structure dotted-path Adapter 접근 계약
+- `USV-COMMON-09`: PBIT/IBIT 외 비동기 Result/ACK correlation
+- `USV-COMMON-10`: RTP endpoint / 물리 채널 배치값
+- `USV-COMMON-11`: CSCI 물리 오탈자와 실제 DDS IDL 철자 확인
+- `USV-COMMON-12`: 수치 sentinel/invalid 결과의 Semantic 노출 정책
 
-### USV-COMMON-02 — DDS Boolean wire type 표현 — **RESOLVED (2026-08-28)**
+Resolved common master issue는 다음 2개다.
 
-- 공통 `CommonBindingSchema.xsd/WireDataType`에 `Boolean` 추가
-- 실제 DDS/IDL boolean 직접 필드 11개 반영: ElectroOptical 8, ElectroOpticalProcessor 1, NetworkAbstraction 2. PlatformController는 원 CSCI 재감사에서 직접 boolean 0개로 확인되어 기존 10개를 UInt8(octet)로 정정
-- Semantic Boolean이라고 해서 자동으로 wire Boolean으로 변경하지 않는 규칙을 공통 설계문서에 명시
-- AUV / MDV / EMDW 교차 감사 결과 직접 wire Boolean 후보는 0개였으며, 기존 Boolean 의미는 packed bit 또는 numeric sentinel/파생 의미이므로 실제 wire 타입을 유지
+- `USV-COMMON-02`: DDS Boolean wire type — **RESOLVED**
+- `USV-COMMON-04`: primitive wire `dataType` 부족 — **RESOLVED**
 
-### USV-COMMON-03 — 공용 Result Topic source routing / fan-out
+실제 runtime 통합 전에는 `01/03/08/09`를 우선 확정해야 한다. 나머지는 source/IDL, 배치 설정 또는 공통 XSD/모델 개선 항목이며 현재 Semantic/Binding XML의 merge blocker는 아니다.
 
-대표 적용 장치:
-
-- ElectroOpticalProcessor
-- Lidar
-- NavigationRadar
-- NearContactDetection
-- NetworkAbstraction
-- SensorFusion
-
-같은 계열 Result Topic을 여러 처리카드 / 세부 장치가 공유하거나 하나의 요청에서 여러 결과가 fan-out되는 구조가 있으므로, `usvHeader` 및 장비 식별정보 기반 source discrimination 규칙을 Adapter 수준에서 명확히 해야 한다.
-
-### USV-COMMON-04 — 원문 부족 primitive wire dataType — **RESOLVED (2026-08-28)**
-
-- NavigationRadar 및 NetworkAbstraction의 잔여 type은 장치 CSCI/공용 구조체에서 확인하여 해결하였다.
-- PlatformController의 기존 미지정 항목은 `선체제어장치 CSCI.csv`를 message/type별로 전수 재감사하여 primitive type을 확정하였다.
-- 최종 primitive `dataType` 미지정: 0건. 복합 구조체에는 primitive type을 강제하지 않는다.
-
-### 장치 고유로 유지하는 대표 이슈
-
-다음은 공통 이슈로 올리지 않고 해당 장치 문서에 유지한다.
-
-- SSS 전원 상태 5개 0/1 polarity
-- Radar/AIS 탐지거리 octet 프리셋 규칙
-- EOIR Zoom/Focus `0x5555` sentinel
-- IntegratedNavigation 특정 BIT 예약비트/표기 오류
-- AutonomousNavigation Achieved code 및 단위 미기재
-- 각 장치 고유 range / unit / sentinel / 물리 Type 오탈자
+장치별 고유 이슈와 각 공통 ID의 적용 장치는 consolidated master 문서를 기준으로 한다.
 
 ---
 
 ## 15. 장치별 최종 구조 검증 결과
 
-| 장치 | Control | Reply | Monitor | Product | XSD | ID 참조 | converter | Semantic raw enum |
-|---|---:|---:|---:|---:|---|---|---:|---:|
-| AutonomousNavigation | 17 | 26 | 10 | 0 | PASS | PASS | 0 | 0 |
-| CentralControl | 24 | 26 | 3 | 0 | PASS | PASS | 0 | 0 |
-| ElectroOptical | 20 | 22 | 4 | 2 | PASS | PASS | 0 | 0 |
-| ElectroOpticalProcessor | 5 | 7 | 2 | 0 | PASS | PASS | 0 | 0 |
-| IntegratedNavigation | 5 | 6 | 2 | 0 | PASS | PASS | 0 | 0 |
-| Lidar | 4 | 6 | 2 | 0 | PASS | PASS | 0 | 0 |
-| NavigationCamera | 5 | 6 | 2 | 1 | PASS | PASS | 0 | 0 |
-| NavigationRadar | 12 | 14 | 6 | 1 | PASS | PASS | 0 | 0 |
-| NearContactDetection | 4 | 8 | 2 | 1 | PASS | PASS | 0 | 0 |
-| NetworkAbstraction | 19 | 32 | 9 | 0 | PASS | PASS | 0 | 0 |
-| PlatformController | 20 | 37 | 14 | 0 | PASS | PASS | 0 | 0 |
-| RemoteFireControl | 14 | 20 | 3 | 1 | PASS | PASS | 0 | 0 |
-| SensorFusion | 4 | 6 | 3 | 0 | PASS | PASS | 0 | 0 |
-| SideScanSonar | 38 | 47 | 8 | 5 | PASS | PASS | 0 | 0 |
+| 장치 | Control | Reply | Monitor | Product | PackedField | XSD | ID 참조 | converter | Semantic raw enum |
+|---|---:|---:|---:|---:|---:|---|---|---:|---:|
+| AutonomousNavigation | 17 | 26 | 10 | 0 | 0 | PASS | PASS | 0 | 0 |
+| CentralControl | 24 | 26 | 3 | 0 | 2 | PASS | PASS | 0 | 0 |
+| ElectroOptical | 20 | 22 | 4 | 2 | 5 | PASS | PASS | 0 | 0 |
+| ElectroOpticalProcessor | 5 | 7 | 2 | 0 | 0 | PASS | PASS | 0 | 0 |
+| IntegratedNavigation | 5 | 6 | 2 | 0 | 29 | PASS | PASS | 0 | 0 |
+| Lidar | 4 | 6 | 2 | 0 | 0 | PASS | PASS | 0 | 0 |
+| NavigationCamera | 5 | 6 | 2 | 1 | 9 | PASS | PASS | 0 | 0 |
+| NavigationRadar | 12 | 14 | 6 | 1 | 0 | PASS | PASS | 0 | 0 |
+| NearContactDetection | 4 | 8 | 2 | 1 | 37 | PASS | PASS | 0 | 0 |
+| NetworkAbstraction | 19 | 32 | 9 | 0 | 15 | PASS | PASS | 0 | 0 |
+| PlatformController | 20 | 37 | 14 | 0 | 2 | PASS | PASS | 0 | 0 |
+| RemoteFireControl | 14 | 20 | 3 | 1 | 4 | PASS | PASS | 0 | 0 |
+| SensorFusion | 4 | 6 | 3 | 0 | 0 | PASS | PASS | 0 | 0 |
+| SideScanSonar | 38 | 47 | 8 | 5 | 8 | PASS | PASS | 0 | 0 |
 
 `Control` 수는 `ControlSpecs` 하위의 `ControlSpec`, `SetPointSpec`, `TriggerSpec` 등 실제 Binding 대상 제어 subtype 전체를 포함한 수치이다.
 
@@ -475,6 +453,7 @@ DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표�
 | generic 4-state Health CDM 분산 | 정규화 완료 |
 | 확인 가능한 ValueSet ↔ ValueMap 불일치 | 0 |
 | 원문 근거 부족 intentional no-map | SSS 5건 |
+| PackedField 총수 | 111 |
 | PackedField overlap | 0 |
 | PackedField width 초과 | 0 |
 | 공통 Control Semantic Target | 표준 장치 통일 완료 |
@@ -493,9 +472,9 @@ DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표�
 - generic Health 4상태 CDM 일관성 감사
 - ValueSet / ValueMap 전수 대응 감사
 - PackedField 구조 전수 감사
-- 중복 OpenIssue 공통 분류
+- 중복 OpenIssue 공통 분류 및 `USV_OpenIssues_Consolidated_20260828.md` master tracking 문서 작성
 
-장치별 OpenIssues 문서의 과거 “최종 CDM 감사 예정” 문구는 **본 통합 감사 문서가 supersede**한다.
+장치별 OpenIssues 문서의 과거 “최종 CDM 감사 예정” 문구는 **본 통합 감사 문서와 consolidated OpenIssue master가 supersede**한다.
 
 ---
 
@@ -545,3 +524,17 @@ CommandStatusReport = 처리 ACK
 ```
 
 이 기준을 이후 USV XML 변경 시 공통 회귀검증 기준으로 사용한다.
+
+---
+
+## 20. 최종 OpenIssue / Merge Readiness
+
+OpenIssue의 최종 공통/장치고유 분류는 `ProtocolXml/Docs/USV_OpenIssues_Consolidated_20260828.md`를 master로 사용한다.
+
+- Active common master issue: 10개
+- Resolved common master issue: 2개
+- 28개 XML XSD/ID reference blocker: 0개
+- Semantic/Binding 설계 상태: **Review/Merge Ready**
+- Runtime integration 전 우선 확정: `USV-COMMON-01`, `03`, `08`, `09`
+
+현재 남은 TBD는 원문에 없는 값을 의도적으로 추정하지 않은 결과이며, XML 설계 결함과 구분하여 관리한다.

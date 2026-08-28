@@ -301,3 +301,24 @@ ProtocolXml/USV/CentralControl/CentralControl_OpenIssues.md
 ## 현재 상태 한 문장
 
 **AUV는 main 병합 완료. USV는 `feature/usv-semantic-binding-audit`에서 SSS와 CentralControl의 선언형 Semantic/Binding 정리 및 구조 감사까지 완료했으며, 장치 고유 비차단 TBD는 OpenIssues에 보존되어 있다. 다음 USV 장치를 같은 규칙으로 한 번에 처리하면 된다.**
+
+
+---
+
+## 20. 2026-08-28 USV 최종 통합감사 업데이트
+
+> 이 섹션은 본 HANDOFF 상단/중간의 초기 시각 기준 USV 진행상태를 supersede한다. 실제 작업 시작 전에는 항상 GitHub 최신 HEAD를 다시 확인한다.
+
+- RCU 직접 연동 USV 14개 장치의 Semantic/Binding 설계 및 CSV 재심층 감사 완료.
+- 14개 Semantic + 14개 Binding XSD PASS.
+- Control/Reply/Monitor/Product cross-reference 오류 0.
+- converter 0, source-confirmed primitive `dataType` 미지정 0.
+- 최신 PackedField 총수 111.
+- 실제 DDS/IDL Boolean direct field 총 11: EO 8 / EOP 1 / NetworkAbstraction 2 / PlatformController 0.
+- PBIT/IBIT 실제 Result Reply 61개, commandID 포함 0개 → `USV-COMMON-01`.
+- 최종 공통/장치 고유 OpenIssue master: `ProtocolXml/Docs/USV_OpenIssues_Consolidated_20260828.md`.
+- 최종 통합 감사: `ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md`.
+- Active common master issue 10개, resolved common 2개.
+- Semantic/Binding 설계 자체는 Review/Merge Ready. Runtime 연동 전 `USV-COMMON-01/03/08/09` 우선 확정 필요.
+- SideScanSonar 문서의 과거 `최종 CDM 감사`는 통합감사 완료로 RESOLVED/superseded.
+- 현재 남은 장치 고유 TBD는 raw code/unit/bit polarity/운용 규칙/배치값/IDL 확인이 필요한 항목이며 원문 없이 임의로 닫지 않는다.

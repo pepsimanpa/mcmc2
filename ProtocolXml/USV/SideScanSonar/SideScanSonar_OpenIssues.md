@@ -52,12 +52,11 @@
 ### 6. 로컬 XSD 복사본 정리
 
 - `SideScanSonar/CommonSpecSchema.xsd`, `SideScanSonar/CommonBindingSchema.xsd`는 현재 `ProtocolXml/XSD`의 공통 XSD보다 오래된 snapshot이다.
-- 이번 단계에서는 외부 도구가 이 파일을 직접 참조할 가능성을 고려해 파일 자체는 삭제하지 않는다.
-- SSS XML의 `schemaLocation`만 공통 XSD로 전환하고, USV 전체 migration 완료 후 외부 의존성을 확인한 다음 삭제 여부를 결정한다.
+- SSS XML의 `schemaLocation`과 USV 전체 migration은 공통 XSD 기준으로 완료하였다. 다만 외부 도구가 로컬 snapshot을 직접 참조할 가능성이 남아 있어 파일 자체는 삭제하지 않는다. 외부 의존성 확인 후 삭제 여부만 별도로 결정한다.
 
-### 7. 최종 CDM 감사
+### 7. [RESOLVED] 최종 CDM 감사
 
-- CDM 명칭과 계층은 USV 장치 전체를 동일 기준으로 정리한 뒤 별도 전수 감사한다.
+- USV 14개 장치 최종 통합감사를 완료했으며 `ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md`와 `USV_OpenIssues_Consolidated_20260828.md`가 이 후속항목을 supersede한다.
 
 ### 8. CSCI 오탈자 보존
 
@@ -70,7 +69,7 @@
 - IDL 매핑 기준: `octet/unsigned char -> UInt8`, `short -> Int16`, `unsigned short -> UInt16`, `long -> Int32`, `unsigned long -> UInt32`, `float -> Float32`, `double -> Float64`.
 - `USVMessageBase`, `DestinationType` 등 composite 구조체에는 primitive `dataType`을 억지로 부여하지 않는다.
 - 동일 이름이라도 메시지별 타입이 달라질 수 있는 필드는 DDS `typeName` 문맥으로 재확인한다. 특히 원신호의 `pulseType`과 제어 `StatusConfigType.pulseType`처럼 이름 재사용이 있는 경우 현재 Binding에 실제 사용되는 메시지 정의를 우선한다.
-- `boolean`, 배열, 문자열/char, 사용자 정의 구조체처럼 현재 `WireDataType`으로 직접 표현하기 애매한 항목은 후속 검토로 남긴다.
+- 실제 DDS/IDL `boolean`은 공통 `WireDataType.Boolean`으로 표현한다. 배열, 문자열/char, 사용자 정의 구조체는 각 원문 wire 구조와 공통 XSD 표현을 따른다.
 
 
 ## Enum / ValueMap migration
@@ -78,7 +77,7 @@
 - Semantic 논리 상태의 raw 숫자 코드를 제거하고 실제 DDS 코드는 Binding `ValueMap`으로 이동한다.
 - 반영: 운용모드, SSS/GF PulseType, SSS/GF TVG, 진회수 상태, USBL 모드, 3개 Brake, 2개 Limit Switch, CBIT 4상태, 제어 `powerOn`, 제어 `pulseType`.
 - 5개 `DetailSystemStatusType` powerStatus는 원문에서 0/1 의미가 직접 확인되지 않아 raw 0/1을 임시 유지한다.
-- `SideScanSonar.SonarType`, `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`, `SideScanSonar.Subsystem(targetDevice)`은 최종 논리 값/CDM 재확인 후 이동한다.
+- `SideScanSonar.SonarType`과 `SideScanSonar.Subsystem(targetDevice)`은 원문 값으로 논리화 완료하였다. `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`만 원문 코드 의미 부족으로 TBD를 유지한다.
 - 최종 CDM 감사 전에는 기존 CDM을 재사용하고 새 CDM 생성을 최소화한다.
 
 
@@ -103,7 +102,7 @@
 - GapFiller는 별도 range 설정이 없고 예인형 SSS range와 동기화된다. 현재 평면 Parameter 모델에서 조건부 적용은 직접 표현하지 않고 후속 스키마/OM 검토로 남긴다.
 - `ReceiveProcessing.TVG.Mode`는 CSCI에서 `0=Off(TVG 미사용), 1=On`이 직접 확인되어 이미 Semantic ValueSet/Binding ValueMap으로 반영되어 있다. `ReceiveProcessing.SoftwareGain.Mode(0~2)`와 `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 이번 CSCI에 해당 모드 필드/코드 의미가 없어 QuantityProfile TBD를 유지한다.
 - `LanchAndRecoveryBackStopReportType.slideBackStop`은 CSCI에서 `0=정지상태, 1=슬라이드 후퇴고정완료, 2=복귀완료`가 직접 확인되어 Semantic ValueSetResult/Binding ValueMap으로 반영하였다. PBIT/IBIT은 각 필드 자체에 직접 코드/bit 의미가 명시된 항목만 추가 논리화하고, 근거가 비어 있는 항목은 Raw/TBD를 유지한다.
-- 새 SonarType/Subsystem/MCS/LaunchReport 하위 CDM 경로는 연결용 임시 키이며 최종 USV CDM 감사에서 명칭/계층을 재검토한다.
+- SonarType/Subsystem/MCS/LaunchReport 하위 CDM은 최종 USV 통합 감사에서 현재 의미 연결을 유지하기로 하였으며, 새로운 원문 근거가 없는 한 재명명하지 않는다.
 
 
 ## Final structural audit
