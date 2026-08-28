@@ -1,0 +1,139 @@
+name: Temporary Lidar Network RCWS Minimal Diff
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+    paths: ['.github/workflows/xml-minimal-diff-lidar-network-rcws-temp.yml']
+permissions:
+  contents: write
+jobs:
+  minimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+      - run: python -m pip install lxml
+      - name: Restore unchanged fragments and validate
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re, subprocess, difflib, sys
+          BASE='8b551afe1f95762bafac78f53b6d43a66c610188'
+          files=[
+            'ProtocolXml/USV/Lidar/LidarSemantic.xml','ProtocolXml/USV/Lidar/LidarBinding.xml',
+            'ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionSemantic.xml','ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionBinding.xml',
+            'ProtocolXml/USV/RemoteFireControl/RemoteFireControlSemantic.xml','ProtocolXml/USV/RemoteFireControl/RemoteFireControlBinding.xml']
+          targets={'TextConstantSpec','GroupSpec','QuantitySpec','ValueSetSpec','BooleanSpec','TextSpec','CollectionSpec','ElementSpec','ControlSpec','Reply','QuantityProfile','ValueSetProfile','BooleanProfile','Profile','GroupResult','QuantityResult','ValueSetResult','BooleanResult','Result','ProductStreamSpec','MonitorBinding','ControlBinding','Field','FixedField','DerivedField','ArrayField','Element','PackedField','BitMember','ProductBinding'}
+          context_tags={'GroupSpec','CollectionSpec','ElementSpec','ControlSpec','Reply','MonitorBinding','ControlBinding','ArrayField','Element','PackedField','ProductBinding'}
+          token_re=re.compile(r'<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<![^>]*>|</?[^>]+?>')
+          start_re=re.compile(r'<\s*([A-Za-z_][\w:.-]*)\b([^>]*)>')
+          end_re=re.compile(r'</\s*([A-Za-z_][\w:.-]*)\s*>')
+          def attrs(s): return dict(re.findall(r'([A-Za-z_][\w:.-]*)\s*=\s*["\']([^"\']*)["\']',s))
+          def ident(tag,a):
+            for k in ('id','semantic_id','bindRef','name','cdm','sourceField'):
+              if a.get(k): return (tag,k,a[k])
+            return None
+          def scan(text):
+            out={}; stack=[]; ctx=[]
+            for m in token_re.finditer(text):
+              tok=m.group(0)
+              if tok.startswith('<!--') or tok.startswith('<?') or (tok.startswith('<!') and not tok.startswith('</')): continue
+              em=end_re.fullmatch(tok)
+              if em:
+                if stack:
+                  ent=stack.pop()
+                  if ent['ctx_added']: ctx.pop()
+                  if ent['key'] is not None: out.setdefault(ent['key'],[]).append((ent['start'],m.end()))
+                continue
+              sm=start_re.fullmatch(tok)
+              if not sm: continue
+              tag=sm.group(1).split(':')[-1]; a=attrs(sm.group(2)); ii=ident(tag,a); selfclose=tok.rstrip().endswith('/>')
+              key=tuple(ctx+[ii]) if tag in targets and ii else None
+              if key is not None and selfclose: out.setdefault(key,[]).append((m.start(),m.end()))
+              elif not selfclose:
+                add=tag in context_tags and ii is not None
+                stack.append({'start':m.start(),'key':key,'ctx_added':add})
+                if add: ctx.append(ii)
+            return out
+          def canon(s):
+            s=re.sub(r'<!--[\s\S]*?-->','',s)
+            return re.sub(r'>\s+<','><',s.strip())
+          def comments(s): return [re.sub(r'\s+',' ',x.strip()) for x in re.findall(r'<!--([\s\S]*?)-->',s)]
+          def sim(a,b): return difflib.SequenceMatcher(None,a,b).ratio()>=0.55
+          def diff_total():
+            o=subprocess.check_output(['git','diff','--numstat',BASE,'--',*files],text=True)
+            n=0
+            for ln in o.splitlines():
+              a,d,*_=ln.split('\t'); n+=(int(a) if a.isdigit() else 0)+(int(d) if d.isdigit() else 0)
+            return n
+          before=diff_total(); print('DIFF_TOTAL_BEFORE',before)
+          for fp in files:
+            p=Path(fp); cur=p.read_text(); old=subprocess.check_output(['git','show',f'{BASE}:{fp}'],text=True)
+            print('COMMENTS_BEFORE_RESTORE',fp,'old',len(comments(old)),'current',len(comments(cur)))
+            cs=scan(cur); os=scan(old); candidates=[]
+            for k,cv in cs.items():
+              ov=os.get(k)
+              if not ov or len(cv)!=1 or len(ov)!=1: continue
+              a,b=cv[0]; oa,ob=ov[0]; cf=cur[a:b]; of=old[oa:ob]
+              if canon(cf)!=canon(of): continue
+              cc,oc=comments(cf),comments(of)
+              # Do not discard a current-only source/design comment.
+              if any(not any(sim(c,x) for x in oc) for c in cc): continue
+              if cf!=of: candidates.append((a,b,oa,ob))
+            candidates.sort(key=lambda x:(x[1]-x[0]),reverse=True); selected=[]
+            for c in candidates:
+              a,b,_,_=c
+              if any(sa<=a and b<=sb for sa,sb,_,_ in selected): continue
+              selected.append(c)
+            for a,b,oa,ob in sorted(selected,reverse=True): cur=cur[:a]+old[oa:ob]+cur[b:]
+            p.write_text(cur)
+            print('RESTORED',fp,len(selected),'COMMENTS_AFTER',len(comments(cur)))
+          after=diff_total(); print('DIFF_TOTAL_AFTER',after)
+          if after>before:
+            subprocess.check_call(['git','checkout','--',*files]); print('REVERT_DIFF_INCREASE')
+
+          NS={'u':'http://lignex1.com/mcmc2/umsSchema'}; root=Path('ProtocolXml')
+          ss=etree.XMLSchema(etree.parse(str(root/'XSD/CommonSpecSchema.xsd'))); bs=etree.XMLSchema(etree.parse(str(root/'XSD/CommonBindingSchema.xsd')))
+          fail=[]
+          for d in ['Lidar','NetworkAbstraction','RemoteFireControl']:
+            sp=root/f'USV/{d}/{d}Semantic.xml'; bp=root/f'USV/{d}/{d}Binding.xml'; sd=etree.parse(str(sp)); bd=etree.parse(str(bp))
+            for p,doc,sch in [(sp,sd,ss),(bp,bd,bs)]:
+              ok=sch.validate(doc); print('XSD',p,'PASS' if ok else 'FAIL')
+              if not ok:
+                fail.append(str(p)); [print(' XSDERR',x) for x in sch.error_log]
+            def aset(doc,x): return set(doc.xpath(x,namespaces=NS))
+            for k,a,b in [
+              ('Control',aset(sd,'//u:ControlSpec/@id'),aset(bd,'//u:ControlBinding/@semantic_id')),
+              ('Reply',aset(sd,'//u:Reply/@bindRef'),aset(bd,'//u:ControlBinding/u:Reply/@semantic_id')),
+              ('Monitor',aset(sd,'/u:*/*[local-name()="MonitorSpecs"]/*/@id'),aset(bd,'/u:*/*[local-name()="Monitors"]/u:MonitorBinding/@semantic_id')),
+              ('Product',aset(sd,'/u:*/*[local-name()="SensorProductSpecs"]/*/@id'),aset(bd,'/u:*/*[local-name()="SensorProducts"]/u:ProductBinding/@semantic_id'))]:
+              print('XREF',d,k,len(a),len(b),sorted(a-b),sorted(b-a))
+              if a!=b: fail.append(d+':'+k)
+            conv=bd.xpath('//@converter'); print('CONVERTER',d,len(conv));
+            if conv: fail.append(d+':converter')
+            nums=[]
+            for v in sd.xpath('//u:Value',namespaces=NS):
+              t=(v.text or '').strip()
+              if re.fullmatch(r'[-+]?\d+(?:\.\d+)?',t): nums.append(t)
+            print('RAW_ENUM',d,len(nums));
+            if nums: fail.append(d+':raw')
+            miss=[]
+            for x in bd.xpath('//u:Field|//u:FixedField|//u:DerivedField',namespaces=NS):
+              if x.get('dataType') is None and x.get('name') not in {'usvHeader','destination'}: miss.append((x.get('name'),x.get('cdm')))
+            print('MISSING_DATATYPE',d,len(miss),miss[:20])
+            if d in {'Lidar','RemoteFireControl'} and miss: fail.append(d+':datatype')
+          print('FAIL',fail)
+          if fail: sys.exit(1)
+          PY
+          git diff --check
+          echo '--- DIFF STAT VS PRE-TASK HEAD ---'
+          git diff --stat 8b551afe1f95762bafac78f53b6d43a66c610188 -- ProtocolXml/USV/Lidar ProtocolXml/USV/NetworkAbstraction ProtocolXml/USV/RemoteFireControl
+      - name: Commit minimal diff restoration
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ProtocolXml/USV/Lidar/LidarSemantic.xml ProtocolXml/USV/Lidar/LidarBinding.xml ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionSemantic.xml ProtocolXml/USV/NetworkAbstraction/NetworkAbstractionBinding.xml ProtocolXml/USV/RemoteFireControl/RemoteFireControlSemantic.xml ProtocolXml/USV/RemoteFireControl/RemoteFireControlBinding.xml
+          if git diff --cached --quiet; then echo 'No additional restoration'; else git commit -m 'Restore unchanged Lidar Network RCWS XML fragments'; git push origin HEAD:feature/usv-semantic-binding-audit; fi
