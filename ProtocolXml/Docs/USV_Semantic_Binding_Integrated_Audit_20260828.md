@@ -368,7 +368,7 @@ SideScanSonar의 다음 상태 필드는 Semantic 논리 상태가 존재하지�
 
 원문 / IDL 근거가 직접 확인되는 primitive 필드는 Binding `dataType`을 선언하는 것이 원칙이다.
 
-최종 감사에서 `usvHeader` / `destination` composite를 제외하고 남은 primitive `dataType` 미지정은 총 **419건**이다.
+최종 감사에서 `usvHeader` / `destination` 및 `ProcessorIBIT` 같은 composite를 제외하고 남은 primitive `dataType` 미지정은 총 **0건**이다.
 
 | 장치 | 미지정 수 | 사유 |
 |---|---:|---|
@@ -376,13 +376,11 @@ SideScanSonar의 다음 상태 필드는 Semantic 논리 상태가 존재하지�
 | ElectroOpticalProcessor | 0 | `controlImageSave`를 `dataType="Boolean"`으로 해결 |
 | NavigationRadar | 0 | `항해레이더 정보처리 CSC.csv`에서 `frameWidth/frameHeight=long(4 Byte)` 확인 후 `Int32` 반영 |
 | NetworkAbstraction | 0 | `공용 구조체.csv`에서 GeoSat 수치 8개 primitive type까지 확인 완료 |
-| PlatformController | 419 | 실제 DDS boolean 10개 해결; 나머지 legacy 상태/PBIT/IBIT primitive type 근거 부족 |
+| PlatformController | 0 | `선체제어장치 CSCI.csv` 전수 재확인으로 상태/PBIT/IBIT/Heartbeat primitive type 반영; 기존 Boolean 10개는 원문 octet에 따라 UInt8로 정정 |
 | 기타 9개 장치 | 0 | 확인 가능한 primitive type 반영 완료 |
-| **합계** | **419** |  |
+| **합계** | **0** |  |
 
-이 419건은 XSD 오류가 아니다. 현재 XSD에서 `dataType` 속성 자체는 선택적이다.
-
-다만 프로젝트 설계 규칙상 확인 가능한 primitive type은 선언해야 하므로, **추가 CSCI / IDL 근거 확보 후 보강할 공통 후속항목**으로 관리한다.
+현재 14개 USV 장치의 source-confirmed primitive field는 모두 `dataType`이 선언되었다. `usvHeader`, `destination`, `ProcessorIBIT` 등 복합 구조체는 primitive `WireDataType` 대상이 아니므로 예외로 유지한다.
 
 DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표현한다. Semantic Boolean이 octet/packed bit/sentinel에서 파생되는 경우에는 실제 wire 타입을 유지한다.
 
@@ -404,7 +402,7 @@ DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표�
 ### USV-COMMON-02 — DDS Boolean wire type 표현 — **RESOLVED (2026-08-28)**
 
 - 공통 `CommonBindingSchema.xsd/WireDataType`에 `Boolean` 추가
-- 실제 DDS/IDL boolean 직접 필드 21개 반영: ElectroOptical 8, ElectroOpticalProcessor 1, PlatformController 10, NetworkAbstraction 2
+- 실제 DDS/IDL boolean 직접 필드 11개 반영: ElectroOptical 8, ElectroOpticalProcessor 1, NetworkAbstraction 2. PlatformController는 원 CSCI 재감사에서 직접 boolean 0개로 확인되어 기존 10개를 UInt8(octet)로 정정
 - Semantic Boolean이라고 해서 자동으로 wire Boolean으로 변경하지 않는 규칙을 공통 설계문서에 명시
 - AUV / MDV / EMDW 교차 감사 결과 직접 wire Boolean 후보는 0개였으며, 기존 Boolean 의미는 packed bit 또는 numeric sentinel/파생 의미이므로 실제 wire 타입을 유지
 
@@ -421,11 +419,11 @@ DDS / IDL primitive `boolean`은 공통 `WireDataType.Boolean`으로 직접 표�
 
 같은 계열 Result Topic을 여러 처리카드 / 세부 장치가 공유하거나 하나의 요청에서 여러 결과가 fan-out되는 구조가 있으므로, `usvHeader` 및 장비 식별정보 기반 source discrimination 규칙을 Adapter 수준에서 명확히 해야 한다.
 
-### USV-COMMON-04 — 원문 부족 primitive wire dataType
+### USV-COMMON-04 — 원문 부족 primitive wire dataType — **RESOLVED (2026-08-28)**
 
-- 총 미지정: 419건
-- Boolean schema gap은 해결되었고, 남은 항목은 CSCI/IDL primitive 근거 미확보 항목
-- 원문 없이 추정하여 채우지 않는다.
+- NavigationRadar 및 NetworkAbstraction의 잔여 type은 장치 CSCI/공용 구조체에서 확인하여 해결하였다.
+- PlatformController의 기존 미지정 항목은 `선체제어장치 CSCI.csv`를 message/type별로 전수 재감사하여 primitive type을 확정하였다.
+- 최종 primitive `dataType` 미지정: 0건. 복합 구조체에는 primitive type을 강제하지 않는다.
 
 ### 장치 고유로 유지하는 대표 이슈
 

@@ -58,14 +58,16 @@
    - 따라서 '내부 필드를 여러 Reply로 쪼개지 않는다'는 공통 원칙을 유지하면서도, 물리 메시지 타입별 Reply는 각각 유지한다.
    - 향후 원작자가 하나의 상위 시험 완료 집계 메시지를 정의할 경우 재검토한다.
 
-9. **[RESOLVED] DDS boolean wire type**
-   - 공통 `WireDataType`에 `Boolean`을 추가하였다.
-   - 원 CSCI/IDL에서 실제 DDS boolean으로 확인된 CBIT/환경상태 직접 Field 10개를 `dataType="Boolean"`으로 선언하였다.
-   - octet으로 정의된 ENV command와 bow-thruster enable 등은 기존 UInt8/SourceValueMap을 유지한다.
+9. **[RESOLVED] PlatformController Boolean wire 재감사**
+   - `선체제어장치 CSCI.csv`를 직접 재확인한 결과 PlatformController 원문에는 primitive `boolean` 필드가 없다.
+   - 기존에 `Boolean`으로 선언했던 `fireDetected`, `leakDetected`, `flowAnomalyDetected`, `fireSensor1~3Alarm`, `autoExtinguisher1~4Active` 10개는 모두 원문 `octet`이므로 `UInt8`로 정정하였다.
+   - 이 필드들의 Semantic Boolean 의미는 유지하되, wire primitive type은 원문 `octet`을 따른다.
 
-10. **일부 선체 상태/IBIT 상세 primitive dataType**
-   - 선체제어 CSCI의 대형 상태/IBIT 구조체 중 현재 확보 근거에서 primitive type을 직접 재확인하지 못한 필드는 BindingOnly 또는 dataType 미지정으로 유지한다.
-   - 전역 primitive dataType 감사 시 원 선체제어 CSCI/IDL을 기준으로 추가 보강해야 한다.
+10. **[RESOLVED] 선체 상태/PBIT/IBIT primitive dataType 전수 감사**
+   - `선체제어장치 CSCI.csv`의 각 DDS message/type별 필드 정의를 기준으로 기존 미지정 primitive field의 `dataType`을 전수 보강하였다.
+   - Engine/WaterJet/BowThruster/Power/Battery/Generator/Environment/Wind/Fire/Leak/Flow/Stabilizer/Interceptor/SeaWaterConditioner/TowingDevice/SPCE IBIT와 CBIT/PBIT, Propulsion/ENV/Power HeartBeat, Distress/Wind/SeaWaterConditioner 상태를 원문 타입대로 반영하였다.
+   - `vcuProcessorIBIT`, `vcuTmpProcessorIBIT`는 원문 `ProcessorIBIT` 복합 구조체이므로 primitive `dataType`을 부여하지 않는다.
+   - 최종 감사에서 composite/system field를 제외한 primitive `dataType` 미지정은 0건이며 XSD 검증을 통과하였다.
 
 11. **CBIT 내부 boolean/bitfield 세부 의미**
    - `powerStatus`, 일부 Environment/IBIT 상태는 bitfield 또는 장치고유 raw 상태로 보인다.
