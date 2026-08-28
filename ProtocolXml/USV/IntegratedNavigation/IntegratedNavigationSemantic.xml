@@ -1,175 +1,582 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
-  <!--복합항법장치(Combined Navigation Equipment, CNE) Semantic 명세: 원격통제장치 CSCI ↔ 복합항법장치 CSCI 직접 연동 기준.-->
-  <!--설계 결정: RTCMDataReportType은 복합항법장치에 주기적으로 제공되는 GNSS 보정 입력 데이터이므로 응답 없는 Control(updateRtcmData)로 정의한다.-->
-  <!--설계 결정: vaildRtcmDataSize 원문 Range 0~1,000,000,000은 rtcmDataBuf 256 Byte 및 '버퍼 중 가용 데이터 크기' 설명과 충돌하므로 Semantic Range를 0~256 byte로 정규화한다. 물리 필드명 오탈자(vaild)는 Binding에 그대로 유지한다.-->
-  <!--BIT 계열의 bit-packed octet/uint32 필드는 임의의 bit extractor를 도입하지 않고 raw 값으로 노출하며 원문 비트 의미를 주석으로 보존한다.-->
-  <!--설계 결정: integratedNavigationAidedSensor는 원문의 key 정의(0, 1, 2, 4, 8, 16)를 그대로 ValueSet으로 정의한다. 조합 가능한 bit mask라는 근거는 원문에 없으므로 조합값은 임의 해석하지 않는다.-->
+<?xml version="1.0" encoding="UTF-8"?>
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ../../XSD/CommonSpecSchema.xsd">
+  <!--복합항법장치(CNE) Semantic: 원격통제장치(RCU)와의 직접 연동만 포함한다.-->
+  <!--WaterCurrentReportType과 AIS raw UDP는 RCU 직접 접점이 아니므로 제외한다.-->
+  <!--RTCMDataReportType의 vaildRtcmDataSize는 원문 0~1,000,000,000과 256-byte 버퍼가 충돌하여 기존 합의대로 Semantic 0~256 byte를 유지한다.-->
+  <!--BIT 비트 위치/물리 코드는 Binding 책임이며 Semantic에는 각 점검 항목의 논리 상태만 노출한다.-->
   <ConstantSpecs id="constant">
-    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name">
-      <Value>IntegratedNavigation</Value>
-    </TextConstantSpec>
-    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description">
-      <Value>복합항법 정보, GNSS 보정정보 입력, 상태 감시 및 원격 자체점검·장비 제어 인터페이스</Value>
-    </TextConstantSpec>
+    <TextConstantSpec id="productName" name="제품명" cdm="Product.Name"><Value>IntegratedNavigation</Value></TextConstantSpec>
+    <TextConstantSpec id="productDescription" name="제품 설명" cdm="Product.Description"><Value>복합항법 정보, GNSS 보정정보 입력, 상태 감시 및 원격 자체점검 인터페이스</Value></TextConstantSpec>
   </ConstantSpecs>
 
   <MonitorSpecs id="monitor">
     <GroupSpec id="navigationData" name="무인수상정 항법정보" cdm="Navigation.Integrated.Data">
-      <QuantitySpec id="sequenceNumber" name="메시지 발행 카운트" cdm="Message.SequenceNumber">
-        <Range min="0" max="255"/>
-      </QuantitySpec>
-      <QuantitySpec id="latitude" name="함체 위치 위도" cdm="Navigation.Position.Latitude">
-        <Unit>deg</Unit>
-        <Range min="-90" max="90"/>
-      </QuantitySpec>
-      <QuantitySpec id="longitude" name="함체 위치 경도" cdm="Navigation.Position.Longitude">
-        <Unit>deg</Unit>
-        <Range min="-180" max="180"/>
-      </QuantitySpec>
-      <QuantitySpec id="mslAltitude" name="함체 MSL 고도" cdm="Navigation.Position.MSLAltitude">
-        <Unit>m</Unit>
-        <Range min="0"/>
-      </QuantitySpec>
-      <QuantitySpec id="velocityNorth" name="북방향 속도" cdm="Navigation.Velocity.North">
-        <Unit>m/s</Unit>
-        <Range min="-299792458" max="299792458"/>
-      </QuantitySpec>
-      <QuantitySpec id="velocityEast" name="동방향 속도" cdm="Navigation.Velocity.East">
-        <Unit>m/s</Unit>
-        <Range min="-299792458" max="299792458"/>
-      </QuantitySpec>
-      <QuantitySpec id="velocityDown" name="하방향 속도" cdm="Navigation.Velocity.Down">
-        <Unit>m/s</Unit>
-        <Range min="-299792458" max="299792458"/>
-      </QuantitySpec>
-      <QuantitySpec id="groundSpeed" name="수평속도" cdm="Motion.GroundSpeed">
-        <Unit>m/s</Unit>
-        <Range min="-299792458" max="299792458"/>
-      </QuantitySpec>
-      <QuantitySpec id="roll" name="함체 Roll" cdm="Attitude.Roll">
-        <Unit>rad</Unit>
-        <Range min="-6.28318530718" max="6.28318530718"/>
-      </QuantitySpec>
-      <QuantitySpec id="pitch" name="함체 Pitch" cdm="Attitude.Pitch">
-        <Unit>rad</Unit>
-        <Range min="-6.28318530718" max="6.28318530718"/>
-      </QuantitySpec>
-      <QuantitySpec id="yaw" name="함체 Yaw" cdm="Attitude.Yaw">
-        <Unit>rad</Unit>
-        <Range min="-6.28318530718" max="6.28318530718"/>
-      </QuantitySpec>
-      <QuantitySpec id="courseYaw" name="함체 진행방향 Yaw" cdm="Navigation.Course.Yaw">
-        <Unit>rad</Unit>
-        <Range min="-6.28318530718" max="6.28318530718"/>
-      </QuantitySpec>
-      <QuantitySpec id="imuAccelX" name="IMU 가속도 X" cdm="Navigation.IMU.Acceleration.X">
-        <Unit>m/s2</Unit>
-        <Range min="-1310.68" max="1310.68"/>
-      </QuantitySpec>
-      <QuantitySpec id="imuAccelY" name="IMU 가속도 Y" cdm="Navigation.IMU.Acceleration.Y">
-        <Unit>m/s2</Unit>
-        <Range min="-1310.68" max="1310.68"/>
-      </QuantitySpec>
-      <QuantitySpec id="imuAccelZ" name="IMU 가속도 Z" cdm="Navigation.IMU.Acceleration.Z">
-        <Unit>m/s2</Unit>
-        <Range min="-1310.68" max="1310.68"/>
-      </QuantitySpec>
-      <QuantitySpec id="imuGyroX" name="IMU 각속도 X" cdm="Navigation.IMU.Gyro.X">
-        <Unit>rad/s</Unit>
-        <Range min="-32.767" max="32.676"/>
-      </QuantitySpec>
-      <QuantitySpec id="imuGyroY" name="IMU 각속도 Y" cdm="Navigation.IMU.Gyro.Y">
-        <Unit>rad/s</Unit>
-        <Range min="-32.767" max="32.677"/>
-      </QuantitySpec>
-      <QuantitySpec id="imuGyroZ" name="IMU 각속도 Z" cdm="Navigation.IMU.Gyro.Z">
-        <Unit>rad/s</Unit>
-        <Range min="-32.767" max="32.678"/>
-      </QuantitySpec>
-      <ValueSetSpec id="integratedNavigationStatus" name="통합항법 상태" cdm="Navigation.Integrated.Status">
-        <Values>
-          <Value cdm="Navigation.Integrated.Status.Idle">0</Value>
-          <Value cdm="Navigation.Integrated.Status.Align">1</Value>
-          <Value cdm="Navigation.Integrated.Status.Navigation">2</Value>
-        </Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="integratedNavigationAidedSensor" name="통합항법 사용 측정치" cdm="Navigation.Integrated.AidedSensor">
-        <Values>
-          <Value cdm="Navigation.Integrated.AidedSensor.INSOnly">0</Value>
-          <Value cdm="Navigation.Integrated.AidedSensor.GNSSPV">1</Value>
-          <Value cdm="Navigation.Integrated.AidedSensor.GNSSHeading">2</Value>
-          <Value cdm="Navigation.Integrated.AidedSensor.AJASGNSSPV">4</Value>
-          <Value cdm="Navigation.Integrated.AidedSensor.ELoranPV">8</Value>
-          <Value cdm="Navigation.Integrated.AidedSensor.DVL">16</Value>
-        </Values>
-      </ValueSetSpec>
-      <!--원문 Range는 0~16이며 key는 0=INS-Only, 1=GNSS PV, 2=GNSS Heading, 4=AJ/AS GNSS PV, 8=eLoran PV, 16=DVL로 정의되어 있다. 조합 가능한 bit mask라는 설명은 없으므로 정의된 key만 사용한다.-->
-      <ValueSetSpec id="gnssNavigationStatus" name="위성항법 상태" cdm="Navigation.GNSS.Status">
-        <Values>
-          <Value cdm="Navigation.GNSS.Status.Fix2D">1</Value>
-          <Value cdm="Navigation.GNSS.Status.Fix3D">2</Value>
-          <Value cdm="Navigation.GNSS.Status.DGPS">3</Value>
-          <Value cdm="Navigation.GNSS.Status.RTK">4</Value>
-        </Values>
-      </ValueSetSpec>
-      <ValueSetSpec id="ajAsStatus" name="항재밍·항기만 상태" cdm="Navigation.GNSS.AntiJamSpoof.Status">
-        <Values>
-          <Value cdm="Navigation.GNSS.AntiJamSpoof.Status.AntiJamDetected">1</Value>
-          <Value cdm="Navigation.GNSS.AntiJamSpoof.Status.AntiSpoofDetected">2</Value>
-        </Values>
-      </ValueSetSpec>
-      <!--ajAsStatus 원문 정의는 1=GPS 항재밍 감지, 2=항기만 감지이다. 정상/동시감지 값은 명시되지 않아 추가 값을 임의 정의하지 않는다.-->
+      <QuantitySpec id="sequenceNumber" name="메시지 발행 카운트" cdm="Message.SequenceNumber"><Range min="0" max="255"/><Resolution>1</Resolution></QuantitySpec>
+      <QuantitySpec id="latitude" name="함체 위치 위도" cdm="Navigation.Position.Latitude"><Unit>deg</Unit><Range min="-90" max="90"/></QuantitySpec>
+      <QuantitySpec id="longitude" name="함체 위치 경도" cdm="Navigation.Position.Longitude"><Unit>deg</Unit><Range min="-180" max="180"/></QuantitySpec>
+      <QuantitySpec id="mslAltitude" name="함체 MSL 고도" cdm="Navigation.Position.MSLAltitude"><Unit>m</Unit><Range min="0"/></QuantitySpec>
+      <QuantitySpec id="velocityNorth" name="북방향 속도" cdm="Navigation.Velocity.North"><Unit>m/s</Unit><Range min="-299792458" max="299792458"/></QuantitySpec>
+      <QuantitySpec id="velocityEast" name="동방향 속도" cdm="Navigation.Velocity.East"><Unit>m/s</Unit><Range min="-299792458" max="299792458"/></QuantitySpec>
+      <QuantitySpec id="velocityDown" name="하방향 속도" cdm="Navigation.Velocity.Down"><Unit>m/s</Unit><Range min="-299792458" max="299792458"/></QuantitySpec>
+      <QuantitySpec id="groundSpeed" name="수평속도" cdm="Motion.GroundSpeed"><Unit>m/s</Unit><Range min="-299792458" max="299792458"/></QuantitySpec>
+      <QuantitySpec id="roll" name="함체 Roll" cdm="Attitude.Roll"><Unit>rad</Unit><Range min="-6.28318530718" max="6.28318530718"/></QuantitySpec>
+      <QuantitySpec id="pitch" name="함체 Pitch" cdm="Attitude.Pitch"><Unit>rad</Unit><Range min="-6.28318530718" max="6.28318530718"/></QuantitySpec>
+      <QuantitySpec id="yaw" name="함체 Yaw" cdm="Attitude.Yaw"><Unit>rad</Unit><Range min="-6.28318530718" max="6.28318530718"/></QuantitySpec>
+      <QuantitySpec id="courseYaw" name="함체 진행방향 Yaw" cdm="Navigation.Course.Yaw"><Unit>rad</Unit><Range min="-6.28318530718" max="6.28318530718"/></QuantitySpec>
+      <QuantitySpec id="imuAccelX" name="IMU 가속도 X" cdm="Navigation.IMU.Acceleration.X"><Unit>m/s2</Unit><Range min="-1310.68" max="1310.68"/></QuantitySpec>
+      <QuantitySpec id="imuAccelY" name="IMU 가속도 Y" cdm="Navigation.IMU.Acceleration.Y"><Unit>m/s2</Unit><Range min="-1310.68" max="1310.68"/></QuantitySpec>
+      <QuantitySpec id="imuAccelZ" name="IMU 가속도 Z" cdm="Navigation.IMU.Acceleration.Z"><Unit>m/s2</Unit><Range min="-1310.68" max="1310.68"/></QuantitySpec>
+      <QuantitySpec id="imuGyroX" name="IMU 각속도 X" cdm="Navigation.IMU.Gyro.X"><Unit>rad/s</Unit><Range min="-32.767" max="32.676"/></QuantitySpec>
+      <QuantitySpec id="imuGyroY" name="IMU 각속도 Y" cdm="Navigation.IMU.Gyro.Y"><Unit>rad/s</Unit><Range min="-32.767" max="32.677"/></QuantitySpec>
+      <QuantitySpec id="imuGyroZ" name="IMU 각속도 Z" cdm="Navigation.IMU.Gyro.Z"><Unit>rad/s</Unit><Range min="-32.767" max="32.678"/></QuantitySpec>
+      <ValueSetSpec id="integratedNavigationStatus" name="통합항법 상태" cdm="Navigation.Integrated.Status"><Values><Value name="Idle" cdm="Navigation.Integrated.Status.Idle"/><Value name="Align" cdm="Navigation.Integrated.Status.Align"/><Value name="Navigation" cdm="Navigation.Integrated.Status.Navigation"/></Values></ValueSetSpec>
+      <ValueSetSpec id="integratedNavigationAidedSensor" name="통합항법 사용 측정치" cdm="Navigation.Integrated.AidedSensor"><Values><Value name="INSOnly" cdm="Navigation.Integrated.AidedSensor.INSOnly"/><Value name="GNSSPV" cdm="Navigation.Integrated.AidedSensor.GNSSPV"/><Value name="GNSSHeading" cdm="Navigation.Integrated.AidedSensor.GNSSHeading"/><Value name="AJASGNSSPV" cdm="Navigation.Integrated.AidedSensor.AJASGNSSPV"/><Value name="ELoranPV" cdm="Navigation.Integrated.AidedSensor.ELoranPV"/><Value name="DVL" cdm="Navigation.Integrated.AidedSensor.DVL"/></Values></ValueSetSpec>
+      <ValueSetSpec id="gnssNavigationStatus" name="위성항법 상태" cdm="Navigation.GNSS.Status"><Values><Value name="Fix2D" cdm="Navigation.GNSS.Status.Fix2D"/><Value name="Fix3D" cdm="Navigation.GNSS.Status.Fix3D"/><Value name="DGPS" cdm="Navigation.GNSS.Status.DGPS"/><Value name="RTK" cdm="Navigation.GNSS.Status.RTK"/></Values></ValueSetSpec>
+      <ValueSetSpec id="ajAsStatus" name="항재밍·항기만 상태" cdm="Navigation.GNSS.AntiJamSpoof.Status"><Values><Value name="AntiJamDetected" cdm="Navigation.GNSS.AntiJamSpoof.Status.AntiJamDetected"/><Value name="AntiSpoofDetected" cdm="Navigation.GNSS.AntiJamSpoof.Status.AntiSpoofDetected"/></Values></ValueSetSpec>
       <QuantitySpec id="gnssSatelliteCount" name="위성항법 위성 수" cdm="Navigation.GNSS.SatelliteCount"/>
     </GroupSpec>
-
     <GroupSpec id="cneCbitStatus" name="복합항법장치 CBIT 상태" cdm="Health.CBIT.CNE">
-      <QuantitySpec id="sysCbit" name="복합항법카드 CBIT raw 상태" cdm="Health.CNE.CBIT.System.Raw">
-        <Range min="0" max="255"/>
-      </QuantitySpec>
-      <!--sysCbit: Bit0-1 INC 시스템 오류(0=정상, 2=비가용).-->
-      <QuantitySpec id="imuCbit" name="관성측정장치 CBIT raw 상태" cdm="Health.CNE.CBIT.IMU.Raw"><Range min="0" max="255"/></QuantitySpec>
-      <!--imuCbit: Bit0-1 통신 오류(0=정상,3=미응답), Bit2-3 데이터 무결성(0=정상,2=비가용), Bit4-5 BIT 오류(0=정상,2=비가용).-->
-      <QuantitySpec id="gnssCbit" name="위성항법수신기 CBIT raw 상태" cdm="Health.CNE.CBIT.GNSS.Raw"><Range min="0" max="255"/></QuantitySpec>
-      <QuantitySpec id="ajCbit" name="항재밍안테나 CBIT raw 상태" cdm="Health.CNE.CBIT.AntiJam.Raw"><Range min="0" max="255"/></QuantitySpec>
-      <QuantitySpec id="ajasCbit" name="항기만위성항법수신기 CBIT raw 상태" cdm="Health.CNE.CBIT.AntiSpoofGNSS.Raw"><Range min="0" max="255"/></QuantitySpec>
-      <QuantitySpec id="eLoranCbit" name="지상파항법수신카드 CBIT raw 상태" cdm="Health.CNE.CBIT.ELoran.Raw"><Range min="0" max="255"/></QuantitySpec>
-      <QuantitySpec id="dvlCbit" name="측심기 CBIT raw 상태" cdm="Health.CNE.CBIT.DVL.Raw"><Range min="0" max="255"/></QuantitySpec>
-      <QuantitySpec id="aisCbit" name="선박자동식별장치 CBIT raw 상태" cdm="Health.CNE.CBIT.AIS.Raw"><Range min="0" max="255"/></QuantitySpec>
-      <QuantitySpec id="idcCbit" name="DDS통신카드 CBIT raw 상태" cdm="Health.CNE.CBIT.IDC.Raw"><Range min="0" max="255"/></QuantitySpec>
-      <!--gnss/aj/ajas/eLoran/ais/idc: Bit0-1 통신 오류(0=정상,3=미응답), Bit2-3 데이터 무결성 오류(0=정상,2=비가용). dvl은 추가로 Bit4-5 BIT 오류를 사용한다.-->
+      <ValueSetSpec id="cbitSysSystemError" name="복합항법카드 INC 시스템 오류" cdm="Health.CNE.CBIT.sys.systemError">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitImuCommunication" name="관성측정장치 통신 상태" cdm="Health.CNE.CBIT.imu.communication">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitImuDataIntegrity" name="관성측정장치 데이터 무결성" cdm="Health.CNE.CBIT.imu.dataIntegrity">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitImuBitStatus" name="관성측정장치 BIT 상태" cdm="Health.CNE.CBIT.imu.bitStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitGnssCommunication" name="위성항법수신기 통신 상태" cdm="Health.CNE.CBIT.gnss.communication">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitGnssDataIntegrity" name="위성항법수신기 데이터 무결성" cdm="Health.CNE.CBIT.gnss.dataIntegrity">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitAntiJamCommunication" name="항재밍안테나 통신 상태" cdm="Health.CNE.CBIT.antiJam.communication">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitAntiJamDataIntegrity" name="항재밍안테나 데이터 무결성" cdm="Health.CNE.CBIT.antiJam.dataIntegrity">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitAntiSpoofGNSSCommunication" name="항기만위성항법수신기 통신 상태" cdm="Health.CNE.CBIT.antiSpoofGNSS.communication">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitAntiSpoofGNSSDataIntegrity" name="항기만위성항법수신기 데이터 무결성" cdm="Health.CNE.CBIT.antiSpoofGNSS.dataIntegrity">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitELoranCommunication" name="지상파항법수신카드 통신 상태" cdm="Health.CNE.CBIT.eLoran.communication">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitELoranDataIntegrity" name="지상파항법수신카드 데이터 무결성" cdm="Health.CNE.CBIT.eLoran.dataIntegrity">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitDvlCommunication" name="측심기 통신 상태" cdm="Health.CNE.CBIT.dvl.communication">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitDvlDataIntegrity" name="측심기 데이터 무결성" cdm="Health.CNE.CBIT.dvl.dataIntegrity">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitDvlBitStatus" name="측심기 BIT 상태" cdm="Health.CNE.CBIT.dvl.bitStatus">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitAisCommunication" name="선박자동식별장치 통신 상태" cdm="Health.CNE.CBIT.ais.communication">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitAisDataIntegrity" name="선박자동식별장치 데이터 무결성" cdm="Health.CNE.CBIT.ais.dataIntegrity">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitIdcCommunication" name="DDS통신카드 통신 상태" cdm="Health.CNE.CBIT.idc.communication">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="NoResponse" cdm="Health.NoResponse"/>
+        </Values>
+      </ValueSetSpec>
+      <ValueSetSpec id="cbitIdcDataIntegrity" name="DDS통신카드 데이터 무결성" cdm="Health.CNE.CBIT.idc.dataIntegrity">
+        <Values>
+          <Value name="Normal" cdm="Health.Normal"/>
+          <Value name="Unavailable" cdm="Health.Unavailable"/>
+        </Values>
+      </ValueSetSpec>
     </GroupSpec>
   </MonitorSpecs>
 
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="복합항법장치 연동 개시" cdm="Control.Navigation.Integration.Start">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Control.Navigation.Integration.Start.Response" required="true"/>
-    </ControlSpec>
-    <ControlSpec id="restartSystem" name="복합항법장치 시스템 재시작" cdm="Control.Navigation.System.Restart">
-      <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Control.Navigation.System.Restart.Response" required="true"/>
-    </ControlSpec>
+    <ControlSpec id="startIntegration" name="복합항법장치 연동 개시" cdm="Control.Navigation.Integration.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
+    <ControlSpec id="restartSystem" name="복합항법장치 시스템 재시작" cdm="Control.Navigation.System.Restart"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
     <ControlSpec id="requestPbit" name="복합항법장치 PBIT 요청" cdm="Control.Navigation.PBIT.Request">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Control.Navigation.PBIT.Request.Response" required="true"/>
-      <Reply bindRef="requestPbitResult" cdm="Control.Navigation.PBIT.Result"/>
+      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="requestPbitResult" cdm="Control.Navigation.PBIT.Result" required="true"><Results><GroupResult name="cnePbit" cdm="Health.CNE.PBIT">
+          <ValueSetResult name="sys.systemError" cdm="Health.CNE.PBIT.sys.systemError">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.communication" cdm="Health.CNE.PBIT.imu.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.dataIntegrity" cdm="Health.CNE.PBIT.imu.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.bitStatus" cdm="Health.CNE.PBIT.imu.bitStatus">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="gnss.communication" cdm="Health.CNE.PBIT.gnss.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="gnss.dataIntegrity" cdm="Health.CNE.PBIT.gnss.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="antiJam.communication" cdm="Health.CNE.PBIT.antiJam.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="antiJam.dataIntegrity" cdm="Health.CNE.PBIT.antiJam.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="antiSpoofGNSS.communication" cdm="Health.CNE.PBIT.antiSpoofGNSS.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="antiSpoofGNSS.dataIntegrity" cdm="Health.CNE.PBIT.antiSpoofGNSS.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="eLoran.communication" cdm="Health.CNE.PBIT.eLoran.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="eLoran.dataIntegrity" cdm="Health.CNE.PBIT.eLoran.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.communication" cdm="Health.CNE.PBIT.dvl.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.dataIntegrity" cdm="Health.CNE.PBIT.dvl.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.bitStatus" cdm="Health.CNE.PBIT.dvl.bitStatus">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="ais.communication" cdm="Health.CNE.PBIT.ais.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="ais.dataIntegrity" cdm="Health.CNE.PBIT.ais.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="idc.communication" cdm="Health.CNE.PBIT.idc.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="idc.dataIntegrity" cdm="Health.CNE.PBIT.idc.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+      </GroupResult></Results></Reply>
     </ControlSpec>
     <ControlSpec id="requestIbit" name="복합항법장치 IBIT 요청" cdm="Control.Navigation.IBIT.Request">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Control.Navigation.IBIT.Request.Response" required="true"/>
-      <Reply bindRef="requestIbitResult" cdm="Control.Navigation.IBIT.Result"/>
+      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply bindRef="requestIbitResult" cdm="Control.Navigation.IBIT.Result" required="true"><Results><GroupResult name="cneIbit" cdm="Health.CNE.IBIT">
+        <ValueSetResult name="sys.systemError" cdm="Health.CNE.IBIT.sys.systemError"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
+        <ValueSetResult name="sys.clockConfig" cdm="Health.CNE.IBIT.sys.clockConfig"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
+        <ValueSetResult name="sys.powerConfig" cdm="Health.CNE.IBIT.sys.powerConfig"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
+        <ValueSetResult name="sys.memoryTest" cdm="Health.CNE.IBIT.sys.memoryTest"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
+          <ValueSetResult name="imu.communication" cdm="Health.CNE.IBIT.imu.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.dataIntegrity" cdm="Health.CNE.IBIT.imu.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.bitStatus" cdm="Health.CNE.IBIT.imu.bitStatus">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="gnss.communication" cdm="Health.CNE.IBIT.gnss.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="gnss.dataIntegrity" cdm="Health.CNE.IBIT.gnss.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="antiJam.communication" cdm="Health.CNE.IBIT.antiJam.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="antiJam.dataIntegrity" cdm="Health.CNE.IBIT.antiJam.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="antiSpoofGNSS.communication" cdm="Health.CNE.IBIT.antiSpoofGNSS.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="antiSpoofGNSS.dataIntegrity" cdm="Health.CNE.IBIT.antiSpoofGNSS.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="eLoran.communication" cdm="Health.CNE.IBIT.eLoran.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="eLoran.dataIntegrity" cdm="Health.CNE.IBIT.eLoran.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.communication" cdm="Health.CNE.IBIT.dvl.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.dataIntegrity" cdm="Health.CNE.IBIT.dvl.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.bitStatus" cdm="Health.CNE.IBIT.dvl.bitStatus">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="ais.communication" cdm="Health.CNE.IBIT.ais.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="ais.dataIntegrity" cdm="Health.CNE.IBIT.ais.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="idc.communication" cdm="Health.CNE.IBIT.idc.communication">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="NoResponse" cdm="Health.NoResponse"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="idc.dataIntegrity" cdm="Health.CNE.IBIT.idc.dataIntegrity">
+            <Values>
+              <Value name="Normal" cdm="Health.Normal"/>
+              <Value name="Unavailable" cdm="Health.Unavailable"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.gyroTest" cdm="Health.CNE.IBIT.IMU.GyroTest">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.accelTest" cdm="Health.CNE.IBIT.IMU.AccelTest">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.otherTest" cdm="Health.CNE.IBIT.IMU.OtherTest">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.memoryTest" cdm="Health.CNE.IBIT.IMU.MemoryTest">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.processorTest" cdm="Health.CNE.IBIT.IMU.ProcessorTest">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <QuantityResult name="imu.counter" cdm="Health.CNE.IBIT.IMU.Counter"><Range min="0" max="15"/><Resolution>1</Resolution></QuantityResult>
+          <ValueSetResult name="imu.failed" cdm="Health.CNE.IBIT.IMU.Failed">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.cAxisRlgReset" cdm="Health.CNE.IBIT.IMU.CAxisRLGReset">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.bAxisRlgReset" cdm="Health.CNE.IBIT.IMU.BAxisRLGReset">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="imu.aAxisRlgReset" cdm="Health.CNE.IBIT.IMU.AAxisRLGReset">
+            <Values>
+              <Value name="OK" cdm="Health.Test.OK"/>
+              <Value name="Error" cdm="Health.Test.Error"/>
+            </Values>
+          </ValueSetResult>
+          <QuantityResult name="imu.accelerometerTemperature" cdm="Health.CNE.IBIT.IMU.AccelerometerTemperature"><Unit>degC</Unit><Resolution>1</Resolution></QuantityResult>
+          <ValueSetResult name="dvl.BeamVelocity.Beam1" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam1">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamVelocity.Beam2" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam2">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamVelocity.Beam3" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam3">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamVelocity.Beam4" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam4">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamDistance.Beam1" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam1">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamDistance.Beam2" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam2">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamDistance.Beam3" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam3">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamDistance.Beam4" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam4">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamFOM.Beam1" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam1">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamFOM.Beam2" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam2">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamFOM.Beam3" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam3">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.BeamFOM.Beam4" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam4">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.XVelocity" cdm="Health.CNE.IBIT.DVL.XVelocity">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.YVelocity" cdm="Health.CNE.IBIT.DVL.YVelocity">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.Z1Velocity" cdm="Health.CNE.IBIT.DVL.Z1Velocity">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.Z2Velocity" cdm="Health.CNE.IBIT.DVL.Z2Velocity">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.XFOM" cdm="Health.CNE.IBIT.DVL.XFOM">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.YFOM" cdm="Health.CNE.IBIT.DVL.YFOM">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.Z1FOM" cdm="Health.CNE.IBIT.DVL.Z1FOM">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <ValueSetResult name="dvl.Z2FOM" cdm="Health.CNE.IBIT.DVL.Z2FOM">
+            <Values>
+              <Value name="Invalid" cdm="Data.Invalid"/>
+              <Value name="Valid" cdm="Data.Valid"/>
+            </Values>
+          </ValueSetResult>
+          <QuantityResult name="idcTemperature" cdm="Health.CNE.IBIT.IDC.Temperature"><Unit>degC</Unit></QuantityResult>
+          <QuantityResult name="idcCpuLoad" cdm="Health.CNE.IBIT.IDC.CpuLoad"><Unit>%</Unit></QuantityResult>
+      </GroupResult></Results></Reply>
     </ControlSpec>
     <ControlSpec id="updateRtcmData" name="위성항법 RTCM 보정정보 입력" cdm="Control.Navigation.GNSS.RTCM.Update">
-      <Parameters>
-        <QuantityProfile cdm="Navigation.GNSS.RTCM.ValidDataSize">
-          <Unit>byte</Unit>
-          <Range min="0" max="256"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
-        <Profile cdm="Navigation.GNSS.RTCM.Data"/>
-      </Parameters>
-      <!--원문 vaildRtcmDataSize Range는 0~1,000,000,000이나 rtcmDataBuf가 256 Byte이고 해당 필드는 버퍼 내 가용 데이터 크기를 뜻하므로 0~256 byte로 적용한다. RTCM payload 자체는 변환하지 않고 원문 버퍼를 그대로 전달한다.-->
+      <Parameters><QuantityProfile cdm="Navigation.GNSS.RTCM.ValidDataSize"><Unit>byte</Unit><Range min="0" max="256"/><Resolution>1</Resolution></QuantityProfile><Profile cdm="Navigation.GNSS.RTCM.Data"/></Parameters>
+      <!--원문 물리 필드명 vaildRtcmDataSize 오탈자는 Binding에서 그대로 유지한다.-->
     </ControlSpec>
   </ControlSpecs>
 </SensorSpec>
