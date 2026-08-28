@@ -1,0 +1,35 @@
+name: temporary SSS OpenIssue cleanup
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Clean stale SSS issue text
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('ProtocolXml/USV/SideScanSonar/SideScanSonar_OpenIssues.md')
+          s=p.read_text(encoding='utf-8')
+          old='- 케이블 분리 `0/1`, 화면모드 `0/1`, 자동 진회수 명령 `0/1/2`, BackStop 현재 `0/1/2` FixedField 구조를 확인했다. BackStop 결과 Report의 raw 의미는 별도 TBD이다.'
+          new='- 케이블 분리 `0/1`, 화면모드 `0/1`, 자동 진회수 명령 `0/1/2`, BackStop 현재 `0/1/2` FixedField 구조를 확인했다. BackStop 결과 Report도 CSCI의 `0=정지상태 / 1=후퇴고정완료 / 2=복귀완료`를 ValueSetResult/ValueMap으로 확정하였다.'
+          if old not in s: raise SystemExit('stale BackStop line not found')
+          s=s.replace(old,new)
+          old2='- `TSAPBITReportType`, `TSAIBITReportType` 내부 필드는 현재 Binding에 이미 존재하는 CDM을 그대로 Semantic Result에 재사용하며, Total 상태코드 및 IBIT detail bit의 raw 의미는 추가 추론하지 않는다.'
+          new2='- `TSAPBITReportType`, `TSAIBITReportType` 내부 필드는 현재 Binding의 CDM을 Semantic Result에 재사용한다. 각 필드의 CSV 행에 `0=정상/1=기능저하/2=비가용/3=미응답` 또는 구체 bit 의미가 직접 기재된 항목은 ValueSetResult/PackedField로 논리화하고, 해당 행의 의미가 비어 있는 항목은 Raw로 유지한다.'
+          if old2 not in s: raise SystemExit('stale BIT text not found')
+          s=s.replace(old2,new2)
+          p.write_text(s,encoding='utf-8')
+      - name: Commit cleanup
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ProtocolXml/USV/SideScanSonar/SideScanSonar_OpenIssues.md
+          git commit -m 'Clean resolved SSS CSV audit notes'
+          git push origin HEAD:feature/usv-semantic-binding-audit
