@@ -19,7 +19,10 @@ jobs:
           text=open(p,encoding='utf-8').read()
 
           def expected(ctx, n):
-              # Common CBIT/PBIT result messages.
+              # Composite/system fields are not primitive WireDataType targets.
+              if n in {'usvHeader','destination','vcuProcessorIBIT','vcuTmpProcessorIBIT'}:
+                  return None
+
               if ctx in {'PropulsionCBITReportType','PropulsionPBITReportType','AccessoriesCBITReportType','AccessoriesPBITReportType','SubsystemCBITReportType','SubsystemPBITReportType','SPCECBITReportType','SPCEPBITReportType'}:
                   return 'UInt8'
               if ctx=='ElectricalCBITReportType':
@@ -53,9 +56,7 @@ jobs:
                   return 'UInt8'
               if ctx=='InterceptorIBITReportType':
                   return 'Float32' if n=='targetLIST' else 'UInt8'
-              if ctx=='SPCEIBITReportType':
-                  if n in {'vcuProcessorIBIT','vcuTmpProcessorIBIT'}: return None
-                  return 'UInt8'
+              if ctx=='SPCEIBITReportType': return 'UInt8'
 
               if ctx=='PropulsionHeartBeatReportType':
                   if n.endswith('AlternatorPotential') or n=='fuelRemain': return 'Int16'
@@ -66,11 +67,10 @@ jobs:
                   if n.startswith('flowMeter'): return 'UInt16'
                   if n.startswith('leakSensor'): return 'Float32'
               if ctx=='PowerHeartBeatReportType':
-                  if n=='portONStatus': return 'UInt64'
+                  if n in {'portONStatus','starboardONStatus'}: return 'UInt64'
                   if n in {'pduTemp','powerSourceStatus','pduSourceStatus','batteryChargeStatus','batteryLevel','batteryFaultStatus'}: return 'UInt8'
                   return 'UInt16'
-              if ctx=='DistressReportType':
-                  if n in {'latitude','longitude','altitude'}: return 'Float64'
+              if ctx=='DistressReportType' and n in {'latitude','longitude','altitude'}: return 'Float64'
               if ctx=='WindReportType': return 'Float64'
               if ctx=='SeaWaterConditionerStatusReportType': return 'Float32'
               return None
@@ -79,47 +79,47 @@ jobs:
           for line in text.splitlines(True):
               ch=re.search(r'<DDSChannel\b[^>]*\btypeName="([^"]+)"',line)
               if ch: ctx=ch.group(1)
-              fm=re.search(r'<(Field|FixedField|DerivedField)\b[^>]*\bname="([^"]+)"[^>]*>',line)
+              # Only the opening Field/FixedField/DerivedField tag is modified.
+              fm=re.search(r'<(Field|FixedField|DerivedField)\b[^>]*>',line)
               if fm:
-                  full=fm.group(0); name=fm.group(2); leaf=name.split('.')[-1]
-                  want=expected(ctx,leaf)
-                  if want:
-                      dm=re.search(r'\bdataType="([^"]+)"',full)
-                      old=dm.group(1) if dm else None
-                      if old!=want:
-                          if dm:
-                              new=re.sub(r'\bdataType="[^"]+"',f'dataType="{want}"',full,count=1)
-                          else:
-                              new=full[:-1]+f' dataType="{want}">'
-                          line=line[:fm.start()]+new+line[fm.end():]
-                          changes.append((ctx,name,old,want))
+                  full=fm.group(0)
+                  nm=re.search(r'\bname="([^"]+)"',full)
+                  if nm:
+                      name=nm.group(1); leaf=name.split('.')[-1]
+                      want=expected(ctx,leaf)
+                      if want:
+                          dm=re.search(r'\bdataType="([^"]+)"',full)
+                          old=dm.group(1) if dm else None
+                          if old!=want:
+                              if dm:
+                                  new=re.sub(r'\bdataType="[^"]+"',f'dataType="{want}"',full,count=1)
+                              elif full.endswith('/>'):
+                                  new=full[:-2]+f' dataType="{want}"/>'
+                              else:
+                                  new=full[:-1]+f' dataType="{want}">'
+                              line=line[:fm.start()]+new+line[fm.end():]
+                              changes.append((ctx,name,old,want))
               out.append(line)
           open(p,'w',encoding='utf-8',newline='').write(''.join(out))
           print('CHANGES',len(changes))
-          for x in changes: print('|'.join('' if v is None else str(v) for v in x))
+          print('BOOLEAN_TO_UINT8',sum(1 for x in changes if x[2]=='Boolean' and x[3]=='UInt8'))
 
-          # Source audit: all primitive fields in the audited SPCE messages must now have dataType.
           import xml.etree.ElementTree as ET
           ns='{http://lignex1.com/mcmc2/umsSchema}'
           root=ET.parse(p).getroot()
-          missing=[]; booleans=[]
-          def walk(el,c=None):
-              ch=el.find(ns+'DDSChannel')
-              if ch is not None and ch.get('typeName'): c=ch.get('typeName')
+          booleans=[]; unresolved=[]
+          allowed_untyped={'usvHeader','destination','vcuProcessorIBIT','vcuTmpProcessorIBIT'}
+          for el in root.iter():
               tag=el.tag.split('}')[-1]
-              if tag in {'Field','FixedField','DerivedField'}:
-                  name=el.get('name',''); leaf=name.split('.')[-1]
-                  want=expected(c,leaf)
-                  if want and not el.get('dataType'): missing.append((c,name,want))
-                  if el.get('dataType')=='Boolean': booleans.append((c,name))
-              for child in list(el):
-                  if child.tag==ns+'DDSChannel': continue
-                  walk(child,c)
-          walk(root)
-          print('SOURCE_PRIMITIVE_MISSING',len(missing),missing)
+              if tag not in {'Field','FixedField','DerivedField'}: continue
+              name=el.get('name','')
+              if el.get('dataType')=='Boolean': booleans.append(name)
+              if not el.get('dataType') and name not in allowed_untyped:
+                  unresolved.append(name)
           print('PLATFORM_BOOLEAN_COUNT',len(booleans),booleans)
-          if missing: raise SystemExit('source-confirmed primitive dataType still missing')
-          if booleans: raise SystemExit('PlatformController source CSCI has no primitive boolean fields')
+          print('UNTYPED_NONCOMPOSITE',len(unresolved),unresolved)
+          if booleans: raise SystemExit('PlatformController CSCI has no primitive boolean fields')
+          if unresolved: raise SystemExit('non-composite Field remains without dataType')
       - name: XSD validate
         run: |
           python -m pip install -q lxml
