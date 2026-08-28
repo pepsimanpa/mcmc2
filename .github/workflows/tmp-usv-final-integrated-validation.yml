@@ -1,0 +1,127 @@
+name: temporary final integrated USV validation
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+          fetch-depth: 0
+      - run: python -m pip install --quiet lxml
+      - name: Final integrated audit
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree
+          import re,collections
+          U='http://lignex1.com/mcmc2/umsSchema'; N={'u':U}
+          devs=['AutonomousNavigation','CentralControl','ElectroOptical','ElectroOpticalProcessor','IntegratedNavigation','Lidar','NavigationCamera','NavigationRadar','NearContactDetection','NetworkAbstraction','PlatformController','RemoteFireControl','SensorFusion','SideScanSonar']
+          sx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonSpecSchema.xsd')); bx=etree.XMLSchema(etree.parse('ProtocolXml/XSD/CommonBindingSchema.xsd'))
+          failed=False; total_missing=0; corr=[]; common=[]; packed=0
+          print('=== FINAL DEVICE VALIDATION ===')
+          for d in devs:
+              p=Path('ProtocolXml/USV')/d; s=etree.parse(str(p/f'{d}Semantic.xml')); b=etree.parse(str(p/f'{d}Binding.xml'))
+              sv=sx.validate(s); bv=bx.validate(b)
+              cs={x.get('id') for x in s.xpath('//u:ControlSpecs/*[@id]',namespaces=N)}; cb={x.get('semantic_id') for x in b.xpath('//u:ControlBinding',namespaces=N)}
+              rs={x.get('bindRef') for x in s.xpath('//u:ControlSpecs/*/u:Reply',namespaces=N)}; rb={x.get('semantic_id') for x in b.xpath('//u:ControlBinding/u:Reply',namespaces=N)}
+              ms={x.get('id') for x in s.xpath('//u:MonitorSpecs/*[@id]',namespaces=N)}; mb={x.get('semantic_id') for x in b.xpath('//u:MonitorBinding',namespaces=N)}
+              ps={x.get('id') for x in s.xpath('//u:ProductStreamSpec',namespaces=N)}; pb={x.get('semantic_id') for x in b.xpath('//u:ProductBinding',namespaces=N)}
+              conv=(p/f'{d}Binding.xml').read_text().count('converter=')
+              raw=0
+              for q in s.xpath('//u:ValueSetSpec|//u:ValueSetProfile|//u:ValueSetResult|//u:HealthStatusSetSpec',namespaces=N):
+                  raw += sum(1 for v in q.xpath('./u:Values/u:Value',namespaces=N) if v.text and re.fullmatch(r'\s*[-+]?\d+(?:\.\d+)?\s*',v.text))
+              missing=[]
+              for x in b.xpath('//u:Field|//u:DerivedField|//u:FixedField',namespaces=N):
+                  n=x.get('name','')
+                  if n in ('usvHeader','destination') or n.endswith('.usvHeader') or n.endswith('.destination'): continue
+                  if x.get('dataType') is None: missing.append(n)
+              total_missing+=len(missing)
+              print(f'{d}: XSD={sv and bv} C={len(cs)} R={len(rs)} M={len(ms)} P={len(ps)} refOK={cs==cb and rs==rb and ms==mb and ps==pb} converter={conv} rawEnum={raw} missingType={len(missing)}')
+              if missing: print('  MISSING_TYPE',missing)
+              if not(sv and bv and cs==cb and rs==rb and ms==mb and ps==pb) or conv or raw: failed=True
+
+              # common controls and ACK contract
+              for c in s.xpath('//u:ControlSpec',namespaces=N):
+                  cid=c.get('id',''); low=cid.lower(); kind=None
+                  if cid=='startIntegration' or cid in ('startControlStationIntegration','startUsvIntegration'): kind='Integration'
+                  elif cid=='restartSystem': kind='Restart'
+                  elif (cid=='requestPbit') or (low.startswith('request') and 'pbit' in low): kind='PBIT'
+                  elif (cid=='requestIbit') or (low.startswith('request') and 'ibit' in low): kind='IBIT'
+                  if kind:
+                      cbx=b.xpath(f'//u:ControlBinding[@semantic_id="{cid}"]',namespaces=N)[0]; ch=cbx.find(f'{{{U}}}DDSChannel'); t=c.find(f'{{{U}}}Target')
+                      dst=[x.get('sourceField') for x in cbx if isinstance(x.tag,str) and etree.QName(x).localname=='DerivedField' and 'destination' in x.get('name','').lower()]
+                      common.append((d,cid,kind,c.get('cdm'),t.get('cdm') if t is not None else None,ch.get('topicName'),ch.get('typeName'),dst))
+
+              # actual PBIT/IBIT result correlation: identify non-CommandStatus replies under PBIT/IBIT request controls.
+              for c in s.xpath('//u:ControlSpec',namespaces=N):
+                  cid=c.get('id',''); low=cid.lower()
+                  if not (low.startswith('request') and ('pbit' in low or 'ibit' in low)): continue
+                  kind='PBIT' if 'pbit' in low else 'IBIT'
+                  for r in c.xpath('./u:Reply',namespaces=N):
+                      rid=r.get('bindRef'); br=b.xpath(f'//u:Reply[@semantic_id="{rid}"]',namespaces=N)
+                      if not br: continue
+                      ch=br[0].find(f'{{{U}}}DDSChannel')
+                      if ch is not None and ch.get('typeName')=='CommandStatusReportType': continue
+                      fields=[x.get('name') for x in br[0] if isinstance(x.tag,str) and etree.QName(x).localname in ('Field','DerivedField','FixedField')]
+                      corr.append((d,kind,rid,ch.get('typeName') if ch is not None else None,'commandID' in fields or any(x.endswith('.commandID') for x in fields)))
+
+              for pf in b.xpath('//u:PackedField',namespaces=N):
+                  packed+=1; width=int(pf.get('width')); used=set()
+                  for bm in pf.xpath('./u:BitMember',namespaces=N):
+                      off=int(bm.get('offset')); bw=int(bm.get('width','1')); bits=set(range(off,off+bw))
+                      if off+bw>width or used&bits: failed=True; print('PACK_ERROR',d,pf.get('name'),bm.get('name'))
+                      used|=bits
+
+          print('\n=== COMMON CONTROL CONTRACT ===')
+          for x in common: print('COMMON',x)
+          print('\n=== PBIT/IBIT RESULT CORRELATION ===')
+          by=collections.defaultdict(lambda:[0,0])
+          for x in corr:
+              by[x[0]][0]+=1; by[x[0]][1]+=int(x[-1]); print('RESULT',x)
+          print('CORR_SUMMARY',dict(by),'totalResults',len(corr),'withCommandID',sum(x[-1] for x in corr))
+          print('\n=== PACKED SUMMARY ===',packed)
+
+          # ValueSet/ValueMap coverage after normalization.
+          mism=[]; nomap=[]
+          for d in devs:
+              p=Path('ProtocolXml/USV')/d; s=etree.parse(str(p/f'{d}Semantic.xml')); b=etree.parse(str(p/f'{d}Binding.xml'))
+              sem={}
+              for q in s.xpath('//u:ValueSetSpec|//u:ValueSetProfile|//u:ValueSetResult|//u:HealthStatusSetSpec',namespaces=N):
+                  c=q.get('cdm'); vals={v.get('cdm') for v in q.xpath('./u:Values/u:Value',namespaces=N) if v.get('cdm')}
+                  if c and vals: sem.setdefault(c,[]).append(vals)
+              for x in b.xpath('//u:Field[@cdm]|//u:DerivedField[@cdm]|//u:BitMember[@cdm]',namespaces=N):
+                  c=x.get('cdm')
+                  if c not in sem: continue
+                  vm=x.find(f'{{{U}}}ValueMap'); sm=x.find(f'{{{U}}}SourceValueMap')
+                  if vm is None:
+                      if sm is None: nomap.append((d,c,x.get('name')))
+                  else:
+                      vals={m.get('cdm') for m in vm.findall(f'{{{U}}}Map') if m.get('cdm')}
+                      if not any(vals==z for z in sem[c]): mism.append((d,c,x.get('name')))
+          print('VALUE_MAP_MISMATCH',len(mism),mism)
+          print('VALUE_SET_WITHOUT_MAP',len(nomap),nomap)
+          if mism or nomap: failed=True
+
+          # Duplicate issue themes.
+          issues=[]
+          for d in devs:
+              q=Path('ProtocolXml/USV')/d/f'{d}_OpenIssues.md'
+              if q.exists():
+                  for line in q.read_text().splitlines():
+                      if re.match(r'^\s*\d+\.\s+\*\*',line): issues.append((d,line.strip()))
+          themes={
+            'PBIT_IBIT_CORRELATION':r'PBIT/IBIT.*correlation|PBIT/IBIT Result correlation|PBIT/IBIT.*매칭|요청.*결과.*연결',
+            'BOOLEAN_WIRE_TYPE':r'DDS boolean|Boolean wire|WireDataType.*Boolean|boolean.*WireDataType',
+            'SOURCE_ROUTING':r'source routing|source-card|송신 카드|송신.*식별|fan-out',
+          }
+          print('\n=== OPEN ISSUE THEMES === total',len(issues))
+          for k,p in themes.items():
+              h=[x for x in issues if re.search(p,x[1],re.I)]; print(k,len(h),h)
+          if failed: raise SystemExit(1)
+          PY
