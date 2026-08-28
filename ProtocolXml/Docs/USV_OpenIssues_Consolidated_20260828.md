@@ -128,7 +128,7 @@
 
 ### 공통 이슈 요약
 
-- Active master issue: **10개** (`01`, `03`, `05`~`12`)
+- Active common master issue: **10개** (`01`, `03`, `05`~`12`)
 - Resolved master issue: **2개** (`02`, `04`)
 - XML 설계 merge blocker: **0개**
 - 실제 runtime 통합 전에 우선 확정할 항목: **01, 03, 08, 09**
