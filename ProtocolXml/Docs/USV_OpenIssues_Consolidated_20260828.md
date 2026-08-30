@@ -6,6 +6,7 @@
 - 범위: 원격통제장치(RCU)와 직접 연동하는 USV 장치 14종
 - 상위 설계 기준: `ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md`
 - 통합 감사: `ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md`
+- CSV 재심층 감사 최종 갱신: 2026-08-30
 
 ---
 
@@ -218,7 +219,8 @@
 장치 고유 TBD:
 1. Radar/AIS 탐지거리 제어 octet의 실제 거리/프리셋 값 체계.
 2. `radarMessageTransmitStatus`가 가리키는 실제 메시지/업무 의미.
-3. `AISContactType` 일부 Range/Unavailable 원본 표 이상값.
+
+재심층 감사에서 `AISContactType`의 밀린 Range 셀은 동일 `공용 구조체.csv`의 `RadarAISFusionContactType` 동일 필드 교차근거로 해소하였다. 복원 근거가 없는 `shipLength/shipWidth`는 Range 미지정으로 유지한다.
 
 ### 4.9 NearContactDetection
 
