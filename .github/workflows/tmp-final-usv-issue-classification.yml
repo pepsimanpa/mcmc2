@@ -1,0 +1,103 @@
+name: temporary final USV issue classification
+on:
+  push:
+    branches: [feature/usv-semantic-binding-audit]
+permissions:
+  contents: write
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/usv-semantic-binding-audit
+      - name: Finalize issue classification
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('ProtocolXml/Docs/USV_OpenIssues_Consolidated_20260828.md')
+          s=p.read_text(encoding='utf-8')
+          old='## 6. 최종 결론\n\nUSV 14개 장치의 Semantic / Binding 설계 및 CSV 기반 source audit는 완료 상태다.'
+          if old not in s:
+              raise SystemExit('final conclusion marker missing')
+          lines=[
+            '## 6. 최종 잔여 이슈 분류',
+            '',
+            '### 6.1 현재 CSV 감사 종료 판단',
+            '',
+            '- 14개 RCU 직접 연동 장치에 대해 대상 CSCI, 원격통제장치 CSCI, 공용 구조체/규칙/식별자 규칙을 재심층 교차감사하였다.',
+            '- 현재 확보된 CSV 세트 안에서 **추가로 즉시 종료할 수 있다고 확인된 known Remaining TBD는 0건**이다.',
+            '- 따라서 이후 동일 CSV를 반복 검색하여 값을 추정하지 않는다. 새 ICD/IDL/원작자 자료/Adapter 계약/배치 설정이 추가될 때만 해당 이슈를 재개한다.',
+            '- 공통 Active master 10개와 장치 고유 TBD 55개를 합쳐 현재 관리 대상은 **총 65개**이며, 모두 XML XSD/참조 merge blocker는 아니다.',
+            '',
+            '### 6.2 근거 종류별 최종 분류',
+            '',
+            '| 분류 | 닫기 위해 필요한 근거 | 공통 master / 대표 장치 항목 | 처리 시점 |',
+            '|---|---|---|---|',
+            '| **A. Runtime / Adapter 계약** | 요청-결과 correlation, source routing, fan-out 완료판정, nested member 접근, count/sequence validation, one-shot/reset·우선순위 같은 실행 규칙 | `USV-COMMON-01`, `03`, `05`, `08`, `09`; NetworkAbstraction commandID 생산주체; RCWS initZeroing/reboot 우선순위; Platform 운용모드별 parameter 조건 | **실연동 전 우선** |',
+            '| **B. ICD / CSCI / 원작자 의미 확인** | raw code 의미, Unit, Range, bit polarity, 조건부 제약, 상태/제어 업무 의미 | AutonomousNavigation 대부분, CentralControl VHF/voice/operationalState, EOIR SWIR/Wiper/Swing, NavigationCamera detail polarity, NavigationRadar range control, Platform mask/ENV 값, RCWS joystick/no-driving-zone, SensorFusion Wave, SSS power/mode/frequency | 원문 확보 시 |',
+            '| **C. DDS IDL / 실제 wire 선언 확인** | CSCI 오탈자와 실제 Type/member 철자, signedness 또는 CSCI만으로 확정 안 되는 wire 세부 | `USV-COMMON-11`; IntegratedNavigation IMU temperature signedness; Central/RCWS/SSS 물리 오탈자 | IDL 확보 시 |',
+            '| **D. 배치 / ICD 설정값** | RTP IP/Port, 실제 채널 배치 및 스트림 공유 여부 | `USV-COMMON-10` (EOIR, NavigationCamera, NearContactDetection) | 배치설계/시험 전 |',
+            '| **E. 공통 XSD / Semantic 모델 정책** | symbolic Range 표현, sentinel/invalid 노출 정책 등 공통 모델 확장 결정 | `USV-COMMON-06`, `12`; SSS 조건부 Parameter 표현 | 공통 모델 개선 시 |',
+            '| **F. 저장소/외부 의존 정리** | 사용처 검색 및 외부 의존성 확인 | SSS 로컬 구형 XSD snapshot 삭제 여부 | merge 전후 housekeeping |',
+            '',
+            '### 6.3 장치별 주 근거 분류',
+            '',
+            '| 장치 | 장치 고유 TBD | 주로 필요한 후속 근거 |',
+            '|---|---:|---|',
+            '| AutonomousNavigation | 12 | ICD/원작자 의미·단위·시간 convention |',
+            '| CentralControl | 5 | ICD/원작자 + 일부 IDL |',
+            '| ElectroOptical | 6 | ICD/원작자 + RTP 배치/IDL |',
+            '| ElectroOpticalProcessor | 0 | 공통 issue만 관리 |',
+            '| IntegratedNavigation | 5 | ICD/IDL |',
+            '| Lidar | 0 | 공통 issue만 관리 |',
+            '| NavigationCamera | 2 | ICD/원작자 + RTP 배치 |',
+            '| NavigationRadar | 2 | ICD/원작자 |',
+            '| NearContactDetection | 1 | 센서 운용규칙 + RTP 배치 |',
+            '| NetworkAbstraction | 4 | Adapter/producer 계약 + 원작자 의미 |',
+            '| PlatformController | 6 | 상세 ICD/bit assignment + 운용 FSM |',
+            '| RemoteFireControl | 5 | 상세 ICD/원작자 + 운용/Adapter 정책 |',
+            '| SensorFusion | 1 | Wave 원천 ICD/단위 정의 |',
+            '| SideScanSonar | 6 | 상세 ICD/원작자 + 공통 모델/저장소 의존성 |',
+            '| **합계** | **55** | 공통 Active 10개와 별도 관리 |',
+            '',
+            '### 6.4 최종 우선순위',
+            '',
+            '1. **P0 — 실제 연동 전에 반드시 확정**: `USV-COMMON-01`, `03`, `08`, `09`.',
+            '2. **P1 — IDL/원작자 자료가 들어오면 즉시 재개**: `USV-COMMON-07`, `11`과 장치별 raw code/Unit/bit polarity/조건부 규칙.',
+            '3. **P2 — 시험/배치 단계**: `USV-COMMON-10`, count/sequence validation(`05`), 장치별 RTP/운용 설정.',
+            '4. **P3 — 공통 모델 개선**: symbolic Range(`06`), sentinel/invalid 표현(`12`), 조건부 Parameter 표현.',
+            '5. **P4 — housekeeping**: SSS 로컬 XSD snapshot 등 외부 의존성 확인 후 정리.',
+            '',
+            '이 분류 이후에는 **새 근거가 들어오기 전까지 장치별 CSV 재감사를 반복하지 않는다.** `USV_OpenIssues_Consolidated_20260828.md`를 단일 master로 사용하고, 상세 원문 맥락만 각 장치 `*_OpenIssues.md`에서 유지한다.',
+            '',
+            '---',
+            '',
+          ]
+          section='\n'.join(lines)
+          s=s.replace(old,section+'\n## 7. 최종 결론\n\nUSV 14개 장치의 Semantic / Binding 설계 및 CSV 기반 source audit는 완료 상태다.',1)
+          s=s.replace('따라서 현재 브랜치는 Semantic/Binding 설계 자체로는 merge 가능한 상태이며, 본 문서의 공통 master ID와 장치 고유 TBD를 이후 ICD/IDL/Adapter 확인 시 순차적으로 닫는다.',
+                      '따라서 현재 브랜치는 Semantic/Binding 설계 자체로는 merge 가능한 상태이며, 현재 확보 CSV 기반 감사는 종료한다. 이후에는 본 문서의 최종 분류에 따라 새 ICD/IDL/Adapter/배치 근거가 들어올 때만 해당 master issue를 순차적으로 닫는다.',1)
+          p.write_text(s,encoding='utf-8')
+      - name: Validate final classification
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ProtocolXml/Docs/USV_OpenIssues_Consolidated_20260828.md')
+          s=p.read_text(encoding='utf-8')
+          assert '## 6. 최종 잔여 이슈 분류' in s
+          assert 'known Remaining TBD는 0건' in s
+          assert '총 65개' in s
+          assert '| **합계** | **55** |' in s
+          assert 'P0 — 실제 연동 전에 반드시 확정' in s
+          assert '## 7. 최종 결론' in s
+          assert s.count('## 6. 최종 결론') == 0
+          print('FINAL USV ISSUE CLASSIFICATION PASS')
+          PY
+      - name: Commit final classification
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ProtocolXml/Docs/USV_OpenIssues_Consolidated_20260828.md
+          git commit -m 'Finalize USV remaining issue classification'
+          git push origin HEAD:feature/usv-semantic-binding-audit
