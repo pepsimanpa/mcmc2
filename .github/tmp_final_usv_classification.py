@@ -1,0 +1,147 @@
+from pathlib import Path
+
+sem=Path('ProtocolXml/USV/SideScanSonar/SideScanSonarSemantic.xml')
+bind=Path('ProtocolXml/USV/SideScanSonar/SideScanSonarBinding.xml')
+sssissues=Path('ProtocolXml/USV/SideScanSonar/SideScanSonar_OpenIssues.md')
+master=Path('ProtocolXml/Docs/USV_OpenIssues_Consolidated_20260828.md')
+s=sem.read_text(encoding='utf-8')
+b=bind.read_text(encoding='utf-8')
+o=sssissues.read_text(encoding='utf-8')
+m=master.read_text(encoding='utf-8')
+
+def rep(text, old, new, label, count=1):
+    n=text.count(old)
+    if n != count:
+        raise SystemExit(f'{label}: expected {count}, found {n}')
+    return text.replace(old,new,count)
+
+s=rep(s,
+'''        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Mode">
+          <Range min="0" max="2"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>''',
+'''        <ValueSetProfile cdm="ReceiveProcessing.SoftwareGain.Mode">
+          <Values>
+            <Value name="AutoGain" cdm="ReceiveProcessing.SoftwareGain.Mode.AutoGain"/>
+            <Value name="TVG" cdm="ReceiveProcessing.SoftwareGain.Mode.TVG"/>
+            <Value name="RawGain" cdm="ReceiveProcessing.SoftwareGain.Mode.RawGain"/>
+          </Values>
+        </ValueSetProfile>''','semantic software gain mode')
+
+s=rep(s,
+'''        <QuantityProfile cdm="ReceiveProcessing.LowPassFilter.Mode">
+          <Range min="0" max="1"/>
+          <Resolution>1</Resolution>
+        </QuantityProfile>''',
+'''        <ValueSetProfile cdm="ReceiveProcessing.LowPassFilter.Mode">
+          <Values>
+            <Value name="Disabled" cdm="ReceiveProcessing.LowPassFilter.Mode.Disabled"/>
+            <Value name="Enabled" cdm="ReceiveProcessing.LowPassFilter.Mode.Enabled"/>
+          </Values>
+        </ValueSetProfile>''','semantic low pass mode')
+
+b=rep(b,
+'      <Field name="swGainMode" cdm="ReceiveProcessing.SoftwareGain.Mode" dataType="UInt8"/>',
+'''      <Field name="swGainMode" cdm="ReceiveProcessing.SoftwareGain.Mode" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="ReceiveProcessing.SoftwareGain.Mode.AutoGain" value="0"/>
+          <Map cdm="ReceiveProcessing.SoftwareGain.Mode.TVG" value="1"/>
+          <Map cdm="ReceiveProcessing.SoftwareGain.Mode.RawGain" value="2"/>
+        </ValueMap>
+      </Field>''','binding software gain mode')
+
+b=rep(b,
+'      <Field name="lowPassFilterMode" cdm="ReceiveProcessing.LowPassFilter.Mode" dataType="UInt8"/>',
+'''      <Field name="lowPassFilterMode" cdm="ReceiveProcessing.LowPassFilter.Mode" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="ReceiveProcessing.LowPassFilter.Mode.Disabled" value="0"/>
+          <Map cdm="ReceiveProcessing.LowPassFilter.Mode.Enabled" value="1"/>
+        </ValueMap>
+      </Field>''','binding low pass mode')
+
+o=rep(o,
+'- `SideScanSonar.SonarType`과 `SideScanSonar.Subsystem(targetDevice)`은 원문 값으로 논리화 완료하였다. `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`만 원문 코드 의미 부족으로 TBD를 유지한다.',
+'- `SideScanSonar.SonarType`, `SideScanSonar.Subsystem(targetDevice)`, `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`는 원문 값으로 논리화 완료하였다. SoftwareGain은 원격통제장치 CSCI의 `0=Auto Gain / 1=TVG / 2=Raw Gain`, LowPassFilter는 `0=미사용 / 1=사용`을 Semantic ValueSet + Binding ValueMap으로 반영하였다.','sss enum migration')
+
+o=rep(o,
+'- `ReceiveProcessing.TVG.Mode`는 CSCI에서 `0=Off(TVG 미사용), 1=On`이 직접 확인되어 이미 Semantic ValueSet/Binding ValueMap으로 반영되어 있다. `ReceiveProcessing.SoftwareGain.Mode(0~2)`와 `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 이번 CSCI에 해당 모드 필드/코드 의미가 없어 QuantityProfile TBD를 유지한다.',
+'- `ReceiveProcessing.TVG.Mode`는 예인형수중탐색장치 CSCI에서 `0=Off(TVG 미사용), 1=On`이 직접 확인되어 Semantic ValueSet/Binding ValueMap으로 반영되어 있다. `ReceiveProcessing.SoftwareGain.Mode`는 원격통제장치 CSCI에서 `0=Auto Gain, 1=TVG, 2=Raw Gain`, `ReceiveProcessing.LowPassFilter.Mode`는 `0=미사용, 1=사용`이 직접 정의되어 있으므로 동일하게 ValueSet/ValueMap으로 확정하였다.','sss source audit')
+
+m=rep(m,
+'5. GapFiller range가 SSS range와 동기화되는 조건을 평면 Parameter 모델에서 표현하는 방법.\n6. SoftwareGain Mode(0~2), LowPassFilter Mode(0~1)의 논리값 의미.',
+'5. GapFiller range가 SSS range와 동기화되는 조건을 평면 Parameter 모델에서 표현하는 방법.\n\n재심층 감사에서 SoftwareGain Mode(`0=Auto Gain / 1=TVG / 2=Raw Gain`)와 LowPassFilter Mode(`0=미사용 / 1=사용`)는 원격통제장치 CSCI 직접 근거로 해소하였다.','master SSS resolved modes')
+
+marker='## 5. 최종 merge / runtime readiness 판단\n'
+if marker not in m:
+    raise SystemExit('master readiness marker missing')
+classification='''## 5. 최종 해결 경로 분류
+
+### 5.1 현재 보유 CSV로 추가 해결 가능한 항목
+
+- **0건**. 2026-08-30 기준 보유한 장치 CSCI, 원격통제장치 CSCI, 공용 구조체/규칙/식별자 CSV의 재심층 교차감사를 완료하였다.
+- 마지막 잔여 CSV 항목이던 SideScanSonar SoftwareGain/LowPassFilter Mode도 원격통제장치 CSCI 직접 정의로 해소하였다.
+- 따라서 이후 동일 CSV를 반복 검색하여 새로운 raw code/Unit/bit 의미를 추정하는 작업은 중단한다. 새 CSCI/ICD/IDL 또는 원작자 답변이 추가될 때만 재개한다.
+
+### 5.2 해결 경로 분류 기준
+
+| 분류 | 필요한 추가 근거 | 처리 원칙 |
+|---|---|---|
+| **IDL/ICD·원문 추가근거** | DDS IDL, 상세 ICD, 신규/정정 CSCI | wire 철자·signedness·bit mapping·누락 code/Unit을 직접 확인한 뒤 반영 |
+| **Adapter/runtime 규칙** | OM/Adapter 설계, FSM, correlation/routing 규칙 | XML에 임의 transaction 로직을 넣지 않고 runtime 계약으로 확정 |
+| **원작자/운용정책 확인** | 원작자 답변, 운용개념, 장비 운용 절차 | 의미 충돌·우선순위·one-shot·조건부 사용 규칙을 정책 근거로 확정 |
+| **공통 XSD/모델 개선** | CommonSpec/Binding 스키마 설계 결정 | symbolic Range, sentinel, 조건부 parameter 같은 표현력 문제를 공통 모델에서 해결 |
+| **배치/설정 확인** | RTP/IP/Port, 현장 configuration | 소스 의미와 분리하여 배치값으로 관리 |
+
+### 5.3 공통 master issue 분류 및 우선순위
+
+| Common ID | 최종 분류 | 우선순위 | 필요한 다음 근거 |
+|---|---|---|---|
+| `USV-COMMON-01` | Adapter/runtime | **P0** | PBIT/IBIT 비동기 결과 correlation 및 동시요청 정책 |
+| `USV-COMMON-03` | Adapter/runtime | **P0** | shared Topic source routing, fan-out, multi-result 완료 판정 |
+| `USV-COMMON-05` | Adapter/runtime + 공통 validation | P2 | count/sequence 불일치 처리 규칙 |
+| `USV-COMMON-06` | 공통 XSD/모델 | P3 | symbolic Range(`-PI~+PI`) 표현 방식 |
+| `USV-COMMON-07` | IDL/ICD·원작자 | P2 | CIPE producer별 `cipeOperationalStatus` 실제 subset |
+| `USV-COMMON-08` | Adapter/runtime | **P0** | dotted-path nested member 접근 공식 계약 |
+| `USV-COMMON-09` | Adapter/runtime | **P0** | 일반 비동기 Control↔Result transaction correlation |
+| `USV-COMMON-10` | 배치/ICD | P1 | RTP endpoint/channel 실제 IP/Port 및 공유 여부 |
+| `USV-COMMON-11` | DDS IDL | P1 | CSCI 오탈자와 실제 Topic/Type/member 철자 대조 |
+| `USV-COMMON-12` | 공통 XSD/모델 + 운용정책 | P2 | sentinel/invalid 값을 수치와 별도 상태로 노출할지 결정 |
+
+`USV-COMMON-02(Boolean wire type)`와 `USV-COMMON-04(primitive dataType)`는 해결 완료 상태를 유지한다.
+
+### 5.4 장치별 고유 이슈의 주 해결 경로
+
+| 장치 | 남은 고유 이슈의 주 해결 경로 | 다음에 받아야 할 자료/결정 |
+|---|---|---|
+| AutonomousNavigation | IDL/ICD + 원작자/운용정책 | Achieved code, 시간 encoding, Unit, RestrictArea/Return/Tracking 규칙 |
+| CentralControl | 원작자/ICD + Adapter/runtime | Authority routing, VHF 채널표, PBIT 주기 의미, 상태 code |
+| ElectroOptical | IDL/ICD + 원작자 + 배치 | SWIR/IBIT/Wiper code, Swing Unit, No-change 우선순위, RTP |
+| ElectroOpticalProcessor | **장치 고유 이슈 없음** | 공통 issue `01/03/05/06/07`만 추적 |
+| IntegratedNavigation | DDS IDL + 원작자 | bitmask 조합, AJ/AS 상태, signedness/Range, RTCM size 계약 |
+| Lidar | **장치 고유 이슈 없음** | 공통 issue `01/03/05/07`만 추적 |
+| NavigationCamera | IDL/원작자 + 배치 | IBIT polarity/반복 카메라 detail, RTP |
+| NavigationRadar | 상세 ICD/원작자 | Radar/AIS range-control octet 표, radarMessageTransmitStatus 의미 |
+| NearContactDetection | 원작자/runtime + 배치 | Lidar Level/Action 동시 bit 규칙, RTP |
+| NetworkAbstraction | IDL/원작자 + Adapter/runtime | commsChannelID=2, commandID 주체, L-Band bit polarity, valid=false 처리 |
+| PlatformController | 상세 ICD/IDL + 운용 FSM | Power/CCTV mask, ENV code, raw status, 모드별 유효 parameter |
+| RemoteFireControl | 상세 ICD/원작자 + 운용정책 | joystick 변환, IBIT polarity, zone sentinel, initZeroing, reboot 우선순위 |
+| SensorFusion | 원작자/공용구조체 정정 | waveSpectrum/integratedWaveEnergy Unit/Range |
+| SideScanSonar | IDL/원작자 + 공통 모델 | power/detail polarity, 로컬 XSD 의존성, HMS frequency, 조건부 GapFiller range |
+
+### 5.5 작업 종료 기준
+
+- **CSV source audit: 완료** — 현재 보유 CSV로 추가 확정 가능한 active issue 0건.
+- **Semantic/Binding XML: Review/Merge Ready** — 현재 OpenIssue는 XML 구조 결함이 아니라 외부 근거 또는 runtime/model 계약 대기 항목이다.
+- **실제 연동 착수 전 P0**: `USV-COMMON-01`, `03`, `08`, `09`를 먼저 확정한다.
+- 이후 P1(IDL/배치), P2(원작자 의미·validation), P3(공통 모델 개선) 순으로 정리한다.
+
+---
+
+'''
+m=m.replace(marker,classification+'## 6. 최종 merge / runtime readiness 판단\n',1)
+m=m.replace('## 6. 최종 결론','## 7. 최종 결론',1)
+
+sem.write_text(s,encoding='utf-8')
+bind.write_text(b,encoding='utf-8')
+sssissues.write_text(o,encoding='utf-8')
+master.write_text(m,encoding='utf-8')
