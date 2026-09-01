@@ -3,165 +3,137 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>UMS XML Design Explorer</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>UMS Design Trace</title>
   <link rel="stylesheet" href="design.css">
   <script src="design.js" defer></script>
 </head>
-<body class="design-body">
-<a class="skip-link" href="#designMain">본문으로 바로가기</a>
-<div class="design-shell">
-  <header class="design-topbar">
-    <div class="design-brand">
-      <span class="brand-mark">UM</span>
-      <span>
-        <strong>UMS XML Design Explorer</strong>
-        <small>장비 → 기능 → Semantic → Binding → Reply → TBD</small>
-      </span>
+<body>
+<a class="skip-link" href="#main">본문으로 바로가기</a>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-glyph">DT</span>
+      <div>
+        <strong>UMS Design Trace</strong>
+        <small>XML 구조가 아니라 설계의 흐름을 추적합니다</small>
+      </div>
     </div>
-    <div class="design-actions">
-      <a class="button ghost" href="index.html#cdm">CDM 원칙</a>
-      <a class="button ghost" href="index.html#hmi">HMI 데모</a>
-      <label class="button primary" for="designFolderInput">XML 폴더 선택</label>
+    <div class="top-actions">
+      <a href="index.html#cdm">CDM 원칙</a>
+      <a href="index.html#hmi">HMI 데모</a>
+      <label class="open-folder" for="designFolderInput">XML 폴더 열기</label>
       <input id="designFolderInput" class="visually-hidden" type="file" webkitdirectory multiple accept=".xml,.xsd,.md,.idl">
     </div>
   </header>
 
-  <section class="design-intro">
-    <div>
-      <p class="design-eyebrow">DESIGN FIRST</p>
-      <h1>XML을 열어보지 않아도<br>설계 의도가 먼저 보이게</h1>
-      <p>장비 하나를 선택하면 어떤 기능이 있고, 그 기능의 논리 의미가 실제 DDS/TCP/UDP/RS422 필드로 어떻게 연결되는지 한 화면에서 확인합니다.</p>
-    </div>
-    <div class="design-source" id="designSourceState">
-      <b>LOCAL</b>
-      <strong>폴더를 선택하세요</strong>
-      <small>파일은 브라우저 내부에서만 읽습니다.</small>
-    </div>
-  </section>
-
-  <section id="designStats" class="design-stats" aria-live="polite">
-    <div><span>장비</span><strong>0</strong></div>
-    <div><span>Control</span><strong>0</strong></div>
-    <div><span>Monitor</span><strong>0</strong></div>
-    <div><span>Product</span><strong>0</strong></div>
-    <div><span>Binding</span><strong>0</strong></div>
-    <div><span>OpenIssue 문서</span><strong>0</strong></div>
-  </section>
-
-  <main id="designMain">
-    <section id="designEmpty" class="design-empty">
-      <b>01</b>
-      <div>
-        <h2>먼저 XML 폴더를 선택하세요.</h2>
-        <p>저장소 루트 또는 <code>ProtocolXml</code> 폴더를 선택하면 Specification의 참조를 따라 Semantic/Binding을 자동 연결합니다.</p>
+  <main id="main">
+    <section id="landing" class="landing">
+      <p class="kicker">DESIGN TRACE</p>
+      <h1>한 기능이<br><em>실제 메시지</em>가 되는 과정을 본다.</h1>
+      <p class="landing-copy">Specification은 어디를 가리키고, Semantic은 무엇을 뜻하며, Binding은 그 의미를 어떤 필드와 값으로 옮기는지 한 흐름으로 추적합니다.</p>
+      <div class="trace-preview" aria-hidden="true">
+        <span>SPECIFICATION</span><i>→</i><span>SEMANTIC</span><i>→</i><span>BINDING</span><i>→</i><span>WIRE</span>
       </div>
+      <label class="landing-open" for="designFolderInput">설계 폴더 선택</label>
+      <div id="sourceState" class="source-state">로컬 파일만 브라우저에서 읽습니다.</div>
     </section>
 
-    <section id="designWorkspace" class="design-workspace" hidden>
-      <aside class="design-sidebar">
-        <header>
-          <p>DEVICE</p>
-          <h2>장비</h2>
-          <input id="designDeviceSearch" type="search" placeholder="장비명 · SpecRef 검색">
-        </header>
-        <div id="designDeviceList" class="design-device-list"></div>
+    <section id="workspace" class="workspace" hidden>
+      <aside class="device-rail">
+        <div class="rail-head">
+          <span class="rail-label">EQUIPMENT</span>
+          <input id="deviceSearch" type="search" placeholder="장비 검색" aria-label="장비 검색">
+        </div>
+        <div id="deviceList" class="device-list"></div>
+        <div class="rail-foot">
+          <span id="railSource">LOCAL</span>
+          <small>원문에 없는 의미는 추정하지 않음</small>
+        </div>
       </aside>
 
-      <section class="design-content">
-        <article id="designDeviceHero" class="design-device-hero"></article>
-
-        <section class="design-path-card">
-          <div class="design-path-title">
-            <p>REFERENCE PATH</p>
-            <h2>Specification → Semantic → Binding</h2>
+      <section class="stage">
+        <header class="device-header">
+          <div>
+            <p id="deviceEyebrow" class="kicker">EQUIPMENT MAP</p>
+            <h1 id="deviceTitle">—</h1>
+            <p id="deviceMeta" class="device-meta">—</p>
           </div>
-          <div id="designReferencePath" class="design-reference-path"></div>
+          <div id="deviceInlineStats" class="inline-stats"></div>
+        </header>
+
+        <section class="function-map-wrap">
+          <div class="section-heading">
+            <div>
+              <span>01</span>
+              <div><b>Equipment Map</b><small>이 장비가 정의한 기능</small></div>
+            </div>
+            <input id="functionSearch" type="search" placeholder="기능 · ID · CDM 검색" aria-label="기능 검색">
+          </div>
+          <div id="functionMap" class="function-map"></div>
         </section>
 
-        <section class="design-function-layout">
-          <aside class="design-function-browser">
-            <header>
-              <div>
-                <p>FUNCTION</p>
-                <h2>기능</h2>
-              </div>
-              <div class="design-function-filters" id="designFunctionFilters">
-                <button class="is-active" data-kind="All">전체</button>
-                <button data-kind="Control">Control</button>
-                <button data-kind="Monitor">Monitor</button>
-                <button data-kind="Product">Product</button>
-              </div>
-              <input id="designFunctionSearch" type="search" placeholder="기능명 · CDM · ID 검색">
-            </header>
-            <div id="designFunctionList" class="design-function-list"></div>
-          </aside>
+        <section id="traceEmpty" class="trace-empty">
+          <span>02</span>
+          <div>
+            <b>기능을 선택하면 설계 경로가 펼쳐집니다.</b>
+            <p>문서 목록을 읽는 대신, 하나의 기능이 Specification에서 Wire까지 어떻게 이어지는지 추적합니다.</p>
+          </div>
+        </section>
 
-          <section class="design-detail">
-            <div id="designNoFunction" class="design-no-function">
-              <b>02</b>
-              <div>
-                <h2>기능을 선택하세요.</h2>
-                <p>Semantic 의미와 실제 Binding 메시지를 같은 화면에서 비교할 수 있습니다.</p>
-              </div>
+        <section id="tracePanel" class="trace-panel" hidden>
+          <header class="trace-header">
+            <div>
+              <div class="trace-title-line"><span id="traceKind" class="kind-badge">—</span><code id="traceCode">—</code></div>
+              <h2 id="traceTitle">—</h2>
+              <p id="traceDescription">—</p>
             </div>
+            <button id="inspectSemantic" class="text-button" type="button">Semantic 원문</button>
+          </header>
 
-            <div id="designFunctionDetail" hidden>
-              <article id="designFunctionHero" class="design-function-hero"></article>
-
-              <section class="design-flow">
-                <div><b>1</b><span><strong>기능</strong><small id="flowFeature">—</small></span></div>
-                <i>→</i>
-                <div><b>2</b><span><strong>Semantic</strong><small id="flowSemantic">—</small></span></div>
-                <i>→</i>
-                <div><b>3</b><span><strong>Binding</strong><small id="flowBinding">—</small></span></div>
-                <i>→</i>
-                <div><b>4</b><span><strong>Wire</strong><small id="flowWire">—</small></span></div>
-                <i>→</i>
-                <div><b>5</b><span><strong>Reply</strong><small id="flowReply">—</small></span></div>
-              </section>
-
-              <section class="design-compare-grid">
-                <article class="design-semantic-card">
-                  <header><p>LOGICAL MEANING</p><h2>Semantic</h2></header>
-                  <div id="designSemanticSummary"></div>
-                  <div id="designSemanticTable"></div>
-                </article>
-                <article class="design-binding-card">
-                  <header><p>PHYSICAL REPRESENTATION</p><h2>Binding</h2></header>
-                  <div id="designBindingVariants"></div>
-                </article>
-              </section>
-
-              <section class="design-reply-issues-grid">
-                <article class="design-reply-card">
-                  <header><p>RESULT / ACK</p><h2>Reply</h2></header>
-                  <div id="designReplyDetail"></div>
-                </article>
-                <article class="design-issue-card">
-                  <header><p>KNOWN UNKNOWN</p><h2>TBD / OpenIssue</h2></header>
-                  <div id="designIssueDetail"></div>
-                </article>
-              </section>
-
-              <details class="design-raw-card">
-                <summary><span><strong>원본 XML 확인</strong><small>선택 기능의 Semantic/Binding 원문</small></span><b>⌄</b></summary>
-                <div class="design-raw-grid">
-                  <div><h3>Semantic XML</h3><pre><code id="designRawSemantic"></code></pre></div>
-                  <div><h3>Binding XML</h3><pre><code id="designRawBinding"></code></pre></div>
-                </div>
-              </details>
+          <section class="trace-canvas" aria-label="Specification Semantic Binding Wire 추적">
+            <div class="trace-columns" aria-hidden="true">
+              <span>SPECIFICATION<small>무엇을 참조하는가</small></span>
+              <span>SEMANTIC<small>무슨 의미인가</small></span>
+              <span>BINDING<small>어떻게 표현하는가</small></span>
+              <span>WIRE<small>어디로 전달되는가</small></span>
+            </div>
+            <div class="trace-main-row">
+              <article id="specNode" class="trace-node spec-node"></article>
+              <article id="semanticNode" class="trace-node semantic-node interactive" tabindex="0" role="button"></article>
+              <div id="bindingNodes" class="binding-stack"></div>
+              <div id="wireNodes" class="wire-stack"></div>
             </div>
           </section>
+
+          <section id="replySection" class="reply-section" hidden>
+            <div class="section-heading compact">
+              <div><span>↩</span><div><b>Reply Lane</b><small>Control의 응답 경로</small></div></div>
+            </div>
+            <div id="replyLane" class="reply-lane"></div>
+          </section>
+
+          <section class="field-trace-section">
+            <div class="section-heading compact">
+              <div><span>03</span><div><b>Field Trace</b><small>Semantic 의미와 Binding 필드의 직접 근거</small></div></div>
+              <small class="evidence-note">동일 CDM · sourceField · converter · ValueMap · PackedField만 표시</small>
+            </div>
+            <div id="fieldTrace" class="field-trace"></div>
+          </section>
+
+          <section id="issueStrip" class="issue-strip"></section>
         </section>
       </section>
+
+      <aside id="inspector" class="inspector">
+        <div class="inspector-head">
+          <div><span>INSPECTOR</span><b id="inspectorTitle">Source</b></div>
+          <button id="closeInspector" type="button" aria-label="Inspector 닫기">×</button>
+        </div>
+        <div id="inspectorEmpty" class="inspector-empty">Trace의 Semantic 또는 Binding 필드를 선택하면 원 XML과 변환 근거를 여기서 확인할 수 있습니다.</div>
+        <div id="inspectorBody" class="inspector-body" hidden></div>
+      </aside>
     </section>
   </main>
-
-  <footer class="design-footer">
-    <span>UMS XML Design Explorer · read-only local viewer</span>
-    <span>원문에 없는 의미는 Web에서 새로 추정하지 않습니다.</span>
-  </footer>
 </div>
 </body>
 </html>
