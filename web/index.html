@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UMS Protocol Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#mainContent">본문으로 바로가기</a>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="#cdm">
+      <span class="brand-mark">UM</span>
+      <span><strong>UMS Protocol Explorer</strong><small>AUV · USV · MDV · EMDW · XML/XSD · HMI</small></span>
+    </a>
+    <div class="source-actions">
+      <div class="source-summary" aria-live="polite"><span class="source-dot" id="sourceDot"></span><span><strong id="sourceFolderName">내장 문서 모드</strong><small id="sourceStatusText">XML 폴더 선택 · 관계 분석</small></span></div>
+      <label class="button primary" for="folderInput">XML 폴더 선택</label>
+      <input id="folderInput" class="visually-hidden" type="file" webkitdirectory multiple accept=".xml,.xsd,.md,.idl">
+    </div>
+  </header>
+
+  <section class="source-bar">
+    <div><span>XML</span><strong id="xmlFileCount">0</strong></div>
+    <div><span>XSD</span><strong id="xsdFileCount">0</strong></div>
+    <div><span>IDL</span><strong id="idlFileCount">0</strong></div>
+    <div><span>Control</span><strong id="controlCount">0</strong></div>
+    <div><span>Monitor</span><strong id="monitorCount">0</strong></div>
+    <div><span>Sensor Product</span><strong id="productCount">0</strong></div>
+    <div><span>진단</span><strong id="diagnosticCount">0</strong></div>
+    <p><b>LOCAL ONLY</b> 브라우저 내부 처리 · 외부 전송 없음</p>
+  </section>
+
+  <nav class="tabbar" role="tablist" aria-label="문서 영역">
+    <button id="tab-cdm" class="tab-button is-active" role="tab" aria-selected="true" aria-controls="panel-cdm" data-tab="cdm"><b>01</b><span><strong>CDM 분류</strong><small>공통 모델과 Extension</small></span></button>
+    <button id="tab-model" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-model" tabindex="-1" data-tab="model"><b>02</b><span><strong>XML 설명</strong><small>XSD · Semantic · Binding</small></span></button>
+    <button id="tab-hmi" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-hmi" tabindex="-1" data-tab="hmi"><b>03</b><span><strong>HMI 데모</strong><small>명령에서 논리 메시지까지</small></span></button>
+  </nav>
+
+  <main id="mainContent">
+    <section id="panel-cdm" class="tab-panel" role="tabpanel" aria-labelledby="tab-cdm" data-panel="cdm">
+      <section class="profile-formula"><div class="section-heading"><div><p>UMS PROFILE</p><h2>무인체계 Profile 구성</h2></div></div><div class="formula-track">
+        <article class="formula-card core"><b>01</b><strong>Core</strong><small>식별·상태·위치·임무·자료</small></article><i>+</i>
+        <article class="formula-card domain"><b>02</b><strong>Underwater</strong><small>수심·수중항법·수중통신</small></article><i>+</i>
+        <article class="formula-card autonomy"><b>03</b><strong>Autonomy</strong><small>계획·실행·복귀</small></article><i>+</i>
+        <article class="formula-card capability"><b>04</b><strong>Capabilities</strong><small>RF·Sonar·Camera·Security</small></article><i>+</i>
+        <article class="formula-card project"><b>05</b><strong>Project Profile</strong><small>AUV · USV · MDV · EMDW 고유 의미</small></article>
+      </div></section>
+
+      <section class="axis-grid"><div class="section-heading"><div><p>THREE AXES</p><h2>CDM 분류 축</h2></div></div>
+        <article class="axis-card"><b>A</b><div><h3>기능 축</h3><p>요구 · 변경 · 응답</p></div><ul><li>Request · 정보와 처리 요구</li><li>Control · 동작과 설정 변경</li><li>Response · 논리 응답</li></ul></article>
+        <article class="axis-card"><b>B</b><div><h3>정보 도메인 축</h3><p>정보 영역</p></div><div class="tag-cloud"><span>Platform</span><span>Mission</span><span>Navigation</span><span>Health</span><span>RecordedData</span><span>Communication</span><span>Equipment</span></div></article>
+        <article class="axis-card"><b>C</b><div><h3>모델 계층 축</h3><p>공통 모델 · 확장 경계</p></div><ul><li>Core / Domain / Autonomy</li><li>Capability / Project Extension</li><li>BindingOnly / ProfileRef · 별도 판정</li></ul></article>
+      </section>
+
+      <section class="cdm-reference">
+        <aside class="reference-nav"><p>REFERENCE</p><h2>CDM 문서</h2><button class="reference-button is-active" data-cdm-view="principles">핵심 적용 원칙</button><div id="cdmFileButtons"></div><small id="cdmReferenceHint">XML 폴더 선택 후 Markdown 문서 표시</small></aside>
+        <article class="reference-content" id="cdmDocument" tabindex="-1"></article>
+      </section>
+    </section>
+
+    <section id="panel-model" class="tab-panel" role="tabpanel" aria-labelledby="tab-model" data-panel="model" hidden>
+      <div id="modelEmptyState" class="empty-callout"><b>↗</b><span><strong>XML 폴더 선택 필요</strong><small>Specification · Semantic · Binding · XSD</small></span></div>
+
+      <div id="modelWorkspace" hidden>
+        <section class="analysis-overview">
+          <div class="device-picker" id="devicePicker">
+            <div class="device-picker-summary"><p>DEVICE</p><span><strong id="devicePickerName">장치를 선택하세요</strong><small id="devicePickerMeta">분석 장치 목록</small></span><button class="button ghost" id="devicePickerButton" type="button" aria-expanded="false">장치 선택</button></div>
+            <div class="device-popover" id="devicePopover" hidden><input id="deviceSearch" type="search" placeholder="장치명 또는 SpecRef 검색"><div class="device-list" id="deviceList"></div></div>
+          </div>
+          <div class="device-detail">
+            <div class="device-detail-label"><p>SELECTED DEVICE</p><strong id="deviceDetailName">장치를 선택하세요</strong></div>
+            <div class="relationship-map" id="relationshipMap"><p class="device-empty">상단 장치 선택 필요</p></div>
+            <details class="schema-rail" id="schemaRail"><summary><b>SCHEMA</b><span id="schemaSummary">공통 XSD 0종 · Root 0 · Include 0</span><small>펼치기</small></summary><div class="schema-list" id="schemaList"></div></details>
+          </div>
+        </section>
+
+        <section class="explorer-layout">
+          <section class="panel-card control-browser"><header><div><p>SEMANTIC → BINDING</p><h2>기능 관계</h2></div><input id="controlSearch" type="search" placeholder="ID, CDM 또는 종류 검색"></header><div id="controlList" class="control-list"></div></section>
+          <aside class="panel-card detail-inspector"><header><p>INSPECTOR</p><h2>선택 상세</h2></header><div id="modelDetail" class="model-detail"><p class="empty-text">파일 또는 기능을 선택하세요.</p></div></aside>
+          <aside class="panel-card binding-inspector"><header><p>BINDING</p><h2>전송 상세</h2></header><div id="bindingDetail" class="binding-detail"><p class="empty-text">기능 선택 후 Binding 정보 표시</p></div></aside>
+        </section>
+
+        <section class="diagnostics-section"><div class="section-heading"><div><p>STATIC DIAGNOSTICS</p><h2>관계 진단</h2></div></div><div id="diagnosticList" class="diagnostic-list"></div></section>
+      </div>
+    </section>
+
+    <section id="panel-hmi" class="tab-panel" role="tabpanel" aria-labelledby="tab-hmi" data-panel="hmi" hidden>
+      <div id="hmiEmptyState" class="empty-callout"><b>⌘</b><span><strong>XML 폴더 선택 필요</strong><small>Semantic Control · Binding 기반 데모</small></span></div>
+
+      <div id="hmiWorkspace" hidden>
+        <section class="flow-strip"><div class="flow-node"><b>01</b><span><strong>HMI CSC</strong><small>Draft 작성·DDS Requester</small></span></div><div class="flow-link"><strong>DDS Request / Reply</strong><small>OperationManagement.idl</small></div><div class="flow-node"><b>02</b><span><strong>OPERATION MANAGEMENT CSC</strong><small>XML 조회·검증·Binding 변환</small></span></div><div class="flow-link"><strong>DDS / TCP / UDP / RTP / RS422</strong><small>논리 장치 메시지</small></div><div class="flow-node"><b>03</b><span><strong>UMS</strong><small>AUV · USV · MDV · EMDW</small></span></div></section>
+
+        <section class="hmi-layout">
+          <article class="panel-card terminal-panel">
+            <header><div><p>HMI CSC</p><h2>Command Terminal</h2></div><div class="terminal-actions"><span id="hmiState" class="state-chip">SPEC NOT LOADED</span><button id="resetDemoButton" class="button ghost" type="button">데모 초기화</button></div></header>
+            <details id="presetPicker" class="draft-picker"><summary><span><small>예제 Draft 빠르게 채우기</small><strong id="presetSelection">Control 검색 또는 선택</strong></span><b>⌄</b></summary><div class="draft-picker-menu"><input id="presetSearch" type="search" placeholder="Control 이름 또는 Full ID 검색"><div id="presetList" class="preset-list"></div></div></details>
+            <div class="terminal"><div class="terminal-titlebar"><span>● ● ●</span><span>hmi-control-client</span><span>UTF-8</span></div><div id="terminalLog" class="terminal-log" role="log" aria-live="polite"></div><form id="terminalForm" class="terminal-form"><span>hmi@csc:~$</span><input id="terminalInput" placeholder="request -rcc" autocomplete="off"><button>실행</button></form></div>
+            <details class="command-guide compact-guide" open><summary><span><small>COMMAND CHEAT SHEET</small><strong>HMI 명령 형식</strong></span><b>⌄</b></summary><div class="command-list"><div><code>request -rcc</code><span>ControlSpec 카탈로그 요청</span></div><div><code>control -i &lt;id&gt;</code><span>Draft 시작</span></div><div><code>control -a &lt;key&gt;,&lt;value&gt;</code><span>입력값 추가</span></div><div><code>control -p</code><span>Draft 확인</span></div><div><code>control -r</code><span>검증 · 변환 · Mock 송신</span></div><div><code>control -c</code><span>Draft 초기화</span></div></div></details>
+            <div class="draft-card"><header><div><p>CURRENT DRAFT</p><h3 id="draftControlId">선택되지 않음</h3></div><button id="sendDraftButton" class="button primary">control -r 송신</button></header><div id="argumentChips" class="argument-chips"><span class="empty-text">입력된 key-value가 없습니다.</span></div></div>
+          </article>
+
+          <article class="panel-card om-workspace">
+            <header><div><p>OPERATION MANAGEMENT CSC</p><h2>XML Binding Processing</h2></div><span id="omState" class="state-chip">IDLE</span></header>
+            <div class="om-inner-grid"><section class="om-resolver"><div class="om-subhead"><p>BINDING RESOLVER</p><h3>Control 처리 파이프라인</h3></div><label class="route-select">Binding 선택<select id="routePolicy"><option value="AUTO">DEFAULT · 첫 번째 Binding</option></select><small>실제 링크 상태를 판단하지 않는 데모 기본 정책입니다.</small></label><ol id="pipeline" class="pipeline"><li data-step="lookup"><b>1</b><span><strong>Control 조회</strong><small>Semantic ID</small></span></li><li data-step="validate"><b>2</b><span><strong>입력 검증</strong><small>필수·형식·범위</small></span></li><li data-step="binding"><b>3</b><span><strong>Binding 선택</strong><small>Channel·Reply</small></span></li><li data-step="mapping"><b>4</b><span><strong>Field 구성</strong><small>Input·Fixed·Derived·TBD</small></span></li><li data-step="publish"><b>5</b><span><strong>Mock 송신</strong><small>미확정 값은 보류</small></span></li></ol><div id="bindingSummary" class="binding-summary"><p class="empty-text">송신 후 선택 Binding이 표시됩니다.</p></div><div id="resultBanner" class="result-banner"><strong>처리 대기</strong><small>실제 장비 상태가 아닙니다.</small></div></section>
+              <section class="payload-panel"><header><div><p>LOGICAL DEVICE MESSAGE · MOCK</p><h3>Field Mapping</h3></div><button id="copyPayloadButton" class="button ghost" disabled>복사</button></header><div class="table-scroll"><table class="payload-table"><thead><tr><th>Field / Mapping Rule</th><th>Physical Value</th><th>공급 주체</th></tr></thead><tbody id="payloadTableBody"><tr><td colspan="3" class="table-empty">아직 생성된 논리 메시지가 없습니다.</td></tr></tbody></table></div></section></div>
+          </article>
+        </section>
+
+        <section class="catalog-section"><header><div><p>GENERATED FROM SEMANTIC XML</p><h2>Control 카탈로그</h2></div><input id="hmiCatalogSearch" type="search" placeholder="Control ID 또는 CDM 검색"></header><div id="hmiCatalog" class="catalog-grid"></div></section>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>UMS Protocol Explorer · static offline documentation</span><span>XML 관계 분석 · 논리 메시지 Mock · 실제 장비 송수신 아님</span></footer>
+</div>
+</body>
+</html>

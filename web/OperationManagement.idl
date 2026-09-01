@@ -1,0 +1,95 @@
+/*
+- (c) Copyright, Real-Time Innovations, 2020.  All rights reserved.
+- RTI grants Licensee a license to use, modify, compile, and create derivative
+- works of the software solely for use with RTI Connext DDS. Licensee may
+- redistribute copies of the software provided that all such copies are subject
+- to this license. The software is provided "as is", with no warranty of any
+- type, including any warranty for fitness for any purpose. RTI is under no
+- obligation to maintain or support the software. RTI shall not be liable for
+- any incidental or consequential damages arising out of the use or inability
+- to use the software.
+*/
+
+module Common
+{
+    // ControlSpecListReply에서는 fieldValue를 비워 메타데이터로 제공하고,
+    // ControlExecutionRequest에서는 HMI가 입력한 실제 값을 fieldValue에 저장한다.
+    struct ControlParam
+    {
+        wstring<100> fieldName;
+        wstring<100> cdm;
+        wstring<40> dataType;
+        boolean required;
+        wstring<200> fieldValue;
+        wstring<200> defaultValue;
+        wstring<40> unit;
+        wstring<40> minValue;
+        wstring<40> maxValue;
+        wstring<40> resolution;
+        wstring<200> description;
+    };
+
+    // targetCdm은 ControlExecutionRequest.targetId가 자동 공급할 Semantic Target이다.
+    // 따라서 Target은 params에 중복 포함하지 않는다.
+    struct ControlSpec
+    {
+        wstring<100> id;
+        wstring<100> name;
+        wstring<100> cdm;
+        wstring<100> targetCdm;
+        int32 numsOfParams;
+        sequence<ControlParam, 100> params;
+    };
+
+    enum OperationState
+    {
+        Finished,
+        Processing,
+        Failed
+    };
+};
+
+module Messages
+{
+    module OperationManagement
+    {
+        // 1. Request Control Specification List of Vehicle
+        struct ControlSpecListRequest
+        {
+            @key wstring<40> targetId;
+            wstring<40> targetName;
+        };
+
+        struct ControlSpecListReply
+        {
+            @key wstring<40> targetId;
+            wstring<40> targetName;
+            int32 numsOfControlSpecs;
+            sequence<Common::ControlSpec, 100> controlSpecList;
+        };
+
+        // 2. Request Execution of Control Command to Vehicle
+        struct ControlExecutionRequest
+        {
+            @key wstring targetId;
+            Common::ControlSpec controlSpec;
+        };
+
+        struct ControlExecutionReply
+        {
+            @key wstring targetId;
+            Common::OperationState executionReport;
+        };
+
+        // 3. Request Monitor Information
+        struct MonitorSpecListRequest
+        {
+            @key wstring targetId;
+        };
+
+        struct MonitorSpecListReply
+        {
+            @key wstring targetId;
+        };
+    };
+};
