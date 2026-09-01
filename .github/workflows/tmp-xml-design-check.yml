@@ -1,0 +1,23 @@
+name: temporary XML design explorer validation
+on:
+  push:
+    branches: [feature/xml-design-explorer]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: node --check web/design.js
+      - name: Check required design files
+        run: |
+          test -f web/design.html
+          test -f web/design.css
+          test -f web/design.js
+          grep -q 'design.js' web/design.html
+          grep -q 'design.css' web/design.html
+          grep -q 'designFolderInput' web/design.html
+          grep -q 'XmlDesignExplorer' web/design.js
+          echo 'XML DESIGN STATIC CHECK PASS'
