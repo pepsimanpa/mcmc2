@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UMS XML Design Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="design.css">
+  <script src="design.js" defer></script>
+</head>
+<body class="design-body">
+<a class="skip-link" href="#designMain">본문으로 바로가기</a>
+<div class="design-shell">
+  <header class="design-topbar">
+    <div class="design-brand">
+      <span class="brand-mark">UM</span>
+      <span>
+        <strong>UMS XML Design Explorer</strong>
+        <small>장비 → 기능 → Semantic → Binding → Reply → TBD</small>
+      </span>
+    </div>
+    <div class="design-actions">
+      <a class="button ghost" href="index.html#cdm">CDM 원칙</a>
+      <a class="button ghost" href="index.html#hmi">HMI 데모</a>
+      <label class="button primary" for="designFolderInput">XML 폴더 선택</label>
+      <input id="designFolderInput" class="visually-hidden" type="file" webkitdirectory multiple accept=".xml,.xsd,.md,.idl">
+    </div>
+  </header>
+
+  <section class="design-intro">
+    <div>
+      <p class="design-eyebrow">DESIGN FIRST</p>
+      <h1>XML을 열어보지 않아도<br>설계 의도가 먼저 보이게</h1>
+      <p>장비 하나를 선택하면 어떤 기능이 있고, 그 기능의 논리 의미가 실제 DDS/TCP/UDP/RS422 필드로 어떻게 연결되는지 한 화면에서 확인합니다.</p>
+    </div>
+    <div class="design-source" id="designSourceState">
+      <b>LOCAL</b>
+      <strong>폴더를 선택하세요</strong>
+      <small>파일은 브라우저 내부에서만 읽습니다.</small>
+    </div>
+  </section>
+
+  <section id="designStats" class="design-stats" aria-live="polite">
+    <div><span>장비</span><strong>0</strong></div>
+    <div><span>Control</span><strong>0</strong></div>
+    <div><span>Monitor</span><strong>0</strong></div>
+    <div><span>Product</span><strong>0</strong></div>
+    <div><span>Binding</span><strong>0</strong></div>
+    <div><span>OpenIssue 문서</span><strong>0</strong></div>
+  </section>
+
+  <main id="designMain">
+    <section id="designEmpty" class="design-empty">
+      <b>01</b>
+      <div>
+        <h2>먼저 XML 폴더를 선택하세요.</h2>
+        <p>저장소 루트 또는 <code>ProtocolXml</code> 폴더를 선택하면 Specification의 참조를 따라 Semantic/Binding을 자동 연결합니다.</p>
+      </div>
+    </section>
+
+    <section id="designWorkspace" class="design-workspace" hidden>
+      <aside class="design-sidebar">
+        <header>
+          <p>DEVICE</p>
+          <h2>장비</h2>
+          <input id="designDeviceSearch" type="search" placeholder="장비명 · SpecRef 검색">
+        </header>
+        <div id="designDeviceList" class="design-device-list"></div>
+      </aside>
+
+      <section class="design-content">
+        <article id="designDeviceHero" class="design-device-hero"></article>
+
+        <section class="design-path-card">
+          <div class="design-path-title">
+            <p>REFERENCE PATH</p>
+            <h2>Specification → Semantic → Binding</h2>
+          </div>
+          <div id="designReferencePath" class="design-reference-path"></div>
+        </section>
+
+        <section class="design-function-layout">
+          <aside class="design-function-browser">
+            <header>
+              <div>
+                <p>FUNCTION</p>
+                <h2>기능</h2>
+              </div>
+              <div class="design-function-filters" id="designFunctionFilters">
+                <button class="is-active" data-kind="All">전체</button>
+                <button data-kind="Control">Control</button>
+                <button data-kind="Monitor">Monitor</button>
+                <button data-kind="Product">Product</button>
+              </div>
+              <input id="designFunctionSearch" type="search" placeholder="기능명 · CDM · ID 검색">
+            </header>
+            <div id="designFunctionList" class="design-function-list"></div>
+          </aside>
+
+          <section class="design-detail">
+            <div id="designNoFunction" class="design-no-function">
+              <b>02</b>
+              <div>
+                <h2>기능을 선택하세요.</h2>
+                <p>Semantic 의미와 실제 Binding 메시지를 같은 화면에서 비교할 수 있습니다.</p>
+              </div>
+            </div>
+
+            <div id="designFunctionDetail" hidden>
+              <article id="designFunctionHero" class="design-function-hero"></article>
+
+              <section class="design-flow">
+                <div><b>1</b><span><strong>기능</strong><small id="flowFeature">—</small></span></div>
+                <i>→</i>
+                <div><b>2</b><span><strong>Semantic</strong><small id="flowSemantic">—</small></span></div>
+                <i>→</i>
+                <div><b>3</b><span><strong>Binding</strong><small id="flowBinding">—</small></span></div>
+                <i>→</i>
+                <div><b>4</b><span><strong>Wire</strong><small id="flowWire">—</small></span></div>
+                <i>→</i>
+                <div><b>5</b><span><strong>Reply</strong><small id="flowReply">—</small></span></div>
+              </section>
+
+              <section class="design-compare-grid">
+                <article class="design-semantic-card">
+                  <header><p>LOGICAL MEANING</p><h2>Semantic</h2></header>
+                  <div id="designSemanticSummary"></div>
+                  <div id="designSemanticTable"></div>
+                </article>
+                <article class="design-binding-card">
+                  <header><p>PHYSICAL REPRESENTATION</p><h2>Binding</h2></header>
+                  <div id="designBindingVariants"></div>
+                </article>
+              </section>
+
+              <section class="design-reply-issues-grid">
+                <article class="design-reply-card">
+                  <header><p>RESULT / ACK</p><h2>Reply</h2></header>
+                  <div id="designReplyDetail"></div>
+                </article>
+                <article class="design-issue-card">
+                  <header><p>KNOWN UNKNOWN</p><h2>TBD / OpenIssue</h2></header>
+                  <div id="designIssueDetail"></div>
+                </article>
+              </section>
+
+              <details class="design-raw-card">
+                <summary><span><strong>원본 XML 확인</strong><small>선택 기능의 Semantic/Binding 원문</small></span><b>⌄</b></summary>
+                <div class="design-raw-grid">
+                  <div><h3>Semantic XML</h3><pre><code id="designRawSemantic"></code></pre></div>
+                  <div><h3>Binding XML</h3><pre><code id="designRawBinding"></code></pre></div>
+                </div>
+              </details>
+            </div>
+          </section>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <footer class="design-footer">
+    <span>UMS XML Design Explorer · read-only local viewer</span>
+    <span>원문에 없는 의미는 Web에서 새로 추정하지 않습니다.</span>
+  </footer>
+</div>
+</body>
+</html>
