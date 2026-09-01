@@ -532,13 +532,24 @@
           <Map cdm="Ping.PulseType.Chirp" value="1"/>
         </ValueMap>
       </Field>
-      <Field name="swGainMode" cdm="ReceiveProcessing.SoftwareGain.Mode" dataType="UInt8"/>
+      <Field name="swGainMode" cdm="ReceiveProcessing.SoftwareGain.Mode" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="ReceiveProcessing.SoftwareGain.Mode.AutoGain" value="0"/>
+          <Map cdm="ReceiveProcessing.SoftwareGain.Mode.TVG" value="1"/>
+          <Map cdm="ReceiveProcessing.SoftwareGain.Mode.RawGain" value="2"/>
+        </ValueMap>
+      </Field>
       <Field name="autoGain" cdm="ReceiveProcessing.SoftwareGain.Auto" dataType="UInt8"/>
       <Field name="tvgA" cdm="ReceiveProcessing.SoftwareGain.TVGA" dataType="UInt8"/>
       <Field name="tvgB" cdm="ReceiveProcessing.SoftwareGain.TVGB" dataType="UInt8"/>
       <Field name="tvgC" cdm="ReceiveProcessing.SoftwareGain.TVGC" dataType="UInt8"/>
       <Field name="rawGain" cdm="ReceiveProcessing.SoftwareGain.Raw" dataType="UInt8"/>
-      <Field name="lowPassFilterMode" cdm="ReceiveProcessing.LowPassFilter.Mode" dataType="UInt8"/>
+      <Field name="lowPassFilterMode" cdm="ReceiveProcessing.LowPassFilter.Mode" dataType="UInt8">
+        <ValueMap>
+          <Map cdm="ReceiveProcessing.LowPassFilter.Mode.Disabled" value="0"/>
+          <Map cdm="ReceiveProcessing.LowPassFilter.Mode.Enabled" value="1"/>
+        </ValueMap>
+      </Field>
       <Field name="lowPassFilterLevel" cdm="ReceiveProcessing.LowPassFilter.Level" dataType="UInt8"/>
       <!-- ACK=O 공통 처리상태. CommandStatusReport 내부에는 Success/Completed 값이 없으므로 실제 동작 완료로 해석하지 않는다. -->
       <Reply semantic_id="configureOperatingParametersAck" required="true">

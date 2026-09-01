@@ -77,7 +77,7 @@
 - Semantic 논리 상태의 raw 숫자 코드를 제거하고 실제 DDS 코드는 Binding `ValueMap`으로 이동한다.
 - 반영: 운용모드, SSS/GF PulseType, SSS/GF TVG, 진회수 상태, USBL 모드, 3개 Brake, 2개 Limit Switch, CBIT 4상태, 제어 `powerOn`, 제어 `pulseType`.
 - 5개 `DetailSystemStatusType` powerStatus는 원문에서 0/1 의미가 직접 확인되지 않아 raw 0/1을 임시 유지한다.
-- `SideScanSonar.SonarType`과 `SideScanSonar.Subsystem(targetDevice)`은 원문 값으로 논리화 완료하였다. `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`만 원문 코드 의미 부족으로 TBD를 유지한다.
+- `SideScanSonar.SonarType`, `SideScanSonar.Subsystem(targetDevice)`, `ReceiveProcessing.SoftwareGain.Mode`, `ReceiveProcessing.LowPassFilter.Mode`는 원문 값으로 논리화 완료하였다. SoftwareGain은 원격통제장치 CSCI의 `0=Auto Gain / 1=TVG / 2=Raw Gain`, LowPassFilter는 `0=미사용 / 1=사용`을 Semantic ValueSet + Binding ValueMap으로 반영하였다.
 - 최종 CDM 감사 전에는 기존 CDM을 재사용하고 새 CDM 생성을 최소화한다.
 
 
@@ -100,7 +100,7 @@
 - `LaunchReportType.launch`: 결과 의미 `0=정지상태`, `1=진수완료`, `2=회수완료`로 반영하며, `AutoLaunchControlType.launch` 명령의 `0=정지/1=진수/2=회수`와 구분한다.
 - `StatusConfigType.frequency`: 예인형 SSS(`sonarType=0`)에 대해 100/600 kHz만 원문에 명시된다. 현재 CommonSpecSchema에 제어용 `QuantityValueSetProfile`이 없어 `Profile`을 유지하고 XML 주석으로 제한을 보존한다. 선체부착형 frequency 허용값은 TBD이다.
 - GapFiller는 별도 range 설정이 없고 예인형 SSS range와 동기화된다. 현재 평면 Parameter 모델에서 조건부 적용은 직접 표현하지 않고 후속 스키마/OM 검토로 남긴다.
-- `ReceiveProcessing.TVG.Mode`는 CSCI에서 `0=Off(TVG 미사용), 1=On`이 직접 확인되어 이미 Semantic ValueSet/Binding ValueMap으로 반영되어 있다. `ReceiveProcessing.SoftwareGain.Mode(0~2)`와 `ReceiveProcessing.LowPassFilter.Mode(0~1)`은 이번 CSCI에 해당 모드 필드/코드 의미가 없어 QuantityProfile TBD를 유지한다.
+- `ReceiveProcessing.TVG.Mode`는 예인형수중탐색장치 CSCI에서 `0=Off(TVG 미사용), 1=On`이 직접 확인되어 Semantic ValueSet/Binding ValueMap으로 반영되어 있다. `ReceiveProcessing.SoftwareGain.Mode`는 원격통제장치 CSCI에서 `0=Auto Gain, 1=TVG, 2=Raw Gain`, `ReceiveProcessing.LowPassFilter.Mode`는 `0=미사용, 1=사용`이 직접 정의되어 있으므로 동일하게 ValueSet/ValueMap으로 확정하였다.
 - `LanchAndRecoveryBackStopReportType.slideBackStop`은 CSCI에서 `0=정지상태, 1=슬라이드 후퇴고정완료, 2=복귀완료`가 직접 확인되어 Semantic ValueSetResult/Binding ValueMap으로 반영하였다. PBIT/IBIT은 각 필드 자체에 직접 코드/bit 의미가 명시된 항목만 추가 논리화하고, 근거가 비어 있는 항목은 Raw/TBD를 유지한다.
 - SonarType/Subsystem/MCS/LaunchReport 하위 CDM은 최종 USV 통합 감사에서 현재 의미 연결을 유지하기로 하였으며, 새로운 원문 근거가 없는 한 재명명하지 않는다.
 

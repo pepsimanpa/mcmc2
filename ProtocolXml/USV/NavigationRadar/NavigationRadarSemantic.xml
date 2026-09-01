@@ -66,25 +66,32 @@
       <QuantitySpec id="contactNum" name="접촉물 개수" cdm="Contact.AIS.Count">
         <Unit>num</Unit>
       </QuantitySpec>
-      <!--TBD: 공용 구조체 AISContactType의 Range 열은 일부 값의 정합성이 불명확하여 Semantic에는 타입/단위/명확한 특성만 반영하고 수치 Range를 임의 보정하지 않는다.-->
+      <!--CSV 재심층 감사: AISContactType의 Range 열 일부는 행이 밀려 섞인 값으로 확인되었다. 동일 공용 구조체의 RadarAISFusionContactType에서 같은 필드명/자료형/단위가 다시 정의된 경우에만 교차확인 Range를 적용하고, 대응 근거가 없는 shipLength/shipWidth 등은 Range를 비워 둔다.-->
       <CollectionSpec id="contactTypeList" name="AIS 접촉물 목록" cdm="Contact.AIS.List" minOccurs="0" maxOccurs="256">
         <ElementSpec id="aisContact" name="AIS 접촉물" cdm="Contact.AIS.Item">
-          <QuantitySpec id="contactID" name="접촉물 식별번호" cdm="Contact.Identifier"/>
+          <QuantitySpec id="contactID" name="접촉물 식별번호" cdm="Contact.Identifier">
+            <Range min="20000"/>
+          </QuantitySpec>
           <QuantitySpec id="mmsi" name="선박고유식별번호" cdm="Contact.AIS.MMSI"/>
           <QuantitySpec id="latitude" name="위도" cdm="Contact.Position.Latitude">
             <Unit>deg</Unit>
+            <Range min="-90" max="90"/>
           </QuantitySpec>
           <QuantitySpec id="longitude" name="경도" cdm="Contact.Position.Longitude">
             <Unit>deg</Unit>
+            <Range min="-180" max="180"/>
           </QuantitySpec>
           <QuantitySpec id="course" name="침로" cdm="Contact.Course">
             <Unit>deg</Unit>
+            <Range min="0" max="360"/>
           </QuantitySpec>
           <QuantitySpec id="speed" name="속력" cdm="Contact.Speed">
             <Unit>kts</Unit>
+            <Range min="0" max="45"/>
           </QuantitySpec>
           <QuantitySpec id="detectionRange" name="거리" cdm="Contact.Range">
             <Unit>m</Unit>
+            <Range min="0" max="12000"/>
           </QuantitySpec>
           <QuantitySpec id="cpa" name="CPA" cdm="Contact.CPA">
             <Unit>m</Unit>
@@ -94,18 +101,23 @@
           </QuantitySpec>
           <QuantitySpec id="collisionRisk" name="충돌위험도" cdm="Contact.CollisionRisk">
             <Unit>%</Unit>
+            <Range min="1" max="100"/>
           </QuantitySpec>
           <QuantitySpec id="heading" name="선수방위각" cdm="Contact.Heading">
             <Unit>deg</Unit>
+            <Range min="0" max="360"/>
             <Resolution>0.1</Resolution>
           </QuantitySpec>
           <QuantitySpec id="rateOfTurn" name="선박 회전속도" cdm="Contact.RateOfTurn">
             <Unit>deg/min</Unit>
+            <Range min="-90" max="90"/>
           </QuantitySpec>
           <TextSpec id="shipName" name="선박명" cdm="Contact.AIS.ShipName">
             <MaxLength>21</MaxLength>
           </TextSpec>
-          <QuantitySpec id="shipType" name="선박종류" cdm="Contact.AIS.ShipType"/>
+          <QuantitySpec id="shipType" name="선박종류" cdm="Contact.AIS.ShipType">
+            <Range min="0" max="255"/>
+          </QuantitySpec>
           <QuantitySpec id="shipLength" name="선박길이" cdm="Contact.Length">
             <Unit>m</Unit>
           </QuantitySpec>

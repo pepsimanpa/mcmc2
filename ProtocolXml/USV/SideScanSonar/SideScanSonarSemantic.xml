@@ -635,10 +635,13 @@
             <Value name="Chirp" cdm="Ping.PulseType.Chirp"/>
           </Values>
         </ValueSetProfile>
-        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Mode">
-          <Range min="0" max="2"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="ReceiveProcessing.SoftwareGain.Mode">
+          <Values>
+            <Value name="AutoGain" cdm="ReceiveProcessing.SoftwareGain.Mode.AutoGain"/>
+            <Value name="TVG" cdm="ReceiveProcessing.SoftwareGain.Mode.TVG"/>
+            <Value name="RawGain" cdm="ReceiveProcessing.SoftwareGain.Mode.RawGain"/>
+          </Values>
+        </ValueSetProfile>
         <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Auto">
           <Unit>%</Unit>
           <Range min="0" max="100"/>
@@ -663,10 +666,12 @@
           <Range min="0" max="80"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.LowPassFilter.Mode">
-          <Range min="0" max="1"/>
-          <Resolution>1</Resolution>
-        </QuantityProfile>
+        <ValueSetProfile cdm="ReceiveProcessing.LowPassFilter.Mode">
+          <Values>
+            <Value name="Disabled" cdm="ReceiveProcessing.LowPassFilter.Mode.Disabled"/>
+            <Value name="Enabled" cdm="ReceiveProcessing.LowPassFilter.Mode.Enabled"/>
+          </Values>
+        </ValueSetProfile>
         <QuantityProfile cdm="ReceiveProcessing.LowPassFilter.Level">
           <Range min="0" max="14"/>
           <Resolution>1</Resolution>

@@ -21,7 +21,7 @@
 - 레이더 영상은 기존대로 SensorProduct/RTP로 유지한다.
 - `RadarAISStatusReportType.frameWidth`와 `frameHeight`는 `항해레이더 정보처리 CSC.csv`에서 각각 `long`, 4 Byte로 확인되어 Binding `Int32`로 확정하였다.
 
-## 3. Remaining TBD
+## 3. Remaining TBD / Resolved — 미해결 6개
 
 1. **Radar/AIS 탐지거리 제어 octet 값 체계**
    - `RadarRangeControlType.setTargetRange`와 `AISRangeFilterControlType.setAISRange`는 모두 `octet`으로만 정의되어 있다.
@@ -47,12 +47,13 @@
 6. **contact count와 sequence 길이 일치 규칙**
    - Radar/AIS sequence 최대 길이는 256이지만 `contactNum`과 실제 sequence length가 불일치할 때의 처리 규칙은 없다.
 
-7. **AISContactType 일부 원본 표 이상값**
-   - 일부 Range/Unavailable 셀이 인접 필드 값과 섞인 것으로 보이며 의미가 명확하지 않다.
-   - 특히 위치/회전율 등의 비정상 표기는 원작자/IDL 근거 전까지 임의 수정하지 않는다.
+7. **[RESOLVED] AISContactType 일부 원본 표 이상값**
+   - 공용 구조체의 `AISContactType` Range 열은 `longitude=10000~`, `course=0~1`, `speed=0~12000`, `shipName=-180~180`, `shipType=0~360`, `shipLength=0~45`처럼 인접 의미와 맞지 않는 값이 연속되어 행/셀 정렬이 밀린 export 결함으로 판단된다.
+   - 동일 `공용 구조체.csv`의 `RadarAISFusionContactType`에 동일 필드명/자료형/단위가 재정의되어 있어 `latitude=-90~90`, `longitude=-180~180`, `course=0~360`, `speed=0~45`, `detectionRange=0~12000`, `collisionRisk=1~100`, `shipType=0~255`를 교차확인하였다. AIS 자체 행에서 독립적으로 명확한 `contactID>=20000`, `heading=0~360`, `rateOfTurn=-90~90`도 반영하였다.
+   - `shipLength/shipWidth`처럼 교차 구조에도 Range가 없는 항목은 임의 범위를 만들지 않고 Unit/Unavailable 의미만 유지한다. 이 기준으로 표 이상값 이슈를 종료한다.
 
 
 ## 4. 현재 상태
 
-- 원문 직접 근거가 있는 Semantic/Binding 정합성 보강은 완료하였다.
-- 남은 항목은 사용자가 임의로 정책을 선택할 사항이 아니라 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.
+- 원문 직접 근거가 있는 Semantic/Binding 정합성 보강과 항해레이더/공용구조체 CSV 재심층 감사까지 완료하였다.
+- AISContactType 표 정렬 이상 1건은 동일 공용 구조체의 RadarAISFusionContactType 교차근거로 해소하였다. 미해결 6건은 추가 CSCI/IDL/Adapter 근거가 필요한 비차단 TBD이다.

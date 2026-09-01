@@ -6,6 +6,7 @@
 - 범위: 원격통제장치(RCU)와 직접 연동하는 USV 장치 14종
 - 상위 설계 기준: `ProtocolXml/Docs/UMS_Semantic_Binding_Design_Rules_20260826.md`
 - 통합 감사: `ProtocolXml/Docs/USV_Semantic_Binding_Integrated_Audit_20260828.md`
+- CSV 재심층 감사 최종 갱신: 2026-08-30
 
 ---
 
@@ -218,7 +219,8 @@
 장치 고유 TBD:
 1. Radar/AIS 탐지거리 제어 octet의 실제 거리/프리셋 값 체계.
 2. `radarMessageTransmitStatus`가 가리키는 실제 메시지/업무 의미.
-3. `AISContactType` 일부 Range/Unavailable 원본 표 이상값.
+
+재심층 감사에서 `AISContactType`의 밀린 Range 셀은 동일 `공용 구조체.csv`의 `RadarAISFusionContactType` 동일 필드 교차근거로 해소하였다. 복원 근거가 없는 `shipLength/shipWidth`는 Range 미지정으로 유지한다.
 
 ### 4.9 NearContactDetection
 
@@ -279,13 +281,77 @@ L-Band 통제소/중계소 그룹 결과 식별과 공용 Result source routing�
 3. 장치 폴더의 오래된 로컬 XSD snapshot 삭제 여부와 외부 의존성.
 4. 선체부착형 SSS frequency 허용값 및 StatusConfig frequency 조건부 제약.
 5. GapFiller range가 SSS range와 동기화되는 조건을 평면 Parameter 모델에서 표현하는 방법.
-6. SoftwareGain Mode(0~2), LowPassFilter Mode(0~1)의 논리값 의미.
+
+재심층 감사에서 SoftwareGain Mode(`0=Auto Gain / 1=TVG / 2=Raw Gain`)와 LowPassFilter Mode(`0=미사용 / 1=사용`)는 원격통제장치 CSCI 직접 근거로 해소하였다.
 
 기존 문서의 "최종 CDM 감사" 항목은 `USV_Semantic_Binding_Integrated_Audit_20260828.md`가 완료/supersede하며 active issue로 세지 않는다.
 
 ---
 
-## 5. 최종 merge / runtime readiness 판단
+## 5. 최종 해결 경로 분류
+
+### 5.1 현재 보유 CSV로 추가 해결 가능한 항목
+
+- **0건**. 2026-08-30 기준 보유한 장치 CSCI, 원격통제장치 CSCI, 공용 구조체/규칙/식별자 CSV의 재심층 교차감사를 완료하였다.
+- 마지막 잔여 CSV 항목이던 SideScanSonar SoftwareGain/LowPassFilter Mode도 원격통제장치 CSCI 직접 정의로 해소하였다.
+- 따라서 이후 동일 CSV를 반복 검색하여 새로운 raw code/Unit/bit 의미를 추정하는 작업은 중단한다. 새 CSCI/ICD/IDL 또는 원작자 답변이 추가될 때만 재개한다.
+
+### 5.2 해결 경로 분류 기준
+
+| 분류 | 필요한 추가 근거 | 처리 원칙 |
+|---|---|---|
+| **IDL/ICD·원문 추가근거** | DDS IDL, 상세 ICD, 신규/정정 CSCI | wire 철자·signedness·bit mapping·누락 code/Unit을 직접 확인한 뒤 반영 |
+| **Adapter/runtime 규칙** | OM/Adapter 설계, FSM, correlation/routing 규칙 | XML에 임의 transaction 로직을 넣지 않고 runtime 계약으로 확정 |
+| **원작자/운용정책 확인** | 원작자 답변, 운용개념, 장비 운용 절차 | 의미 충돌·우선순위·one-shot·조건부 사용 규칙을 정책 근거로 확정 |
+| **공통 XSD/모델 개선** | CommonSpec/Binding 스키마 설계 결정 | symbolic Range, sentinel, 조건부 parameter 같은 표현력 문제를 공통 모델에서 해결 |
+| **배치/설정 확인** | RTP/IP/Port, 현장 configuration | 소스 의미와 분리하여 배치값으로 관리 |
+
+### 5.3 공통 master issue 분류 및 우선순위
+
+| Common ID | 최종 분류 | 우선순위 | 필요한 다음 근거 |
+|---|---|---|---|
+| `USV-COMMON-01` | Adapter/runtime | **P0** | PBIT/IBIT 비동기 결과 correlation 및 동시요청 정책 |
+| `USV-COMMON-03` | Adapter/runtime | **P0** | shared Topic source routing, fan-out, multi-result 완료 판정 |
+| `USV-COMMON-05` | Adapter/runtime + 공통 validation | P2 | count/sequence 불일치 처리 규칙 |
+| `USV-COMMON-06` | 공통 XSD/모델 | P3 | symbolic Range(`-PI~+PI`) 표현 방식 |
+| `USV-COMMON-07` | IDL/ICD·원작자 | P2 | CIPE producer별 `cipeOperationalStatus` 실제 subset |
+| `USV-COMMON-08` | Adapter/runtime | **P0** | dotted-path nested member 접근 공식 계약 |
+| `USV-COMMON-09` | Adapter/runtime | **P0** | 일반 비동기 Control↔Result transaction correlation |
+| `USV-COMMON-10` | 배치/ICD | P1 | RTP endpoint/channel 실제 IP/Port 및 공유 여부 |
+| `USV-COMMON-11` | DDS IDL | P1 | CSCI 오탈자와 실제 Topic/Type/member 철자 대조 |
+| `USV-COMMON-12` | 공통 XSD/모델 + 운용정책 | P2 | sentinel/invalid 값을 수치와 별도 상태로 노출할지 결정 |
+
+`USV-COMMON-02(Boolean wire type)`와 `USV-COMMON-04(primitive dataType)`는 해결 완료 상태를 유지한다.
+
+### 5.4 장치별 고유 이슈의 주 해결 경로
+
+| 장치 | 남은 고유 이슈의 주 해결 경로 | 다음에 받아야 할 자료/결정 |
+|---|---|---|
+| AutonomousNavigation | IDL/ICD + 원작자/운용정책 | Achieved code, 시간 encoding, Unit, RestrictArea/Return/Tracking 규칙 |
+| CentralControl | 원작자/ICD + Adapter/runtime | Authority routing, VHF 채널표, PBIT 주기 의미, 상태 code |
+| ElectroOptical | IDL/ICD + 원작자 + 배치 | SWIR/IBIT/Wiper code, Swing Unit, No-change 우선순위, RTP |
+| ElectroOpticalProcessor | **장치 고유 이슈 없음** | 공통 issue `01/03/05/06/07`만 추적 |
+| IntegratedNavigation | DDS IDL + 원작자 | bitmask 조합, AJ/AS 상태, signedness/Range, RTCM size 계약 |
+| Lidar | **장치 고유 이슈 없음** | 공통 issue `01/03/05/07`만 추적 |
+| NavigationCamera | IDL/원작자 + 배치 | IBIT polarity/반복 카메라 detail, RTP |
+| NavigationRadar | 상세 ICD/원작자 | Radar/AIS range-control octet 표, radarMessageTransmitStatus 의미 |
+| NearContactDetection | 원작자/runtime + 배치 | Lidar Level/Action 동시 bit 규칙, RTP |
+| NetworkAbstraction | IDL/원작자 + Adapter/runtime | commsChannelID=2, commandID 주체, L-Band bit polarity, valid=false 처리 |
+| PlatformController | 상세 ICD/IDL + 운용 FSM | Power/CCTV mask, ENV code, raw status, 모드별 유효 parameter |
+| RemoteFireControl | 상세 ICD/원작자 + 운용정책 | joystick 변환, IBIT polarity, zone sentinel, initZeroing, reboot 우선순위 |
+| SensorFusion | 원작자/공용구조체 정정 | waveSpectrum/integratedWaveEnergy Unit/Range |
+| SideScanSonar | IDL/원작자 + 공통 모델 | power/detail polarity, 로컬 XSD 의존성, HMS frequency, 조건부 GapFiller range |
+
+### 5.5 작업 종료 기준
+
+- **CSV source audit: 완료** — 현재 보유 CSV로 추가 확정 가능한 active issue 0건.
+- **Semantic/Binding XML: Review/Merge Ready** — 현재 OpenIssue는 XML 구조 결함이 아니라 외부 근거 또는 runtime/model 계약 대기 항목이다.
+- **실제 연동 착수 전 P0**: `USV-COMMON-01`, `03`, `08`, `09`를 먼저 확정한다.
+- 이후 P1(IDL/배치), P2(원작자 의미·validation), P3(공통 모델 개선) 순으로 정리한다.
+
+---
+
+## 6. 최종 merge / runtime readiness 판단
 
 ### Semantic / Binding 설계
 
@@ -315,7 +381,7 @@ L-Band 통제소/중계소 그룹 결과 식별과 공용 Result source routing�
 
 ---
 
-## 6. 최종 결론
+## 7. 최종 결론
 
 USV 14개 장치의 Semantic / Binding 설계 및 CSV 기반 source audit는 완료 상태다. 남은 문제는 크게 다음 세 종류로 한정된다.
 
