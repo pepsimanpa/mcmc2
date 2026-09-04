@@ -942,6 +942,7 @@ body { font-size: 14px; }
 .docs-article .hmi-contract-table th { font-size: .57rem; }
 .docs-article .hmi-contract-table th,
 .docs-article .hmi-contract-table td { padding: 8px 9px; }
+.docs-article .hmi-value-map-cell { white-space: pre-line; line-height: 1.75; }
 .docs-article .hmi-command-cell { min-width: 175px; }
 .docs-article .hmi-reply-card {
   margin: 9px 0 0;

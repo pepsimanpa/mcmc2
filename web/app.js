@@ -895,13 +895,21 @@ function attachBindings(ref, diagnostics) {
       }
       action.inputs = action.parameters.map((input) => {
         const exactField = fields.find((field) => field.cdm === input.cdm && ['Field', 'ArrayField'].includes(field.kind));
+        const wireValues = action.bindings.flatMap((binding) => flattenFields(binding.fields)
+          .filter((field) => field.cdm === input.cdm)
+          .flatMap((field) => (field.maps || [])
+            .filter((item) => item.kind === 'ValueMap')
+            .map((item) => ({ ...item, sourceFile: binding.sourceFile, transport: binding.transport }))));
+        const uniqueWireValues = wireValues.filter((item, index, list) => list.findIndex((candidate) => (
+          candidate.cdm === item.cdm && candidate.value === item.value
+        )) === index);
         let type = input.type;
         if (type === 'unknown') {
           if (/Communication\.RF\.Configuration\.(?:OperationMode|.*\.Power)$/.test(input.cdm)) type = 'text';
           else if (/Identifier\.Numeric|Latitude|Longitude|Depth|Speed|Bearing|Range|Heading|Pitch|Command|Reason|Type|Brightness|Interval|Channel|TimeSlot/i.test(input.cdm)) type = 'number';
           else if (exactField && /UInt|Int|Float|Scale|Bit/i.test(exactField.converter)) type = 'number';
         }
-        return { ...input, type, key: aliasFor(input, fields, used) };
+        return { ...input, type, key: aliasFor(input, fields, used), wireValues: uniqueWireValues };
       });
     }
 
@@ -2213,6 +2221,7 @@ function sampleObjectFromCollection(input) {
 }
 
 function sampleValue(input) {
+  if (input.wireValues?.length) return input.wireValues[0].value;
   if (input.values?.length) {
     const firstValue = input.values[0];
     return firstValue.value || firstValue.cdm || firstValue.name || 'VALUE';
@@ -2437,7 +2446,14 @@ function flattenSemanticProfiles(profiles) {
 
 function profileAllowedLabel(profile) {
   if (profile.values?.length) {
-    return profile.values.map((item) => item.name || item.value || item.cdm).filter(Boolean).join(', ');
+    return profile.values.map((item) => {
+      const wire = profile.wireValues?.find((candidate) => candidate.cdm === item.cdm);
+      const logical = item.name || item.value || item.cdm?.split('.').pop() || item.cdm;
+      return wire?.value !== undefined && wire.value !== '' ? `${wire.value} = ${logical}` : logical;
+    }).filter(Boolean).join('\n');
+  }
+  if (profile.wireValues?.length) {
+    return profile.wireValues.map((item) => `${item.value} = ${item.cdm?.split('.').pop() || item.cdm}`).join('\n');
   }
   const range = profileRangeLabel(profile);
   if (range !== '—') return range;
@@ -2446,6 +2462,7 @@ function profileAllowedLabel(profile) {
 }
 
 function hmiExampleValue(profile) {
+  if (profile.wireValues?.length) return profile.wireValues[0].value;
   if (profile.values?.length) {
     const firstValue = profile.values[0];
     return firstValue.value || firstValue.cdm || firstValue.name || 'VALUE';
@@ -2466,7 +2483,7 @@ function hmiProfileTable(title, profiles, inputMode = false) {
   const head = el('thead');
   const headRow = el('tr');
   const headings = inputMode
-    ? ['입력 Key', 'CDM 의미', '형식', '범위·선택값', '명령']
+    ? ['입력 Key', 'CDM 의미', '형식', '실제 입력/송신값 · 의미', '명령']
     : ['출력 항목', 'CDM 의미', '형식', '범위·선택값'];
   headings.forEach((heading) => headRow.append(el('th', '', heading)));
   head.append(headRow);
@@ -2477,11 +2494,12 @@ function hmiProfileTable(title, profiles, inputMode = false) {
     const keyCell = el('td');
     keyCell.append(el('code', '', key || '미정'));
     if (inputMode && !profile.required) keyCell.append(el('small', 'optional-mark', '선택'));
+    const allowedCell = el('td', 'hmi-value-map-cell', profileAllowedLabel(profile));
     row.append(
       keyCell,
       el('td', '', profile.cdm || '미정'),
       el('td', '', profileTypeLabel(profile.type)),
-      el('td', '', profileAllowedLabel(profile)),
+      allowedCell,
     );
     if (inputMode) {
       const command = `control -a ${key},${hmiExampleValue(profile)}`;
@@ -2511,7 +2529,13 @@ function fieldRuleLabel(field) {
   if (field.dataType) values.push(field.dataType);
   if (field.offset !== undefined && field.offset !== '') values.push(`offset ${field.offset}`);
   if (field.width) values.push(`width ${field.width}`);
-  if (field.maps?.length) values.push(`map ${field.maps.length}개`);
+  if (field.maps?.length) {
+    const mappings = field.maps.map((item) => {
+      const source = item.cdm?.split('.').pop() || item.sourceValue || item.cdm || 'value';
+      return `${source}→${item.value}`;
+    });
+    values.push(`map: ${mappings.join(', ')}`);
+  }
   return values.join(' · ') || '별도 매핑 규칙 없음';
 }
 
@@ -2938,6 +2962,8 @@ function parseArgument(input, raw) {
   if (input.type === 'valueSet' && input.values?.length) {
     const text = String(raw).trim();
     const normalized = text.toLowerCase();
+    const wireValue = input.wireValues?.find((item) => String(item.value).toLowerCase() === normalized);
+    if (wireValue) return { ok: true, value: wireValue.value };
     const selected = input.values.find((item) => [
       item.value,
       item.name,
@@ -2945,8 +2971,7 @@ function parseArgument(input, raw) {
       item.cdm?.split('.').pop(),
     ].filter(Boolean).some((candidate) => String(candidate).toLowerCase() === normalized));
     if (!selected) {
-      const allowed = input.values.map((item) => item.name || item.value || item.cdm?.split('.').pop()).filter(Boolean);
-      return { ok: false, message: `${input.key} 허용값: ${allowed.join(', ')}` };
+      return { ok: false, message: `${input.key} 허용값: ${profileAllowedLabel(input)}` };
     }
     return { ok: true, value: selected.value || selected.cdm || selected.name };
   }
