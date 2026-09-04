@@ -15,7 +15,7 @@ const OPERATION_STATES = {
   failed: 'Failed',
 };
 
-const FIELD_NAMES = ['Field', 'FixedField', 'DerivedField', 'ArrayField'];
+const FIELD_NAMES = ['Field', 'FixedField', 'DerivedField', 'ArrayField', 'PackedField'];
 const CHANNEL_NAMES = ['DDSChannel', 'TCPChannel', 'UDPChannel', 'RTPChannel', 'RS422Channel', 'Channel'];
 
 const SUPPORTED_DERIVED = new Set([
@@ -69,6 +69,11 @@ const state = {
   selectedFeatures: new Set(),
   featureSelectionAnchor: null,
   demo: {},
+  hmiKind: 'Control',
+  hmiDeviceKey: '',
+  hmiActionId: '',
+  hmiBindingKey: '',
+  hmiSourceKey: 'semantic',
 };
 
 const ids = [
@@ -194,11 +199,12 @@ function parserError(doc) {
 }
 
 function profileType(localName) {
-  if (['QuantityProfile', 'QuantitySpec', 'QuantityValueSetSpec'].includes(localName)) return 'number';
-  if (['BooleanProfile', 'BooleanSpec'].includes(localName)) return 'boolean';
+  if (['QuantityProfile', 'QuantitySpec', 'QuantityValueSetSpec', 'QuantityResult'].includes(localName)) return 'number';
+  if (['BooleanProfile', 'BooleanSpec', 'BooleanResult'].includes(localName)) return 'boolean';
   if (['CollectionProfile', 'CollectionSpec'].includes(localName)) return 'collection';
   if (['TextProfile', 'TextSpec'].includes(localName)) return 'text';
-  if (['ValueSetSpec', 'HealthStatusSetSpec'].includes(localName)) return 'valueSet';
+  if (['ValueSetProfile', 'ValueSetSpec', 'ValueSetResult', 'HealthStatusSetSpec'].includes(localName)) return 'valueSet';
+  if (localName === 'Result') return 'result';
   return 'unknown';
 }
 
@@ -537,12 +543,14 @@ function resolveReferencedFile(files, vehicleFile, reference) {
 }
 
 function parseProfile(node) {
-  const range = all(node, 'Range')[0];
-  const unit = all(node, 'Unit')[0];
-  const resolution = all(node, 'Resolution')[0];
+  const range = direct(node, 'Range')[0];
+  const unit = direct(node, 'Unit')[0];
+  const resolution = direct(node, 'Resolution')[0];
+  const valuesNode = direct(node, 'Values')[0];
   const required = attr(node, 'required');
   return {
     kind: node.localName,
+    name: attr(node, 'name'),
     type: profileType(node.localName),
     cdm: attr(node, 'cdm'),
     required: required ? required !== 'false' : attr(node, 'minOccurs') !== '0',
@@ -554,7 +562,16 @@ function parseProfile(node) {
     minOccurs: attr(node, 'minOccurs'),
     maxOccurs: attr(node, 'maxOccurs'),
     description: commentBefore(node),
-    children: direct(node).filter((child) => child.localName.endsWith('Profile') || child.localName.endsWith('Spec')).map(parseProfile),
+    values: valuesNode
+      ? direct(valuesNode, 'Value').map((item) => ({
+        value: attr(item, 'value') || value(item),
+        name: attr(item, 'name'),
+        cdm: attr(item, 'cdm'),
+      }))
+      : [],
+    children: direct(node)
+      .filter((child) => /(?:Profile|Spec|Result)$/.test(child.localName) || child.localName === 'Results')
+      .map(parseProfile),
   };
 }
 
@@ -566,9 +583,10 @@ function parseControlGroup(ref, file) {
       const parametersNode = first(node, 'Parameters');
       const replies = direct(node, 'Reply').map((reply) => ({
         cdm: attr(reply, 'cdm'),
-        bindRef: attr(reply, 'bindRef'),
+        bindRef: semanticRefId(attr(reply, 'bindRef')),
         required: attr(reply, 'required') !== 'false',
         timeout: attr(reply, 'timeout'),
+        results: direct(first(reply, 'Results')).map(parseProfile),
       }));
       const target = targetNode
         ? { kind: 'Target', type: 'unknown', cdm: attr(targetNode, 'cdm'), required: true, defaultValue: '', unit: '', min: null, max: null, resolution: null, description: commentBefore(targetNode) }
@@ -584,6 +602,10 @@ function parseControlGroup(ref, file) {
         description: commentBefore(node),
         target,
         parameters: parametersNode ? direct(parametersNode).map(parseProfile) : [],
+        preconditions: direct(node, 'Precondition').map((item) => ({
+          cdm: attr(item, 'cdm'),
+          description: commentBefore(item),
+        })),
         outputs: [],
         replies,
         bindings: [],
@@ -650,21 +672,61 @@ function parseProductGroup(ref, file) {
     });
 }
 
+function parseMaps(node) {
+  return direct(node)
+    .filter((child) => ['ValueMap', 'SourceValueMap'].includes(child.localName))
+    .flatMap((holder) => direct(holder, 'Map').map((item) => ({
+      kind: holder.localName,
+      cdm: attr(item, 'cdm'),
+      sourceValue: attr(item, 'sourceValue'),
+      value: attr(item, 'value'),
+    })));
+}
+
 function parseField(node) {
   const element = first(node, 'Element');
+  const bitMembers = node.localName === 'PackedField'
+    ? direct(node, 'BitMember').map((member) => ({
+      kind: 'BitMember',
+      name: attr(member, 'name'),
+      cdm: attr(member, 'cdm'),
+      value: attr(member, 'fixedValue'),
+      fixedValue: attr(member, 'fixedValue'),
+      sourceFields: attr(member, 'sourceField').split(',').map((item) => item.trim()).filter(Boolean),
+      converter: attr(member, 'converter'),
+      offset: attr(member, 'offset'),
+      width: attr(member, 'width') || '1',
+      maps: parseMaps(member),
+      description: commentBefore(member),
+      children: [],
+    }))
+    : [];
   return {
     kind: node.localName,
     name: attr(node, 'name'),
     cdm: attr(node, 'cdm'),
     value: attr(node, 'value'),
+    fixedValue: attr(node, 'fixedValue'),
+    defaultValue: attr(node, 'defaultValue'),
     converter: attr(node, 'converter'),
     sourceFields: attr(node, 'sourceField').split(',').map((item) => item.trim()).filter(Boolean),
+    dataType: attr(node, 'dataType'),
+    scale: attr(node, 'scale'),
+    length: attr(node, 'length'),
+    format: attr(node, 'format'),
+    width: attr(node, 'width'),
+    byteOrder: attr(node, 'byteOrder'),
+    expectedMask: attr(node, 'expectedMask'),
+    expectedValue: attr(node, 'expectedValue'),
     inputUnit: attr(node, 'inputUnit'),
     outputUnit: attr(node, 'outputUnit'),
     minOccurs: attr(node, 'minOccurs'),
     maxOccurs: attr(node, 'maxOccurs'),
+    maps: parseMaps(node),
     description: commentBefore(node),
-    children: element
+    children: bitMembers.length
+      ? bitMembers
+      : element
       ? direct(element).filter((child) => FIELD_NAMES.includes(child.localName)).map(parseField)
       : [],
   };
@@ -758,13 +820,19 @@ function parseProductBindingGroup(ref, file) {
 
 function aliasFor(input, fields, used) {
   let key = '';
-  const exact = fields.find((field) => field.cdm === input.cdm && ['Field', 'ArrayField'].includes(field.kind));
-  if (exact) key = exact.name;
+  const exactNames = [...new Set(fields
+    .filter((field) => field.cdm === input.cdm && ['Field', 'ArrayField', 'BitMember'].includes(field.kind))
+    .map((field) => field.name)
+    .filter(Boolean))];
+  if (exactNames.length === 1) key = exactNames[0];
 
   if (!key) {
     const leaf = input.cdm.split('.').pop();
-    const suffix = fields.find((field) => field.kind === 'Field' && field.name.toLowerCase().endsWith(leaf.toLowerCase()));
-    if (suffix) key = suffix.name;
+    const suffixNames = [...new Set(fields
+      .filter((field) => ['Field', 'ArrayField', 'BitMember'].includes(field.kind)
+        && field.name.toLowerCase().endsWith(leaf.toLowerCase()))
+      .map((field) => field.name))];
+    if (suffixNames.length === 1) key = suffixNames[0];
   }
 
   if (!key) {
@@ -1144,6 +1212,7 @@ function renderBundle() {
   renderDiagnostics();
   renderCatalog();
   renderPresets();
+  renderHmiWorkspace();
   renderCdmFileButtons();
   if (state.cdmView !== 'principles') showCdmView(state.cdmView);
 }
@@ -1696,6 +1765,7 @@ function profileTypeLabel(type) {
     collection: '목록 (collection)',
     text: '문자열 (text)',
     valueSet: '값 목록 (valueSet)',
+    result: '결과값 (result)',
   }[type] || '미정';
 }
 
@@ -1749,7 +1819,15 @@ function profileTable(title, profiles, inputMode = false) {
 function fieldDisplay(field) {
   return [
     field.value ? `value=${field.value}` : '',
+    field.fixedValue ? `fixedValue=${field.fixedValue}` : '',
     field.cdm || '',
+    field.dataType || '',
+    field.scale ? `scale=${field.scale}` : '',
+    field.offset !== undefined && field.offset !== '' ? `offset=${field.offset}` : '',
+    field.width ? `width=${field.width}` : '',
+    field.expectedValue ? `expected=${field.expectedValue}` : '',
+    field.expectedMask ? `mask=${field.expectedMask}` : '',
+    field.maps?.length ? `${field.maps.length} map` : '',
     field.converter || '',
   ].filter(Boolean).join(' · ') || '—';
 }
@@ -2125,7 +2203,9 @@ function updateRouteOptions(control) {
 
 function sampleObjectFromCollection(input) {
   const sample = {};
-  for (const child of input.children || []) {
+  const element = (input.children || []).find((child) => child.kind === 'ElementProfile');
+  const children = element?.children?.length ? element.children : (input.children || []);
+  for (const child of children) {
     const key = lowerFirst(child.cdm.split('.').pop());
     sample[key] = sampleValue(child);
   }
@@ -2133,6 +2213,10 @@ function sampleObjectFromCollection(input) {
 }
 
 function sampleValue(input) {
+  if (input.values?.length) {
+    const firstValue = input.values[0];
+    return firstValue.value || firstValue.cdm || firstValue.name || 'VALUE';
+  }
   if (input.type === 'boolean') return true;
   if (input.type === 'collection') return [sampleObjectFromCollection(input)];
   if (/Communication\.RF\.Configuration\.OperationMode/.test(input.cdm)) return '1:1';
@@ -2140,9 +2224,15 @@ function sampleValue(input) {
   if (/Communication\.RF\.Configuration\..*\.Channel/.test(input.cdm)) return 1;
   if (/Communication\.RF\.Configuration\..*\.Power/.test(input.cdm)) return 'LOW';
   if (input.type === 'number') {
+    if (Number.isFinite(input.min) && Number.isFinite(input.max)) {
+      if (input.min <= 1 && input.max >= 1) return 1;
+      const middle = input.min + ((input.max - input.min) / 2);
+      return Number(middle.toPrecision(8));
+    }
+    if (Number.isFinite(input.min)) return input.min;
+    if (Number.isFinite(input.max)) return input.max;
     if (/Latitude/.test(input.cdm)) return 37.1234567;
     if (/Longitude/.test(input.cdm)) return 127.1234567;
-    if (Number.isFinite(input.min)) return input.min === 0 ? 1 : input.min;
     return 1;
   }
   return 'DEMO';
@@ -2226,6 +2316,548 @@ function renderCatalog(filter = '') {
   if (!dom.hmiCatalog.children.length) dom.hmiCatalog.append(el('p', 'empty-text', '검색 결과가 없습니다.'));
 }
 
+function setupHmiContractUi() {
+  if (!dom.hmiWorkspace || dom.hmiContractLayout) return;
+
+  document.title = 'UMS XML Reference';
+  const brandTitle = document.querySelector('.brand strong');
+  const brandSub = document.querySelector('.brand small');
+  const brandLink = document.querySelector('.brand');
+  if (brandTitle) brandTitle.textContent = 'UMS XML Reference';
+  if (brandSub) brandSub.textContent = 'Semantic · Binding · HMI Contract';
+  if (brandLink) brandLink.href = '#hmi';
+  const tabLabels = {
+    hmi: ['01', '기능 문서', 'Semantic · Binding Reference'],
+    model: ['02', '관계 진단', 'Specification · XSD 관계'],
+    cdm: ['03', 'CDM 참고', '공통 모델과 Extension'],
+  };
+  for (const [name, labels] of Object.entries(tabLabels)) {
+    const button = document.querySelector(`[data-tab=${name}]`);
+    if (!button) continue;
+    const number = button.querySelector('b');
+    const title = button.querySelector('strong');
+    const note = button.querySelector('small');
+    if (number) number.textContent = labels[0];
+    if (title) title.textContent = labels[1];
+    if (note) note.textContent = labels[2];
+  }
+  const footerLabels = document.querySelectorAll('footer span');
+  if (footerLabels[0]) footerLabels[0].textContent = 'UMS XML Reference · static offline documentation';
+  if (footerLabels[1]) footerLabels[1].textContent = 'Semantic · Binding 설명 · 논리 메시지 Mock · 실제 장비 송수신 아님';
+  const emptyTitle = dom.hmiEmptyState?.querySelector('strong');
+  const emptyNote = dom.hmiEmptyState?.querySelector('small');
+  if (emptyTitle) emptyTitle.textContent = 'XML 설계 폴더를 선택하세요';
+  if (emptyNote) emptyNote.textContent = 'Specification · Semantic · Binding을 연결해 기능 문서를 생성합니다.';
+  if (dom.sourceStatusText && !state.bundle) dom.sourceStatusText.textContent = 'XML 폴더 선택 · 기능 문서 생성';
+
+  const oldFlow = dom.hmiWorkspace.querySelector('.flow-strip');
+  const oldCatalog = dom.hmiWorkspace.querySelector('.catalog-section');
+  if (oldFlow) oldFlow.hidden = true;
+  if (oldCatalog) oldCatalog.hidden = true;
+
+  const layout = el('section', 'protocol-docs-layout');
+  layout.id = 'hmiContractLayout';
+
+  const navigator = el('aside', 'docs-navigation');
+  const navHead = el('header', 'docs-pane-head');
+  navHead.append(el('p', '', 'UMS XML REFERENCE'), el('h2', '', '기능 목차'));
+  const deviceLabel = el('label', 'hmi-device-label');
+  deviceLabel.append(el('span', '', '장치 문서'));
+  const deviceSelect = el('select');
+  deviceSelect.id = 'hmiDeviceSelect';
+  deviceLabel.append(deviceSelect);
+  const kindTabs = el('div', 'hmi-kind-tabs');
+  for (const kind of ['Control', 'Monitor', 'Product']) {
+    const button = el('button', kind === 'Control' ? 'is-active' : '', kind);
+    button.type = 'button';
+    button.dataset.hmiKind = kind;
+    kindTabs.append(button);
+  }
+  const search = el('input');
+  search.id = 'hmiFunctionSearch';
+  search.type = 'search';
+  search.placeholder = '기능명, ID, CDM 검색';
+  const list = el('div', 'hmi-function-list');
+  list.id = 'hmiFunctionList';
+  navigator.append(navHead, deviceLabel, kindTabs, search, list);
+
+  const contract = el('article', 'docs-article');
+  const contractHead = el('header', 'docs-pane-head docs-article-head');
+  const contractTitle = el('div');
+  contractTitle.append(el('p', '', 'SEMANTIC DOCUMENT'), el('h2', '', '기능 설명서'));
+  const catalogCommand = el('div', 'hmi-catalog-command');
+  catalogCommand.append(el('code', '', 'request -rcc'));
+  const catalogCopy = el('button', 'button ghost', '복사');
+  catalogCopy.type = 'button';
+  catalogCopy.dataset.copyText = 'request -rcc';
+  catalogCommand.append(catalogCopy);
+  contractHead.append(contractTitle, catalogCommand);
+  const contractBody = el('div', 'hmi-contract-body');
+  contractBody.id = 'hmiContractBody';
+  contract.append(contractHead, contractBody);
+
+  const response = el('aside', 'docs-source');
+  const responseHead = el('header', 'docs-pane-head');
+  responseHead.append(el('p', '', 'BINDING & SOURCE'), el('h2', '', '전송 정의·XML 근거'));
+  const responseBody = el('div', 'hmi-response-body');
+  responseBody.id = 'hmiResponseBody';
+  response.append(responseHead, responseBody);
+
+  layout.append(navigator, contract, response);
+  dom.hmiWorkspace.prepend(layout);
+
+  const legacyLayout = dom.hmiWorkspace.querySelector('.hmi-layout');
+  if (legacyLayout) {
+    const demo = el('details', 'hmi-demo-drawer');
+    demo.id = 'hmiDemoDrawer';
+    const summary = el('summary');
+    summary.append(el('span', '', '터미널·Mock 실행 데모'), el('small', '', '필요할 때 펼치기'));
+    demo.append(summary, legacyLayout);
+    dom.hmiWorkspace.append(demo);
+    dom.hmiDemoDrawer = demo;
+  }
+
+  dom.hmiContractLayout = layout;
+  dom.hmiDeviceSelect = deviceSelect;
+  dom.hmiKindTabs = kindTabs;
+  dom.hmiFunctionSearch = search;
+  dom.hmiFunctionList = list;
+  dom.hmiContractBody = contractBody;
+  dom.hmiResponseBody = responseBody;
+}
+
+function flattenSemanticProfiles(profiles) {
+  const output = [];
+  for (const profile of profiles || []) {
+    if (profile.cdm || profile.name) output.push(profile);
+    output.push(...flattenSemanticProfiles(profile.children));
+  }
+  return output;
+}
+
+function profileAllowedLabel(profile) {
+  if (profile.values?.length) {
+    return profile.values.map((item) => item.name || item.value || item.cdm).filter(Boolean).join(', ');
+  }
+  const range = profileRangeLabel(profile);
+  if (range !== '—') return range;
+  if (profile.defaultValue !== '') return `기본값 ${profile.defaultValue}`;
+  return '—';
+}
+
+function hmiExampleValue(profile) {
+  if (profile.values?.length) {
+    const firstValue = profile.values[0];
+    return firstValue.value || firstValue.cdm || firstValue.name || 'VALUE';
+  }
+  const sample = sampleValue(profile);
+  return typeof sample === 'string' ? sample : JSON.stringify(sample);
+}
+
+function hmiProfileTable(title, profiles, inputMode = false) {
+  const section = el('section', 'hmi-contract-section');
+  section.append(el('h3', '', title));
+  if (!profiles.length) {
+    section.append(el('p', 'semantic-empty', inputMode ? 'HMI 입력 없음' : '표시할 의미 항목 없음'));
+    return section;
+  }
+  const wrap = el('div', 'hmi-contract-table-wrap');
+  const table = el('table', 'hmi-contract-table');
+  const head = el('thead');
+  const headRow = el('tr');
+  const headings = inputMode
+    ? ['입력 Key', 'CDM 의미', '형식', '범위·선택값', '명령']
+    : ['출력 항목', 'CDM 의미', '형식', '범위·선택값'];
+  headings.forEach((heading) => headRow.append(el('th', '', heading)));
+  head.append(headRow);
+  const body = el('tbody');
+  for (const profile of profiles) {
+    const row = el('tr');
+    const key = inputMode ? profile.key : (profile.name || lowerFirst(profile.cdm.split('.').pop()));
+    const keyCell = el('td');
+    keyCell.append(el('code', '', key || '미정'));
+    if (inputMode && !profile.required) keyCell.append(el('small', 'optional-mark', '선택'));
+    row.append(
+      keyCell,
+      el('td', '', profile.cdm || '미정'),
+      el('td', '', profileTypeLabel(profile.type)),
+      el('td', '', profileAllowedLabel(profile)),
+    );
+    if (inputMode) {
+      const command = `control -a ${key},${hmiExampleValue(profile)}`;
+      const commandCell = el('td', 'hmi-command-cell');
+      commandCell.append(el('code', '', command));
+      const copy = el('button', 'icon-copy', '복사');
+      copy.type = 'button';
+      copy.dataset.copyText = command;
+      commandCell.append(copy);
+      row.append(commandCell);
+    }
+    body.append(row);
+  }
+  table.append(head, body);
+  wrap.append(table);
+  section.append(wrap);
+  return section;
+}
+
+function fieldRuleLabel(field) {
+  const values = [];
+  if (field.fixedValue !== '') values.push(`고정값 ${field.fixedValue}`);
+  else if (field.value !== '') values.push(`값 ${field.value}`);
+  if (field.cdm) values.push(field.cdm);
+  if (field.sourceFields?.length) values.push(`source: ${field.sourceFields.join(', ')}`);
+  if (field.converter) values.push(`converter: ${field.converter}`);
+  if (field.dataType) values.push(field.dataType);
+  if (field.offset !== undefined && field.offset !== '') values.push(`offset ${field.offset}`);
+  if (field.width) values.push(`width ${field.width}`);
+  if (field.maps?.length) values.push(`map ${field.maps.length}개`);
+  return values.join(' · ') || '별도 매핑 규칙 없음';
+}
+
+function docsFieldTable(title, fields) {
+  const details = el('details', 'docs-field-details');
+  const flat = flattenFields(fields);
+  const summary = el('summary');
+  summary.append(el('span', '', title), el('small', '', `${flat.length} fields · 펼치기`));
+  details.append(summary);
+  if (!flat.length) {
+    details.append(el('p', 'semantic-empty', '정의된 Field 없음'));
+    return details;
+  }
+  const wrap = el('div', 'docs-field-table-wrap');
+  const table = el('table', 'docs-field-table');
+  const head = el('thead');
+  const headRow = el('tr');
+  ['Field', 'Kind', 'Value / CDM / Converter'].forEach((label) => headRow.append(el('th', '', label)));
+  head.append(headRow);
+  const body = el('tbody');
+  for (const field of flat) {
+    const row = el('tr');
+    row.append(el('td', '', field.name || '이름 없음'), el('td', '', field.kind), el('td', '', fieldRuleLabel(field)));
+    body.append(row);
+  }
+  table.append(head, body);
+  wrap.append(table);
+  details.append(wrap);
+  return details;
+}
+
+function docsChannelCard(title, channel, fields, reply = null) {
+  const section = el('section', 'docs-binding-message');
+  const heading = el('header');
+  heading.append(el('h3', '', title));
+  if (reply && (!reply.required || reply.timeout)) {
+    heading.append(el('small', '', `${reply.required ? '' : '선택 응답'}${reply.timeout ? ` timeout ${reply.timeout}` : ''}`.trim()));
+  }
+  section.append(heading);
+  const meta = el('dl', 'docs-meta-grid compact');
+  for (const [label, raw] of [...channelRows(channel), ['Field', `${flattenFields(fields).length}개`]]) {
+    const item = el('div');
+    item.append(el('dt', '', label), el('dd', '', raw || '—'));
+    meta.append(item);
+  }
+  section.append(meta, docsFieldTable(`${title} Field`, fields));
+  return section;
+}
+
+function xmlExcerpt(file, action, binding = null) {
+  const lines = String(file?.text || '').split(/\r?\n/);
+  if (!lines.length) return { start: 1, lines: ['XML 원문 없음'] };
+  const id = action.semanticId;
+  const attribute = binding ? 'semantic_id' : 'id';
+  let hit = lines.findIndex((line) => line.includes(attribute) && line.includes(id));
+  if (hit < 0) hit = lines.findIndex((line) => line.includes(id));
+  if (hit < 0) return { start: 1, lines: lines.slice(0, 80) };
+
+  let start = hit;
+  while (start > Math.max(0, hit - 10) && !/<[A-Za-z_:][\w:.-]*/.test(lines[start])) start -= 1;
+  const opening = lines[start].match(/<([A-Za-z_:][\w:.-]*)/);
+  let end = Math.min(lines.length - 1, start + 100);
+  if (opening && !/\/>\s*$/.test(lines[start])) {
+    const tag = opening[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const openPattern = new RegExp(`<${tag}(?:\\s|>|/)`, 'g');
+    const closePattern = new RegExp(`</${tag}>`, 'g');
+    let depth = 0;
+    for (let index = start; index < Math.min(lines.length, start + 160); index += 1) {
+      depth += (lines[index].match(openPattern) || []).length;
+      depth -= (lines[index].match(closePattern) || []).length;
+      if (depth === 0 && index >= hit) {
+        end = index;
+        break;
+      }
+    }
+  }
+  return { start: start + 1, lines: lines.slice(start, end + 1) };
+}
+
+function sourceFileFor(action, binding) {
+  if (!state.bundle) return null;
+  if (!binding) return action.ref?.semanticFile || state.bundle.files.find((file) => file.path === action.sourcePath);
+  return state.bundle.files.find((file) => file.path === binding.sourcePath)
+    || action.ref?.bindingFiles.find((file) => file.name === binding.sourceFile)
+    || null;
+}
+
+function docsXmlSource(action, binding) {
+  const section = el('section', 'docs-xml-source');
+  const tabs = el('div', 'docs-source-tabs');
+  const semanticTab = el('button', state.hmiSourceKey === 'semantic' ? 'is-active' : '', 'Semantic');
+  semanticTab.type = 'button';
+  semanticTab.dataset.hmiSource = 'semantic';
+  tabs.append(semanticTab);
+  for (const variant of action.bindings) {
+    const button = el('button', state.hmiSourceKey === variant.key ? 'is-active' : '', variant.transport);
+    button.type = 'button';
+    button.dataset.hmiSource = variant.key;
+    button.title = variant.sourceFile;
+    tabs.append(button);
+  }
+
+  const sourceBinding = action.bindings.find((item) => item.key === state.hmiSourceKey) || null;
+  const file = sourceFileFor(action, sourceBinding);
+  const head = el('header', 'docs-source-file');
+  head.append(el('strong', '', file?.name || '원문 파일 없음'), el('small', '', file?.path || '참조 경로를 확인하세요.'));
+  section.append(tabs, head);
+  if (!file) {
+    section.append(el('p', 'semantic-empty', '표시할 XML 원문이 없습니다.'));
+    return section;
+  }
+
+  const excerpt = xmlExcerpt(file, action, sourceBinding);
+  const pre = el('pre', 'xml-source-code');
+  excerpt.lines.forEach((line, index) => {
+    const row = el('span', line.includes(action.semanticId) ? 'is-hit' : '');
+    row.append(el('i', '', excerpt.start + index), el('code', '', line || ' '));
+    pre.append(row);
+  });
+  section.append(pre);
+  return section;
+}
+
+function renderHmiResponse(action) {
+  clear(dom.hmiResponseBody);
+  if (!action) {
+    dom.hmiResponseBody.append(el('p', 'semantic-empty', '메시지를 선택하면 Binding과 XML 원문을 표시합니다.'));
+    return;
+  }
+
+  let binding = action.bindings.find((item) => item.key === state.hmiBindingKey);
+  if (!binding) {
+    binding = action.bindings[0] || null;
+    state.hmiBindingKey = binding?.key || '';
+  }
+  if (state.hmiSourceKey !== 'semantic' && !action.bindings.some((item) => item.key === state.hmiSourceKey)) {
+    state.hmiSourceKey = 'semantic';
+  }
+
+  const overview = el('section', 'docs-binding-overview');
+  const heading = el('div', 'docs-section-title');
+  heading.append(el('div', '', 'Binding variant'), el('strong', '', `${action.bindings.length}개`));
+  overview.append(heading);
+  if (action.bindings.length > 1) {
+    const selector = el('div', 'docs-binding-tabs');
+    for (const variant of action.bindings) {
+      const button = el('button', variant.key === state.hmiBindingKey ? 'is-active' : '');
+      button.type = 'button';
+      button.dataset.hmiBinding = variant.key;
+      button.append(el('strong', '', variant.transport), el('small', '', variant.sourceFile));
+      selector.append(button);
+    }
+    overview.append(selector);
+  }
+
+  if (!binding) {
+    overview.append(el('p', 'docs-warning', '연결된 Binding이 없습니다. Semantic 정의와 Specification 참조를 확인하세요.'));
+  } else {
+    overview.append(el('p', 'docs-file-label', `${binding.transport} · ${binding.sourceFile}`));
+    const requestName = action.kind === 'Control' ? 'Request' : action.kind;
+    overview.append(docsChannelCard(requestName, binding.channel, binding.fields));
+    for (const reply of binding.replies) {
+      overview.append(docsChannelCard(`Reply · ${reply.semanticId}`, reply.channel, reply.fields, reply));
+    }
+  }
+  dom.hmiResponseBody.append(overview, docsXmlSource(action, binding));
+}
+
+function renderHmiContract(action) {
+  clear(dom.hmiContractBody);
+  if (!action) {
+    dom.hmiContractBody.append(el('p', 'semantic-empty', '왼쪽 목차에서 기능을 선택하세요.'));
+    renderHmiResponse(null);
+    return;
+  }
+
+  const articleHead = el('section', 'docs-action-head');
+  articleHead.append(el('p', 'docs-breadcrumb', `${action.ref?.name || action.ref?.id || '장치'} / ${action.kind} / ${action.semanticId}`));
+  const trace = el('div', 'docs-trace-path');
+  [
+    ['Specification', action.ref?.vehicleFile?.name || '미정'],
+    ['Semantic', action.sourceFile || '미정'],
+    ['Binding', `${action.bindings.length} variant`],
+  ].forEach(([label, raw], index) => {
+    if (index) trace.append(el('i', '', '→'));
+    const node = el('span');
+    node.append(el('small', '', label), el('strong', '', raw));
+    trace.append(node);
+  });
+  articleHead.append(trace);
+  const titleRow = el('div');
+  const title = el('div');
+  title.append(el('span', `feature-badge ${action.kind.toLowerCase()}`, action.kind), el('h1', '', action.name));
+  const idCopy = el('button', 'button ghost', 'ID 복사');
+  idCopy.type = 'button';
+  idCopy.dataset.copyText = action.publicId;
+  titleRow.append(title, idCopy);
+  articleHead.append(titleRow, el('code', 'hmi-full-id', action.publicId));
+  articleHead.append(el('p', 'docs-lead', action.description || (
+    action.kind === 'Control'
+      ? 'HMI에서 요청하여 장치 동작 또는 설정을 변경하는 Control 메시지입니다.'
+      : action.kind === 'Monitor'
+        ? '장치가 송신하며 HMI가 지속적으로 수신·표시하는 Monitor 메시지입니다.'
+        : '장치가 생성하는 파일·프레임·스트림 형태의 Product 메시지입니다.'
+  )));
+
+  const meta = el('dl', 'docs-meta-grid');
+  [
+    ['CDM', action.cdm || '미정'],
+    ['SpecRef', action.ref?.id || '미정'],
+    ['Semantic', action.sourceFile],
+    ['Local ID', action.semanticId],
+    ['Binding', `${action.bindings.length} variant`],
+  ].forEach(([label, raw]) => {
+    const item = el('div');
+    item.append(el('dt', '', label), el('dd', '', raw));
+    meta.append(item);
+  });
+  articleHead.append(meta);
+  dom.hmiContractBody.append(articleHead);
+
+  if (action.kind === 'Control') {
+    const commands = [
+      'request -rcc',
+      `control -i ${action.publicId}`,
+      ...action.inputs.map((input) => `control -a ${input.key},${hmiExampleValue(input)}`),
+      'control -r',
+    ];
+    const commandSection = el('section', 'hmi-command-sequence docs-section');
+    const commandHead = el('header');
+    commandHead.append(el('div', '', '01'), el('h2', '', 'HMI 호출 순서'));
+    const copyAll = el('button', 'button primary', '명령 전체 복사');
+    copyAll.type = 'button';
+    copyAll.dataset.copyText = commands.join('\n');
+    commandHead.append(copyAll);
+    const pre = el('pre');
+    pre.append(el('code', '', commands.join('\n')));
+    commandSection.append(commandHead, pre);
+    dom.hmiContractBody.append(commandSection, hmiProfileTable('02 · HMI 입력', action.inputs, true));
+
+    const replySection = el('section', 'docs-section docs-replies');
+    replySection.append(el('h2', '', `03 · Reply 출력 (${action.replies.length})`));
+    if (!action.replies.length) replySection.append(el('p', 'semantic-empty', 'Semantic에 Reply가 정의되어 있지 않습니다.'));
+    for (const reply of action.replies) {
+      const card = el('article', 'hmi-reply-card');
+      const head = el('header');
+      head.append(el('code', '', reply.bindRef || 'bindRef 미정'));
+      if (!reply.required || reply.timeout) {
+        head.append(el('small', '', `${reply.required ? '' : '선택 응답'}${reply.timeout ? ` timeout ${reply.timeout}` : ''}`.trim()));
+      }
+      card.append(head, el('p', '', reply.cdm || 'CDM 미정'));
+      card.append(hmiProfileTable('HMI 출력 항목', flattenSemanticProfiles(reply.results), false));
+      replySection.append(card);
+    }
+    dom.hmiContractBody.append(replySection);
+
+    if (action.preconditions?.length) {
+      const conditions = el('section', 'docs-section docs-conditions');
+      conditions.append(el('h2', '', '실행 전제조건'));
+      const list = el('ul');
+      action.preconditions.forEach((item) => list.append(el('li', '', item.cdm)));
+      conditions.append(list);
+      dom.hmiContractBody.append(conditions);
+    }
+    const tryIt = el('details', 'docs-try-it');
+    const trySummary = el('summary');
+    trySummary.append(el('strong', '', 'Try it · 터미널과 Mock으로 확인'), el('small', '', '보조 기능 펼치기'));
+    const demoButton = el('button', 'button ghost hmi-open-demo', '이 Control로 터미널 데모 열기');
+    demoButton.type = 'button';
+    demoButton.dataset.hmiOpenDemo = action.publicId;
+    tryIt.append(trySummary, demoButton);
+    dom.hmiContractBody.append(tryIt);
+  } else if (action.kind === 'Monitor') {
+    dom.hmiContractBody.append(el('p', 'docs-info', 'Monitor는 control -i로 호출하지 않습니다. HMI가 수신하여 아래 의미 항목을 표시합니다.'));
+    dom.hmiContractBody.append(hmiProfileTable('HMI 표시 항목', flattenSemanticProfiles(action.outputs), false));
+  } else {
+    const product = el('section', 'docs-section');
+    product.append(el('h2', '', 'Product 정의'));
+    product.append(makeDl([
+      ['형태', action.productType || '미정'],
+      ['종류', action.productKind || '미정'],
+      ['처리 상태', action.processingState || '미정'],
+    ]));
+    dom.hmiContractBody.append(product);
+  }
+  renderHmiResponse(action);
+}
+
+function renderHmiWorkspace() {
+  if (!state.bundle || !dom.hmiDeviceSelect) return;
+  const refs = state.bundle.refs;
+  if (!refs.length) return;
+  const previousDevice = state.hmiDeviceKey;
+  clear(dom.hmiDeviceSelect);
+  for (const ref of refs) {
+    const option = el('option', '', `${ref.name || ref.id} · ${ref.actions.length}개 메시지`);
+    option.value = referenceKey(ref);
+    dom.hmiDeviceSelect.append(option);
+  }
+  if (!refs.some((ref) => referenceKey(ref) === previousDevice)) state.hmiDeviceKey = referenceKey(refs[0]);
+  dom.hmiDeviceSelect.value = state.hmiDeviceKey;
+
+  const activeRef = refs.find((ref) => referenceKey(ref) === state.hmiDeviceKey) || refs[0];
+  const query = (dom.hmiFunctionSearch?.value || '').trim().toLowerCase();
+  const actions = activeRef.actions.filter((action) => (
+    action.kind === state.hmiKind
+    && (!query
+      || action.publicId.toLowerCase().includes(query)
+      || action.name.toLowerCase().includes(query)
+      || action.cdm.toLowerCase().includes(query))
+  ));
+
+  for (const button of dom.hmiKindTabs.querySelectorAll('[data-hmi-kind]')) {
+    const count = activeRef.actions.filter((action) => action.kind === button.dataset.hmiKind).length;
+    button.textContent = `${button.dataset.hmiKind} ${count}`;
+    button.classList.toggle('is-active', button.dataset.hmiKind === state.hmiKind);
+  }
+
+  let selectedAction = actions.find((item) => item.publicId === state.hmiActionId);
+  if (!selectedAction) {
+    selectedAction = actions[0] || null;
+    state.hmiActionId = selectedAction?.publicId || '';
+  }
+
+  clear(dom.hmiFunctionList);
+  for (const action of actions) {
+    const summary = action.kind === 'Control'
+      ? `${action.cdm || 'CDM 미정'} · 입력 ${action.inputs.length} · Reply ${action.replies.length}`
+      : action.kind === 'Monitor'
+        ? `${action.cdm || 'CDM 미정'} · 출력 ${flattenSemanticProfiles(action.outputs).length} · Binding ${action.bindings.length}`
+        : `${action.cdm || 'CDM 미정'} · Product · Binding ${action.bindings.length}`;
+    const button = el('button', action.publicId === state.hmiActionId ? 'is-active' : '');
+    button.type = 'button';
+    button.dataset.hmiAction = action.publicId;
+    button.append(
+      el('strong', '', action.name),
+      el('code', '', action.publicId),
+      el('small', '', summary),
+    );
+    dom.hmiFunctionList.append(button);
+  }
+  if (!actions.length) dom.hmiFunctionList.append(el('p', 'semantic-empty', '해당 메시지 없음'));
+
+  renderHmiContract(selectedAction);
+}
+
 function makeRequestId(prefix) {
   return `${prefix}-${String(state.demo.requestId++).padStart(6, '0')}`;
 }
@@ -2284,6 +2916,7 @@ function parseArgument(input, raw) {
     return { ok: false, message: `${input.key}는 boolean이어야 합니다.` };
   }
   if (input.type === 'collection') {
+    if (Array.isArray(raw)) return { ok: true, value: raw };
     try {
       const parsed = JSON.parse(raw);
       return Array.isArray(parsed)
@@ -2296,9 +2929,26 @@ function parseArgument(input, raw) {
   if (input.type === 'number') {
     const parsed = Number(raw);
     if (!Number.isFinite(parsed)) return { ok: false, message: `${input.key}는 숫자여야 합니다.` };
-    if (input.min !== null && parsed < input.min) return { ok: false, message: `${input.key} 최솟값 ${input.min}` };
-    if (input.max !== null && parsed > input.max) return { ok: false, message: `${input.key} 최댓값 ${input.max}` };
+    if ((input.min !== null && parsed < input.min) || (input.max !== null && parsed > input.max)) {
+      const range = `${input.min ?? '…'}..${input.max ?? '…'}${input.unit ? ` ${input.unit}` : ''}`;
+      return { ok: false, message: `${input.key} 범위 오류: ${range}만 입력할 수 있습니다.` };
+    }
     return { ok: true, value: parsed };
+  }
+  if (input.type === 'valueSet' && input.values?.length) {
+    const text = String(raw).trim();
+    const normalized = text.toLowerCase();
+    const selected = input.values.find((item) => [
+      item.value,
+      item.name,
+      item.cdm,
+      item.cdm?.split('.').pop(),
+    ].filter(Boolean).some((candidate) => String(candidate).toLowerCase() === normalized));
+    if (!selected) {
+      const allowed = input.values.map((item) => item.name || item.value || item.cdm?.split('.').pop()).filter(Boolean);
+      return { ok: false, message: `${input.key} 허용값: ${allowed.join(', ')}` };
+    }
+    return { ok: true, value: selected.value || selected.cdm || selected.name };
   }
   return { ok: true, value: raw };
 }
@@ -2306,6 +2956,11 @@ function parseArgument(input, raw) {
 function validateControl(control) {
   const definitions = new Map(control.inputs.map((input) => [input.key, input]));
   const values = {};
+  for (const input of control.inputs) {
+    if (input.defaultValue === '') continue;
+    const parsed = parseArgument(input, input.defaultValue);
+    if (parsed.ok) values[input.key] = parsed.value;
+  }
   for (const [key, raw] of state.demo.args) {
     const input = definitions.get(key);
     if (!input) return { ok: false, code: 'UNKNOWN_ARGUMENT', message: `알 수 없는 key ${key}. 허용: ${[...definitions.keys()].join(', ')}` };
@@ -2327,6 +2982,7 @@ function resolveBinding(control) {
 
 function sourceValue(source, control, values, physical) {
   if (control.target && (source === control.target.cdm || source === control.target.key || source === 'System.Target.DeviceId')) return targetDeviceValue(control);
+  if (source.startsWith('System.Target.')) return targetDeviceValue(control);
   const input = control.inputs.find((item) => item.cdm === source || item.key === source);
   if (input && Object.hasOwn(values, input.key)) return values[input.key];
   if (Object.hasOwn(physical, source)) return physical[source];
@@ -2334,7 +2990,10 @@ function sourceValue(source, control, values, physical) {
   if (source === 'System.Generated.HeartbeatSequence') return state.demo.sequence;
   if (source === 'System.Generated.Sequence') return state.demo.sequence;
   if (source === 'System.Generated.CommandSequence') return state.demo.sequence;
+  if (source === 'System.Generated.USVMessageBase') return `USV_HEADER_${state.demo.sequence}`;
+  if (/^System\.Generated\./.test(source)) return state.demo.sequence;
   if (source === 'System.Context.CommandID') return state.demo.sequence;
+  if (source === 'System.Frame.Checksum') return 'MOCK_CHECKSUM';
   if (source === 'System.Communication.LastReceivedCompletionCommand') return state.demo.lastCompletionCommand || 0;
   return undefined;
 }
@@ -2351,10 +3010,49 @@ function numericValue(raw) {
   return null;
 }
 
+function declaredMapValue(field, raw) {
+  if (raw === undefined) return undefined;
+  const text = String(raw);
+  const sourceMap = field.maps?.find((item) => item.kind === 'SourceValueMap' && item.sourceValue === text);
+  if (sourceMap) return sourceMap.value;
+  const valueMap = field.maps?.find((item) => (
+    item.kind === 'ValueMap'
+    && (item.cdm === text || item.cdm?.split('.').pop() === text || item.value === text)
+  ));
+  return valueMap ? valueMap.value : raw;
+}
+
+function packedFieldValue(field, control, values, physical) {
+  let packed = BigInt(numericValue(field.defaultValue) ?? 0);
+  for (const member of field.children || []) {
+    let raw;
+    if (member.fixedValue !== '') raw = member.fixedValue;
+    else if (member.sourceFields.length) raw = sourceValue(member.sourceFields[0], control, values, physical);
+    else raw = fieldInput(member, control, values)?.value;
+    if (raw === undefined) {
+      if (!member.cdm && !member.sourceFields.length) raw = 0;
+      else return { ok: false, value: `TBD bit ${member.name}` };
+    }
+    raw = declaredMapValue(member, raw);
+    const numeric = numericValue(raw);
+    if (numeric === null || !Number.isInteger(numeric)) return { ok: false, value: `TBD bit ${member.name}` };
+    const offset = BigInt(Number(member.offset || 0));
+    const width = BigInt(Number(member.width || 1));
+    const mask = ((1n << width) - 1n) << offset;
+    packed = (packed & ~mask) | ((BigInt(numeric) << offset) & mask);
+  }
+  const totalWidth = Number(field.width || 32);
+  return { ok: true, value: totalWidth > 32 ? `0x${packed.toString(16).toUpperCase()}` : Number(packed) };
+}
+
 function derivedValue(field, control, values, physical) {
   const sources = field.sourceFields.map((source) => sourceValue(source, control, values, physical));
   const converter = field.converter;
   const now = state.demo.now || new Date();
+
+  if (!converter && sources.length && sources[0] !== undefined) {
+    return { ok: true, value: declaredMapValue(field, sources[0]) };
+  }
 
   if (/^TargetAuvToInformation[123]$/.test(converter)) {
     const kind = Number(converter.slice(-1));
@@ -2396,6 +3094,11 @@ function mapBinding(control, binding, values) {
     let row;
     if (field.kind === 'FixedField') {
       row = { field, name: field.name, value: field.value, owner: 'fixed', note: 'Binding FixedField', unresolved: false };
+    } else if (field.kind === 'PackedField') {
+      const result = packedFieldValue(field, control, values, physical);
+      row = result.ok
+        ? { field, name: field.name, value: result.value, owner: 'derived', note: 'Binding PackedField', unresolved: false }
+        : { field, name: field.name, value: result.value, owner: 'converter', note: 'PACKED FIELD SOURCE REQUIRED', unresolved: true };
     } else if (field.kind === 'DerivedField') {
       const result = derivedValue(field, control, values, physical);
       row = result.ok
@@ -2403,7 +3106,7 @@ function mapBinding(control, binding, values) {
         : { field, name: field.name, value: result.value, owner: 'converter', note: `CONVERTER UNSUPPORTED · ${field.converter || 'converter'}`, unresolved: true };
     } else {
       const found = fieldInput(field, control, values);
-      if (found) row = { field, name: field.name, value: found.value, owner: found.automaticTarget ? 'target' : 'input', note: found.automaticTarget ? '자동 Target' : `HMI Parameter · ${found.input.key}`, unresolved: false };
+      if (found) row = { field, name: field.name, value: declaredMapValue(field, found.value), owner: found.automaticTarget ? 'target' : 'input', note: found.automaticTarget ? '자동 Target' : `HMI Parameter · ${found.input.key}`, unresolved: false };
       else if (!field.cdm && (field.name.toLowerCase().includes('reserve') || field.name.toLowerCase().includes('reserved'))) row = { field, name: field.name, value: 0, owner: 'fallback', note: 'Web Demo fallback · zero-fill', unresolved: false };
       else row = { field, name: field.name, value: 'TBD', owner: 'xml', note: 'XML DEFINITION REQUIRED · 값 공급 규칙 없음', unresolved: true };
     }
@@ -2618,16 +3321,26 @@ function handleSelect(id) {
     appendTerminal('먼저 request -rcc를 실행하세요.', 'error');
     return false;
   }
-  if (!selectControl(id, false, true)) {
+  const previousId = state.demo.controlId;
+  const hadArguments = state.demo.args.size > 0;
+  const preserveArguments = previousId === id;
+  if (!selectControl(id, false, preserveArguments)) {
     const near = state.bundle.controls.filter((item) => item.publicId.toLowerCase().includes(id.toLowerCase())).map((item) => item.publicId);
     appendTerminal(`알 수 없는 Control ID${near.length ? `. 후보: ${near.join(', ')}` : `: ${id}`}`, 'error');
     return false;
+  }
+  if (previousId && previousId !== id && hadArguments) {
+    appendTerminal('Control이 변경되어 이전 Draft 입력값을 초기화했습니다.', 'info');
   }
   return true;
 }
 
 function handleArgument(key, raw) {
   const control = state.demo.controlId ? state.bundle.controls.find((item) => item.publicId === state.demo.controlId) : null;
+  if (!control) {
+    appendTerminal('먼저 control -i <full-id>로 Control을 선택하세요.', 'error');
+    return false;
+  }
   if (control?.target && [control.target.key, control.target.cdm, 'targetId'].includes(key)) {
     appendTerminal(`${key}는 ControlExecutionRequest.targetId에서 자동 공급되므로 HMI가 입력하지 않습니다.`, 'error');
     return false;
@@ -2639,6 +3352,16 @@ function handleArgument(key, raw) {
   )));
   if (managed.has(key)) {
     appendTerminal(`${key}는 Binding 관리 Field이므로 HMI가 입력할 수 없습니다.`, 'error');
+    return false;
+  }
+  const input = control.inputs.find((item) => item.key === key);
+  if (!input) {
+    appendTerminal(`UNKNOWN_ARGUMENT: 알 수 없는 key ${key}. 허용: ${control.inputs.map((item) => item.key).join(', ') || '입력 없음'}`, 'error');
+    return false;
+  }
+  const validation = parseArgument(input, raw);
+  if (!validation.ok) {
+    appendTerminal(`TYPE_OR_RANGE: ${validation.message}`, 'error');
     return false;
   }
   const before = state.demo.args.get(key);
@@ -2735,6 +3458,15 @@ async function executeCommand(raw) {
   else appendTerminal('알 수 없는 명령입니다. -h 또는 help를 입력하세요.', 'error');
 }
 
+const tabbar = document.querySelector('.tabbar');
+if (tabbar) {
+  for (const name of ['hmi', 'model', 'cdm']) {
+    const button = document.querySelector(`[data-tab=${name}]`);
+    if (button) tabbar.append(button);
+  }
+}
+setupHmiContractUi();
+
 for (const button of tabButtons) {
   button.addEventListener('click', () => activateTab(button.dataset.tab));
   button.addEventListener('keydown', handleTabKey);
@@ -2759,6 +3491,14 @@ if (dom.schemaRail) dom.schemaRail.addEventListener('toggle', () => {
 });
 if (dom.hmiCatalogSearch) dom.hmiCatalogSearch.addEventListener('input', () => renderCatalog(dom.hmiCatalogSearch.value));
 if (dom.presetSearch) dom.presetSearch.addEventListener('input', () => renderPresets(dom.presetSearch.value));
+if (dom.hmiDeviceSelect) dom.hmiDeviceSelect.addEventListener('change', () => {
+  state.hmiDeviceKey = dom.hmiDeviceSelect.value;
+  state.hmiActionId = '';
+  state.hmiBindingKey = '';
+  state.hmiSourceKey = 'semantic';
+  renderHmiWorkspace();
+});
+if (dom.hmiFunctionSearch) dom.hmiFunctionSearch.addEventListener('input', renderHmiWorkspace);
 if (dom.sendDraftButton) dom.sendDraftButton.addEventListener('click', publishControl);
 if (dom.resetDemoButton) dom.resetDemoButton.addEventListener('click', resetDemo);
 
@@ -2788,6 +3528,60 @@ if (dom.copyPayloadButton) dom.copyPayloadButton.addEventListener('click', async
 });
 
 document.addEventListener('click', (event) => {
+  const copy = event.target.closest('[data-copy-text]');
+  if (copy) {
+    navigator.clipboard.writeText(copy.dataset.copyText || '').catch(() => {});
+    const original = copy.textContent;
+    copy.textContent = '복사됨';
+    window.setTimeout(() => { copy.textContent = original; }, 900);
+    return;
+  }
+
+  const hmiKind = event.target.closest('[data-hmi-kind]');
+  if (hmiKind) {
+    state.hmiKind = hmiKind.dataset.hmiKind;
+    state.hmiActionId = '';
+    state.hmiBindingKey = '';
+    state.hmiSourceKey = 'semantic';
+    renderHmiWorkspace();
+    return;
+  }
+
+  const hmiAction = event.target.closest('[data-hmi-action]');
+  if (hmiAction) {
+    state.hmiActionId = hmiAction.dataset.hmiAction;
+    state.hmiBindingKey = '';
+    state.hmiSourceKey = 'semantic';
+    renderHmiWorkspace();
+    return;
+  }
+
+  const hmiBinding = event.target.closest('[data-hmi-binding]');
+  if (hmiBinding) {
+    state.hmiBindingKey = hmiBinding.dataset.hmiBinding;
+    if (state.hmiSourceKey !== 'semantic') state.hmiSourceKey = state.hmiBindingKey;
+    const action = state.bundle?.actions.find((item) => item.publicId === state.hmiActionId) || null;
+    renderHmiResponse(action);
+    return;
+  }
+
+  const hmiSource = event.target.closest('[data-hmi-source]');
+  if (hmiSource) {
+    state.hmiSourceKey = hmiSource.dataset.hmiSource;
+    const action = state.bundle?.actions.find((item) => item.publicId === state.hmiActionId) || null;
+    renderHmiResponse(action);
+    return;
+  }
+
+  const openDemo = event.target.closest('[data-hmi-open-demo]');
+  if (openDemo) {
+    state.demo.specLoaded = true;
+    selectControl(openDemo.dataset.hmiOpenDemo, true);
+    if (dom.hmiDemoDrawer) dom.hmiDemoDrawer.open = true;
+    dom.hmiDemoDrawer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
   const device = event.target.closest('[data-device-key]');
   if (device && state.bundle) {
     showReference(device.dataset.deviceKey);
@@ -2840,7 +3634,7 @@ document.addEventListener('click', (event) => {
   }
 });
 
-const initialTab = ['cdm', 'model', 'hmi'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'cdm';
+const initialTab = ['cdm', 'model', 'hmi'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'hmi';
 activateTab(initialTab);
 renderPrinciples();
 resetDemo();

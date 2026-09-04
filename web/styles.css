@@ -394,3 +394,661 @@ input[type=search]{width:min(270px,100%)}
   .semantic-table td:before{content:attr(data-label);color:var(--muted);font-size:.58rem;font-weight:800}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+/* HMI-first contract workspace */
+.hmi-contract-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, .62fr) minmax(480px, 1fr) minmax(480px, 1fr);
+  gap: 12px;
+  min-height: 660px;
+  margin-bottom: 14px;
+}
+
+.hmi-contract-nav,
+.hmi-contract-main,
+.hmi-response-panel,
+.hmi-demo-drawer {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.hmi-contract-nav,
+.hmi-contract-main,
+.hmi-response-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.hmi-contract-head {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.hmi-contract-head p,
+.hmi-contract-head h2 {
+  margin: 0;
+}
+
+.hmi-contract-head p {
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.hmi-contract-head h2 {
+  margin-top: 4px;
+  font-size: 20px;
+}
+
+.hmi-device-label {
+  display: grid;
+  gap: 6px;
+  margin: 14px 14px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.hmi-device-label select,
+#hmiFunctionSearch {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 10px 11px;
+}
+
+.hmi-kind-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin: 0 14px 10px;
+}
+
+.hmi-kind-tabs button {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hmi-kind-tabs button.is-active {
+  border-color: var(--cyan);
+  background: rgba(66, 212, 217, .12);
+  color: var(--cyan);
+}
+
+#hmiFunctionSearch {
+  width: calc(100% - 28px);
+  margin: 0 14px 10px;
+}
+
+.hmi-function-list {
+  display: grid;
+  gap: 6px;
+  max-height: 520px;
+  overflow: auto;
+  padding: 0 10px 12px 14px;
+}
+
+.hmi-function-list > button {
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-left: 3px solid var(--cyan);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 11px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hmi-function-list > button:hover,
+.hmi-function-list > button.is-active {
+  border-color: var(--cyan);
+  background: rgba(66, 212, 217, .12);
+}
+
+.hmi-function-list code,
+.hmi-function-list small {
+  display: block;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hmi-contract-body,
+.hmi-response-body {
+  max-height: 586px;
+  overflow: auto;
+  padding: 14px;
+}
+
+.hmi-catalog-command {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hmi-catalog-command code,
+.hmi-full-id,
+.hmi-command-sequence pre {
+  color: var(--cyan);
+}
+
+.hmi-action-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.hmi-action-summary h2,
+.hmi-action-summary p {
+  margin: 8px 0 0;
+}
+
+.hmi-action-summary h2 {
+  font-size: 20px;
+}
+
+.hmi-full-id {
+  display: block;
+  margin-top: 9px;
+  overflow-wrap: anywhere;
+}
+
+.hmi-command-sequence,
+.hmi-contract-section,
+.hmi-reply-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.hmi-command-sequence,
+.hmi-contract-section {
+  margin-top: 10px;
+  padding: 12px;
+}
+
+.hmi-command-sequence > header,
+.hmi-reply-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hmi-command-sequence h3,
+.hmi-contract-section h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.hmi-command-sequence pre {
+  margin: 0;
+  border-radius: 9px;
+  background: #061119;
+  padding: 12px;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.hmi-contract-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+.hmi-contract-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.hmi-contract-table th,
+.hmi-contract-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.hmi-contract-table th {
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.hmi-contract-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.hmi-command-cell {
+  min-width: 190px;
+}
+
+.hmi-command-cell code {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--cyan);
+}
+
+.icon-copy {
+  margin-top: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.hmi-reply-card {
+  margin-top: 8px;
+  padding: 10px;
+  border-left: 3px solid var(--cyan);
+}
+
+.hmi-reply-card > p,
+.hmi-kind-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.hmi-reply-card .hmi-contract-section {
+  padding: 0;
+  border: 0;
+}
+
+.hmi-route-details {
+  margin-top: 7px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.hmi-route-details > summary {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.hmi-route-details > summary small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.hmi-route-details .binding-detail-large {
+  margin: 0;
+  padding: 8px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.hmi-open-demo {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.hmi-demo-drawer {
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.hmi-demo-drawer > summary {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 16px;
+  cursor: pointer;
+}
+
+.hmi-demo-drawer > summary small {
+  color: var(--muted);
+}
+
+.hmi-demo-drawer > .hmi-layout {
+  padding: 12px;
+}
+
+@media (max-width: 1280px) {
+  .hmi-contract-layout {
+    grid-template-columns: 250px minmax(420px, 1fr);
+  }
+
+  .hmi-response-panel {
+    grid-column: 1 / -1;
+  }
+
+  .hmi-response-body {
+    max-height: 460px;
+  }
+}
+
+@media (max-width: 820px) {
+  .hmi-contract-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hmi-contract-body,
+  .hmi-response-body,
+  .hmi-function-list {
+    max-height: none;
+  }
+}
+
+/* Protocol documentation workspace */
+body { font-size: 14px; }
+.topbar { min-height: 68px; }
+.brand-mark { width: 38px; height: 38px; border-radius: 10px; }
+.brand strong { font-size: .92rem; }
+.brand small, .source-summary small { font-size: .68rem; }
+.source-summary strong { font-size: .78rem; }
+.source-actions .button { min-height: 36px; padding: 0 13px; font-size: .75rem; }
+.source-bar { gap: 16px; padding: 7px 0; }
+.source-bar strong { font-size: .9rem; }
+.source-bar span, .source-bar p { font-size: .64rem; }
+.tabbar { gap: 7px; padding: 10px 0 12px; }
+.tab-button { min-height: 54px; padding: 9px 13px; border-radius: 10px; }
+.tab-button strong { font-size: .82rem; }
+.tab-button small { font-size: .64rem; }
+
+.protocol-docs-layout {
+  display: grid;
+  grid-template-columns: minmax(230px, .52fr) minmax(520px, 1.08fr) minmax(430px, .9fr);
+  min-height: 680px;
+  height: calc(100vh - 225px);
+  max-height: 900px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #09141d;
+  box-shadow: var(--shadow);
+}
+
+.docs-navigation,
+.docs-article,
+.docs-source {
+  display: grid;
+  grid-template-rows:auto minmax(0,1fr);
+  min-width: 0;
+  min-height: 0;
+  background: var(--surface);
+}
+.docs-navigation,
+.docs-article { border-right: 1px solid var(--line); }
+.docs-navigation { grid-template-rows:auto auto auto auto minmax(0,1fr); background: #08131b; }
+.docs-article { background: #0b1721; }
+.docs-source { background: #07121a; }
+
+.docs-pane-head {
+  display: flex;
+  min-height: 66px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 15px;
+  border-bottom: 1px solid var(--line);
+}
+.docs-pane-head p,
+.docs-pane-head h2 { margin: 0; }
+.docs-pane-head p {
+  color: var(--cyan);
+  font: 800 .61rem/1.2 Consolas, monospace;
+  letter-spacing: .15em;
+}
+.docs-pane-head h2 { margin-top: 4px; font-size: 1rem; letter-spacing: -.02em; }
+.docs-article-head .hmi-catalog-command { gap: 6px; }
+.docs-article-head .hmi-catalog-command code { font-size: .68rem; }
+.docs-article-head .button { min-height: 30px; padding: 0 8px; font-size: .62rem; }
+
+.docs-navigation .hmi-device-label { margin: 11px 11px 7px; font-size: .64rem; }
+.docs-navigation .hmi-device-label select,
+.docs-navigation #hmiFunctionSearch {
+  min-height: 35px;
+  border-radius: 7px;
+  font-size: .72rem;
+  background: #061018;
+}
+.docs-navigation .hmi-kind-tabs { gap: 4px; margin: 0 11px 7px; }
+.docs-navigation .hmi-kind-tabs button { padding: 6px 3px; border-radius: 6px; font-size: .64rem; }
+.docs-navigation #hmiFunctionSearch { width: calc(100% - 22px); margin: 0 11px 8px; }
+.docs-navigation .hmi-function-list {
+  align-content: start;
+  max-height: none;
+  min-height: 0;
+  padding: 0 6px 10px 10px;
+  scrollbar-gutter: stable;
+}
+.docs-navigation .hmi-function-list > button {
+  gap: 3px;
+  border: 0;
+  border-left: 2px solid #355060;
+  border-radius: 5px;
+  padding: 8px 9px;
+  background: transparent;
+}
+.docs-navigation .hmi-function-list > button:hover { background: #10222d; }
+.docs-navigation .hmi-function-list > button.is-active {
+  border-left-color: var(--cyan);
+  background: #12303e;
+  box-shadow: inset 0 0 0 1px #44c6d03d;
+}
+.docs-navigation .hmi-function-list strong { font-size: .76rem; }
+.docs-navigation .hmi-function-list code { color: #a7c0ce; font-size: .62rem; }
+.docs-navigation .hmi-function-list small { color: #728b99; font-size: .59rem; }
+
+.docs-article .hmi-contract-body,
+.docs-source .hmi-response-body {
+  max-height: none;
+  min-height: 0;
+  padding: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+.docs-action-head { padding: 24px 26px 20px; border-bottom: 1px solid var(--line); }
+.docs-breadcrumb { margin: 0 0 15px; color: #7893a2; font: .66rem Consolas, monospace; }
+.docs-trace-path {
+  display: grid!important;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,.7fr);
+  align-items: stretch!important;
+  gap: 7px!important;
+  margin-bottom: 20px;
+}
+.docs-trace-path > span { min-width: 0; padding: 7px 9px; border: 1px solid #203847; border-radius: 6px; background: #08151e; }
+.docs-trace-path small,
+.docs-trace-path strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.docs-trace-path small { color: #6f8997; font-size: .52rem; text-transform: uppercase; letter-spacing: .07em; }
+.docs-trace-path strong { margin-top: 2px; color: #bfd0d8; font: .59rem Consolas, monospace; }
+.docs-trace-path i { align-self: center; color: #486778; font-style: normal; font-size: .7rem; }
+.docs-action-head > div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.docs-action-head h1 { max-width: none; margin: 8px 0 0; font-size: 1.75rem; letter-spacing: -.035em; }
+.docs-action-head .hmi-full-id { margin-top: 10px; color: #99dce3; font-size: .77rem; }
+.docs-lead { max-width: 760px; margin: 17px 0; color: #b5c6cf; font-size: .82rem; line-height: 1.75; }
+.docs-action-head .button { min-height: 32px; padding: 0 10px; font-size: .65rem; }
+
+.docs-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 18px 0 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--line);
+}
+.docs-meta-grid > div { min-width: 0; padding: 8px 10px; background: #0a1822; }
+.docs-meta-grid dt { color: #738c9a; font-size: .59rem; text-transform: uppercase; letter-spacing: .08em; }
+.docs-meta-grid dd { margin: 3px 0 0; overflow-wrap: anywhere; color: #d9e5ea; font: .68rem/1.45 Consolas, monospace; }
+.docs-meta-grid.compact { margin: 0 0 9px; }
+
+.docs-article .docs-section,
+.docs-article > .hmi-contract-body > .hmi-contract-section {
+  margin: 0;
+  padding: 20px 26px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+.docs-article .docs-section h2 { margin: 0 0 13px; font-size: .95rem; }
+.docs-article .hmi-command-sequence > header { margin-bottom: 10px; }
+.docs-article .hmi-command-sequence > header > div {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  background: #163746;
+  color: var(--cyan);
+  font: 800 .65rem Consolas, monospace;
+}
+.docs-article .hmi-command-sequence > header h2 { flex: 1; margin: 0; }
+.docs-article .hmi-command-sequence pre {
+  border: 1px solid #1b3644;
+  background: #040c12;
+  color: #93e5e8;
+  font-size: .72rem;
+  line-height: 1.8;
+}
+.docs-article .hmi-contract-section > h3 { margin-bottom: 11px; font-size: .9rem; }
+.docs-article .hmi-contract-table { font-size: .68rem; }
+.docs-article .hmi-contract-table th { font-size: .57rem; }
+.docs-article .hmi-contract-table th,
+.docs-article .hmi-contract-table td { padding: 8px 9px; }
+.docs-article .hmi-command-cell { min-width: 175px; }
+.docs-article .hmi-reply-card {
+  margin: 9px 0 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #08151e;
+}
+.docs-article .hmi-reply-card .hmi-contract-section { margin: 10px 0 0; padding: 0; }
+.docs-info,
+.docs-warning {
+  margin: 18px 26px;
+  padding: 11px 13px;
+  border-left: 3px solid var(--cyan);
+  background: #102630;
+  color: #b9ccd5;
+  font-size: .75rem;
+}
+.docs-warning { margin: 10px 0; border-left-color: var(--amber); background: #2b2217; }
+.docs-try-it {
+  margin: 18px 26px 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.docs-try-it > summary { display: flex; justify-content: space-between; gap: 12px; padding: 11px 13px; cursor: pointer; }
+.docs-try-it > summary strong { font-size: .74rem; }
+.docs-try-it > summary small { font-size: .61rem; }
+.docs-try-it .hmi-open-demo { width: calc(100% - 24px); margin: 0 12px 12px; min-height: 34px; font-size: .68rem; }
+
+.docs-source .hmi-response-body { padding: 12px; }
+.docs-section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.docs-section-title div { color: #78919f; font-size: .63rem; text-transform: uppercase; letter-spacing: .08em; }
+.docs-section-title strong { color: var(--cyan); font-size: .7rem; }
+.docs-binding-tabs { display: flex; gap: 5px; margin: 8px 0; overflow: auto; }
+.docs-binding-tabs button,
+.docs-source-tabs button {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #08151e;
+  color: #8ca3b0;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.docs-binding-tabs button { display: grid; gap: 1px; min-width: 92px; text-align: left; }
+.docs-binding-tabs button strong { font-size: .65rem; }
+.docs-binding-tabs button small { max-width: 140px; overflow: hidden; font-size: .55rem; text-overflow: ellipsis; white-space: nowrap; }
+.docs-binding-tabs button.is-active,
+.docs-source-tabs button.is-active { border-color: var(--cyan); background: #12303e; color: var(--cyan); }
+.docs-file-label { margin: 9px 0; color: #dce8ed; font: 700 .72rem Consolas, monospace; overflow-wrap: anywhere; }
+.docs-binding-message {
+  margin-top: 8px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0a1822;
+}
+.docs-binding-message > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.docs-binding-message h3 { margin: 0 0 8px; font-size: .8rem; }
+.docs-binding-message header small { color: var(--amber); font-size: .56rem; }
+.docs-field-details { border: 1px solid #203747; border-radius: 6px; overflow: hidden; }
+.docs-field-details > summary { display: flex; justify-content: space-between; gap: 9px; padding: 8px 9px; cursor: pointer; color: var(--cyan); font-size: .66rem; }
+.docs-field-details > summary small { font-size: .55rem; }
+.docs-field-details[open] > summary { border-bottom: 1px solid var(--line); }
+.docs-field-table-wrap { max-height: 300px; overflow: auto; }
+.docs-field-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: .61rem; }
+.docs-field-table th,
+.docs-field-table td { padding: 7px 8px; border-bottom: 1px solid #ffffff0a; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.docs-field-table th { color: #78909d; font-size: .53rem; text-transform: uppercase; letter-spacing: .05em; background: #102431; }
+.docs-field-table th:nth-child(1) { width: 26%; }
+.docs-field-table th:nth-child(2) { width: 18%; }
+.docs-field-table td:nth-child(2) { color: var(--amber); }
+
+.docs-xml-source { margin-top: 13px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #040b10; }
+.docs-source-tabs { display: flex; gap: 4px; padding: 8px; overflow: auto; border-bottom: 1px solid var(--line); background: #0b1922; }
+.docs-source-tabs button { flex: 0 0 auto; padding: 5px 8px; font-size: .59rem; }
+.docs-source-file { display: grid; gap: 2px; padding: 8px 10px; border-bottom: 1px solid #172b37; }
+.docs-source-file strong { font: .67rem Consolas, monospace; }
+.docs-source-file small { overflow: hidden; color: #6f8794; font: .55rem Consolas, monospace; text-overflow: ellipsis; white-space: nowrap; }
+.xml-source-code { max-height: 420px; margin: 0; overflow: auto; padding: 7px 0 12px; font: .61rem/1.65 Consolas, monospace; tab-size: 2; }
+.xml-source-code > span { display: grid; grid-template-columns: 42px max-content; min-width: 100%; padding-right: 12px; }
+.xml-source-code > span:hover { background: #10202a; }
+.xml-source-code > span.is-hit { background: #12303e; }
+.xml-source-code i { padding-right: 9px; color: #49616e; font-style: normal; text-align: right; user-select: none; }
+.xml-source-code code { color: #adc1cb; white-space: pre; }
+.xml-source-code .is-hit code { color: #d9f8f8; }
+
+.hmi-demo-drawer { margin: 12px 0 20px; border-radius: 10px; }
+.hmi-demo-drawer > summary { padding: 10px 13px; font-size: .72rem; }
+
+@media (max-width: 1380px) {
+  .protocol-docs-layout { grid-template-columns: 235px minmax(500px, 1fr); height: auto; max-height: none; }
+  .docs-source { grid-column: 1 / -1; min-height: 620px; border-top: 1px solid var(--line); }
+  .docs-article, .docs-navigation { height: 720px; }
+}
+@media (max-width: 850px) {
+  .app-shell { padding: 0 14px; }
+  .source-bar { overflow-x: auto; }
+  .source-bar p { display: none; }
+  .protocol-docs-layout { display: block; }
+  .docs-navigation, .docs-article, .docs-source { height: auto; min-height: 0; border: 0; border-bottom: 1px solid var(--line); }
+  .docs-navigation .hmi-function-list { max-height: 320px; }
+  .docs-article .hmi-contract-body, .docs-source .hmi-response-body { max-height: none; }
+  .docs-action-head, .docs-article .docs-section, .docs-article > .hmi-contract-body > .hmi-contract-section { padding-left: 16px; padding-right: 16px; }
+  .docs-info, .docs-warning, .docs-try-it { margin-left: 16px; margin-right: 16px; }
+  .docs-meta-grid { grid-template-columns: 1fr; }
+  .docs-trace-path { grid-template-columns:1fr; }
+  .docs-trace-path i { display:none; }
+  .hmi-contract-table-wrap { overflow-x: auto; }
+  .hmi-contract-table { min-width: 680px; }
+}
