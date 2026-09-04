@@ -1,0 +1,30 @@
+name: temporary validate XML design understanding
+on:
+  push:
+    branches: [feature/xml-design-understanding]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: node --check web/design.js
+      - name: Required files and anchors
+        run: |
+          test -f web/design.html
+          test -f web/design.css
+          test -f web/design.js
+          grep -q 'id="deviceList"' web/design.html
+          grep -q 'id="featureGrid"' web/design.html
+          grep -q 'id="semanticSummary"' web/design.html
+          grep -q 'id="bindingVariants"' web/design.html
+          grep -q 'id="evidenceList"' web/design.html
+      - name: No old trace layout reuse
+        run: |
+          ! grep -q 'trace-main-row' web/design.html
+          ! grep -q 'SPECIFICATION.*SEMANTIC.*BINDING.*WIRE' web/design.html
