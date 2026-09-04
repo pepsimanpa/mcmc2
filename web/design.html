@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UMS XML Design Atlas</title>
+  <link rel="stylesheet" href="design.css">
+  <script src="design.js" defer></script>
+</head>
+<body>
+<div class="atlas-shell">
+  <header class="atlas-topbar">
+    <div class="brand-block">
+      <div class="brand-mark">XML</div>
+      <div>
+        <strong>UMS XML Design Atlas</strong>
+        <small>XML을 읽는 대신 설계를 이해하는 화면</small>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a href="index.html#hmi">HMI 데모</a>
+      <label for="folderInput" class="open-button">설계 폴더 열기</label>
+      <input id="folderInput" type="file" webkitdirectory multiple accept=".xml,.xsd,.md,.idl" hidden>
+    </div>
+  </header>
+
+  <main>
+    <section id="landing" class="landing">
+      <div class="landing-copy">
+        <p class="eyebrow">DESIGN-FIRST VIEW</p>
+        <h1>장비 하나를 고르면<br>그 XML 설계가 <em>한 장의 설계서</em>가 됩니다.</h1>
+        <p>Control과 Monitor가 무엇인지, 사용자가 무엇을 넣는지, 어떤 물리 메시지로 변환되는지, Reply와 남은 TBD가 무엇인지 한 화면에서 봅니다.</p>
+        <label for="folderInput" class="landing-button">XML 폴더 선택</label>
+        <small id="landingStatus">로컬 브라우저에서만 분석합니다.</small>
+      </div>
+      <div class="landing-board" aria-hidden="true">
+        <article><span>01</span><b>장비</b><small>무엇을 하는가</small></article>
+        <article><span>02</span><b>기능</b><small>무슨 의미인가</small></article>
+        <article><span>03</span><b>구현</b><small>어떻게 전송되는가</small></article>
+        <article><span>04</span><b>근거</b><small>확정 / TBD</small></article>
+      </div>
+    </section>
+
+    <section id="workspace" class="workspace" hidden>
+      <aside class="device-column">
+        <div class="column-head">
+          <div><p>01 · EQUIPMENT</p><h2>장비</h2></div>
+          <input id="deviceSearch" type="search" placeholder="장비 검색">
+        </div>
+        <div id="deviceList" class="device-list"></div>
+      </aside>
+
+      <section class="design-sheet">
+        <header class="sheet-header">
+          <div>
+            <p class="eyebrow">DESIGN SHEET</p>
+            <h1 id="deviceTitle">장비를 선택하세요</h1>
+            <p id="deviceSubtitle">Specification → Semantic → Binding을 사람이 읽기 쉬운 구조로 다시 보여줍니다.</p>
+          </div>
+          <div id="deviceStats" class="stats"></div>
+        </header>
+
+        <section class="sheet-overview">
+          <article>
+            <span>설계 구성</span>
+            <strong id="sourceSummary">—</strong>
+            <small id="sourceFiles">—</small>
+          </article>
+          <article>
+            <span>설계 상태</span>
+            <strong id="issueSummary">—</strong>
+            <small>원문 근거가 없는 값은 확정하지 않습니다.</small>
+          </article>
+        </section>
+
+        <section class="function-section">
+          <div class="section-title">
+            <div><p>02 · CAPABILITY</p><h2>이 장비가 하는 일</h2></div>
+            <div class="filters">
+              <button class="filter is-active" data-filter="all">전체</button>
+              <button class="filter" data-filter="Control">Control</button>
+              <button class="filter" data-filter="Monitor">Monitor</button>
+              <button class="filter" data-filter="Product">Product</button>
+              <input id="featureSearch" type="search" placeholder="기능 · CDM 검색">
+            </div>
+          </div>
+          <div id="featureGrid" class="feature-grid"></div>
+        </section>
+
+        <section id="emptyDetail" class="empty-detail">
+          <b>기능을 선택하세요.</b>
+          <span>선택한 기능의 논리 의미와 물리 구현을 나란히 비교합니다.</span>
+        </section>
+
+        <section id="featureDetail" class="feature-detail" hidden>
+          <header class="feature-head">
+            <div>
+              <div class="feature-label-line"><span id="featureKind" class="kind-pill">CONTROL</span><code id="featureId">—</code></div>
+              <h2 id="featureTitle">—</h2>
+              <p id="featureCdm">—</p>
+            </div>
+            <button id="openHmiButton" type="button">이 Control 실행 예 보기</button>
+          </header>
+
+          <div class="compare-grid">
+            <article class="meaning-card">
+              <div class="card-title"><span>03A</span><div><b>논리 의미 · Semantic</b><small>사용자와 시스템이 이해해야 하는 의미</small></div></div>
+              <div id="semanticSummary" class="summary-block"></div>
+              <div id="semanticParams" class="semantic-params"></div>
+            </article>
+
+            <article class="wire-card">
+              <div class="card-title"><span>03B</span><div><b>물리 구현 · Binding</b><small>실제 Topic / Type / Field / ValueMap</small></div></div>
+              <div id="bindingSummary" class="summary-block"></div>
+              <div id="bindingVariants" class="binding-variants"></div>
+            </article>
+          </div>
+
+          <section id="replyPanel" class="reply-panel" hidden>
+            <div class="card-title"><span>04</span><div><b>Reply / Result</b><small>처리 ACK와 실제 결과를 구분해서 봅니다.</small></div></div>
+            <div id="replyList" class="reply-list"></div>
+          </section>
+
+          <section class="evidence-panel">
+            <div class="card-title"><span>05</span><div><b>설계 근거와 TBD</b><small>확정된 것과 추가 확인이 필요한 것을 분리합니다.</small></div></div>
+            <div id="evidenceList" class="evidence-list"></div>
+          </section>
+        </section>
+      </section>
+    </section>
+  </main>
+</div>
+</body>
+</html>
