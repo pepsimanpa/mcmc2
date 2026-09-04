@@ -41,6 +41,18 @@ module Common
         sequence<ControlParam, 100> params;
     };
 
+    // Semantic Reply의 Result/QuantityResult/BooleanResult/ValueSetResult/GroupResult를
+    // HMI에 전달하기 위한 공통 평탄화 결과 항목이다.
+    // GroupResult는 fieldName을 "group.child" 형식의 경로로 표현한다.
+    struct ControlResult
+    {
+        wstring<150> fieldName;
+        wstring<100> cdm;
+        wstring<40> dataType;
+        wstring<200> fieldValue;
+        wstring<40> unit;
+    };
+
     enum OperationState
     {
         Finished,
@@ -69,16 +81,24 @@ module Messages
         };
 
         // 2. Request Execution of Control Command to Vehicle
+        // requestId는 한 번의 제어 실행 요청과 이후 하나 이상의 Reply를 상관시키는 식별자다.
         struct ControlExecutionRequest
         {
-            @key wstring targetId;
+            @key wstring<40> requestId;
+            wstring<40> targetId;
             Common::ControlSpec controlSpec;
         };
 
+        // 동일 Control에 처리상태 Reply와 실제 결과 Reply가 함께 존재할 수 있으므로
+        // controlId와 replyCdm으로 어느 Control의 어떤 Semantic Reply인지 명시한다.
         struct ControlExecutionReply
         {
-            @key wstring targetId;
+            @key wstring<40> requestId;
+            wstring<40> targetId;
+            wstring<100> controlId;
+            wstring<100> replyCdm;
             Common::OperationState executionReport;
+            sequence<Common::ControlResult, 100> results;
         };
 
         // 3. Request Monitor Information
