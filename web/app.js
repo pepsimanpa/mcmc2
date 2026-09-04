@@ -858,6 +858,29 @@ function aliasFor(input, fields, used) {
   return key;
 }
 
+function attachReplyFieldMetadata(profile, bindingReplies) {
+  const matchingFields = bindingReplies
+    .flatMap((reply) => flattenFields(reply.fields))
+    .filter((field) => (
+      (profile.cdm && field.cdm === profile.cdm)
+      || (profile.name && field.name === profile.name)
+    ));
+  const wireValues = matchingFields
+    .flatMap((field) => (field.maps || [])
+      .filter((item) => item.kind === 'ValueMap')
+      .map((item) => ({ ...item, fieldName: field.name })))
+    .filter((item, index, list) => list.findIndex((candidate) => (
+      candidate.cdm === item.cdm && candidate.value === item.value
+    )) === index);
+  const wireTypes = [...new Set(matchingFields.map((field) => field.dataType).filter(Boolean))];
+  return {
+    ...profile,
+    wireValues,
+    wireType: wireTypes.join(' / '),
+    children: (profile.children || []).map((child) => attachReplyFieldMetadata(child, bindingReplies)),
+  };
+}
+
 function attachBindings(ref, diagnostics) {
   const variants = ref.bindingFiles.flatMap((file) => [
     ...parseBindingGroup(ref, file, 'Control'),
@@ -910,6 +933,15 @@ function attachBindings(ref, diagnostics) {
           else if (exactField && /UInt|Int|Float|Scale|Bit/i.test(exactField.converter)) type = 'number';
         }
         return { ...input, type, key: aliasFor(input, fields, used), wireValues: uniqueWireValues };
+      });
+      action.replies = action.replies.map((reply) => {
+        const bindingReplies = action.bindings.flatMap((binding) => (
+          binding.replies || []
+        ).filter((candidate) => candidate.semanticId === reply.bindRef));
+        return {
+          ...reply,
+          results: reply.results.map((result) => attachReplyFieldMetadata(result, bindingReplies)),
+        };
       });
     }
 
@@ -2485,6 +2517,7 @@ function hmiProfileTable(title, profiles, inputMode = false) {
   const headings = inputMode
     ? ['입력 Key', 'CDM 의미', '형식', '실제 입력/송신값 · 의미', '명령']
     : ['출력 항목', 'CDM 의미', '형식', '범위·선택값'];
+  if (!inputMode) headings[3] = '\uC2E4\uC81C \uC218\uC2E0\uAC12 \u00B7 \uC758\uBBF8';
   headings.forEach((heading) => headRow.append(el('th', '', heading)));
   head.append(headRow);
   const body = el('tbody');
@@ -2494,11 +2527,22 @@ function hmiProfileTable(title, profiles, inputMode = false) {
     const keyCell = el('td');
     keyCell.append(el('code', '', key || '미정'));
     if (inputMode && !profile.required) keyCell.append(el('small', 'optional-mark', '선택'));
-    const allowedCell = el('td', 'hmi-value-map-cell', profileAllowedLabel(profile));
+    const hasDeclaredMeaning = Boolean(
+      profile.values?.length
+      || profile.wireValues?.length
+      || profile.min !== null
+      || profile.max !== null
+      || profile.unit
+      || profile.defaultValue !== '',
+    );
+    const allowedLabel = !inputMode && !hasDeclaredMeaning
+      ? '\uC815\uC758 \uC5C6\uC74C (XML\uC5D0 \uAC12 \uC758\uBBF8 \uB9E4\uD551 \uC5C6\uC74C)'
+      : profileAllowedLabel(profile);
+    const allowedCell = el('td', 'hmi-value-map-cell', allowedLabel);
     row.append(
       keyCell,
       el('td', '', profile.cdm || '미정'),
-      el('td', '', profileTypeLabel(profile.type)),
+      el('td', '', profile.wireType || profileTypeLabel(profile.type)),
       allowedCell,
     );
     if (inputMode) {
