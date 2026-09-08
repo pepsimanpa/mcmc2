@@ -84,7 +84,7 @@ const ids = [
   'schemaSummary', 'schemaList', 'devicePicker', 'devicePickerButton', 'devicePickerName', 'devicePickerMeta',
   'devicePopover', 'deviceSearch', 'deviceList', 'deviceDetailName',
   'selectionFileCount', 'selectionControlCount', 'selectionMonitorCount', 'selectionProductCount',
-  'loadedFileCount', 'fileList', 'controlSearch', 'controlList', 'modelDetail', 'bindingDetail', 'diagnosticList',
+  'loadedFileCount', 'fileList', 'controlSearch', 'controlList', 'modelDetail', 'bindingDetail', 'diagnosticList', 'docsDiagnosticCount',
   'cdmDocument', 'cdmFileButtons', 'cdmReferenceHint',
   'hmiEmptyState', 'hmiWorkspace', 'presetPicker', 'presetSearch', 'presetSelection', 'presetList', 'hmiState', 'terminalLog', 'terminalForm',
   'terminalInput', 'draftControlId', 'sendDraftButton', 'argumentChips', 'omState',
@@ -280,27 +280,31 @@ const tabButtons = [...document.querySelectorAll('[role=tab]')];
 const panels = [...document.querySelectorAll('[role=tabpanel]')];
 
 function activateTab(name, focus = false) {
+  const target = tabButtons.find((button) => button.dataset.tab === name && !button.disabled && !button.hidden);
+  const activeName = target ? name : 'hmi';
   for (const button of tabButtons) {
-    const active = button.dataset.tab === name;
+    const active = button.dataset.tab === activeName;
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-selected', String(active));
     button.tabIndex = active ? 0 : -1;
     if (active && focus) button.focus();
   }
-  for (const panel of panels) panel.hidden = panel.dataset.panel !== name;
-  history.replaceState(null, '', `#${name}`);
+  for (const panel of panels) panel.hidden = panel.dataset.panel !== activeName;
+  history.replaceState(null, '', `#${activeName}`);
 }
 
 function handleTabKey(event) {
-  const current = tabButtons.indexOf(event.currentTarget);
+  const enabledTabs = tabButtons.filter((button) => !button.disabled && !button.hidden);
+  const current = enabledTabs.indexOf(event.currentTarget);
+  if (current < 0) return;
   let next = current;
-  if (event.key === 'ArrowRight') next = (current + 1) % tabButtons.length;
-  else if (event.key === 'ArrowLeft') next = (current - 1 + tabButtons.length) % tabButtons.length;
+  if (event.key === 'ArrowRight') next = (current + 1) % enabledTabs.length;
+  else if (event.key === 'ArrowLeft') next = (current - 1 + enabledTabs.length) % enabledTabs.length;
   else if (event.key === 'Home') next = 0;
-  else if (event.key === 'End') next = tabButtons.length - 1;
+  else if (event.key === 'End') next = enabledTabs.length - 1;
   else return;
   event.preventDefault();
-  activateTab(tabButtons[next].dataset.tab, true);
+  activateTab(enabledTabs[next].dataset.tab, true);
 }
 
 function appendInline(node, text) {
@@ -2070,11 +2074,15 @@ function showFeature(id, options = {}) {
 
 function renderDiagnostics() {
   clear(dom.diagnosticList);
-  for (const item of state.bundle.diagnostics) {
+  const issues = state.bundle.diagnostics.filter((item) => item.level !== 'ok');
+  if (dom.diagnosticCount) dom.diagnosticCount.textContent = issues.length;
+  if (dom.docsDiagnosticCount) dom.docsDiagnosticCount.textContent = `${issues.length}\uAC74`;
+  for (const item of issues) {
     const row = el('div', `diagnostic-item ${item.level}`);
     row.append(el('b', '', item.level.toUpperCase()), el('span', '', `${item.code} · ${item.message}`));
     dom.diagnosticList.append(row);
   }
+  if (!issues.length) dom.diagnosticList.append(el('p', 'diagnostic-empty', '\uBC1C\uACAC\uB41C XML \uC5F0\uACB0 \uC624\uB958\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.'));
 }
 
 function getUniqueFileByName(name) {
@@ -2382,6 +2390,25 @@ function setupHmiContractUi() {
     if (title) title.textContent = labels[1];
     if (note) note.textContent = labels[2];
   }
+  const docsTabbar = document.querySelector('.tabbar');
+  const modelTab = document.querySelector('[data-tab=model]');
+  const modelPanel = document.querySelector('[data-panel=model]');
+  const cdmTab = document.querySelector('[data-tab=cdm]');
+  if (docsTabbar) docsTabbar.classList.add('is-compact');
+  if (modelTab) {
+    modelTab.hidden = true;
+    modelTab.setAttribute('aria-hidden', 'true');
+  }
+  if (modelPanel) modelPanel.hidden = true;
+  if (cdmTab) {
+    cdmTab.disabled = true;
+    cdmTab.setAttribute('aria-disabled', 'true');
+    cdmTab.classList.add('is-coming-soon');
+    const number = cdmTab.querySelector('b');
+    const note = cdmTab.querySelector('small');
+    if (number) number.textContent = '02';
+    if (note) note.textContent = '\uC900\uBE44 \uC911';
+  }
   const footerLabels = document.querySelectorAll('footer span');
   if (footerLabels[0]) footerLabels[0].textContent = 'UMS XML Reference · static offline documentation';
   if (footerLabels[1]) footerLabels[1].textContent = 'Semantic · Binding 설명 · 논리 메시지 Mock · 실제 장비 송수신 아님';
@@ -2437,15 +2464,31 @@ function setupHmiContractUi() {
   contractBody.id = 'hmiContractBody';
   contract.append(contractHead, contractBody);
 
-  const response = el('aside', 'docs-source');
-  const responseHead = el('header', 'docs-pane-head');
-  responseHead.append(el('p', '', 'BINDING & SOURCE'), el('h2', '', '전송 정의·XML 근거'));
+  const response = el('details', 'docs-integration-details');
+  const responseSummary = el('summary');
+  responseSummary.append(
+    el('strong', '', '\uC7A5\uCE58 \uC5F0\uB3D9 \uBA54\uC2DC\uC9C0 \uBCF4\uAE30'),
+    el('small', '', '\uC6B4\uC6A9\uAD00\uB9AC CSC \u00B7 \uC5F0\uB3D9 CSC \u2194 UMS'),
+  );
+  const responseHead = el('header', 'docs-integration-head');
+  responseHead.append(el('p', '', 'BINDING MESSAGE'), el('h2', '', '\uC7A5\uCE58 \uC5F0\uB3D9 \uC815\uC758'));
   const responseBody = el('div', 'hmi-response-body');
   responseBody.id = 'hmiResponseBody';
-  response.append(responseHead, responseBody);
+  response.append(responseSummary, responseHead, responseBody);
 
-  layout.append(navigator, contract, response);
-  dom.hmiWorkspace.prepend(layout);
+  layout.append(navigator, contract);
+  const diagnostics = el('details', 'docs-diagnostics-drawer');
+  const diagnosticsSummary = el('summary');
+  const diagnosticsCount = el('span', 'diagnostic-count', '0\uAC74');
+  diagnosticsCount.id = 'docsDiagnosticCount';
+  diagnosticsSummary.append(
+    el('strong', '', 'XML \uAC80\uC0AC'),
+    diagnosticsCount,
+    el('small', '', '\uC624\uB958\u00B7\uB204\uB77D\uB9CC \uD655\uC778'),
+  );
+  diagnostics.append(diagnosticsSummary);
+  if (dom.diagnosticList) diagnostics.append(dom.diagnosticList);
+  dom.hmiWorkspace.prepend(layout, diagnostics);
 
   const legacyLayout = dom.hmiWorkspace.querySelector('.hmi-layout');
   if (legacyLayout) {
@@ -2465,6 +2508,8 @@ function setupHmiContractUi() {
   dom.hmiFunctionList = list;
   dom.hmiContractBody = contractBody;
   dom.hmiResponseBody = responseBody;
+  dom.hmiIntegrationDetails = response;
+  dom.docsDiagnosticCount = diagnosticsCount;
 }
 
 function flattenSemanticProfiles(profiles) {
@@ -2511,7 +2556,7 @@ function hmiProfileTable(title, profiles, inputMode = false) {
     return section;
   }
   const wrap = el('div', 'hmi-contract-table-wrap');
-  const table = el('table', 'hmi-contract-table');
+  const table = el('table', `hmi-contract-table ${inputMode ? 'is-input' : 'is-output'}`);
   const head = el('thead');
   const headRow = el('tr');
   const headings = inputMode
@@ -2668,7 +2713,13 @@ function sourceFileFor(action, binding) {
 }
 
 function docsXmlSource(action, binding) {
-  const section = el('section', 'docs-xml-source');
+  const section = el('details', 'docs-xml-source');
+  const summary = el('summary');
+  summary.append(
+    el('strong', '', '\uC6D0\uBCF8 XML \uBCF4\uAE30'),
+    el('small', '', 'Semantic / Binding'),
+  );
+  section.append(summary);
   const tabs = el('div', 'docs-source-tabs');
   const semanticTab = el('button', state.hmiSourceKey === 'semantic' ? 'is-active' : '', 'Semantic');
   semanticTab.type = 'button';
@@ -2844,14 +2895,10 @@ function renderHmiContract(action) {
       conditions.append(list);
       dom.hmiContractBody.append(conditions);
     }
-    const tryIt = el('details', 'docs-try-it');
-    const trySummary = el('summary');
-    trySummary.append(el('strong', '', 'Try it · 터미널과 Mock으로 확인'), el('small', '', '보조 기능 펼치기'));
-    const demoButton = el('button', 'button ghost hmi-open-demo', '이 Control로 터미널 데모 열기');
+    const demoButton = el('button', 'button ghost hmi-open-demo docs-try-it', 'Try it · 터미널과 Mock 데모 열기');
     demoButton.type = 'button';
     demoButton.dataset.hmiOpenDemo = action.publicId;
-    tryIt.append(trySummary, demoButton);
-    dom.hmiContractBody.append(tryIt);
+    dom.hmiContractBody.append(demoButton);
   } else if (action.kind === 'Monitor') {
     dom.hmiContractBody.append(el('p', 'docs-info', 'Monitor는 control -i로 호출하지 않습니다. HMI가 수신하여 아래 의미 항목을 표시합니다.'));
     dom.hmiContractBody.append(hmiProfileTable('HMI 표시 항목', flattenSemanticProfiles(action.outputs), false));
@@ -2866,6 +2913,7 @@ function renderHmiContract(action) {
     dom.hmiContractBody.append(product);
   }
   renderHmiResponse(action);
+  if (dom.hmiIntegrationDetails) dom.hmiContractBody.append(dom.hmiIntegrationDetails);
 }
 
 function renderHmiWorkspace() {
@@ -3703,7 +3751,7 @@ document.addEventListener('click', (event) => {
   }
 });
 
-const initialTab = ['cdm', 'model', 'hmi'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'hmi';
+const initialTab = 'hmi';
 activateTab(initialTab);
 renderPrinciples();
 resetDemo();
