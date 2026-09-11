@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "UserTerminal": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    }
+  }
+}

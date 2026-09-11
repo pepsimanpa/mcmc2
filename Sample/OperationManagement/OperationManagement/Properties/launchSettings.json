@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "OperationManagement": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Rti.ConnextDds" Version="7.3.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\UserTerminal\DdsRuntimeService\DdsRuntimeService.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ums_instance\" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="mkdir &quot;$(TargetDir)spec&quot;&#xD;&#xA;copy &quot;$(ProjectDir)spec\&quot; &quot;$(TargetDir)spec\&quot;&#xD;&#xA;mkdir &quot;$(TargetDir)svc&quot;&#xD;&#xA;copy &quot;$(ProjectDir)svc\&quot; &quot;$(TargetDir)svc\&quot;" />
+  </Target>
+
+</Project>

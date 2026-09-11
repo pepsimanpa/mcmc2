@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:///C:/Program Files/rti_connext_dds-7.3.0/bin/../resource/app/app_support/rtiddsgen/schema/rti_dds_profiles.xsd">
+<types>
+<module name="Common">
+  <struct name= "ControlParam">
+    <member name="fieldName" stringMaxLength="255" type="wstring"/>
+    <member name="fixedValue" stringMaxLength="255" type="wstring"/>
+  </struct>
+  <struct name= "ControlSpec">
+    <member name="id" stringMaxLength="40" type="wstring"/>
+    <member name="name" stringMaxLength="100" type="wstring"/>
+    <member name="cdm" stringMaxLength="100" type="wstring"/>
+    <member name="numsOfParams" type="int32"/>
+    <member name="params" sequenceMaxLength="100" type="nonBasic"  nonBasicTypeName= "Common::ControlParam"/>
+  </struct>
+  <enum name="OperationState">
+    <enumerator name="Finished"/>
+    <enumerator name="Processing"/>
+    <enumerator name="Failed"/>
+  </enum> 
+</module>
+<module name="Messages">
+  <module name="OperationManagement">
+    <struct name= "ControlSpecListRequest">
+      <member name="targetId" stringMaxLength="40" type="wstring" key="true"/>
+      <member name="targetName" stringMaxLength="40" type="wstring"/>
+    </struct>
+    <struct name= "ControlSpecListReply">
+      <member name="targetId" stringMaxLength="40" type="wstring" key="true"/>
+      <member name="targetName" stringMaxLength="40" type="wstring"/>
+      <member name="numsOfControlSpecs" type="int32"/>
+      <member name="controlSpecList" sequenceMaxLength="100" type="nonBasic"  nonBasicTypeName= "Common::ControlSpec"/>
+    </struct>
+    <struct name= "ControlExecutionRequest">
+      <member name="targetId" stringMaxLength="255" type="wstring" key="true"/>
+      <member name="controlSpec" type="nonBasic"  nonBasicTypeName= "Common::ControlSpec"/>
+    </struct>
+    <struct name= "ControlExecutionReply">
+      <member name="targetId" stringMaxLength="255" type="wstring" key="true"/>
+      <member name="executionReport" type="nonBasic"  nonBasicTypeName= "Common::OperationState"/>
+    </struct>
+    <struct name= "MonitorSpecListRequest">
+      <member name="targetId" stringMaxLength="255" type="wstring" key="true"/>
+    </struct>
+    <struct name= "MonitorSpecListReply">
+      <member name="targetId" stringMaxLength="255" type="wstring" key="true"/>
+    </struct>
+  </module>
+</module>
+</types>
+</dds>

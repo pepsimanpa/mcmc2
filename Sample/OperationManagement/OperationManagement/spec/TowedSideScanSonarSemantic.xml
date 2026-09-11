@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SensorSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./CommonSpecSchema.xsd">
+    <ConstantSpecs id="constant">
+        <TextConstantSpec id="productName" name="제품명" cdm="ProductName">
+            <Value>SeaView400MP</Value>
+        </TextConstantSpec>
+        <TextConstantSpec id="productDescription" name="제품 설명" cdm="ProductDescription">
+            <Value>Side Scan Sonar</Value>
+        </TextConstantSpec>
+        <QuantityConstantSpec id="operationFrequency" name="운용 주파수" cdm="Ping.CarrierFrequency">
+            <Unit>kHz</Unit>
+            <Value>455</Value>
+        </QuantityConstantSpec>
+        <QuantityConstantSpec id="maxOperatingRange" name="최대 운용 거리" cdm="Constraint.MaximumDetectionRange">
+            <Unit>m</Unit>
+            <Value>150</Value>
+        </QuantityConstantSpec>
+        <QuantityConstantSpec id="maxOperatingDepth" name="최대 운용 수심" cdm="Constraint.MaximumOperatingDepth">
+            <Unit>m</Unit>
+            <Value>300</Value>
+        </QuantityConstantSpec>
+        <QuantityConstantSpec id="maxTowSpeed" name="최대 토잉 속도" cdm="Constraint.MaximumTowSpeed">
+            <Unit>kn</Unit>
+            <Value>12</Value>
+        </QuantityConstantSpec>
+    </ConstantSpecs>
+    <MonitorSpecs id="monitor">
+        <GroupSpec id="mode" name="예인형SSS 모드 정보" cdm="Mode">
+            <ValueSetSpec id="winchMode" name="Winch Mode" cdm="WinchMode">
+                <Values>
+                    <Value>Auto</Value>
+                    <Value>Manual</Value>
+                </Values>
+            </ValueSetSpec>
+            <ValueSetSpec id="screenChangeMode" name="소나정보 실시간/병합모드" cdm="OperationMode">
+                <Values>
+                    <Value>RealTimeMode</Value>
+                    <Value>MergeMode</Value>
+                </Values>
+            </ValueSetSpec>
+        </GroupSpec>
+
+        <GroupSpec id="ping" name="PING 정보" cdm="Ping">
+            <QuantitySpec id="pingSequence" name="핑 번호" cdm="Ping.Sequence">
+                <Range min="0" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <ValueSetSpec id="pulseType" name="펄스 타입" cdm="Ping.PulseType">
+                <Values>
+                    <Value cdm="Ping.PulseType.ContinuousWave" />
+					<Value cdm="Ping.Pulsetype.Chirp" />
+                </Values>
+            </ValueSetSpec>
+            <QuantityValueSetSpec id="frequency" name="주파수" cdm="Ping.CarrierFrequency">
+                <Values>
+                    <Value>100</Value>
+                    <Value>600</Value>
+                </Values>
+                <Unit>kHz</Unit>
+            </QuantityValueSetSpec>
+            <QuantityValueSetSpec id="bandwidth" name="대역폭" cdm="Ping.Bandwidth">
+                <Values>
+                    <Value>xxx</Value>
+                </Values>
+                <Unit>kHz</Unit>
+            </QuantityValueSetSpec>
+        </GroupSpec>
+
+        <GroupSpec id="settingValues" name="설정 값" cdm="Setting">
+            <QuantitySpec id="range" name="Range" cdm="Setting.DetectionRange">
+                <Unit>m</Unit>
+                <Range min="0" max="300" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="tvg" name="TVG" cdm="Setting.TVG">
+                <Range min="0" max="7" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="gain" name="Gain" cdm="Setting.Gain">
+                <Range min="0" max="80" />
+                <Resolution>1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+
+        <GroupSpec id="position" name="위치 정보" cdm="Position">
+            <QuantitySpec id="latitude" name="Latitude" cdm="Position.Latitude">
+                <Format>dms</Format>
+            </QuantitySpec>
+            <QuantitySpec id="longitude" name="Longitude" cdm="Position.Longitude">
+                <Format>dms</Format>
+            </QuantitySpec>
+            <QuantitySpec id="heading" name="Heading" cdm="Position.Heading">
+                <Unit>deg</Unit>
+                <Range min="-360.00" max="360.00" />
+                <Resolution>0.01</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="depth" name="Depth" cdm="Position.Depth">
+                <Unit>m</Unit>
+                <Range min="0.00" max="300.00" />
+                <Resolution>0.01</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="altitude" name="Altitude" cdm="Position.Altitude">
+                <Unit>m</Unit>
+                <Range min="0.00" max="60.00" />
+                <Resolution>0.01</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+
+        <GroupSpec id="attitude" name="자세 정보" cdm="Attitude">
+            <QuantitySpec id="roll" name="Roll" cdm="Attitude.Roll">
+                <Unit>deg</Unit>
+                <Range min="-360.00" max="360.00" />
+                <Resolution>0.01</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="pitch" name="Pitch" cdm="Attitude.Pitch">
+                <Unit>deg</Unit>
+                <Range min="-360.00" max="360.00" />
+                <Resolution>0.01</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="heading" name="Heading" cdm="Attitude.Heading">
+                <Unit>deg</Unit>
+                <Range min="-360.00" max="360.00" />
+                <Resolution>0.01</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+
+        <GroupSpec id="envState" name="환경 상태" cdm="EnvironmentalState">
+            <QuantitySpec id="temperature" name="온도" cdm="EnvironmentalState.Temperature">
+                <Unit>Celsius</Unit>
+                <Range min="10.0" max="100.0" />
+                <Resolution>0.1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="relativeHumidity" name="상대 습도" cdm="EnvironmentalState.RelativeHumidity">
+                <Unit>ratio</Unit>
+                <Range min="0.0" max="100.0" />
+                <Resolution>0.1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+
+        <GroupSpec id="electricalState" name="전기적 상태" cdm="ElectricalState">
+            <QuantitySpec id="voltage" name="전압" cdm="ElectricalState.Voltage">
+                <Unit>v</Unit>
+                <Range min="0.0" max="30.0" />
+                <Resolution>0.1</Resolution>
+            </QuantitySpec>
+            <QuantitySpec id="current" name="전류" cdm="ElectricalState.Current">
+                <Unit>mA</Unit>
+                <Range min="0.0" max="100.0" />
+                <Resolution>0.1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+
+        <GroupSpec id="motion" name="운동 상태" cdm="Motion">
+            <QuantitySpec id="towSpeed" name="속력" cdm="Motion.Speed">
+                <Unit>kn</Unit>
+                <Range min="0.0" max="100.0" />
+                <Resolution>0.1</Resolution>
+            </QuantitySpec>
+        </GroupSpec>
+
+        <GroupSpec id="subsystemHealthStatus" name="구성품 정상 작동 여부" cdm="CBIT">
+            <HealthStatusSetSpec id="towfishAssembly" name="예인형수중탐색장치 정상 작동 여부">
+                <Values>
+                    <Value cdm="OperationalState.Normal" />
+                    <Value cdm="OperationalState.Disabled" />
+                </Values>
+                <ComponentDomain cdm="SensorSubsystem" />
+                <ComponentRole cdm="TowfishAssembly" />
+                <AffectedFunction cdm="SonarDataAcquisition" />
+            </HealthStatusSetSpec>
+            <HealthStatusSetSpec id="sensorArray" name="센서배열 정상 작동 여부">
+                <Values>
+                    <Value cdm="OperationalState.Normal" />
+                    <Value cdm="OperationalState.Disabled" />
+                </Values>
+                <ComponentDomain cdm="SensorElemnentSubsystem" />
+                <ComponentRole cdm="TransducerArray" />
+                <AffectedFunction cdm="SonarSignalReception" />
+            </HealthStatusSetSpec>
+            <HealthStatusSetSpec id="signalProcessor" name="신호처리장치 정상 작동 여부">
+                <Values>
+                    <Value cdm="OperationalState.Normal" />
+                    <Value cdm="OperationalState.Disabled" />
+                </Values>
+                <ComponentDomain cdm="ProcessingSubsystem" />
+                <ComponentRole cdm="SignalProcessor" />
+                <AffectedFunction cdm="SignalProcessing" />
+            </HealthStatusSetSpec>
+            <HealthStatusSetSpec id="imageProcessor" name="영상처리장치 정상 작동 여부">
+                <Values>
+                    <Value cdm="OperationalState.Normal" />
+                    <Value cdm="OperationalState.Disabled" />
+                </Values>
+                <ComponentDomain cdm="ProcessingSubsystem" />
+                <ComponentRole cdm="ImageProcessor" />
+                <AffectedFunction cdm="ImageGeneration" />
+            </HealthStatusSetSpec>
+        </GroupSpec>
+    </MonitorSpecs>
+    <ControlSpecs id="control">
+        <ControlSpec id="configureOperatingParameters" name="SSS 설정 명령" cdm="Control.SetParameters">
+            <Parameters>
+                <Profile cdm="Coverage.Range" />
+                <Profile cdm="ReceiveProcessing.Gain" />
+                <Profile cdm="ReceiveProcessing.TVG" />
+                <Profile cdm="Ping.PulseWidth" />
+                <Profile cdm="Ping.Frequency" />
+                <Profile cdm="Ping.PulseType" />
+                <Profile>lineBalanceOffserAmplifier</Profile>
+                <Profile>lineAmplifier</Profile>
+            </Parameters>
+        </ControlSpec>
+
+		<ControlSpec id="start" name="장비 실행 명령" cdm="TowedSideScanSonar.Control.Start" />
+		<ControlSpec id="stop" name="장비 중지 명령" cdm="Control.ShutDown" />
+		<ControlSpec id="setAutoMode" name="자동 모드 변경 명령" cdm="Control.ModeChange" />
+		<ControlSpec id="setManualMode" name="수동 모드 변경 명령" cdm="Control.ModeChange" />
+		<ControlSpec id="restartSystem" name="장비 재시작 명령" cdm="Control.Restart" />
+		<ControlSpec id="emergencyStop" name="비상 정지 명령" cdm="Control.EmergencyStop" />
+		<ControlSpec id="cancelEmergencyStop" name="비상 정지 해제 명령" cdm="Control.EmergencyStop" />
+		<ControlSpec id="changeScreenRealTimeMode" name="실시간 화면 모드 변경 명령" />
+		<ControlSpec id="changeScreenMergeMode" name="병합 화면 모드 변경 명령" />
+		
+		<ControlSpec id="launchTowfish" name="자동모드 진수 명령" cdm="Control.Launch">
+			<Precondition cdm="SideScanSonar.State.Auto" />
+		</ControlSpec>
+		<ControlSpec id="recoveryTowfish" name="자동모드 회수 명령" cdm="Control.Recovery">
+			<Precondition cdm="SideScanSonar.State.Auto" />
+		</ControlSpec>
+		
+		<ControlSpec id="powerOnOff" name="장비 전원 제어 명령" cdm="Control.PowerSupplyControl">
+			<Parameters>
+				<Profile cdm="SideScanSonar.Subsystem" />
+				<Profile cdm="PowerSupplyState" />
+			</Parameters>
+		</ControlSpec>
+
+		<SetPointSpec id="setTowingCableLength" name="조출량 설정 명령" cdm="Control.AdjustTowingCable">
+			<Parameters>
+				<QuantityProfile cdm="TowfishState.Position.Depth">
+					<Unit>m</Unit>
+			        <Range min="0.00" max="200.00" />
+			        <Resolution>0.01</Resolution>
+				</QuantityProfile>
+			</Parameters>
+		</SetPointSpec>
+
+		<SetPointSpec id="setTowfishDepth" name="목표수심 설정 명령" cdm="Control.SetPointTowfishDpeth">
+			<Parameters>
+				<QuantityProfile cdm="TowfishState.Position.Depth">
+					<Unit>m</Unit>
+					<Range min="0.00" max="200.00" />
+					<Resolution>0.01</Resolution>
+				</QuantityProfile>
+			</Parameters>
+		</SetPointSpec>
+
+		<ControlSpec id="launchUsbl" name="수동 모드 USBL 진수 명령" cdm="Control.Launch">
+			<Parameters>
+				<Profile cdm="LaunchState" />
+				<QuantityProfile>
+					<Unit>m/s</Unit>
+					<Range min="0.00" max="200.00" />
+					<Resolution>0.01</Resolution>
+				</QuantityProfile>
+			</Parameters>
+            <Precondition cdm="SideScanSonar.State.Manual" />
+        </ControlSpec>
+		<ControlSpec id="recoveryUsbl" name="수동 모드 USBL 회수 명령" cdm="Control.Recovery">
+			<Parameters>
+				<Profile cdm="LaunchState" />
+				<QuantityProfile>
+					<Unit>m/s</Unit>
+					<Range min="0.00" max="200.00" />
+					<Resolution>0.01</Resolution>
+				</QuantityProfile>
+			</Parameters>
+			<Precondition cdm="SideScanSonar.State.Manual" />
+		</ControlSpec>
+
+        <ControlSpec id="startUsbl" name="수동 모드 USBL 작동 명령" cdm="Control.ExecutionControl">
+            <Precondition cdm="SideScanSonar.State.Manual" />
+        </ControlSpec>
+		<ControlSpec id="stopUsbl" name="수동 모드 USBL 정지 명령" cdm="Control.ExecutionControl">
+			<Precondition cdm="SideScanSonar.State.Manual" />
+		</ControlSpec>
+
+		<ControlSpec id="deployWinch" name="수동 모드 윈치 전개 명령" cdm="Control.Launch">
+			<Parameters>
+				<Profile cdm="LaunchState" />
+				<QuantityProfile>
+					<Unit>m</Unit>
+					<Range min="0.00" max="200.00" />
+					<Resolution>0.01</Resolution>
+				</QuantityProfile>
+			</Parameters>
+			<Precondition cdm="SideScanSonar.State.Manual" />
+		</ControlSpec>
+		<ControlSpec id="recoveryWinch" name="수동 모드 윈치 회수 명령" cdm="Control.Recovery">
+			<Parameters>
+				<Profile cdm="LaunchState" />
+				<QuantityProfile>
+					<Unit>m</Unit>
+					<Range min="0.00" max="200.00" />
+					<Resolution>0.01</Resolution>
+				</QuantityProfile>
+			</Parameters>
+			<Precondition cdm="SideScanSonar.State.Manual" />
+		</ControlSpec>
+		
+        <ControlSpec id="deploySlide" name="수동 모드 슬라이드 전개 명령" cdm="Control.Launch">
+            <Parameters>
+                <Profile cdm="LaunchRecoveryState" />
+                <QuantityProfile cdm="LARS.SlideDeploy">
+                    <Unit>m</Unit>
+                    <Range min="0.0" max="20.0"/>
+                    <Resolution>0.1</Resolution>
+                </QuantityProfile>
+            </Parameters>
+            <Precondition cdm="SideScanSonar.State.Manual" />
+        </ControlSpec>
+		<ControlSpec id="recoverySlide" name="수동 모드 슬라이드 회수 명령" cdm="Control.Recovery">
+			<Parameters>
+				<Profile cdm="LaunchRecoveryState" />
+				<QuantityProfile cdm="LARS.SlideDeploy">
+					<Unit>m</Unit>
+					<Range min="0.0" max="20.0"/>
+					<Resolution>0.1</Resolution>
+				</QuantityProfile>
+			</Parameters>
+			<Precondition cdm="SideScanSonar.State.Manual" />
+		</ControlSpec>
+    </ControlSpecs>
+    <SensorProductSpecs id="sensorProduct">
+        <ProductStreamSpec id="compressedSignal" name="압축 원 신호" cdm="ProductStream.Signal">
+            <ProductKind cdm="ProductKind.Processed" />
+        </ProductStreamSpec>
+        <ProductStreamSpec id="compressedGapFiller" name="압축 갭필러 신호">
+            <ProductKind cdm="ProductKind.Processed" />
+        </ProductStreamSpec>
+        <ProductStreamSpec id="compressedMerged" name="압축 원-갭필러 혼합 신호">
+            <ProductKind cdm="ProductKind.Processed" />
+        </ProductStreamSpec>
+        <ProductStreamSpec id="objectDetection2d" name="ATR 결과">
+            <ProductKind cdm="ProductKind.ATR" />
+        </ProductStreamSpec>
+    </SensorProductSpecs>
+</SensorSpec>

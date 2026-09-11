@@ -1,0 +1,158 @@
+/// <summary>
+///		side_scan_sonar subscribe idl
+///		
+///		
+/// </summary>
+
+#include "common.idl"
+
+// 예인형음탐기 SSS 설정 명령
+struct TowedSonarAssemblyStatusConfigType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	int16 range;
+	octet gain;
+	octet timeVariedGain;
+	octet pulseWidth;
+	octet frequency;
+	octet pulseType;
+	octet lineBalanceOffserAmplifier;
+	octet lineAmplifier;
+	int16 commandID;
+};
+
+// 예인형음탐기 SSS 시작 및 정지 명령
+struct TowedSonarArrayStartControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet start; // 0: 정지, 1: 시작
+	int16 commandID;
+};
+
+// 예인형음탐기 장비 전원 제어 명령				
+struct TowedSonarAssemblyPlatformPowerControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet targetDevice; // 1: SSS, 2: USBL, 3: WINCH, 4: CAMERA
+	octet powerOn; // 0: OFF, 1: ON
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 자동 수동 모드 변경				
+struct TowedSonarAssemblyModeControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet mode; // 0: 수동, 1: 자동
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 자동모드 진수/회수 명령
+struct TowedSonarAssemblyAutoLaunchControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet launch; // 0: 진수, 1: 회수
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 장비 재시작
+struct TowedSonarAssemblyRestartControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet restart; // 1: 재시작
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 장비 비상정지
+struct TowedSonarAssemblyEmergencyStopControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet emergencyStop; // 0: 해제, 1: 비상정지
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 조출량 설정 명령
+struct TowedSonarAssemblyCableLengthControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	float lengthCommandWinch;
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 목표수심 설정 명령
+struct TowedSonarAssemblyTargetLengthConfigType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	float targetDepth;
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 화면전환 명령
+struct TowedSonarAssemblyScreanChangeConfigType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet screenChangeMode; // 0: 실시간 모드, 1: 병합 모드
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 수동모드 USBL 진수/회수 명령
+struct TowedSonarAssemblyManualUltraShortBaseLineMotorControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet launch; // 0: 진수, 1: 회수
+	float motorSpeed;
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 수동모드 USBL 센서 작동/정지 명령
+struct TowedSonarAssemblyUltraShortBaseLineStartControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet start; // 0: 정지, 1: 작동
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 수동모드 슬라이드 전개/회수 명령
+struct TowedSonarAssemblyLaunchAndRecoverySlideStartControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet start; // 0: 전개, 1: 회수
+	float slideDeploy;
+	int16 commandID;
+};
+
+// 예인형수중탐색장치 수동모드 윈치 전개/회수 명령
+struct TowedSonarAssemblyLaunchAndRecoveryWinchStartControlType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet start; // 0: 전개, 1: 회수
+	float winchDeploy;
+	int16 commandID;
+};

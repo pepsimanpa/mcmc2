@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:///C:/Program Files/rti_connext_dds-7.3.0/bin/../resource/app/app_support/rtiddsgen/schema/rti_dds_profiles.xsd">
+<types>
+<module name="Types">
+  <const name="REGISTER_PRODUCER_CONTRACT_SERVICE" type="string" value="&quot;RegisterProducerContract&quot;"/>
+  <const name="COMMAND_REGISTER_PRODUCER_CONTRACT_TOPIC" type="string" value="&quot;commandRegisterProducerContract&quot;"/>
+  <const name="RESPONSE_REGISTER_PRODUCER_CONTRACT_TOPIC" type="string" value="&quot;responseRegisterProducerContract&quot;"/>
+  <enum name="SensorProductKind">
+    <enumerator name="SideScanSonarRaw"/>
+    <enumerator name="SideScanSonarProcessed"/>
+  </enum> 
+  <enum name="ResponseCode">
+    <enumerator name="OK"/>
+    <enumerator name="Failed"/>
+  </enum> 
+  <struct name= "RegisterCommandType">
+    <member name="messageId" type="int32" key="true"/>
+    <member name="producerId" type="int32" key="true"/>
+    <member name="serviceSensorProduct" type="nonBasic"  nonBasicTypeName= "Types::SensorProductKind"/>
+  </struct>
+  <struct name= "RegisterResponseType">
+    <member name="messageId" type="int32" key="true"/>
+    <member name="producerId" type="int32" key="true"/>
+    <member name="responseCode" type="nonBasic"  nonBasicTypeName= "Types::ResponseCode"/>
+  </struct>
+</module>
+</types>
+</dds>

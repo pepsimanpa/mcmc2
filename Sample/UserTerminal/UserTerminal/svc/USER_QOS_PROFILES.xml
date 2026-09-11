@@ -1,0 +1,44 @@
+
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="C:/Program Files/rti_connext_dds-7.3.0/resource/schema/rti_dds_profiles.xsd">
+    <!-- Qos Library -->
+    <qos_library name="qosLibrary">
+        <qos_profile name="DefaultProfile">
+        </qos_profile>
+    </qos_library>
+
+	<types>
+		<include file="./TypesLibrary.xml"/>
+	</types>
+
+	<!-- Domain Library -->
+	<!-- Declare Topics -->
+	<domain_library name="Mcmc2DomainLibrary">
+		<domain name="Mcmc2Domain" domain_id="333">
+			<!-- Register Types -->
+			<!--<register_type name="RequestControlMessage" type_ref="Types::RegisterCommandType"/>
+			<register_type name="ReplyControlMessage" type_ref="Types::RegisterResponseType"/>-->
+
+			<!-- Define Topic -->
+			<!--<topic name="requestControlList" register_type_ref="RequestControlMessage"/>
+			<topic name="replyControlList" register_type_ref="ReplyControlMessage"/>-->
+		</domain>
+	</domain_library>
+
+	<!-- Participant library -->
+	<!-- Define Publisher/DataWriter, Subscriber/DataReader -->
+	<domain_participant_library name="Mcmc2ParticipantLibrary">
+		<domain_participant name="UserTerminalParticipant" domain_ref="Mcmc2DomainLibrary::Mcmc2Domain">
+			<!-- Naming Convention -->
+			<!-- Publisher/Subscriber : <ServiceName> -->
+			<!-- DataWriter : <TopicName>Writer -->
+			<!-- DataReader : <TopicName>Reader -->
+			<publisher name="UsvOperationManagementPublisher">
+				<!--<data_writer name="requestControlListWriter" topic_ref="requestControlList"/>-->
+			</publisher>
+			<subscriber name="UsvOperationManagementSubscriber">
+				<!--<data_reader name="replyControlListReader" topic_ref="replyControlList"/>-->
+			</subscriber>
+		</domain_participant>
+	</domain_participant_library>
+</dds>

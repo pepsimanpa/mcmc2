@@ -1,0 +1,108 @@
+/// <summary>
+///		side_scan_sonar publish idl
+///		
+///		
+/// </summary>
+
+#include "common.idl"
+
+// 모드 정보
+struct TowedSonarAssemblyModeStatusType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timeStamp;
+	octet towedSonarAssemblyMode;
+	octet screenChangeMode;
+};
+
+// CBIT 응답
+struct RemoteControlledWeaponSystemCBITReportType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timestamp;
+	octet towedSonarAssemblyTotalCBIT;
+	octet launchAndRecoveryTotalCBIT;
+	octet towedSonarArrayTotalCBIT;
+	octet sonarSignalProcessingEquipmentTotalCBIT;
+	octet sonarImageProcessingEquipmentTotalCBIT;
+};
+
+// 상태정보
+struct TowedSonarAssemblySystemStatusType
+{
+	octet platformIDKey;
+	octet equipmentIDKey;
+	DateTime timestamp;
+	octet towedSonarArrayPowerStatus;
+	octet ultraShortBaseLinePowerStatus;
+	octet winchPowerStatus;
+	octet recoveryUnitPowerStatus;
+	octet cameraPowerStatus;
+	octet towedSonarArrayDepthInfo;
+	int32 gpsDateUtc;
+	int32 gpsTimeUtc;
+	double gpsLatitude;
+	double gpsLongitude;
+	float gpsVelocity;
+	float gpsCourse;
+	float towedSonarArrayHeading;
+	float towedSonarArrayDepth;
+	float towedSonarArrayAltitude;
+	float towedSonarArrayPitch;
+	float towedSonarArrayRoll;
+	float towedSonarArrayTemperature;
+	float towedSonarArrayHumidity;
+	float towedSonarArrayVoltage;
+	float towedSonarArrayCurrent;
+	float recoveryUnitMode;
+	float ultraShortBaseLineMode;
+	float winchMotorBrakeStatus;
+	float slideMotorBrakeStatus;
+	float ultraShortBaseLineMotorBrakeStatus;
+	float cableDeployLength;
+	float cableDeploySpeed;
+	float slidePosition;
+	float ultraShortBaseLineLinkPosition;
+	float ultraShortBaseLineVerticalPosition;
+	float winchCurrent;
+	float recoveryUnitCurrent;
+	float ultraShortBaseLineLinkCurrent;
+	float ultraShortBaseLineVerticalCurrent;
+	float cableTension;
+	float limitSwitchStatus;
+	octet recoveryUnitEmergencyStopStatus;
+};
+
+// 병합 압축 신호 정보
+struct TsaCompressedMergeSignalDataType 
+{
+	int32 pingNumber;
+	int16 range;
+	octet gain;
+	octet tvg;
+	octet pulseWidth; // 0 ~ 10
+	octet frequency; // 0 ~ 1
+	octet pulseType; // 0 ~ 1
+	double latitude;
+	double longitude;
+	float gpsVelocity;
+	float gpsCourse;
+	float towCourse;
+	float towDepth;
+	float towAltitude;
+	float towPitch;
+	float towRoll;
+	float towTemp;
+	float towHumidity;
+	float towVoltage;
+	float towCurrent;
+	int16 dataSideScanSonarCount;
+	int16 dataGapFillerCount;
+	int16 beamCount;
+	int16 channelCount;
+	sequence<int16, 40000> data; // 
+};
+
+// 

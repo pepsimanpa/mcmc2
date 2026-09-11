@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema">
+	<Monitors semantic_id="monitor">
+		<MonitorBindingDDS semantic_id="ping.pulseType">
+			<Channel topicName="MergedOriginalSignalReportType" typeName="MergedOriginalSignalReportType"/>
+			<Field name="pulseType"/>
+		</MonitorBindingDDS>
+		<MonitorBindingDDS semantic_id="ping.pulseWidth">
+			<Channel topicName="MergedOriginalSignalReportType" typeName="MergedOriginalSignalReportType"/>
+			<Field name="pulseWidth"/>
+		</MonitorBindingDDS>
+	</Monitors>
+	<Controls semantic_id="control">
+		<UDP>
+
+		</UDP>
+		<TCP>
+
+		</TCP>
+		<ControlBindingDDS semantic_id="start">
+			<Channel topicName="TowedSonarArrayStartControlType" typeName="TowedSonarArrayStartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="start" cdm="" value="1"/>
+			<Field name="commandID" cdm="Message.ID"/>
+			<Reply semantic_id="" >
+				<Channel topicName="XxxType" typeName="XxxType"/>
+				<Field name="platformIDKey" cdm="Platform.NumericID"/>
+				<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+				<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			</Reply>
+		</ControlBindingDDS>
+		
+		<ControlBindingDDS semantic_id="stop">
+			<Channel topicName="TowedSonarArrayStartControlType" typeName="TowedSonarArrayStartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="start" cdm="Command.Enum" value="0"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="launchTowfish">
+			<Channel topicName="TowedSonarAssemblyAutoLaunchControlType" typeName="TowedSonarAssemblyAutoLaunchControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="launch" cdm="Command.Enum" value="1"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="recoveryTowfish">
+			<Channel topicName="TowedSonarAssemblyAutoLaunchControlType" typeName="TowedSonarAssemblyAutoLaunchControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="launch" cdm="Command.Enum" value="2"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="powerOnOff">
+			<Channel topicName="TowedSonarAssemblyPlatformPowerControlType" typeName="TowedSonarAssemblyPlatformPowerControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<Field name="targetDevice" cdm="Sensor.Equipment.NumericID" />
+			<Field name="powerOn" cdm="Command.Enum" />
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="setAutoMode">
+			<Channel topicName="TowedSonarAssemblyModeControlType" typeName="TowedSonarAssemblyModeControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="Mode" cdm="Command.Enum" value="1"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="setManualMode">
+			<Channel topicName="TowedSonarAssemblyModeControlType" typeName="TowedSonarAssemblyModeControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="Mode" cdm="Command.Enum" value="0"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="restartSystem">
+			<Channel topicName="TowedSonarAssemblyRestartControlType" typeName="TowedSonarAssemblyRestartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="restart" cdm="Command.Enum" value="1"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="emergencyStop">
+			<Channel topicName="TowedSonarAssemblyEmergencyStopControlType" typeName="TowedSonarAssemblyEmergencyStopControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="emergencyStop" cdm="Command.Enum" value="1"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="cancelEmergencyStop">
+			<Channel topicName="TowedSonarAssemblyEmergencyStopControlType" typeName="TowedSonarAssemblyEmergencyStopControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="emergencyStop" cdm="Command.Enum" value="0"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="changeScreenRealTimeMode">
+			<Channel topicName="TowedSonarAssemblyScreanChangeConfigType" typeName="TowedSonarAssemblyScreanChangeConfigType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="screenChangeMode" cdm="Command.Enum" value="0"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="changeScreenMergeMode">
+			<Channel topicName="TowedSonarAssemblyScreanChangeConfigType" typeName="TowedSonarAssemblyScreanChangeConfigType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="screenChangeMode" cdm="Command.Enum" value="1"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="launchUsbl">
+			<Channel topicName="TowedSonarAssemblyManualUltraShortBaseLineMotorControlType" typeName="TowedSonarAssemblyManualUltraShortBaseLineMotorControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="launch" cdm="Command.Enum" value="1"/>
+			<Field name="motorSpeed" cdm="Motion.Speed"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="recoveryUsbl">
+			<Channel topicName="TowedSonarAssemblyManualUltraShortBaseLineMotorControlType" typeName="TowedSonarAssemblyManualUltraShortBaseLineMotorControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="launch" cdm="Command.Enum" value="2"/>
+			<Field name="motorSpeed" cdm="Motion.Speed"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="startUsbl">
+			<Channel topicName="TowedSonarAssemblyUltraShortBaseLineStartControlType" typeName="TowedSonarAssemblyUltraShortBaseLineStartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="start" cdm="Command.Enum" value="1"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="stopUsbl">
+			<Channel topicName="TowedSonarAssemblyUltraShortBaseLineStartControlType" typeName="TowedSonarAssemblyUltraShortBaseLineStartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="start" cdm="Command.Enum" value="0"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="deployWinch">
+			<Channel topicName="TowedSonarAssemblyLaunchAndRecoveryWinchStartControlType" typeName="TowedSonarAssemblyLaunchAndRecoveryWinchStartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="start" cdm="Command.Enum" value="0"/>
+			<Field name="winchDeploy" cdm="Winch.Deploy"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="recoveryWinch">
+			<Channel topicName="TowedSonarAssemblyLaunchAndRecoveryWinchStartControlType" typeName="TowedSonarAssemblyLaunchAndRecoveryWinchStartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="start" cdm="Command.Enum" value="1"/>
+			<Field name="winchDeploy" cdm="Winch.Deploy"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="deploySlide">
+			<Channel topicName="TowedSonarAssemblyLaunchAndRecoverySlideStartControlType" typeName="TowedSonarAssemblyLaunchAndRecoverySlideStartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="start" cdm="Command.Enum" value="0"/>
+			<Field name="slideDeploy" cdm="Slide.Deploy"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+		<ControlBindingDDS semantic_id="recoverySlide">
+			<Channel topicName="TowedSonarAssemblyLaunchAndRecoverySlideStartControlType" typeName="TowedSonarAssemblyLaunchAndRecoverySlideStartControlType"/>
+			<Field name="platformIDKey" cdm="Platform.NumericID"/>
+			<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
+			<Field name="timeStamp" cdm="Global.TimeStamp"/>
+			<FixedField name="start" cdm="Command.Enum" value="1"/>
+			<Field name="slideDeploy" cdm="CommandSlide.Deploy"/>
+			<Field name="commandID" cdm="Message.NumericID"/>
+		</ControlBindingDDS>
+	</Controls>
+</SensorBinding>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain_library name="Mcmc2DomainLibrary">
+	<!-- Domain Library -->
+	<!-- Declare Topics -->
+	<domain name="Mcmc2Domain" domain_id="333">
+		<register_type name="RegisterCommandType" type_ref="Types::RegisterCommandType"/>
+		<register_type name="RegisterResponseType" type_ref="Types::RegisterResponseType"/>
+
+		<topic name="requestSpecList" register_type_ref="RegisterCommandType"/>
+		<topic name="replyRegisterResponse" register_type_ref="RegisterResponseType"/>
+	</domain>
+</domain_library>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ServiceContract xmlns="http://lignex1.com/mcmc2/ServiceContractSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <ServiceId>UU-0001</ServiceId>
+    <ServiceName>UserTerminal</ServiceName>
+
+	<RequestInterface>
+		<RequestInterfaceContract>
+			<OperationName>RegisterProducerContract</OperationName>
+			<RequestType>ProducerContractRegisterCommandType</RequestType> <!-- DDS Topic type name -->
+			<ReplyType>ProducerContractRegisterResponseType</ReplyType> <!-- DDS Topic type name -->
+			<IsReliable>true</IsReliable>
+			<IsKeppAll>true</IsKeppAll>
+			<MaxSamples>UNLIMITED</MaxSamples>
+			<Timeout>1000</Timeout>
+			<RetryCount>3</RetryCount>
+		</RequestInterfaceContract>
+	</RequestInterface>
+
+	<ReplyInterface>
+		<!-- <ReplyInterfaceContract>
+
+        </ReplyInterfaceContract> -->
+	</ReplyInterface>
+
+	<PubInterface>
+		<!-- <PubInterfaceContract>
+
+        </PubInterfaceContract> -->
+	</PubInterface>
+
+	<SubInterface>
+		<!-- <SubInterfaceContract>
+
+        </SubInterfaceContract> -->
+	</SubInterface>
+</ServiceContract>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VehicleSpec xmlns="http://lignex1.com/mcmc2/umsSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://lignex1.com/mcmc2/umsSchema ./VehicleSpecificationSchema.xsd">
+
+    <!--
+    USV Vehicle Specification은 USV 원격 운용을 위한 기본적인 사양에 대한 설명을 포함하는 명세서이다.
+    USV의 기본적인(필수적인) 운용이 가능한 정도의 사양만을 명세하는 것으로 USV의 모든 정보를 표현하려하지 않는 것이 중요하다.
+    USV에서 가져올 정보, 제어할 정보에 집중해서 작성한다.
+    작성해야될 Spec의 큰 기준 중 하나는 지휘소에서 원격 운용, 접근이 가능한 장치가 기준이 된다.
+    원격 지휘소에서 제어할 수 있는 항목 혹은 원격 지휘소에서 획득해야하는 정보 중심으로 작성하는 것이 중요하다.
+    -->
+    <!--
+    
+    -->
+    <Identification>
+        <ID>MCM-USV-LIG-001</ID>
+        <Name>M-Hunter</Name>
+    </Identification>
+
+    <!-- 센서 장비 -->
+    <Sensors>
+		<SensorSpecRef id="towedSideScanSonar" name="예인형 측면주사소나">
+			<SemanticPath>TowedSideScanSonarSemantic.xml</SemanticPath>
+			<BindingPath>TowedSideScanSonarBinding.xml</BindingPath>
+		</SensorSpecRef>
+        <!--<SensorSpecRef id="eots" name="전자광학장치" ref="./SensorSpec/ElectronicOpticalCamera.xml" />
+        <SensorSpecRef id="camera" name="항해용카메라" ref="./SensorSpec/VoyageCamera.xml" />
+        <SensorSpecRef id="radar" name="항해용레이더" ref="./SensorSpec/Radar.xml" />
+        <SensorSpecRef id="ins" name="복합항법장치" ref="./SensorSpec/INS.xml" />-->
+    </Sensors>
+
+    <!-- 플랫폼 장비 --><!--
+    <Platform>
+        <PlatformSpecRef id="platformController" name="선체제어장치" ref="./PlatformSpec/PlatformController.xml" />
+        <PlatformSpecRef id="autonomousNavigation" name="자율운항장치" ref="./PlatformSpec/AutonomousNavigation.xml" />
+    </Platform>
+
+    --><!-- 임무 장비 --><!--
+    <Payloads>
+        <PayloadSpecRef id="missionController" name="임무통제장치" ref="./PayloadSpec/***.xml" />
+        <PayloadSpecRef id="mainController" name="중앙통제장치" ref="./PayloadSpec/***.xml" />
+        <PayloadSpecRef id="navalGun" name="함포" ref="./PayloadSpec/NavalGun.xml" />
+        <PayloadSpecRef id="cis" name="복합감응소해장비" ref="./PayloadSpec/***.xml" />
+        <PayloadSpecRef id="auvLauncher" name="AUV 진수장치" ref="./PayloadSpec/LARS.xml"/>
+        <PayloadSpecRef id="auvRecovery" name="AUV 회수장치" ref="./PayloadSpec/***.xml"/>
+        <PayloadSpecRef id="emdwLauncher" name="EMDW 진수장치" ref="./PayloadSpec/***.xml"/>
+    </Payloads>
+
+    --><!-- 통신 장비 --><!--
+    <Comms>
+        <CommSpecRef id="networkAdapterDevice" name="네트워크추상화장치" ref="./CommSpec/***.xml" />
+        <CommSpecRef id="lteRouter" name="LTE 라우터" ref="./CommSpec/***.xml" />
+        <CommSpecRef id="satRouter" name="위성통신 라우터" ref="./CommSpec/***.xml" />
+        <CommSpecRef id="auvWirelessCommAssembly" name="AUV 무선통신기 조립체" ref="./CommSpec/***.xml" />
+        <CommSpecRef id="usvWirelessCommAssembly" name="USV 무선통신기 조립체" ref="./CommSpec/***.xml" />
+        <CommSpecRef id="auvUsbl" name="AUV 수중통신" ref="./CommSpec/***.xml" />
+        <CommSpecRef id="emdwUsbl" name="EMDW 수중통신" ref="./CommSpec/***.xml" />
+    </Comms>-->
+</VehicleSpec>
