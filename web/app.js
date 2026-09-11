@@ -2191,12 +2191,12 @@ function resetDemo() {
     dom.busTimeline.append(el('p', 'timeline-empty', 'DDS/장치 메시지가 없습니다. request -rcc부터 실행하세요.'));
   }
   setState(dom.hmiState, 'SPEC NOT LOADED');
-  setState(dom.omState, 'IDLE');
+  setState(dom.omState, '대기');
   resetPipeline();
-  if (dom.bindingSummary) dom.bindingSummary.replaceChildren(el('p', 'empty-text', '송신 후 선택 Binding이 표시됩니다.'));
+  if (dom.bindingSummary) dom.bindingSummary.replaceChildren(el('p', 'empty-text', 'control -r 실행 후 OperationManagement 요청 내용이 표시됩니다.'));
   if (dom.resultBanner) {
     dom.resultBanner.className = 'result-banner';
-    dom.resultBanner.replaceChildren(el('strong', '', '처리 대기'), el('small', '', '실제 장비 상태가 아닙니다.'));
+    dom.resultBanner.replaceChildren(el('strong', '', 'Reply 대기'), el('small', '', '실제 장비 상태가 아닌 웹 Mock 결과입니다.'));
   }
   if (dom.payloadTableBody) dom.payloadTableBody.replaceChildren(payloadEmpty('아직 생성된 논리 메시지가 없습니다.'));
   if (dom.copyPayloadButton) dom.copyPayloadButton.disabled = true;
@@ -2492,6 +2492,50 @@ function setupHmiContractUi() {
 
   const legacyLayout = dom.hmiWorkspace.querySelector('.hmi-layout');
   if (legacyLayout) {
+    const terminalForm = legacyLayout.querySelector('.terminal-form');
+    if (terminalForm) {
+      const initialCommand = 'request -rcc';
+      const frameworkPreview = el('div', 'framework-call-preview');
+      const previewText = el('span');
+      previewText.append(el('small', '', 'HMI SW 호출 코드'), el('code', '', operationFrameworkCall(initialCommand)));
+      const previewCopy = el('button', 'icon-copy', '코드 복사');
+      previewCopy.type = 'button';
+      previewCopy.dataset.copyText = operationFrameworkCall(initialCommand);
+      frameworkPreview.append(previewText, previewCopy);
+      terminalForm.insertAdjacentElement('afterend', frameworkPreview);
+      dom.frameworkCallPreview = previewText.querySelector('code');
+      dom.frameworkCallCopy = previewCopy;
+    }
+    const runGuide = [...legacyLayout.querySelectorAll('.command-list > div')]
+      .find((row) => row.querySelector('code')?.textContent.trim() === 'control -r');
+    const runGuideDescription = runGuide?.querySelector('span');
+    if (runGuideDescription) runGuideDescription.textContent = '요청 생성 · OperationManagement 전달';
+
+    const deliveryWorkspace = legacyLayout.querySelector('.om-workspace');
+    if (deliveryWorkspace) {
+      deliveryWorkspace.classList.add('delivery-workspace');
+      const deliveryHeader = el('header');
+      const deliveryTitle = el('div');
+      deliveryTitle.append(el('p', '', 'REQUEST DELIVERY'), el('h2', '', 'OperationManagement 전달'));
+      deliveryHeader.append(deliveryTitle);
+      if (dom.omState) deliveryHeader.append(dom.omState);
+
+      const deliveryBody = el('div', 'delivery-body');
+      const requestCard = el('section', 'delivery-card delivery-request');
+      const requestHead = el('header');
+      requestHead.append(el('p', '', 'CONTROL EXECUTION REQUEST'), el('h3', '', '요청 메시지'));
+      requestCard.append(requestHead);
+      if (dom.bindingSummary) requestCard.append(dom.bindingSummary);
+
+      const replyCard = el('section', 'delivery-card delivery-reply');
+      const replyHead = el('header');
+      replyHead.append(el('p', '', 'EXECUTION REPLY'), el('h3', '', 'Reply 수신'));
+      replyCard.append(replyHead);
+      if (dom.resultBanner) replyCard.append(dom.resultBanner);
+
+      deliveryBody.append(requestCard, replyCard);
+      deliveryWorkspace.replaceChildren(deliveryHeader, deliveryBody);
+    }
     const demo = el('details', 'hmi-demo-drawer');
     demo.id = 'hmiDemoDrawer';
     const summary = el('summary');
@@ -2593,11 +2637,20 @@ function hmiProfileTable(title, profiles, inputMode = false) {
     if (inputMode) {
       const command = `control -a ${key},${hmiExampleValue(profile)}`;
       const commandCell = el('td', 'hmi-command-cell');
-      commandCell.append(el('code', '', command));
-      const copy = el('button', 'icon-copy', '복사');
-      copy.type = 'button';
-      copy.dataset.copyText = command;
-      commandCell.append(copy);
+      const commandExample = el('div', 'hmi-command-example');
+      commandExample.append(el('small', '', '명령 인터페이스'), el('code', '', command));
+      const commandCopy = el('button', 'icon-copy', '명령 복사');
+      commandCopy.type = 'button';
+      commandCopy.dataset.copyText = command;
+      commandExample.append(commandCopy);
+      const frameworkExample = el('div', 'hmi-command-example is-framework');
+      const frameworkCode = operationFrameworkCall(command);
+      frameworkExample.append(el('small', '', 'HMI SW 호출 코드'), el('code', '', frameworkCode));
+      const frameworkCopy = el('button', 'icon-copy', '코드 복사');
+      frameworkCopy.type = 'button';
+      frameworkCopy.dataset.copyText = frameworkCode;
+      frameworkExample.append(frameworkCopy);
+      commandCell.append(commandExample, frameworkExample);
       row.append(commandCell);
     }
     body.append(row);
@@ -2859,16 +2912,32 @@ function renderHmiContract(action) {
       ...action.inputs.map((input) => `control -a ${input.key},${hmiExampleValue(input)}`),
       'control -r',
     ];
+    const frameworkCalls = commands.map(operationFrameworkCall);
     const commandSection = el('section', 'hmi-command-sequence docs-section');
     const commandHead = el('header');
     commandHead.append(el('div', '', '01'), el('h2', '', 'HMI 호출 순서'));
-    const copyAll = el('button', 'button primary', '명령 전체 복사');
-    copyAll.type = 'button';
-    copyAll.dataset.copyText = commands.join('\n');
-    commandHead.append(copyAll);
-    const pre = el('pre');
-    pre.append(el('code', '', commands.join('\n')));
-    commandSection.append(commandHead, pre);
+    const copyActions = el('div', 'hmi-command-copy-actions');
+    const copyCommands = el('button', 'button ghost', '명령 복사');
+    copyCommands.type = 'button';
+    copyCommands.dataset.copyText = commands.join('\n');
+    const copyFramework = el('button', 'button primary', 'HMI 코드 복사');
+    copyFramework.type = 'button';
+    copyFramework.dataset.copyText = frameworkCalls.join('\n');
+    copyActions.append(copyCommands, copyFramework);
+    commandHead.append(copyActions);
+    const examples = el('div', 'hmi-call-examples');
+    const commandBlock = el('section', 'hmi-call-example');
+    commandBlock.append(el('small', '', '명령 인터페이스'));
+    const commandPre = el('pre');
+    commandPre.append(el('code', '', commands.join('\n')));
+    commandBlock.append(commandPre);
+    const frameworkBlock = el('section', 'hmi-call-example is-framework');
+    frameworkBlock.append(el('small', '', '실제 HMI SW 호출 코드'));
+    const frameworkPre = el('pre');
+    frameworkPre.append(el('code', '', frameworkCalls.join('\n')));
+    frameworkBlock.append(frameworkPre);
+    examples.append(commandBlock, frameworkBlock);
+    commandSection.append(commandHead, examples);
     dom.hmiContractBody.append(commandSection, hmiProfileTable('02 · HMI 입력', action.inputs, true));
 
     const replySection = el('section', 'docs-section docs-replies');
@@ -2914,6 +2983,12 @@ function renderHmiContract(action) {
   }
   renderHmiResponse(action);
   if (dom.hmiIntegrationDetails) dom.hmiContractBody.append(dom.hmiIntegrationDetails);
+}
+
+function operationFrameworkCall(command) {
+  const quote = String.fromCharCode(34);
+  const literal = String(command).replace(/\\/g, '\\\\').split(quote).join(`\\${quote}`);
+  return `OperationFramework.Execute(${quote}${literal}${quote});`;
 }
 
 function renderHmiWorkspace() {
@@ -2992,7 +3067,7 @@ async function requestSpecs() {
   const sampleIdentity = makeDdsIdentity();
   const requestPayload = { targetId: 'ALL', targetName: 'ALL' };
 
-  setState(dom.omState, 'CATALOG BUILD');
+  setState(dom.omState, '기능 목록 조회');
   addBus(OM_DDS_TYPES.controlSpecListRequest, 'HMI CSC → OPERATION MANAGEMENT CSC', requestPayload, 'dds', {
     transport: 'DDS',
     sampleIdentity,
@@ -3017,7 +3092,7 @@ async function requestSpecs() {
 
   state.demo.specLoaded = true;
   setState(dom.hmiState, 'SPEC READY');
-  setState(dom.omState, 'IDLE');
+  setState(dom.omState, '대기');
   appendTerminal(`현재 로드된 UMS의 Control Draft ${controls.length}개를 단일 Reply로 수신했습니다.`, 'success');
   if (registeredSpecRefs.length) appendTerminal(`등록 대상: ${registeredSpecRefs.join(', ')}`, 'info');
   appendTerminal('control -i <full-id>로 Draft를 시작하세요.', 'info');
@@ -3252,14 +3327,21 @@ function ownerLabel(owner) {
   }[owner] || owner;
 }
 
-function renderBindingSummary(control, binding) {
+function renderRequestSummary(control, requestId, values) {
   clear(dom.bindingSummary);
+  const target = actionTarget(control);
+  const parameters = Object.entries(values || {})
+    .map(([key, value]) => `${key}=${displayValue(value)}`)
+    .join('\n') || '입력 없음';
   dom.bindingSummary.append(
-    el('h3', '', `${binding.transport} · ${binding.sourceFile}`),
+    el('h3', '', 'ControlExecutionRequest'),
     makeDl([
-      ...channelRows(binding.channel),
-      ['Semantic ID', binding.semanticId],
-      ['Reply', binding.replies.map((item) => item.semanticId).join(', ') || 'No Reply'],
+      ['전달 대상', 'OperationManagement CSC'],
+      ['DDS 요청 타입', OM_DDS_TYPES.controlExecutionRequest],
+      ['Request ID', requestId],
+      ['Target', `${target.targetName} · ${target.targetId}`],
+      ['Control ID', control.publicId],
+      ['HMI 입력', parameters],
     ]),
   );
 }
@@ -3293,6 +3375,56 @@ function renderPayload(binding, mapped, requestId) {
   dom.copyPayloadButton.disabled = false;
 }
 
+function mockReplyOutput(profile) {
+  const wire = profile.wireValues?.[0] || null;
+  const semanticValue = wire
+    ? profile.values?.find((item) => item.cdm === wire.cdm)
+    : profile.values?.[0];
+  const numericWireType = /^(?:U?Int|Float)/.test(profile.wireType || '');
+  const rawValue = wire?.value
+    ?? semanticValue?.value
+    ?? (numericWireType ? 0 : sampleValue(profile));
+  const meaning = semanticValue?.name
+    || semanticValue?.value
+    || semanticValue?.cdm?.split('.').pop()
+    || wire?.cdm?.split('.').pop()
+    || `${profile.cdm || profile.name || '결과'} · 값 의미 매핑 없음`;
+  return {
+    name: profile.name || lowerFirst(profile.cdm?.split('.').pop() || 'result'),
+    value: displayValue(rawValue),
+    meaning,
+  };
+}
+
+function renderReplyResult(control, reply) {
+  dom.resultBanner.className = 'result-banner success';
+  const title = el('strong', '', 'Reply 수신');
+  const description = el('small', '', `${reply.semanticId} · 실제 장비값이 아닌 웹 Mock 수신 예시입니다.`);
+  const table = el('table', 'delivery-reply-table');
+  const head = el('thead');
+  const headRow = el('tr');
+  ['출력 항목', 'Mock 수신값', '의미'].forEach((label) => headRow.append(el('th', '', label)));
+  head.append(headRow);
+  const body = el('tbody');
+  const executionRow = el('tr');
+  executionRow.append(
+    el('td', '', 'executionReport'),
+    el('td', '', OPERATION_STATES.finished),
+    el('td', '', 'OperationManagement 처리 완료'),
+  );
+  body.append(executionRow);
+
+  const semanticReply = control.replies.find((item) => item.bindRef === reply.semanticId);
+  const outputs = flattenSemanticProfiles(semanticReply?.results || []).map(mockReplyOutput);
+  for (const output of outputs) {
+    const row = el('tr');
+    row.append(el('td', '', output.name), el('td', '', output.value), el('td', '', output.meaning));
+    body.append(row);
+  }
+  table.append(head, body);
+  dom.resultBanner.replaceChildren(title, description, table);
+}
+
 function setResult(type, title, detail) {
   dom.resultBanner.className = `result-banner ${type}`;
   dom.resultBanner.replaceChildren(el('strong', '', title), el('small', '', detail));
@@ -3312,7 +3444,7 @@ function publishExecutionState(executionReport, detail = '') {
 
 function rejectRequest(requestId, code, message) {
   publishExecutionState(OPERATION_STATES.failed, `${code}: ${message}`);
-  setState(dom.omState, 'REJECTED');
+  setState(dom.omState, '요청 거절');
   setState(dom.hmiState, 'REJECTED');
   setResult('blocked', `REJECTED · ${code}`, message);
   appendTerminal(`${code}: ${message}`, 'error');
@@ -3346,9 +3478,9 @@ async function publishControl() {
     'dds',
     { transport: 'DDS', sampleIdentity, traceId: requestId, targetRole: 'DDS Target Instance' },
   );
+  setState(dom.omState, '전송 중');
 
   markStep('lookup', 'active');
-  setState(dom.omState, 'LOOKUP');
   await delay(60);
   if (!control) {
     markStep('lookup', 'error');
@@ -3356,6 +3488,7 @@ async function publishControl() {
     return;
   }
   markStep('lookup', 'done');
+  renderRequestSummary(control, requestId, rawValues);
 
   markStep('validate', 'active');
   const validation = validateControl(control);
@@ -3365,6 +3498,8 @@ async function publishControl() {
     return;
   }
   markStep('validate', 'done');
+  renderRequestSummary(control, requestId, validation.values);
+  setState(dom.omState, '전달 완료');
 
   markStep('binding', 'active');
   const binding = resolveBinding(control);
@@ -3374,10 +3509,8 @@ async function publishControl() {
     return;
   }
   markStep('binding', 'done');
-  renderBindingSummary(control, binding);
 
   markStep('mapping', 'active');
-  setState(dom.omState, 'MAPPING');
   await delay(60);
   const mapped = mapBinding(control, binding, validation.values);
   renderPayload(binding, mapped, requestId);
@@ -3385,16 +3518,15 @@ async function publishControl() {
 
   if (mapped.unresolved.length) {
     markStep('publish', 'error');
-    setState(dom.omState, 'PAYLOAD PREVIEW');
+    setState(dom.omState, 'Reply 실패');
     setState(dom.hmiState, 'TBD BLOCKED');
-    setResult('blocked', 'PAYLOAD_PREVIEW_WITH_TBD', `${mapped.unresolved.length}개 Field가 미해결되어 Mock 송신을 보류했습니다.`);
+    setResult('blocked', '요청 처리 실패', `${mapped.unresolved.length}개 필드가 미해결되어 실행할 수 없습니다.`);
     publishExecutionState(OPERATION_STATES.failed, `Logical Message unresolved: ${mapped.unresolved.map((row) => row.name).join(', ')}`);
     state.demo.processing = false;
     return;
   }
 
   markStep('publish', 'active');
-  setState(dom.omState, 'MOCK PUBLISH');
   await delay(60);
   addBus(
     channelSummary(binding.channel),
@@ -3407,12 +3539,12 @@ async function publishControl() {
   state.demo.sequence += 1;
 
   if (!binding.replies.length) {
-    setResult('success', 'MOCK_PUBLISHED_NO_REPLY', 'Reply가 없는 단방향 메시지입니다.');
-    setState(dom.omState, 'MOCK PUBLISHED');
+    setResult('success', '전달 완료 · Reply 없음', 'Reply가 정의되지 않은 단방향 요청입니다.');
+    setState(dom.omState, '전달 완료');
   } else {
     const reply = binding.replies[0];
-    setResult('success', 'MOCK_REPLY_ACCEPTED', `${reply.semanticId} Mock Reply를 수락했습니다. 실제 장비 동작 완료를 의미하지 않습니다.`);
-    setState(dom.omState, 'MOCK REPLY');
+    renderReplyResult(control, reply);
+    setState(dom.omState, 'Reply 수신');
   }
   publishExecutionState(OPERATION_STATES.finished, 'OperationManagement Mock 처리 완료');
   setState(dom.hmiState, 'MOCK COMPLETE');
@@ -3564,6 +3696,11 @@ async function controlCommand(command) {
 async function executeCommand(raw) {
   const command = String(raw).replace(/[–—−]/g, '-').replace(/\s+/g, ' ').trim();
   if (!command) return;
+  if (/^(request|control)(?:\s|$)/i.test(command) && dom.frameworkCallPreview) {
+    const frameworkCode = operationFrameworkCall(command);
+    dom.frameworkCallPreview.textContent = frameworkCode;
+    if (dom.frameworkCallCopy) dom.frameworkCallCopy.dataset.copyText = frameworkCode;
+  }
   state.demo.history.push(command);
   state.demo.historyIndex = state.demo.history.length;
   appendTerminal(command, 'input', '>');

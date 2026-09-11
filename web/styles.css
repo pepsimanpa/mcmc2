@@ -679,13 +679,82 @@ input[type=search]{width:min(270px,100%)}
 }
 
 .hmi-command-cell {
-  min-width: 190px;
+  min-width: 0;
 }
 
 .hmi-command-cell code {
   display: block;
   overflow-wrap: anywhere;
   color: var(--cyan);
+}
+
+.hmi-command-copy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.hmi-call-examples {
+  display: grid;
+  gap: 8px;
+}
+
+.hmi-call-example > small,
+.hmi-command-example > small,
+.framework-call-preview small {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.hmi-call-example.is-framework pre {
+  border: 1px solid rgba(66, 212, 217, .28);
+  background: rgba(66, 212, 217, .06);
+}
+
+.hmi-command-example {
+  min-width: 0;
+}
+
+.hmi-command-example + .hmi-command-example {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.hmi-command-example.is-framework code {
+  color: #8ee9c5;
+}
+
+.framework-call-preview {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 11px;
+  border-top: 1px solid #193542;
+  background: rgba(66, 212, 217, .06);
+}
+
+.framework-call-preview span {
+  min-width: 0;
+}
+
+.framework-call-preview code {
+  display: block;
+  color: #8ee9c5;
+  font: 11px/1.45 Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.framework-call-preview .icon-copy {
+  flex: 0 0 auto;
+  margin-top: 0;
 }
 
 .icon-copy {
@@ -1100,9 +1169,111 @@ button.docs-try-it:hover { background:#102a36;border-color:var(--cyan) }
 .docs-diagnostics-drawer .diagnostic-item { margin:0 }
 .diagnostic-empty { margin:0;padding:12px;color:var(--green);font-size:.7rem }
 
+.hmi-demo-drawer .hmi-layout {
+  grid-template-columns: minmax(520px, 1.3fr) minmax(360px, .7fr);
+  align-items: start;
+}
+.hmi-demo-drawer .terminal-panel { min-height: 650px; }
+.delivery-workspace {
+  min-height: 0;
+  align-self: start;
+  padding: 16px;
+}
+.delivery-workspace > header {
+  padding-bottom: 12px;
+}
+.delivery-workspace > header h2 { font-size: 1rem; }
+.delivery-body {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.delivery-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #08141d;
+}
+.delivery-card > header {
+  margin-bottom: 9px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ffffff10;
+}
+.delivery-card > header p {
+  margin: 0;
+  color: var(--cyan);
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+.delivery-card > header h3 {
+  margin: 3px 0 0;
+  font-size: .82rem;
+}
+.delivery-card .binding-summary,
+.delivery-card .result-banner {
+  margin: 0;
+  background: #091923;
+}
+.delivery-card .binding-summary h3 {
+  margin: 0 0 9px;
+  color: var(--text);
+  font-size: .78rem;
+}
+.delivery-card .binding-summary dl {
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+.delivery-card .binding-summary dl > div {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+}
+.delivery-card .binding-summary dd {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.delivery-card .result-banner strong { font-size: .78rem; }
+.delivery-card .result-banner small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .66rem;
+  line-height: 1.5;
+}
+.delivery-reply-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: .65rem;
+}
+.delivery-reply-table th,
+.delivery-reply-table td {
+  padding: 7px 8px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.delivery-reply-table th {
+  color: var(--muted);
+  font-size: .56rem;
+  letter-spacing: .04em;
+}
+.delivery-reply-table th:nth-child(1) { width: 34%; }
+.delivery-reply-table th:nth-child(2) { width: 22%; }
+.delivery-reply-table td:nth-child(2) {
+  color: var(--cyan);
+  font-family: Consolas, monospace;
+}
+
 @media (max-width: 1380px) {
   .protocol-docs-layout { grid-template-columns: 235px minmax(500px, 1fr); height: auto; max-height: none; }
   .docs-article, .docs-navigation { height: 720px; }
+  .hmi-demo-drawer .hmi-layout { grid-template-columns: 1fr; }
+  .hmi-demo-drawer .terminal-panel { min-height: 620px; }
 }
 @media (max-width: 850px) {
   .app-shell { padding: 0 14px; }
