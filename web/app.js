@@ -2467,7 +2467,7 @@ function setupHmiContractUi() {
   const response = el('details', 'docs-integration-details');
   const responseSummary = el('summary');
   responseSummary.append(
-    el('strong', '', '\uC7A5\uCE58 \uC5F0\uB3D9 \uBA54\uC2DC\uC9C0 \uBCF4\uAE30'),
+    el('strong', '', 'UMS \uC5F0\uB3D9 \uBA54\uC2DC\uC9C0 \uBCF4\uAE30'),
     el('small', '', '\uC6B4\uC6A9\uAD00\uB9AC CSC \u00B7 \uC5F0\uB3D9 CSC \u2194 UMS'),
   );
   const responseHead = el('header', 'docs-integration-head');
