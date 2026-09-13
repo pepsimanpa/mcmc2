@@ -2913,16 +2913,23 @@ function renderHmiContract(action) {
       'control -r',
     ];
     const frameworkCalls = commands.map(operationFrameworkCall);
+    const replySubscription = action.replies.length
+      ? operationFrameworkReplySubscription(action)
+      : '';
+    const frameworkCode = [
+      ...(replySubscription ? ['// Reply 콜백 등록 · 1회', replySubscription, '', '// Control 실행'] : []),
+      ...frameworkCalls,
+    ].join('\n');
     const commandSection = el('section', 'hmi-command-sequence docs-section');
     const commandHead = el('header');
-    commandHead.append(el('div', '', '01'), el('h2', '', 'HMI 호출 순서'));
+    commandHead.append(el('div', 'hmi-command-step', '01'), el('h2', '', 'HMI 호출 순서'));
     const copyActions = el('div', 'hmi-command-copy-actions');
     const copyCommands = el('button', 'button ghost', '명령 복사');
     copyCommands.type = 'button';
     copyCommands.dataset.copyText = commands.join('\n');
     const copyFramework = el('button', 'button primary', 'HMI 코드 복사');
     copyFramework.type = 'button';
-    copyFramework.dataset.copyText = frameworkCalls.join('\n');
+    copyFramework.dataset.copyText = frameworkCode;
     copyActions.append(copyCommands, copyFramework);
     commandHead.append(copyActions);
     const examples = el('div', 'hmi-call-examples');
@@ -2934,7 +2941,7 @@ function renderHmiContract(action) {
     const frameworkBlock = el('section', 'hmi-call-example is-framework');
     frameworkBlock.append(el('small', '', '실제 HMI SW 호출 코드'));
     const frameworkPre = el('pre');
-    frameworkPre.append(el('code', '', frameworkCalls.join('\n')));
+    frameworkPre.append(el('code', '', frameworkCode));
     frameworkBlock.append(frameworkPre);
     examples.append(commandBlock, frameworkBlock);
     commandSection.append(commandHead, examples);
@@ -2989,6 +2996,17 @@ function operationFrameworkCall(command) {
   const quote = String.fromCharCode(34);
   const literal = String(command).replace(/\\/g, '\\\\').split(quote).join(`\\${quote}`);
   return `OperationFramework.Execute(${quote}${literal}${quote});`;
+}
+
+function operationFrameworkReplySubscription(action) {
+  const quote = String.fromCharCode(34);
+  const literal = String(action.publicId || '').replace(/\\/g, '\\\\').split(quote).join(`\\${quote}`);
+  const localId = String(action.semanticId || action.publicId?.split('.').pop() || 'Control');
+  const identifier = localId
+    .replace(/[^A-Za-z0-9]+(.)/g, (_, character) => character.toUpperCase())
+    .replace(/[^A-Za-z0-9_]/g, '');
+  const handlerName = `Handle${identifier ? identifier[0].toUpperCase() + identifier.slice(1) : 'Control'}Reply`;
+  return `OperationFramework.SubscribeReply(${quote}${literal}${quote}, ${handlerName});`;
 }
 
 function renderHmiWorkspace() {

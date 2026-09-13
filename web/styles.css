@@ -692,7 +692,14 @@ input[type=search]{width:min(270px,100%)}
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  margin-left: auto;
+  max-width: 100%;
   gap: 6px;
+}
+
+.hmi-command-copy-actions .button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .hmi-call-examples {
@@ -1020,10 +1027,11 @@ body { font-size: 14px; }
   background: transparent;
 }
 .docs-article .docs-section h2 { margin: 0 0 13px; font-size: .95rem; }
-.docs-article .hmi-command-sequence > header { margin-bottom: 10px; }
-.docs-article .hmi-command-sequence > header > div {
+.docs-article .hmi-command-sequence > header { flex-wrap: wrap; margin-bottom: 10px; }
+.docs-article .hmi-command-sequence > header > .hmi-command-step {
   display: grid;
   place-items: center;
+  flex-shrink: 0;
   width: 25px;
   height: 25px;
   border-radius: 6px;
@@ -1031,7 +1039,7 @@ body { font-size: 14px; }
   color: var(--cyan);
   font: 800 .65rem Consolas, monospace;
 }
-.docs-article .hmi-command-sequence > header h2 { flex: 1; margin: 0; }
+.docs-article .hmi-command-sequence > header h2 { flex: 1; min-width: max-content; margin: 0; }
 .docs-article .hmi-command-sequence pre {
   border: 1px solid #1b3644;
   background: #040c12;
