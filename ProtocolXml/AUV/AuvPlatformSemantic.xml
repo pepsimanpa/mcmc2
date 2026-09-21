@@ -139,38 +139,38 @@
         <ControlSpec id="transferMissionPlan" name="AUV 임무계획 전송" cdm="Request.MissionPlan.Transfer">
             <Target cdm="Platform.Identifier.Numeric"/>
             <Parameters>
-                <ValueSetProfile cdm="MissionPlan.OperationMode">
+                <ValueSetProfile id="operationMode" name="Operation Mode" cdm="MissionPlan.OperationMode">
                     <Values>
                         <Value name="광역탐색" cdm="MissionPlan.OperationMode.WideAreaSearch"/>
                         <Value name="정밀탐색" cdm="MissionPlan.OperationMode.PrecisionSearch"/>
                     </Values>
                 </ValueSetProfile>
-                <QuantityProfile cdm="MissionPlan.Speed">
+                <QuantityProfile id="speed" name="Speed" cdm="MissionPlan.Speed">
                     <Unit>kts</Unit>
                     <Range min="0" max="7"/>
                     <Resolution>1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="MissionPlan.Depth">
+                <QuantityProfile id="depth" name="Depth" cdm="MissionPlan.Depth">
                     <Unit>m</Unit>
                     <Resolution>1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="MissionPlan.ReturnPosition.Latitude">
+                <QuantityProfile id="latitude" name="Latitude" cdm="MissionPlan.ReturnPosition.Latitude">
                     <Unit>rad</Unit>
                 </QuantityProfile>
-                <QuantityProfile cdm="MissionPlan.ReturnPosition.Longitude">
+                <QuantityProfile id="longitude" name="Longitude" cdm="MissionPlan.ReturnPosition.Longitude">
                     <Unit>rad</Unit>
                 </QuantityProfile>
-                <CollectionProfile cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="100">
-                    <ElementProfile cdm="MissionPlan.Waypoint">
-                        <QuantityProfile cdm="MissionPlan.Waypoint.Latitude">
+                <CollectionProfile id="waypoints" name="경유점 목록" cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="100">
+                    <ElementProfile id="waypoint" name="경유점" cdm="MissionPlan.Waypoint">
+                        <QuantityProfile id="latitude" name="위도" cdm="MissionPlan.Waypoint.Latitude">
                             <Unit>rad</Unit>
                         </QuantityProfile>
-                        <QuantityProfile cdm="MissionPlan.Waypoint.Longitude">
+                        <QuantityProfile id="longitude" name="경도" cdm="MissionPlan.Waypoint.Longitude">
                             <Unit>rad</Unit>
                         </QuantityProfile>
                     </ElementProfile>
                 </CollectionProfile>
-                <QuantityProfile cdm="MissionPlan.AlignmentInterval">
+                <QuantityProfile id="alignmentInterval" name="Alignment Interval" cdm="MissionPlan.AlignmentInterval">
                     <!-- ICD에 단위와 범위가 없어 수치 프로파일만 선언한다. -->
                     <Resolution>1</Resolution>
                 </QuantityProfile>
@@ -186,11 +186,11 @@
         <ControlSpec id="controlAuvLocally" name="AUV 근거리 위치 통제" cdm="Control.Platform.Motion">
             <Target cdm="Platform.Identifier.Numeric"/>
             <Parameters>
-                <QuantityProfile cdm="Platform.Motion.Speed">
+                <QuantityProfile id="speed" name="Speed" cdm="Platform.Motion.Speed">
                     <Range min="0" max="255"/>
                     <Resolution>1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="Platform.Motion.Direction">
+                <QuantityProfile id="direction" name="Direction" cdm="Platform.Motion.Direction">
                     <Unit>deg</Unit>
                     <Range min="-15" max="15"/>
                     <Resolution>1</Resolution>
@@ -259,8 +259,8 @@
         <ControlSpec id="emergencyReturn" name="AUV 비상복귀" cdm="Control.Mission.EmergencyReturn">
             <Target cdm="Platform.Identifier.Numeric"/>
             <Parameters>
-                <QuantityProfile cdm="Autonomy.EmergencyReturn.Position.Latitude"><Unit>rad</Unit></QuantityProfile>
-                <QuantityProfile cdm="Autonomy.EmergencyReturn.Position.Longitude"><Unit>rad</Unit></QuantityProfile>
+                <QuantityProfile id="emergencyLatitude" name="비상복귀 위도" cdm="Autonomy.EmergencyReturn.Position.Latitude"><Unit>rad</Unit></QuantityProfile>
+                <QuantityProfile id="emergencyLongitude" name="비상복귀 경도" cdm="Autonomy.EmergencyReturn.Position.Longitude"><Unit>rad</Unit></QuantityProfile>
             </Parameters>
             <Reply cdm="Control.Mission.EmergencyReturn.Response" bindRef="emergencyReturnReply" required="true"/>
         </ControlSpec>
@@ -293,13 +293,13 @@
         <ControlSpec id="requestData" name="AUV 데이터 전송 요청" cdm="Request.RecordedData.Transfer">
             <Target cdm="Platform.Identifier.Numeric"/>
             <Parameters>
-                <BooleanProfile cdm="RecordedData.Selection.Platform" required="false" default="false"/>
-                <BooleanProfile cdm="RecordedData.Selection.SideScanSonar" required="false" default="false"/>
-                <BooleanProfile cdm="RecordedData.Selection.OpticalCamera" required="false" default="false"/>
-                <BooleanProfile cdm="RecordedData.Selection.AcousticCamera" required="false" default="false"/>
-                <BooleanProfile cdm="RecordedData.Selection.ForwardLookingSonar" required="false" default="false"/>
-                <QuantityProfile cdm="RecordedData.FileRange.First"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile>
-                <QuantityProfile cdm="RecordedData.FileRange.Final"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile>
+                <BooleanProfile id="platform" name="Platform" cdm="RecordedData.Selection.Platform" required="false" default="false"/>
+                <BooleanProfile id="sideScanSonar" name="Side Scan Sonar" cdm="RecordedData.Selection.SideScanSonar" required="false" default="false"/>
+                <BooleanProfile id="opticalCamera" name="Optical Camera" cdm="RecordedData.Selection.OpticalCamera" required="false" default="false"/>
+                <BooleanProfile id="acousticCamera" name="Acoustic Camera" cdm="RecordedData.Selection.AcousticCamera" required="false" default="false"/>
+                <BooleanProfile id="forwardLookingSonar" name="Forward Looking Sonar" cdm="RecordedData.Selection.ForwardLookingSonar" required="false" default="false"/>
+                <QuantityProfile id="first" name="First" cdm="RecordedData.FileRange.First"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile>
+                <QuantityProfile id="final" name="Final" cdm="RecordedData.FileRange.Final"><Range min="0" max="65535"/><Resolution>1</Resolution></QuantityProfile>
             </Parameters>
         </ControlSpec>
 
@@ -321,7 +321,7 @@
         <ControlSpec id="setFlashBrightness" name="AUV 점멸등 밝기 설정" cdm="Control.Equipment.Light.Brightness">
             <Target cdm="Platform.Identifier.Numeric"/>
             <Parameters>
-                <QuantityProfile cdm="Equipment.Light.Brightness"><Range min="1" max="10"/><Resolution>1</Resolution></QuantityProfile>
+                <QuantityProfile id="brightness" name="Brightness" cdm="Equipment.Light.Brightness"><Range min="1" max="10"/><Resolution>1</Resolution></QuantityProfile>
             </Parameters>
             <Reply cdm="Control.Equipment.Light.Brightness.Response" bindRef="setFlashBrightnessReply" required="true"/>
         </ControlSpec>

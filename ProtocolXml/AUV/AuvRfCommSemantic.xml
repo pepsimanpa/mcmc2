@@ -44,22 +44,22 @@
         <ControlSpec id="configureRf" name="RF 통신 환경 설정" cdm="Control.Communication.RF.Configuration">
             <Target cdm="Platform.Identifier.Numeric"/>
             <Parameters>
-                <ValueSetProfile cdm="Communication.RF.Configuration.OperationMode">
+                <ValueSetProfile id="operationMode" name="Operation Mode" cdm="Communication.RF.Configuration.OperationMode">
                     <Values><Value name="1:1" cdm="Communication.RF.Configuration.OperationMode.OneToOne"/><Value name="1:2" cdm="Communication.RF.Configuration.OperationMode.OneToTwo"/></Values>
                 </ValueSetProfile>
-                <ValueSetProfile cdm="Communication.RF.Configuration.TimeSlot">
+                <ValueSetProfile id="timeSlot" name="Time Slot" cdm="Communication.RF.Configuration.TimeSlot">
                     <Values><Value name="Time Slot 2" cdm="Communication.RF.Configuration.TimeSlot.Two"/><Value name="Time Slot 4" cdm="Communication.RF.Configuration.TimeSlot.Four"/></Values>
                 </ValueSetProfile>
-                <ValueSetProfile cdm="Communication.RF.Configuration.UHF.Channel">
+                <ValueSetProfile id="uhfChannel" name="UHF Channel" cdm="Communication.RF.Configuration.UHF.Channel">
                     <Values><Value name="UHF CH 1" cdm="Communication.RF.Configuration.UHF.Channel.Channel1"/><Value name="UHF CH 2" cdm="Communication.RF.Configuration.UHF.Channel.Channel2"/><Value name="UHF CH 3" cdm="Communication.RF.Configuration.UHF.Channel.Channel3"/></Values>
                 </ValueSetProfile>
-                <ValueSetProfile cdm="Communication.RF.Configuration.LBand.Channel">
+                <ValueSetProfile id="lBandChannel" name="L Band Channel" cdm="Communication.RF.Configuration.LBand.Channel">
                     <Values><Value name="L-Band CH 1" cdm="Communication.RF.Configuration.LBand.Channel.Channel1"/><Value name="L-Band CH 2" cdm="Communication.RF.Configuration.LBand.Channel.Channel2"/><Value name="L-Band CH 3" cdm="Communication.RF.Configuration.LBand.Channel.Channel3"/></Values>
                 </ValueSetProfile>
-                <ValueSetProfile cdm="Communication.RF.Configuration.UHF.Power">
+                <ValueSetProfile id="uhfPower" name="UHF Power" cdm="Communication.RF.Configuration.UHF.Power">
                     <Values><Value name="OFF" cdm="Communication.RF.Configuration.UHF.Power.Off"/><Value name="LOW" cdm="Communication.RF.Configuration.UHF.Power.Low"/><Value name="HIGH" cdm="Communication.RF.Configuration.UHF.Power.High"/></Values>
                 </ValueSetProfile>
-                <ValueSetProfile cdm="Communication.RF.Configuration.LBand.Power">
+                <ValueSetProfile id="lBandPower" name="L Band Power" cdm="Communication.RF.Configuration.LBand.Power">
                     <Values><Value name="OFF" cdm="Communication.RF.Configuration.LBand.Power.Off"/><Value name="LOW" cdm="Communication.RF.Configuration.LBand.Power.Low"/><Value name="HIGH" cdm="Communication.RF.Configuration.LBand.Power.High"/></Values>
                 </ValueSetProfile>
             </Parameters>
