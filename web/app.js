@@ -624,24 +624,38 @@ function parseControlGroup(ref, file) {
 function parseMonitorGroup(ref, file) {
   const group = all(file.doc, 'MonitorSpecs')[0];
   if (!group) return [];
-  return direct(group, 'GroupSpec').map((node) => ({
-    kind: 'Monitor',
-    ref,
-    groupId: attr(group, 'id'),
-    semanticId: attr(node, 'id'),
-    publicId: `${ref.id}.${attr(group, 'id')}.${attr(node, 'id')}`,
-    name: attr(node, 'name') || attr(node, 'id'),
-    cdm: attr(node, 'cdm'),
-    description: commentBefore(node),
-    target: null,
-    parameters: [],
-    outputs: direct(node).filter((child) => child.localName.endsWith('Spec')).map(parseProfile),
-    replies: [],
-    bindings: [],
-    inputs: [],
-    sourceFile: file.name,
-    sourcePath: file.path,
-  }));
+  const monitorNames = new Set([
+    'QuantitySpec',
+    'TextSpec',
+    'ValueSetSpec',
+    'QuantityValueSetSpec',
+    'HealthStatusSetSpec',
+    'BooleanSpec',
+    'CollectionSpec',
+    'GroupSpec',
+  ]);
+  return direct(group)
+    .filter((node) => monitorNames.has(node.localName))
+    .map((node) => ({
+      kind: 'Monitor',
+      ref,
+      groupId: attr(group, 'id'),
+      semanticId: attr(node, 'id'),
+      publicId: `${ref.id}.${attr(group, 'id')}.${attr(node, 'id')}`,
+      name: attr(node, 'name') || attr(node, 'id'),
+      cdm: attr(node, 'cdm'),
+      description: commentBefore(node),
+      target: null,
+      parameters: [],
+      outputs: node.localName === 'GroupSpec'
+        ? direct(node).filter((child) => child.localName.endsWith('Spec')).map(parseProfile)
+        : [parseProfile(node)],
+      replies: [],
+      bindings: [],
+      inputs: [],
+      sourceFile: file.name,
+      sourcePath: file.path,
+    }));
 }
 
 function parseProductGroup(ref, file) {
@@ -1197,13 +1211,6 @@ function buildBundle(entries) {
     fatal: !vehicleFiles.length,
   };
   auditBundle(bundle);
-  bundle.diagnostics.push({
-    level: bundle.operationManagementIdl ? 'ok' : 'warning',
-    code: 'OM_IDL',
-    message: bundle.operationManagementIdl
-      ? 'OperationManagement.idl을 읽어 DDS 데모 계약으로 표시합니다.'
-      : 'OperationManagement.idl 미포함: 웹 내장 계약으로 DDS 데모를 표시합니다.',
-  });
   return bundle;
 }
 
