@@ -674,15 +674,17 @@ input[type=search]{width:min(270px,100%)}
 .hmi-contract-table.is-output.has-display-name td:nth-child(5) { width: 24%; }
 
 .hmi-contract-table.is-input th:nth-child(1),
-.hmi-contract-table.is-input td:nth-child(1) { width: 17%; }
+.hmi-contract-table.is-input td:nth-child(1) { width: 14%; }
 .hmi-contract-table.is-input th:nth-child(2),
-.hmi-contract-table.is-input td:nth-child(2) { width: 23%; }
+.hmi-contract-table.is-input td:nth-child(2) { width: 15%; }
 .hmi-contract-table.is-input th:nth-child(3),
-.hmi-contract-table.is-input td:nth-child(3) { width: 12%; }
+.hmi-contract-table.is-input td:nth-child(3) { width: 21%; }
 .hmi-contract-table.is-input th:nth-child(4),
-.hmi-contract-table.is-input td:nth-child(4) { width: 22%; }
+.hmi-contract-table.is-input td:nth-child(4) { width: 10%; }
 .hmi-contract-table.is-input th:nth-child(5),
-.hmi-contract-table.is-input td:nth-child(5) { width: 26%; }
+.hmi-contract-table.is-input td:nth-child(5) { width: 18%; }
+.hmi-contract-table.is-input th:nth-child(6),
+.hmi-contract-table.is-input td:nth-child(6) { width: 22%; }
 
 .hmi-contract-table tr:last-child td {
   border-bottom: 0;

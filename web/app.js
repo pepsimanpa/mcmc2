@@ -552,9 +552,11 @@ function parseProfile(node) {
   const resolution = direct(node, 'Resolution')[0];
   const valuesNode = direct(node, 'Values')[0];
   const required = attr(node, 'required');
+  const id = attr(node, 'id');
   return {
     kind: node.localName,
-    key: attr(node, 'id'),
+    id,
+    key: id,
     name: attr(node, 'name'),
     type: profileType(node.localName),
     cdm: attr(node, 'cdm'),
@@ -837,46 +839,11 @@ function parseProductBindingGroup(ref, file) {
   });
 }
 
-function aliasFor(input, fields, used) {
-  let key = '';
-  const exactNames = [...new Set(fields
-    .filter((field) => field.cdm === input.cdm && ['Field', 'ArrayField', 'BitMember'].includes(field.kind))
-    .map((field) => field.name)
-    .filter(Boolean))];
-  if (exactNames.length === 1) key = exactNames[0];
-
-  if (!key) {
-    const leaf = input.cdm.split('.').pop();
-    const suffixNames = [...new Set(fields
-      .filter((field) => ['Field', 'ArrayField', 'BitMember'].includes(field.kind)
-        && field.name.toLowerCase().endsWith(leaf.toLowerCase()))
-      .map((field) => field.name))];
-    if (suffixNames.length === 1) key = suffixNames[0];
-  }
-
-  if (!key) {
-    const fallback = {
-      'Platform.Motion.Speed': 'remoteSpeed',
-      'Platform.Motion.Direction': 'remoteDirection',
-      'Autonomy.EmergencyReturn.Position.Latitude': 'emergencyLatitude',
-      'Autonomy.EmergencyReturn.Position.Longitude': 'emergencyLongitude',
-      'Equipment.Light.Brightness': 'brightness',
-      'MissionPlan.Waypoints': 'waypoints',
-      'RecordedData.FileRange.First': 'fileFirst',
-      'RecordedData.FileRange.Final': 'fileFinal',
-    };
-    key = fallback[input.cdm] || lowerFirst(input.cdm.split('.').pop());
-  }
-
-  if (used.has(key)) {
-    const parts = input.cdm.split('.');
-    key = lowerFirst(parts.slice(-2).join(''));
-  }
-  if (used.has(key)) key = input.cdm;
-  used.add(key);
-  return key;
+function inputIdFor(input, used) {
+  const id = input.id || input.key || '';
+  if (id) used.add(id);
+  return id;
 }
-
 function attachReplyFieldMetadata(profile, bindingReplies) {
   const matchingFields = bindingReplies
     .flatMap((reply) => flattenFields(reply.fields))
@@ -951,7 +918,7 @@ function attachBindings(ref, diagnostics) {
           else if (/Identifier\.Numeric|Latitude|Longitude|Depth|Speed|Bearing|Range|Heading|Pitch|Command|Reason|Type|Brightness|Interval|Channel|TimeSlot/i.test(input.cdm)) type = 'number';
           else if (exactField && /UInt|Int|Float|Scale|Bit/i.test(exactField.converter)) type = 'number';
         }
-        return { ...input, type, key: aliasFor(input, fields, used), wireValues: uniqueWireValues };
+        return { ...input, type, key: inputIdFor(input, used), wireValues: uniqueWireValues };
       });
       action.replies = action.replies.map((reply) => {
         const bindingReplies = action.bindings.flatMap((binding) => (
@@ -1002,7 +969,7 @@ function idlText(value, maxLength = 0) {
 
 function controlParamPayload(input, fieldValue = '') {
   return {
-    fieldName: idlText(input.key, 100),
+    fieldName: idlText(input.id || input.key, 100),
     cdm: idlText(input.cdm, 100),
     dataType: idlText(input.type || 'unknown', 40),
     required: Boolean(input.required),
@@ -1802,7 +1769,7 @@ function renderFeatureList(filter = '') {
 
 function inputLabel(input) {
   const range = input.min !== null || input.max !== null ? ` · ${input.min ?? '…'}..${input.max ?? '…'}` : '';
-  return `${input.key} ← ${input.cdm} · ${input.type}${input.unit ? ` · ${input.unit}` : ''}${range}`;
+  return `${input.key}${input.name ? ` (${input.name})` : ''} ← ${input.cdm} · ${input.type}${input.unit ? ` · ${input.unit}` : ''}${range}`;
 }
 
 function outputLabel(output) {
@@ -1839,7 +1806,7 @@ function profileTable(title, profiles, inputMode = false) {
   const head = el('thead');
   const headRow = el('tr');
   const headings = inputMode
-    ? ['입력 Key', 'CDM 의미', '형식', '범위 / 단위']
+    ? ['입력 ID (Semantic id)', '표시명', 'CDM 의미', '형식', '범위 / 단위']
     : ['CDM 의미', '형식', '범위 / 단위'];
   headings.forEach((heading) => headRow.append(el('th', '', heading)));
   head.append(headRow);
@@ -1848,10 +1815,12 @@ function profileTable(title, profiles, inputMode = false) {
     const row = el('tr');
     if (inputMode) {
       const keyCell = el('td');
-      keyCell.dataset.label = '입력 Key';
-      keyCell.append(el('code', '', profile.key));
+      keyCell.dataset.label = '입력 ID';
+      keyCell.append(el('code', '', profile.id || profile.key || '미정'));
       if (!profile.required) keyCell.append(el('small', 'optional-mark', '선택'));
-      row.append(keyCell);
+      const nameCell = el('td', '', profile.name || '미정');
+      nameCell.dataset.label = '표시명';
+      row.append(keyCell, nameCell);
     }
     const cdmCell = el('td', '', profile.cdm || '미정');
     cdmCell.dataset.label = 'CDM 의미';
@@ -2315,7 +2284,7 @@ function selectControl(id, withSample = false, preserveArgs = false) {
   const target = actionTarget(control);
   appendTerminal(`자동 Target: targetId=${target.targetId}${control.target ? ` → ${control.target.key}=${targetDeviceValue(control)}` : ''}`, 'info');
   appendTerminal('입력 가능한 key:', 'info');
-  if (control.inputs.length) control.inputs.forEach((input) => appendTerminal(`  ${input.key} · ${input.cdm}`, 'info'));
+  if (control.inputs.length) control.inputs.forEach((input) => appendTerminal(`  ${input.key} · ${input.name} · ${input.cdm}`, 'info'));
   else appendTerminal('  입력 없음', 'info');
   return true;
 }
@@ -2558,16 +2527,16 @@ function hmiProfileTable(title, profiles, inputMode = false, showOutputName = fa
   const head = el('thead');
   const headRow = el('tr');
   const headings = inputMode
-    ? ['입력 Key', 'CDM 의미', '형식', '실제 입력/송신값 · 의미', '명령']
+    ? ['입력 ID (Semantic id)', '표시명', 'CDM 의미', '형식', '실제 입력/송신값 · 의미', '명령']
     : showOutputName
-      ? ['출력 Key (Semantic id)', '표시명', 'CDM 의미', '형식', '실제 수신값 · 의미']
+      ? ['출력 ID (Semantic id)', '표시명', 'CDM 의미', '형식', '실제 수신값 · 의미']
       : ['출력 항목', 'CDM 의미', '형식', '실제 수신값 · 의미'];
   headings.forEach((heading) => headRow.append(el('th', '', heading)));
   head.append(headRow);
   const body = el('tbody');
   for (const profile of profiles) {
     const row = el('tr');
-    const key = profile.key || profile.name || lowerFirst(profile.cdm.split('.').pop());
+    const key = profile.id || profile.key || profile.name || lowerFirst(profile.cdm.split('.').pop());
     const keyCell = el('td');
     keyCell.append(el('code', '', key || '미정'));
     if (inputMode && !profile.required) keyCell.append(el('small', 'optional-mark', '선택'));
@@ -2584,7 +2553,7 @@ function hmiProfileTable(title, profiles, inputMode = false, showOutputName = fa
       : profileAllowedLabel(profile);
     const allowedCell = el('td', 'hmi-value-map-cell', allowedLabel);
     const cells = [keyCell];
-    if (showOutputName) cells.push(el('td', '', profile.name || '—'));
+    if (inputMode || showOutputName) cells.push(el('td', '', profile.name || '—'));
     cells.push(
       el('td', '', profile.cdm || '미정'),
       el('td', '', profile.wireType || profileTypeLabel(profile.type)),
