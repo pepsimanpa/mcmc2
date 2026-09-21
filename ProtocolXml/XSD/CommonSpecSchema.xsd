@@ -23,12 +23,12 @@
 
     <!--
         Control Parameter의 API 식별자, 표시명, CDM 의미를 구분한다.
-        기존 Semantic XML의 단계적 이관을 위해 id/name은 현재 optional로 둔다.
+        모든 Semantic Profile은 id/name/cdm을 필수로 선언한다.
     -->
     <xs:attributeGroup name="ProfileAttrs">
-        <xs:attribute name="id" type="xs:string" use="optional" />
-        <xs:attribute name="name" type="xs:string" use="optional" />
-        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="cdm" type="CdmRefType" use="required" />
     </xs:attributeGroup>
 
     <!-- Core Type Below -->

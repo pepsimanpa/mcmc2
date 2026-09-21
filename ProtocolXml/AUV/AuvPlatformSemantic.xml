@@ -154,10 +154,10 @@
                     <Unit>m</Unit>
                     <Resolution>1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile id="latitude" name="Latitude" cdm="MissionPlan.ReturnPosition.Latitude">
+                <QuantityProfile id="returnLatitude" name="복귀 위치 위도" cdm="MissionPlan.ReturnPosition.Latitude">
                     <Unit>rad</Unit>
                 </QuantityProfile>
-                <QuantityProfile id="longitude" name="Longitude" cdm="MissionPlan.ReturnPosition.Longitude">
+                <QuantityProfile id="returnLongitude" name="복귀 위치 경도" cdm="MissionPlan.ReturnPosition.Longitude">
                     <Unit>rad</Unit>
                 </QuantityProfile>
                 <CollectionProfile id="waypoints" name="경유점 목록" cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="100">
