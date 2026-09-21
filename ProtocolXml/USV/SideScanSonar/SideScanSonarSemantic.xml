@@ -557,7 +557,7 @@
     <ControlSpec id="setCommunicationLevel" name="음탐통신량 전환 명령" cdm="Control.Communication.Level">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <ValueSetProfile cdm="Communication.MCS.Level">
+        <ValueSetProfile id="mcsLevel" name="MCS Level" cdm="Communication.MCS.Level">
           <Values>
             <Value name="Level1" cdm="Communication.MCS.Level.Level1"/>
             <Value name="Level2" cdm="Communication.MCS.Level.Level2"/>
@@ -595,84 +595,84 @@
     <ControlSpec id="configureOperatingParameters" name="소나 설정 명령" cdm="Control.SetParameters">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <ValueSetProfile cdm="SideScanSonar.SonarType">
+        <ValueSetProfile id="sonarType" name="Sonar Type" cdm="SideScanSonar.SonarType">
           <Values>
             <Value name="TowedSideScanSonar" cdm="SideScanSonar.SonarType.TowedSideScanSonar"/>
             <Value name="TowedGapFiller" cdm="SideScanSonar.SonarType.TowedGapFiller"/>
             <Value name="HullMountedSideScanSonar" cdm="SideScanSonar.SonarType.HullMountedSideScanSonar"/>
           </Values>
         </ValueSetProfile>
-        <Profile cdm="Ping.CarrierFrequency"/>
+        <Profile id="frequency" name="SSS Frequency" cdm="Ping.CarrierFrequency"/>
         <!-- CSCI 적용조건: StatusConfigType frequency는 예인형 SSS(sonarType=0)에 대해 100/600 kHz만 명시된다. GapFiller는 별도 range 설정이 없고 예인형 SSS range와 동기화된다. 선체부착형 frequency 적용값은 원문에서 확정되지 않아 TBD. -->
-        <QuantityProfile cdm="Coverage.Range">
+        <QuantityProfile id="range" name="Range" cdm="Coverage.Range">
           <Unit>m</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.Gain">
+        <QuantityProfile id="gain" name="Gain" cdm="ReceiveProcessing.Gain">
           <Unit>dB</Unit>
           <Range min="0" max="80"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.TVG.Mode">
+        <QuantityProfile id="tvgMode" name="TVG Mode" cdm="ReceiveProcessing.TVG.Mode">
           <Range min="0" max="1"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.TVG.DistanceCoefficient">
+        <QuantityProfile id="distanceCoefficient" name="Distance Coefficient" cdm="ReceiveProcessing.TVG.DistanceCoefficient">
           <Range min="0" max="999"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.TVG.AttenuationCoefficient">
+        <QuantityProfile id="attenuationCoefficient" name="Attenuation Coefficient" cdm="ReceiveProcessing.TVG.AttenuationCoefficient">
           <Unit>dB</Unit>
           <Range min="0" max="999"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="Ping.PulseWidth">
+        <QuantityProfile id="pulseWidth" name="Pulse Width" cdm="Ping.PulseWidth">
           <Range min="0" max="1000"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <ValueSetProfile cdm="Ping.PulseType">
+        <ValueSetProfile id="pulseType" name="Pulse Type" cdm="Ping.PulseType">
           <Values>
             <Value name="ContinuousWave" cdm="Ping.PulseType.ContinuousWave"/>
             <Value name="Chirp" cdm="Ping.PulseType.Chirp"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="ReceiveProcessing.SoftwareGain.Mode">
+        <ValueSetProfile id="softwareGainMode" name="Software Gain Mode" cdm="ReceiveProcessing.SoftwareGain.Mode">
           <Values>
             <Value name="AutoGain" cdm="ReceiveProcessing.SoftwareGain.Mode.AutoGain"/>
             <Value name="TVG" cdm="ReceiveProcessing.SoftwareGain.Mode.TVG"/>
             <Value name="RawGain" cdm="ReceiveProcessing.SoftwareGain.Mode.RawGain"/>
           </Values>
         </ValueSetProfile>
-        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Auto">
+        <QuantityProfile id="auto" name="Auto" cdm="ReceiveProcessing.SoftwareGain.Auto">
           <Unit>%</Unit>
           <Range min="0" max="100"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.TVGA">
+        <QuantityProfile id="tvga" name="TVGA" cdm="ReceiveProcessing.SoftwareGain.TVGA">
           <Range min="0" max="40"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.TVGB">
+        <QuantityProfile id="tvgb" name="TVGB" cdm="ReceiveProcessing.SoftwareGain.TVGB">
           <Unit>dB/100m</Unit>
           <Range min="0" max="100"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.TVGC">
+        <QuantityProfile id="tvgc" name="TVGC" cdm="ReceiveProcessing.SoftwareGain.TVGC">
           <Unit>dB</Unit>
           <Range min="0" max="80"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="ReceiveProcessing.SoftwareGain.Raw">
+        <QuantityProfile id="softwareGainRaw" name="Software Gain Raw" cdm="ReceiveProcessing.SoftwareGain.Raw">
           <Unit>dB</Unit>
           <Range min="0" max="80"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
-        <ValueSetProfile cdm="ReceiveProcessing.LowPassFilter.Mode">
+        <ValueSetProfile id="lowPassFilterMode" name="Low Pass Filter Mode" cdm="ReceiveProcessing.LowPassFilter.Mode">
           <Values>
             <Value name="Disabled" cdm="ReceiveProcessing.LowPassFilter.Mode.Disabled"/>
             <Value name="Enabled" cdm="ReceiveProcessing.LowPassFilter.Mode.Enabled"/>
           </Values>
         </ValueSetProfile>
-        <QuantityProfile cdm="ReceiveProcessing.LowPassFilter.Level">
+        <QuantityProfile id="lowPassFilterLevel" name="Low Pass Filter Level" cdm="ReceiveProcessing.LowPassFilter.Level">
           <Range min="0" max="14"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
@@ -686,7 +686,7 @@
     <ControlSpec id="start" name="장비 실행 명령" cdm="SideScanSonar.Control.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <ValueSetProfile cdm="SideScanSonar.SonarType">
+        <ValueSetProfile id="sonarType" name="Sonar Type" cdm="SideScanSonar.SonarType">
           <Values>
             <Value name="Towed" cdm="SideScanSonar.SonarType.Towed"/>
             <Value name="HullMounted" cdm="SideScanSonar.SonarType.HullMounted"/>
@@ -702,7 +702,7 @@
     <ControlSpec id="stop" name="장비 중지 명령" cdm="Control.ShutDown">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <ValueSetProfile cdm="SideScanSonar.SonarType">
+        <ValueSetProfile id="sonarType" name="Sonar Type" cdm="SideScanSonar.SonarType">
           <Values>
             <Value name="Towed" cdm="SideScanSonar.SonarType.Towed"/>
             <Value name="HullMounted" cdm="SideScanSonar.SonarType.HullMounted"/>
@@ -718,7 +718,7 @@
     <ControlSpec id="powerOnOff" name="장비 전원 제어 명령" cdm="Control.PowerSupplyControl">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <ValueSetProfile cdm="SideScanSonar.Subsystem">
+        <ValueSetProfile id="subsystem" name="Subsystem" cdm="SideScanSonar.Subsystem">
           <Values>
             <Value name="SideScanSonar" cdm="SideScanSonar.Subsystem.SideScanSonar"/>
             <Value name="USBL" cdm="SideScanSonar.Subsystem.USBL"/>
@@ -727,7 +727,7 @@
             <Value name="HullMountedSonar" cdm="SideScanSonar.Subsystem.HullMountedSonar"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="PowerSupplyState">
+        <ValueSetProfile id="powerSupplyState" name="Power Supply State" cdm="PowerSupplyState">
           <Values>
             <Value name="Off" cdm="PowerSupplyState.Off"/>
             <Value name="On" cdm="PowerSupplyState.On"/>
@@ -835,7 +835,7 @@
     <SetPointSpec id="setTowingCableLength" name="조출량 설정 명령" cdm="Control.AdjustTowingCable">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.Cable.TargetLength">
+        <QuantityProfile id="targetLength" name="Target Length" cdm="LaunchRecovery.Cable.TargetLength">
           <Unit>m</Unit>
           <Range min="0" max="100"/>
         </QuantityProfile>
@@ -849,7 +849,7 @@
     <SetPointSpec id="setTowfishDepth" name="목표수심 설정 명령" cdm="Control.SetPointTowfishDepth">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Position.TargetDepth">
+        <QuantityProfile id="targetDepth" name="Target Depth" cdm="Position.TargetDepth">
           <Unit>m</Unit>
           <Range min="0" max="80"/>
         </QuantityProfile>
@@ -879,7 +879,7 @@
     <ControlSpec id="stopUsblMotion" name="수동 모드 USBL 구동 정지 명령" cdm="Control.USBL.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.USBL.MotorSpeed">
+        <QuantityProfile id="motorSpeed" name="Motor Speed" cdm="LaunchRecovery.USBL.MotorSpeed">
           <Unit>m/s</Unit>
           <Range min="0" max="0.011"/>
         </QuantityProfile>
@@ -894,7 +894,7 @@
     <ControlSpec id="launchUsbl" name="수동 모드 USBL 진수 명령" cdm="Control.Launch">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.USBL.MotorSpeed">
+        <QuantityProfile id="motorSpeed" name="Motor Speed" cdm="LaunchRecovery.USBL.MotorSpeed">
           <Unit>m/s</Unit>
           <Range min="0" max="0.011"/>
         </QuantityProfile>
@@ -909,7 +909,7 @@
     <ControlSpec id="recoveryUsbl" name="수동 모드 USBL 회수 명령" cdm="Control.Recovery">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.USBL.MotorSpeed">
+        <QuantityProfile id="motorSpeed" name="Motor Speed" cdm="LaunchRecovery.USBL.MotorSpeed">
           <Unit>m/s</Unit>
           <Range min="0" max="0.011"/>
         </QuantityProfile>
@@ -924,7 +924,7 @@
     <ControlSpec id="returnUsblOrigin" name="수동 모드 USBL 원점복귀 명령" cdm="Control.USBL.ReturnOrigin">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.USBL.MotorSpeed">
+        <QuantityProfile id="motorSpeed" name="Motor Speed" cdm="LaunchRecovery.USBL.MotorSpeed">
           <Unit>m/s</Unit>
           <Range min="0" max="0.011"/>
         </QuantityProfile>
@@ -957,7 +957,7 @@
     <ControlSpec id="stopSlide" name="수동 모드 슬라이드 정지 명령" cdm="Control.Slide.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.Slide.Position">
+        <QuantityProfile id="slidePosition" name="슬라이드 위치" cdm="LaunchRecovery.Slide.Position">
           <Unit>m</Unit>
           <Range min="0" max="2.15"/>
         </QuantityProfile>
@@ -972,7 +972,7 @@
     <ControlSpec id="moveSlide" name="수동 모드 슬라이드 작동 명령" cdm="Control.Slide.Move">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.Slide.Position">
+        <QuantityProfile id="slidePosition" name="슬라이드 위치" cdm="LaunchRecovery.Slide.Position">
           <Unit>m</Unit>
           <Range min="0" max="2.15"/>
         </QuantityProfile>
@@ -987,7 +987,7 @@
     <ControlSpec id="returnSlideWithTowfish" name="수동 모드 슬라이드 예인체 장착 원점복귀 명령" cdm="Control.Slide.ReturnOrigin.WithTowfish">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.Slide.Position">
+        <QuantityProfile id="slidePosition" name="슬라이드 위치" cdm="LaunchRecovery.Slide.Position">
           <Unit>m</Unit>
           <Range min="0" max="2.15"/>
         </QuantityProfile>
@@ -1002,7 +1002,7 @@
     <ControlSpec id="returnSlideWithoutTowfish" name="수동 모드 슬라이드 예인체 미장착 원점복귀 명령" cdm="Control.Slide.ReturnOrigin.WithoutTowfish">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.Slide.Position">
+        <QuantityProfile id="slidePosition" name="슬라이드 위치" cdm="LaunchRecovery.Slide.Position">
           <Unit>m</Unit>
           <Range min="0" max="2.15"/>
         </QuantityProfile>
@@ -1017,7 +1017,7 @@
     <ControlSpec id="stopWinch" name="수동 모드 윈치 정지 명령" cdm="Control.Winch.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.Winch.CableLength">
+        <QuantityProfile id="cableLength" name="Cable Length" cdm="LaunchRecovery.Winch.CableLength">
           <Unit>m</Unit>
           <Range min="0" max="100"/>
         </QuantityProfile>
@@ -1032,7 +1032,7 @@
     <ControlSpec id="deployWinch" name="수동 모드 윈치 전개 명령" cdm="Control.Launch">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.Winch.CableLength">
+        <QuantityProfile id="cableLength" name="Cable Length" cdm="LaunchRecovery.Winch.CableLength">
           <Unit>m</Unit>
           <Range min="0" max="100"/>
         </QuantityProfile>
@@ -1047,7 +1047,7 @@
     <ControlSpec id="recoveryWinch" name="수동 모드 윈치 회수 명령" cdm="Control.Recovery">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="LaunchRecovery.Winch.CableLength">
+        <QuantityProfile id="cableLength" name="Cable Length" cdm="LaunchRecovery.Winch.CableLength">
           <Unit>m</Unit>
           <Range min="0" max="100"/>
         </QuantityProfile>

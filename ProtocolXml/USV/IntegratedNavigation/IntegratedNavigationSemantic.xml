@@ -575,7 +575,7 @@
       </GroupResult></Results></Reply>
     </ControlSpec>
     <ControlSpec id="updateRtcmData" name="위성항법 RTCM 보정정보 입력" cdm="Control.Navigation.GNSS.RTCM.Update">
-      <Parameters><QuantityProfile cdm="Navigation.GNSS.RTCM.ValidDataSize"><Unit>byte</Unit><Range min="0" max="256"/><Resolution>1</Resolution></QuantityProfile><Profile cdm="Navigation.GNSS.RTCM.Data"/></Parameters>
+      <Parameters><QuantityProfile id="validDataSize" name="Valid Data Size" cdm="Navigation.GNSS.RTCM.ValidDataSize"><Unit>byte</Unit><Range min="0" max="256"/><Resolution>1</Resolution></QuantityProfile><Profile id="data" name="Data" cdm="Navigation.GNSS.RTCM.Data"/></Parameters>
       <!--원문 물리 필드명 vaildRtcmDataSize 오탈자는 Binding에서 그대로 유지한다.-->
     </ControlSpec>
   </ControlSpecs>

@@ -218,13 +218,13 @@
         -->
         <ControlSpec id="configureWirelessPreset" name="무선통신 Preset 설정" cdm="Control.Communication.WirelessPreset">
             <Parameters>
-                <ValueSetProfile cdm="Communication.WirelessPreset.TopologyMode">
+                <ValueSetProfile id="topologyMode" name="Topology Mode" cdm="Communication.WirelessPreset.TopologyMode">
                     <Values>
                         <Value name="HighTransmit" cdm="Communication.WirelessPreset.TopologyMode.HighTransmit"/>
                         <Value name="LowTransmit" cdm="Communication.WirelessPreset.TopologyMode.LowTransmit"/>
                     </Values>
                 </ValueSetProfile>
-                <ValueSetProfile cdm="Communication.WirelessPreset.MissionMode">
+                <ValueSetProfile id="missionMode" name="Mission Mode" cdm="Communication.WirelessPreset.MissionMode">
                     <Values>
                         <Value name="Detection" cdm="Communication.WirelessPreset.MissionMode.Detection"/>
                         <Value name="Sonar" cdm="Communication.WirelessPreset.MissionMode.Sonar"/>
@@ -305,7 +305,7 @@
         -->
         <ControlSpec id="prepareAuthorityTransfer" name="통제권 전환 대기" cdm="Control.Authority.Transfer.Prepare">
             <Parameters>
-                <ValueSetProfile cdm="Control.Authority.TargetControlStation">
+                <ValueSetProfile id="targetControlStation" name="Target Control Station" cdm="Control.Authority.TargetControlStation">
                     <Values>
                         <Value name="FixedRemoteControl" cdm="Control.Authority.TargetControlStation.FixedRemoteControl"/>
                         <Value name="MobileRemoteControl" cdm="Control.Authority.TargetControlStation.MobileRemoteControl"/>
@@ -351,13 +351,13 @@
         <!-- rxChannel의 허용 채널/주파수 범위와 단위가 CSV에 없어 Range/Unit을 지정하지 않는다. -->
         <ControlSpec id="controlVhf" name="음성송수신기 VHF 제어" cdm="Control.Communication.VHF">
             <Parameters>
-                <ValueSetProfile cdm="Communication.VHF.TransmitCommand">
+                <ValueSetProfile id="transmitCommand" name="Transmit Command" cdm="Communication.VHF.TransmitCommand">
                     <Values>
                         <Value name="Stop" cdm="Communication.VHF.TransmitCommand.Stop"/>
                         <Value name="Transmit" cdm="Communication.VHF.TransmitCommand.Transmit"/>
                     </Values>
                 </ValueSetProfile>
-                <QuantityProfile cdm="Communication.VHF.Channel">
+                <QuantityProfile id="channel" name="Channel" cdm="Communication.VHF.Channel">
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
@@ -370,7 +370,7 @@
 
         <ControlSpec id="setVoiceVolume" name="음성송수신기 볼륨 설정" cdm="Control.Communication.Voice.Volume">
             <Parameters>
-                <QuantityProfile cdm="Communication.Voice.Volume.Percent">
+                <QuantityProfile id="percent" name="Percent" cdm="Communication.Voice.Volume.Percent">
                     <Unit>percent</Unit>
                     <Range min="0" max="100"/>
                     <Resolution>1</Resolution>
@@ -385,7 +385,7 @@
 
         <ControlSpec id="setVhfSquelch" name="음성송수신기 VHF 스퀄치 설정" cdm="Control.Communication.VHF.Squelch">
             <Parameters>
-                <QuantityProfile cdm="Communication.VHF.Squelch.Percent">
+                <QuantityProfile id="percent" name="Percent" cdm="Communication.VHF.Squelch.Percent">
                     <Unit>percent</Unit>
                     <Range min="0" max="100"/>
                     <Resolution>1</Resolution>
@@ -401,19 +401,19 @@
         <!-- voiceRxControl은 필드명/설명이 '음성수신명령'이지만 CSV 비고는 raw 1을 '송신'으로 적고 있어 논리 의미를 확정하지 않는다. -->
         <ControlSpec id="configureVoiceCommunication" name="음성 송수신 제어" cdm="Control.Communication.Voice">
             <Parameters>
-                <ValueSetProfile cdm="Communication.Voice.AlarmTransmit">
+                <ValueSetProfile id="alarmTransmit" name="Alarm Transmit" cdm="Communication.Voice.AlarmTransmit">
                     <Values>
                         <Value name="Stop" cdm="Communication.Voice.AlarmTransmit.Stop"/>
                         <Value name="Transmit" cdm="Communication.Voice.AlarmTransmit.Transmit"/>
                     </Values>
                 </ValueSetProfile>
-                <ValueSetProfile cdm="Communication.Voice.Transmit">
+                <ValueSetProfile id="transmit" name="Transmit" cdm="Communication.Voice.Transmit">
                     <Values>
                         <Value name="Stop" cdm="Communication.Voice.Transmit.Stop"/>
                         <Value name="Transmit" cdm="Communication.Voice.Transmit.Transmit"/>
                     </Values>
                 </ValueSetProfile>
-                <Profile cdm="Communication.Voice.Receive"/>
+                <Profile id="receive" name="Receive" cdm="Communication.Voice.Receive"/>
             </Parameters>
             <Reply cdm="Command.ProcessingStatus.Response" bindRef="configureVoiceCommunicationCommandStatusReply" required="true">
                 <Results>
@@ -433,7 +433,7 @@
 
         <ControlSpec id="selectVideoDistribution" name="영상분배 선택" cdm="Control.Video.Distribution">
             <Parameters>
-                <ValueSetProfile cdm="Video.Distribution.Selection">
+                <ValueSetProfile id="selection" name="Selection" cdm="Video.Distribution.Selection">
                     <Values>
                         <Value name="Monitor1" cdm="Video.Distribution.Selection.Monitor1"/>
                         <Value name="Monitor2" cdm="Video.Distribution.Selection.Monitor2"/>

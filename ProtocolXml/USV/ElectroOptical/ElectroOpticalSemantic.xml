@@ -323,7 +323,7 @@
         <ControlSpec id="setOperationMode" name="EOIR 운용모드 설정" cdm="Control.EOIR.Mode.Set">
       <!--operationMode: 0=대기, 1=구동, 2=추적, 3=항해레이더 연동, 4=RCWS 연동, 5=선수지향, 6=SWING, 7=STOW-->
       <Parameters>
-        <ValueSetProfile cdm="Control.EOIR.Mode.Command">
+        <ValueSetProfile id="modeCommand" name="Mode Command" cdm="Control.EOIR.Mode.Command">
           <Values>
             <Value name="Standby" cdm="EOIR.Mode.Standby"/>
             <Value name="ManualDrive" cdm="EOIR.Mode.ManualDrive"/>
@@ -344,11 +344,11 @@
     </ControlSpec>
         <ControlSpec id="controlByJoystick" name="EOIR 조이스틱 구동 제어" cdm="Control.EOIR.Motion.Joystick">
       <Parameters>
-        <QuantityProfile cdm="Control.EOIR.Joystick.Pan">
+        <QuantityProfile id="pan" name="Pan" cdm="Control.EOIR.Joystick.Pan">
           <Unit>%</Unit>
           <Range min="-100" max="100"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Joystick.Tilt">
+        <QuantityProfile id="tilt" name="Tilt" cdm="Control.EOIR.Joystick.Tilt">
           <Unit>%</Unit>
           <Range min="-100" max="100"/>
         </QuantityProfile>
@@ -362,12 +362,12 @@
         <ControlSpec id="pointToPosition" name="EOIR 설정값 구동 제어" cdm="Control.EOIR.Motion.Position">
       <!--referenceModeResult: false(0)=헤딩 기준, true(1)=진북 기준. PAN 허용범위는 헤딩 기준 -180~180 deg, 진북 기준 0~360 deg로 조건부이므로 단일 Range는 지정하지 않는다.-->
       <Parameters>
-        <BooleanProfile cdm="Control.EOIR.Position.ReferenceTrueNorth"/>
-        <QuantityProfile cdm="Control.EOIR.Position.Pan">
+        <BooleanProfile id="referenceTrueNorth" name="Reference True North" cdm="Control.EOIR.Position.ReferenceTrueNorth"/>
+        <QuantityProfile id="pan" name="Pan" cdm="Control.EOIR.Position.Pan">
           <Unit>deg</Unit>
           <Resolution>0.01</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Position.Tilt">
+        <QuantityProfile id="tilt" name="Tilt" cdm="Control.EOIR.Position.Tilt">
           <Unit>deg</Unit>
           <Range min="-90" max="90"/>
           <Resolution>0.01</Resolution>
@@ -383,8 +383,8 @@
       <!--targetSetting: 0=No change, 1=1차 설정, 2=2차 설정, 3=1차 취소, 4=2차 취소. sensorSelection: 0=직전 채널, 1=EO, 2=MWIR. SWIR 추적 값은 원본 CSCI에 없음(TBD).-->
       <!--target1/target2의 targetNumber는 구조체 의미에 따라 Binding에서 각각 0/1로 고정한다. 좌표/크기는 실 영상 pixel 기준이며, EO는 centerX=0~1919/centerY=0~1079/width=0~1920/height=0~1080, IR은 centerX=0~639/centerY=0~479/width=0~640/height=0~480이다. 현재 Parameter Range는 전체 최대 해상도인 EO 기준으로 정의한다.-->
       <Parameters>
-        <BooleanProfile cdm="Control.EOIR.Tracking.AutoEnabled"/>
-        <ValueSetProfile cdm="Control.EOIR.Tracking.TargetSetting">
+        <BooleanProfile id="autoEnabled" name="Auto Enabled" cdm="Control.EOIR.Tracking.AutoEnabled"/>
+        <ValueSetProfile id="targetSetting" name="Target Setting" cdm="Control.EOIR.Tracking.TargetSetting">
           <Values>
             <Value name="NoChange" cdm="EOIR.Tracking.TargetSetting.NoChange"/>
             <Value name="SetTarget1" cdm="EOIR.Tracking.TargetSetting.SetTarget1"/>
@@ -393,43 +393,43 @@
             <Value name="CancelTarget2" cdm="EOIR.Tracking.TargetSetting.CancelTarget2"/>
           </Values>
         </ValueSetProfile>
-        <BooleanProfile cdm="Control.EOIR.Tracking.PriorityChange"/>
-        <ValueSetProfile cdm="Control.EOIR.Tracking.SensorSelection">
+        <BooleanProfile id="priorityChange" name="Priority Change" cdm="Control.EOIR.Tracking.PriorityChange"/>
+        <ValueSetProfile id="sensorSelection" name="Sensor Selection" cdm="Control.EOIR.Tracking.SensorSelection">
           <Values>
             <Value name="Previous" cdm="EOIR.Tracking.Sensor.Previous"/>
             <Value name="EO" cdm="EOIR.Tracking.Sensor.EO"/>
             <Value name="MWIR" cdm="EOIR.Tracking.Sensor.MWIR"/>
           </Values>
         </ValueSetProfile>
-        <QuantityProfile cdm="Control.EOIR.Tracking.Target1.CenterX">
+        <QuantityProfile id="target1CenterX" name="Target 1 Center X" cdm="Control.EOIR.Tracking.Target1.CenterX">
           <Unit>pixel</Unit>
           <Range min="0" max="1919"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Tracking.Target1.CenterY">
+        <QuantityProfile id="target1CenterY" name="Target 1 Center Y" cdm="Control.EOIR.Tracking.Target1.CenterY">
           <Unit>pixel</Unit>
           <Range min="0" max="1079"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Tracking.Target1.Width">
+        <QuantityProfile id="target1Width" name="Target 1 Width" cdm="Control.EOIR.Tracking.Target1.Width">
           <Unit>pixel</Unit>
           <Range min="0" max="1920"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Tracking.Target1.Height">
+        <QuantityProfile id="target1Height" name="Target 1 Height" cdm="Control.EOIR.Tracking.Target1.Height">
           <Unit>pixel</Unit>
           <Range min="0" max="1080"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Tracking.Target2.CenterX">
+        <QuantityProfile id="target2CenterX" name="Target 2 Center X" cdm="Control.EOIR.Tracking.Target2.CenterX">
           <Unit>pixel</Unit>
           <Range min="0" max="1919"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Tracking.Target2.CenterY">
+        <QuantityProfile id="target2CenterY" name="Target 2 Center Y" cdm="Control.EOIR.Tracking.Target2.CenterY">
           <Unit>pixel</Unit>
           <Range min="0" max="1079"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Tracking.Target2.Width">
+        <QuantityProfile id="target2Width" name="Target 2 Width" cdm="Control.EOIR.Tracking.Target2.Width">
           <Unit>pixel</Unit>
           <Range min="0" max="1920"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Tracking.Target2.Height">
+        <QuantityProfile id="target2Height" name="Target 2 Height" cdm="Control.EOIR.Tracking.Target2.Height">
           <Unit>pixel</Unit>
           <Range min="0" max="1080"/>
         </QuantityProfile>
@@ -443,7 +443,7 @@
         <ControlSpec id="pointToRadarTarget" name="항해레이더 지향 목표 표적 설정" cdm="Control.EOIR.Pointing.RadarTarget">
       <!--targetId: 1~65534는 탐지물 ID이며 0 및 65535(0xFFFF)는 Not available 특수값이다.-->
       <Parameters>
-        <QuantityProfile cdm="Control.EOIR.Pointing.RadarTarget.Identifier">
+        <QuantityProfile id="radarTargetIdentifier" name="Radar Target Identifier" cdm="Control.EOIR.Pointing.RadarTarget.Identifier">
           <Unit>num</Unit>
           <Range min="1" max="65534"/>
         </QuantityProfile>
@@ -457,18 +457,18 @@
     <!--swingSpeedResult은 원문 Unit이 deg로 표기되지만 필드 설명은 속도/각속도이므로 deg/s로 추정하지 않고 원문 Unit을 보존하며 OpenIssues에 남긴다.-->
         <ControlSpec id="configureSwing" name="EOIR 스윙 설정" cdm="Control.EOIR.Swing">
       <Parameters>
-        <BooleanProfile cdm="Control.EOIR.Swing.Enabled"/>
-        <QuantityProfile cdm="Control.EOIR.Swing.StartAngle">
+        <BooleanProfile id="swingEnabled" name="Swing Enabled" cdm="Control.EOIR.Swing.Enabled"/>
+        <QuantityProfile id="startAngle" name="Start Angle" cdm="Control.EOIR.Swing.StartAngle">
           <Unit>deg</Unit>
           <Range min="-180" max="180"/>
           <Resolution>0.01</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Swing.EndAngle">
+        <QuantityProfile id="endAngle" name="End Angle" cdm="Control.EOIR.Swing.EndAngle">
           <Unit>deg</Unit>
           <Range min="-180" max="180"/>
           <Resolution>0.01</Resolution>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Swing.Speed">
+        <QuantityProfile id="speed" name="Speed" cdm="Control.EOIR.Swing.Speed">
           <Unit>deg</Unit>
           <Range min="0" max="180"/>
           <Resolution>0.01</Resolution>
@@ -483,7 +483,7 @@
         <ControlSpec id="switchIrVideo" name="IR 영상 전환" cdm="Control.EOIR.Video.IR.Switch">
       <!--irSwitching: false(0)=MWIR 송신(SWIR 포트 닫음), true(1)=SWIR 송신(MWIR 포트 닫음).-->
       <Parameters>
-        <BooleanProfile cdm="Control.EOIR.Video.IR.UseSWIR"/>
+        <BooleanProfile id="useSwir" name="Use Swir" cdm="Control.EOIR.Video.IR.UseSWIR"/>
       </Parameters>
       <Reply bindRef="switchIrVideoAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
@@ -495,15 +495,15 @@
       <!--eoirFlagResult: false(0)=EO, true(1)=MWIR. zoomControl: 0=No action/No change, 1=연속제어, 2=위치제어. continuousZoomControl: 0=No action, 1=Zoom In, 2=Zoom Out, 3=Stop.-->
       <!--positionZoomControl은 raw 0~1000, 0.5%/bit로 해석하여 Semantic 0~500%, Resolution 0.5%로 표현한다. 0x5555는 No change 물리 특수값이며 Binding/구현에서 처리한다.-->
       <Parameters>
-        <BooleanProfile cdm="Control.EOIR.Zoom.UseMWIR"/>
-        <ValueSetProfile cdm="Control.EOIR.Zoom.Mode">
+        <BooleanProfile id="useMwir" name="Use Mwir" cdm="Control.EOIR.Zoom.UseMWIR"/>
+        <ValueSetProfile id="zoomMode" name="Zoom Mode" cdm="Control.EOIR.Zoom.Mode">
           <Values>
             <Value name="NoChange" cdm="EOIR.Zoom.Mode.NoChange"/>
             <Value name="Continuous" cdm="EOIR.Zoom.Mode.Continuous"/>
             <Value name="Position" cdm="EOIR.Zoom.Mode.Position"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.Zoom.Continuous">
+        <ValueSetProfile id="continuous" name="Continuous" cdm="Control.EOIR.Zoom.Continuous">
           <Values>
             <Value name="NoAction" cdm="EOIR.Zoom.Continuous.NoAction"/>
             <Value name="ZoomIn" cdm="EOIR.Zoom.Continuous.In"/>
@@ -511,7 +511,7 @@
             <Value name="Stop" cdm="EOIR.Zoom.Continuous.Stop"/>
           </Values>
         </ValueSetProfile>
-        <QuantityProfile cdm="Control.EOIR.Zoom.Position">
+        <QuantityProfile id="position" name="Position" cdm="Control.EOIR.Zoom.Position">
           <Unit>%</Unit>
           <Range min="0" max="500"/>
           <Resolution>0.5</Resolution>
@@ -527,15 +527,15 @@
       <!--eoirFlagResult: false(0)=EO, true(1)=MWIR. focusControl: 0=No action/No change, 1=연속제어, 2=위치제어. continuousFocusControl: 0=No change, 1=Near, 2=Far, 3=Auto Focus ON, 4=Stop.-->
       <!--positionFocusControl은 raw 0~1000, 0.5%/bit로 해석하여 Semantic 0~500%, Resolution 0.5%로 표현한다. 원본 비고의 "최대 zoom에 대한 비율" 문구는 Focus 항목과 불일치하므로 원문 오기 가능성을 주석으로 남긴다. 0x5555는 No change 물리 특수값이다.-->
       <Parameters>
-        <BooleanProfile cdm="Control.EOIR.Focus.UseMWIR"/>
-        <ValueSetProfile cdm="Control.EOIR.Focus.Mode">
+        <BooleanProfile id="useMwir" name="Use Mwir" cdm="Control.EOIR.Focus.UseMWIR"/>
+        <ValueSetProfile id="focusMode" name="Focus Mode" cdm="Control.EOIR.Focus.Mode">
           <Values>
             <Value name="NoChange" cdm="EOIR.Focus.Mode.NoChange"/>
             <Value name="Continuous" cdm="EOIR.Focus.Mode.Continuous"/>
             <Value name="Position" cdm="EOIR.Focus.Mode.Position"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.Focus.Continuous">
+        <ValueSetProfile id="continuous" name="Continuous" cdm="Control.EOIR.Focus.Continuous">
           <Values>
             <Value name="NoChange" cdm="EOIR.Focus.Continuous.NoChange"/>
             <Value name="Near" cdm="EOIR.Focus.Continuous.Near"/>
@@ -544,7 +544,7 @@
             <Value name="Stop" cdm="EOIR.Focus.Continuous.Stop"/>
           </Values>
         </ValueSetProfile>
-        <QuantityProfile cdm="Control.EOIR.Focus.Position">
+        <QuantityProfile id="position" name="Position" cdm="Control.EOIR.Focus.Position">
           <Unit>%</Unit>
           <Range min="0" max="500"/>
           <Resolution>0.5</Resolution>
@@ -559,7 +559,7 @@
         <ControlSpec id="configureEoSensor" name="EO 카메라 세부 설정" cdm="Control.EOIR.EO.Configure">
       <!--eoSensorControl: 0=No change, 1=Day, 2=Night, 3=연무제거 On, 4=연무제거 Off. eoBLCControl/eoWDRControl: 0=No change, 1=On, 2=Off.-->
       <Parameters>
-        <ValueSetProfile cdm="Control.EOIR.EO.DayNightDehaze">
+        <ValueSetProfile id="dayNightDehaze" name="Day Night Dehaze" cdm="Control.EOIR.EO.DayNightDehaze">
           <Values>
             <Value name="NoChange" cdm="EOIR.EO.Mode.NoChange"/>
             <Value name="Day" cdm="EOIR.EO.Mode.Day"/>
@@ -568,14 +568,14 @@
             <Value name="DehazeOff" cdm="EOIR.EO.Mode.DehazeOff"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.EO.BLC">
+        <ValueSetProfile id="blc" name="Blc" cdm="Control.EOIR.EO.BLC">
           <Values>
             <Value name="NoChange" cdm="EOIR.Switch.NoChange"/>
             <Value name="On" cdm="EOIR.Switch.On"/>
             <Value name="Off" cdm="EOIR.Switch.Off"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.EO.WDR">
+        <ValueSetProfile id="wdr" name="Wdr" cdm="Control.EOIR.EO.WDR">
           <Values>
             <Value name="NoChange" cdm="EOIR.Switch.NoChange"/>
             <Value name="On" cdm="EOIR.Switch.On"/>
@@ -592,28 +592,28 @@
         <ControlSpec id="configureMwirSensor" name="MWIR 카메라 세부 설정" cdm="Control.EOIR.MWIR.Configure">
       <!--NUC/AutoGain: 0=No change, 1=On, 2=Off. Palette: 0=No change, 1=Hot/White, 2=Cold/White. AGC Limit: 0=No change, 1~9=Level(default 4). MIDE: 0=No change, 1~15=Level, 16=Off(default).-->
       <Parameters>
-        <ValueSetProfile cdm="Control.EOIR.MWIR.NUC">
+        <ValueSetProfile id="nuc" name="NUC" cdm="Control.EOIR.MWIR.NUC">
           <Values>
             <Value name="NoChange" cdm="EOIR.Switch.NoChange"/>
             <Value name="On" cdm="EOIR.Switch.On"/>
             <Value name="Off" cdm="EOIR.Switch.Off"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.MWIR.AutoGain">
+        <ValueSetProfile id="autoGain" name="Auto Gain" cdm="Control.EOIR.MWIR.AutoGain">
           <Values>
             <Value name="NoChange" cdm="EOIR.Switch.NoChange"/>
             <Value name="On" cdm="EOIR.Switch.On"/>
             <Value name="Off" cdm="EOIR.Switch.Off"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.MWIR.Palette">
+        <ValueSetProfile id="palette" name="Palette" cdm="Control.EOIR.MWIR.Palette">
           <Values>
             <Value name="NoChange" cdm="EOIR.Palette.NoChange"/>
             <Value name="HotWhite" cdm="EOIR.Palette.HotWhite"/>
             <Value name="ColdWhite" cdm="EOIR.Palette.ColdWhite"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.MWIR.AGCLimit">
+        <ValueSetProfile id="agcLimit" name="Agc Limit" cdm="Control.EOIR.MWIR.AGCLimit">
           <Values>
             <Value name="NoChange" cdm="EOIR.AGCLimit.NoChange"/>
             <Value name="Level1" cdm="EOIR.AGCLimit.Level1"/>
@@ -627,7 +627,7 @@
             <Value name="Level9" cdm="EOIR.AGCLimit.Level9"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.MWIR.MIDE">
+        <ValueSetProfile id="mide" name="Mide" cdm="Control.EOIR.MWIR.MIDE">
           <Values>
             <Value name="NoChange" cdm="EOIR.MIDE.NoChange"/>
             <Value name="Level1" cdm="EOIR.MIDE.Level1"/>
@@ -658,14 +658,14 @@
         <ControlSpec id="configureSwirSensor" name="SWIR 카메라 세부 설정" cdm="Control.EOIR.SWIR.Configure">
       <!--AutoGain: 0=No change, 1=On, 2=Off. Palette: 0=No change, 1=Hot/White, 2=Cold/White.-->
       <Parameters>
-        <ValueSetProfile cdm="Control.EOIR.SWIR.AutoGain">
+        <ValueSetProfile id="autoGain" name="Auto Gain" cdm="Control.EOIR.SWIR.AutoGain">
           <Values>
             <Value name="NoChange" cdm="EOIR.Switch.NoChange"/>
             <Value name="On" cdm="EOIR.Switch.On"/>
             <Value name="Off" cdm="EOIR.Switch.Off"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.SWIR.Palette">
+        <ValueSetProfile id="palette" name="Palette" cdm="Control.EOIR.SWIR.Palette">
           <Values>
             <Value name="NoChange" cdm="EOIR.Palette.NoChange"/>
             <Value name="HotWhite" cdm="EOIR.Palette.HotWhite"/>
@@ -682,7 +682,7 @@
         <ControlSpec id="controlLrf" name="LRF 측정 설정" cdm="Control.EOIR.LRF.Measurement">
       <!--controlLRFCount: 0=No change, 1=단발 1회, 2=1Hz 연속, 3=4Hz 연속, 4=연속 정지. 측정 결과는 LRFReportType을 lrfMeasurement Monitor로 수신한다.-->
       <Parameters>
-        <ValueSetProfile cdm="Control.EOIR.LRF.MeasurementMode">
+        <ValueSetProfile id="measurementMode" name="Measurement Mode" cdm="Control.EOIR.LRF.MeasurementMode">
           <Values>
             <Value name="NoChange" cdm="EOIR.LRF.Mode.NoChange"/>
             <Value name="Single" cdm="EOIR.LRF.Mode.Single"/>
@@ -701,16 +701,16 @@
         <ControlSpec id="configureIlluminator" name="탐조등 설정" cdm="Control.EOIR.Illuminator">
       <!--laserIlluminatorSetting: false(0)=탐조등 사용, true(1)=탐조등 미사용. beamAngleTele/Wide 값은 한 번 확대/축소되는 변화 크기이며 0~255 raw 단계값이다.-->
       <Parameters>
-        <BooleanProfile cdm="Control.EOIR.Illuminator.Disabled"/>
-        <QuantityProfile cdm="Control.EOIR.Illuminator.Brightness">
+        <BooleanProfile id="disabled" name="Disabled" cdm="Control.EOIR.Illuminator.Disabled"/>
+        <QuantityProfile id="brightness" name="Brightness" cdm="Control.EOIR.Illuminator.Brightness">
           <Unit>num</Unit>
           <Range min="0" max="255"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Illuminator.BeamTeleStep">
+        <QuantityProfile id="beamTeleStep" name="Beam Tele Step" cdm="Control.EOIR.Illuminator.BeamTeleStep">
           <Unit>num</Unit>
           <Range min="0" max="255"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Control.EOIR.Illuminator.BeamWideStep">
+        <QuantityProfile id="beamWideStep" name="Beam Wide Step" cdm="Control.EOIR.Illuminator.BeamWideStep">
           <Unit>num</Unit>
           <Range min="0" max="255"/>
         </QuantityProfile>
@@ -724,7 +724,7 @@
         <ControlSpec id="controlWiper" name="Wiper 설정" cdm="Control.EOIR.Wiper">
       <!--원본 CSCI의 wiperSetting 범위는 0~9이나 실제 유효 동작으로 0=No change, 1=1회 동작, 2=연속 동작, 3=Stop만 사용한다. 4/5는 원본에 삭제 요청으로 표기되고 6~9는 정의가 없어 Semantic에서 제외한다.-->
       <Parameters>
-        <ValueSetProfile cdm="Control.EOIR.Wiper.Mode">
+        <ValueSetProfile id="wiperMode" name="Wiper Mode" cdm="Control.EOIR.Wiper.Mode">
           <Values>
             <Value name="NoChange" cdm="EOIR.Wiper.NoChange"/>
             <Value name="Once" cdm="EOIR.Wiper.Once"/>
@@ -742,28 +742,28 @@
         <ControlSpec id="controlPower" name="EOIR 전원 설정" cdm="Control.EOIR.Power">
       <!--각 전원 필드: 0=No change, 1=On, 2=Off. SWIR는 설정/영상전환/IBIT 상태는 존재하지만 EOIRPowerControlType에 swirPower가 정의되어 있지 않아 임의로 추가하지 않는다(TBD).-->
       <Parameters>
-        <ValueSetProfile cdm="Control.EOIR.Power.EO">
+        <ValueSetProfile id="eo" name="EO" cdm="Control.EOIR.Power.EO">
           <Values>
             <Value name="NoChange" cdm="Power.Command.NoChange"/>
             <Value name="On" cdm="Power.Command.On"/>
             <Value name="Off" cdm="Power.Command.Off"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.Power.MWIR">
+        <ValueSetProfile id="mwir" name="Mwir" cdm="Control.EOIR.Power.MWIR">
           <Values>
             <Value name="NoChange" cdm="Power.Command.NoChange"/>
             <Value name="On" cdm="Power.Command.On"/>
             <Value name="Off" cdm="Power.Command.Off"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.Power.LRF">
+        <ValueSetProfile id="lrf" name="Lrf" cdm="Control.EOIR.Power.LRF">
           <Values>
             <Value name="NoChange" cdm="Power.Command.NoChange"/>
             <Value name="On" cdm="Power.Command.On"/>
             <Value name="Off" cdm="Power.Command.Off"/>
           </Values>
         </ValueSetProfile>
-        <ValueSetProfile cdm="Control.EOIR.Power.Illuminator">
+        <ValueSetProfile id="illuminator" name="Illuminator" cdm="Control.EOIR.Power.Illuminator">
           <Values>
             <Value name="NoChange" cdm="Power.Command.NoChange"/>
             <Value name="On" cdm="Power.Command.On"/>

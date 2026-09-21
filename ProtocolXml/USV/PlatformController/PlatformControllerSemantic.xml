@@ -621,9 +621,9 @@
     </ControlSpec>
         <ControlSpec id="powerOnEquipment" name="장비 전원 ON" cdm="Control.Power.On">
       <Parameters>
-        <CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
-          <ElementProfile cdm="Equipment.Identifier">
-            <Profile cdm="Equipment.Identifier.Numeric"/>
+        <CollectionProfile id="powerTargetSet" name="Power Target Set" cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
+          <ElementProfile id="equipment" name="장비" cdm="Equipment.Identifier">
+            <Profile id="equipmentId" name="장비 식별자" cdm="Equipment.Identifier.Numeric"/>
           </ElementProfile>
         </CollectionProfile>
       </Parameters>
@@ -633,9 +633,9 @@
     </ControlSpec>
         <ControlSpec id="powerOffEquipment" name="장비 전원 OFF" cdm="Control.Power.Off">
       <Parameters>
-        <CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
-          <ElementProfile cdm="Equipment.Identifier">
-            <Profile cdm="Equipment.Identifier.Numeric"/>
+        <CollectionProfile id="powerTargetSet" name="Power Target Set" cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
+          <ElementProfile id="equipment" name="장비" cdm="Equipment.Identifier">
+            <Profile id="equipmentId" name="장비 식별자" cdm="Equipment.Identifier.Numeric"/>
           </ElementProfile>
         </CollectionProfile>
       </Parameters>
@@ -645,9 +645,9 @@
     </ControlSpec>
         <ControlSpec id="resetEquipmentPower" name="장비 전원 Reset" cdm="Control.Power.Reset">
       <Parameters>
-        <CollectionProfile cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
-          <ElementProfile cdm="Equipment.Identifier">
-            <Profile cdm="Equipment.Identifier.Numeric"/>
+        <CollectionProfile id="powerTargetSet" name="Power Target Set" cdm="Equipment.Power.TargetSet" minOccurs="1" maxOccurs="51">
+          <ElementProfile id="equipment" name="장비" cdm="Equipment.Identifier">
+            <Profile id="equipmentId" name="장비 식별자" cdm="Equipment.Identifier.Numeric"/>
           </ElementProfile>
         </CollectionProfile>
       </Parameters>
@@ -657,7 +657,7 @@
     </ControlSpec>
         <ControlSpec id="configureSurveillanceCameraPower" name="감시카메라 전원 설정" cdm="Control.Camera.Power.Configuration">
       <Parameters>
-        <Profile cdm="Equipment.Camera.Power.StateSet"/>
+        <Profile id="powerStateSet" name="Power State Set" cdm="Equipment.Camera.Power.StateSet"/>
       </Parameters>
       <Reply bindRef="configureSurveillanceCameraPowerAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
@@ -666,22 +666,22 @@
     <!--ENVCommandType과 TowingDeviceControlType은 ACK=O이나 commandID가 없어 현재 CommandStatusReport Reply를 강제로 연결하지 않는다.-->
         <ControlSpec id="configureEnvironmentSystem" name="환경센서 계통 제어" cdm="Control.Environment.Configuration">
       <Parameters>
-        <Profile cdm="Environment.SeaWaterAirConditioner.Control"/>
-        <QuantityProfile cdm="Environment.SeaWaterAirConditioner.TemperatureSetpoint"><Unit>degC</Unit></QuantityProfile>
-        <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher1.Command"/>
-        <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher2.Command"/>
-        <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher3.Command"/>
-        <BooleanProfile cdm="Safety.FireSuppression.AutoExtinguisher4.Command"/>
+        <Profile id="control" name="Control" cdm="Environment.SeaWaterAirConditioner.Control"/>
+        <QuantityProfile id="temperatureSetpoint" name="Temperature Setpoint" cdm="Environment.SeaWaterAirConditioner.TemperatureSetpoint"><Unit>degC</Unit></QuantityProfile>
+        <BooleanProfile id="autoExtinguisher1Command" name="Auto Extinguisher 1 Command" cdm="Safety.FireSuppression.AutoExtinguisher1.Command"/>
+        <BooleanProfile id="autoExtinguisher2Command" name="Auto Extinguisher 2 Command" cdm="Safety.FireSuppression.AutoExtinguisher2.Command"/>
+        <BooleanProfile id="autoExtinguisher3Command" name="Auto Extinguisher 3 Command" cdm="Safety.FireSuppression.AutoExtinguisher3.Command"/>
+        <BooleanProfile id="autoExtinguisher4Command" name="Auto Extinguisher 4 Command" cdm="Safety.FireSuppression.AutoExtinguisher4.Command"/>
       </Parameters>
     </ControlSpec>
         <ControlSpec id="lockTowingDevice" name="피예인장치 잠금" cdm="Control.TowingDevice.Lock"/>    <ControlSpec id="unlockTowingDevice" name="피예인장치 잠금 해제" cdm="Control.TowingDevice.Unlock"/>
     <!--원격통제장치 CSCI: RUSV::C2::RCU::USVControlType, 10 Hz, ACK 없음. integratedTargetSteering/Throttle은 공용 구조체에서 현 프로젝트 미사용으로 표기되어 Semantic 입력에서는 제외한다.-->
     <ControlSpec id="controlPropulsion" name="실시간 추진 제어" cdm="Control.Platform.Propulsion.Realtime">
       <Parameters>
-        <ValueSetProfile cdm="Platform.Propulsion.ControlMode"><Values><Value name="Neutral" cdm="Platform.Propulsion.ControlMode.Neutral"/><Value name="CourseVelocity" cdm="Platform.Propulsion.ControlMode.CourseVelocity"/><Value name="RpmSteering" cdm="Platform.Propulsion.ControlMode.RpmSteering"/><Value name="Joystick" cdm="Platform.Propulsion.ControlMode.Joystick"/></Values></ValueSetProfile>
-        <QuantityProfile cdm="Platform.Propulsion.TargetCourse"><Unit>rad</Unit></QuantityProfile><QuantityProfile cdm="Platform.Propulsion.TargetVelocity"><Unit>m/s</Unit></QuantityProfile>
-        <QuantityProfile cdm="Platform.Propulsion.Port.TargetSteering"><Unit>0.0001</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile cdm="Platform.Propulsion.Starboard.TargetSteering"><Unit>0.0001</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile cdm="Platform.Propulsion.Port.TargetThrottle"><Unit>0.0001</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile cdm="Platform.Propulsion.Starboard.TargetThrottle"><Unit>0.0001</Unit><Range min="-10000" max="10000"/></QuantityProfile>
-        <QuantityProfile cdm="Platform.Propulsion.Joystick.X"><Unit>0.01%</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile cdm="Platform.Propulsion.Joystick.Y"><Unit>0.01%</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile cdm="Platform.Propulsion.Joystick.Z"><Unit>0.01%</Unit><Range min="-10000" max="10000"/></QuantityProfile><BooleanProfile cdm="Platform.Propulsion.BowThruster.Enabled"/><QuantityProfile cdm="Platform.Propulsion.BowThruster.TargetThrottle"><Unit>0.01%</Unit></QuantityProfile>
+        <ValueSetProfile id="targetControlState" name="목표 제어모드" cdm="Platform.Propulsion.ControlMode"><Values><Value name="Neutral" cdm="Platform.Propulsion.ControlMode.Neutral"/><Value name="CourseVelocity" cdm="Platform.Propulsion.ControlMode.CourseVelocity"/><Value name="RpmSteering" cdm="Platform.Propulsion.ControlMode.RpmSteering"/><Value name="Joystick" cdm="Platform.Propulsion.ControlMode.Joystick"/></Values></ValueSetProfile>
+        <QuantityProfile id="targetCourse" name="침로 목표 값" cdm="Platform.Propulsion.TargetCourse"><Unit>rad</Unit></QuantityProfile><QuantityProfile id="targetVelocity" name="속력 목표 값" cdm="Platform.Propulsion.TargetVelocity"><Unit>m/s</Unit></QuantityProfile>
+        <QuantityProfile id="portTargetSteering" name="좌현 스티어링 제어 목표 값" cdm="Platform.Propulsion.Port.TargetSteering"><Unit>0.0001</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile id="starboardTargetSteering" name="우현 스티어링 제어 목표 값" cdm="Platform.Propulsion.Starboard.TargetSteering"><Unit>0.0001</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile id="portTargetThrottle" name="좌현 스로틀 제어 목표 값" cdm="Platform.Propulsion.Port.TargetThrottle"><Unit>0.0001</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile id="starboardTargetThrottle" name="우현 스로틀 제어 목표 값" cdm="Platform.Propulsion.Starboard.TargetThrottle"><Unit>0.0001</Unit><Range min="-10000" max="10000"/></QuantityProfile>
+        <QuantityProfile id="joystickXAxis" name="조이스틱 X 명령" cdm="Platform.Propulsion.Joystick.X"><Unit>0.01%</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile id="joystickYAxis" name="조이스틱 Y 명령" cdm="Platform.Propulsion.Joystick.Y"><Unit>0.01%</Unit><Range min="-10000" max="10000"/></QuantityProfile><QuantityProfile id="joystickZAxis" name="조이스틱 Z 명령" cdm="Platform.Propulsion.Joystick.Z"><Unit>0.01%</Unit><Range min="-10000" max="10000"/></QuantityProfile><BooleanProfile id="bowthrustEnableCommand" name="선수추력기 Enable 상태" cdm="Platform.Propulsion.BowThruster.Enabled"/><QuantityProfile id="bowthrustTargetThrottle" name="선수추력기 목표 값" cdm="Platform.Propulsion.BowThruster.TargetThrottle"><Unit>0.01%</Unit></QuantityProfile>
       </Parameters>
     </ControlSpec>
   </ControlSpecs>

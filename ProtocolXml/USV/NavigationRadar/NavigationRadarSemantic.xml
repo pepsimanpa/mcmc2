@@ -299,7 +299,7 @@
         <ControlSpec id="setRadarRange" name="항해레이더 탐지거리 설정" cdm="Control.Radar.Range.Set">
       <!--RadarRangeControlType.setTargetRange은 octet으로 정의되어 있으나 값의 단위/범위/프리셋 변환 규칙이 원문에 없다. 상태 radarRange(long, m)를 근거로 임의 변환하지 않는다.-->
       <Parameters>
-        <Profile cdm="Control.Radar.Range.CommandValue"/>
+        <Profile id="commandValue" name="Command Value" cdm="Control.Radar.Range.CommandValue"/>
       </Parameters>
       <Reply bindRef="setRadarRangeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
@@ -338,7 +338,7 @@
         <ControlSpec id="setAISRange" name="AIS 탐지거리 설정" cdm="Control.AIS.Range.Set">
       <!--AISRangeFilterControlType.setAISRange은 octet으로 정의되어 있으나 값의 단위/범위/프리셋 변환 규칙이 원문에 없다. 상태 aisRange(long, m)를 근거로 임의 변환하지 않는다.-->
       <Parameters>
-        <Profile cdm="Control.AIS.Range.CommandValue"/>
+        <Profile id="commandValue" name="Command Value" cdm="Control.AIS.Range.CommandValue"/>
       </Parameters>
       <Reply bindRef="setAISRangeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>

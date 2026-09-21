@@ -279,29 +279,29 @@
     <ControlSpec id="recordWaypointMission" name="경로점 레코드 설정" cdm="Control.Autonomy.Mission.Record.Waypoint">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <CollectionProfile cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
-          <ElementProfile cdm="Autonomy.Mission.Record.CommonMissionData">
-            <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
-            <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+        <CollectionProfile id="commonMissionDataSequence" name="Common Mission Data Sequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <ElementProfile id="commonMissionData" name="Common Mission Data" cdm="Autonomy.Mission.Record.CommonMissionData">
+            <QuantityProfile id="missionId" name="Mission ID" cdm="Autonomy.Mission.Record.MissionID"/>
+            <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Mission.Record.Latitude">
               <Unit>deg</Unit>
               <Range min="-90" max="90"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+            <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Mission.Record.Longitude">
               <Unit>deg</Unit>
               <Range min="-180" max="180"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+            <QuantityProfile id="desiredVelocity" name="Desired Velocity" cdm="Autonomy.Mission.Record.DesiredVelocity">
               <Unit>m/s</Unit>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+            <QuantityProfile id="goalErrorTolerance" name="Goal Error Tolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance">
               <Unit>m</Unit>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
-            <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+            <QuantityProfile id="pointIndex" name="Point Index" cdm="Autonomy.Mission.Record.PointIndex"/>
+            <QuantityProfile id="totalPointCount" name="Total Point Count" cdm="Autonomy.Mission.Record.TotalPointCount"/>
           </ElementProfile>
         </CollectionProfile>
-        <ValueSetProfile cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+        <ValueSetProfile id="endAction" name="End Action" cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
+        <QuantityProfile id="lateralErrorTolerance" name="Lateral Error Tolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance">
           <Unit>m</Unit>
         </QuantityProfile>
       </Parameters>
@@ -312,29 +312,29 @@
     <ControlSpec id="recordGlobalHoverMission" name="목표해점위치고정 레코드 설정" cdm="Control.Autonomy.Mission.Record.GlobalHover">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+        <QuantityProfile id="missionId" name="Mission ID" cdm="Autonomy.Mission.Record.MissionID"/>
+        <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Mission.Record.Latitude">
           <Unit>deg</Unit>
           <Range min="-90" max="90"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+        <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Mission.Record.Longitude">
           <Unit>deg</Unit>
           <Range min="-180" max="180"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+        <QuantityProfile id="desiredVelocity" name="Desired Velocity" cdm="Autonomy.Mission.Record.DesiredVelocity">
           <Unit>m/s</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+        <QuantityProfile id="goalErrorTolerance" name="Goal Error Tolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance">
           <Unit>m</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.EndTime"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Heading"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.EnableModeRadius">
+        <QuantityProfile id="pointIndex" name="Point Index" cdm="Autonomy.Mission.Record.PointIndex"/>
+        <QuantityProfile id="totalPointCount" name="Total Point Count" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <QuantityProfile id="endTime" name="End Time" cdm="Autonomy.Mission.Record.EndTime"/>
+        <QuantityProfile id="heading" name="Heading" cdm="Autonomy.Mission.Record.Heading"/>
+        <QuantityProfile id="enableModeRadius" name="Enable Mode Radius" cdm="Autonomy.Mission.Record.EnableModeRadius">
           <Unit>m</Unit>
         </QuantityProfile>
-        <ValueSetProfile cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
+        <ValueSetProfile id="endAction" name="End Action" cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
       </Parameters>
       <!--GlobalHoverRecordCommand.endTime은 원문상 절대시각/지속시간 의미가 혼재되어 raw unsigned long long 의미로 유지한다. heading Unit도 원문 미기재.-->
       <!--missionType은 HMI 입력값이 아니며 이 Control에 대응하는 고정값 1을 Binding에서 설정한다.-->
@@ -344,30 +344,30 @@
     <ControlSpec id="recordTargetTrackingMission" name="표적추종 레코드 설정" cdm="Control.Autonomy.Mission.Record.TargetTracking">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+        <QuantityProfile id="missionId" name="Mission ID" cdm="Autonomy.Mission.Record.MissionID"/>
+        <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Mission.Record.Latitude">
           <Unit>deg</Unit>
           <Range min="-90" max="90"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+        <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Mission.Record.Longitude">
           <Unit>deg</Unit>
           <Range min="-180" max="180"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+        <QuantityProfile id="desiredVelocity" name="Desired Velocity" cdm="Autonomy.Mission.Record.DesiredVelocity">
           <Unit>m/s</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+        <QuantityProfile id="goalErrorTolerance" name="Goal Error Tolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance">
           <Unit>m</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.TargetTrackingID"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.RangeToTarget">
+        <QuantityProfile id="pointIndex" name="Point Index" cdm="Autonomy.Mission.Record.PointIndex"/>
+        <QuantityProfile id="totalPointCount" name="Total Point Count" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <QuantityProfile id="targetTrackingId" name="Target Tracking ID" cdm="Autonomy.Mission.Record.TargetTrackingID"/>
+        <QuantityProfile id="rangeToTarget" name="Range To Target" cdm="Autonomy.Mission.Record.RangeToTarget">
           <Unit>m</Unit>
           <Range min="0" max="2000"/>
         </QuantityProfile>
-        <ValueSetProfile cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.OffsetFromTarget">
+        <ValueSetProfile id="endAction" name="End Action" cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
+        <QuantityProfile id="offsetFromTarget" name="Offset From Target" cdm="Autonomy.Mission.Record.OffsetFromTarget">
           <Unit>m</Unit>
           <Range min="-2000" max="2000"/>
         </QuantityProfile>
@@ -381,25 +381,25 @@
     <ControlSpec id="recordPointAndGoMission" name="Point &amp; Go 레코드 설정" cdm="Control.Autonomy.Mission.Record.PointAndGo">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+        <QuantityProfile id="missionId" name="Mission ID" cdm="Autonomy.Mission.Record.MissionID"/>
+        <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Mission.Record.Latitude">
           <Unit>deg</Unit>
           <Range min="-90" max="90"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+        <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Mission.Record.Longitude">
           <Unit>deg</Unit>
           <Range min="-180" max="180"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+        <QuantityProfile id="desiredVelocity" name="Desired Velocity" cdm="Autonomy.Mission.Record.DesiredVelocity">
           <Unit>m/s</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+        <QuantityProfile id="goalErrorTolerance" name="Goal Error Tolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance">
           <Unit>m</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
-        <ValueSetProfile cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+        <QuantityProfile id="pointIndex" name="Point Index" cdm="Autonomy.Mission.Record.PointIndex"/>
+        <QuantityProfile id="totalPointCount" name="Total Point Count" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <ValueSetProfile id="endAction" name="End Action" cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
+        <QuantityProfile id="lateralErrorTolerance" name="Lateral Error Tolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance">
           <Unit>m</Unit>
           <Range min="0" max="100"/>
         </QuantityProfile>
@@ -411,25 +411,25 @@
     <ControlSpec id="recordAutonomousNavigationMission" name="자동운항 레코드 설정" cdm="Control.Autonomy.Mission.Record.AutonomousNavigation">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+        <QuantityProfile id="missionId" name="Mission ID" cdm="Autonomy.Mission.Record.MissionID"/>
+        <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Mission.Record.Latitude">
           <Unit>deg</Unit>
           <Range min="-90" max="90"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+        <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Mission.Record.Longitude">
           <Unit>deg</Unit>
           <Range min="-180" max="180"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+        <QuantityProfile id="desiredVelocity" name="Desired Velocity" cdm="Autonomy.Mission.Record.DesiredVelocity">
           <Unit>m/s</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+        <QuantityProfile id="goalErrorTolerance" name="Goal Error Tolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance">
           <Unit>m</Unit>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
-        <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
-        <ValueSetProfile cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+        <QuantityProfile id="pointIndex" name="Point Index" cdm="Autonomy.Mission.Record.PointIndex"/>
+        <QuantityProfile id="totalPointCount" name="Total Point Count" cdm="Autonomy.Mission.Record.TotalPointCount"/>
+        <ValueSetProfile id="endAction" name="End Action" cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
+        <QuantityProfile id="lateralErrorTolerance" name="Lateral Error Tolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance">
           <Unit>m</Unit>
           <Range min="0" max="100"/>
         </QuantityProfile>
@@ -441,32 +441,32 @@
     <ControlSpec id="recordSurfaceReconnaissanceMission" name="수상감시정찰 레코드 설정" cdm="Control.Autonomy.Mission.Record.SurfaceReconnaissance">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <CollectionProfile cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
-          <ElementProfile cdm="Autonomy.Mission.Record.CommonMissionData">
-            <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
-            <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+        <CollectionProfile id="commonMissionDataSequence" name="Common Mission Data Sequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <ElementProfile id="commonMissionData" name="Common Mission Data" cdm="Autonomy.Mission.Record.CommonMissionData">
+            <QuantityProfile id="missionId" name="Mission ID" cdm="Autonomy.Mission.Record.MissionID"/>
+            <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Mission.Record.Latitude">
               <Unit>deg</Unit>
               <Range min="-90" max="90"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+            <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Mission.Record.Longitude">
               <Unit>deg</Unit>
               <Range min="-180" max="180"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+            <QuantityProfile id="desiredVelocity" name="Desired Velocity" cdm="Autonomy.Mission.Record.DesiredVelocity">
               <Unit>m/s</Unit>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+            <QuantityProfile id="goalErrorTolerance" name="Goal Error Tolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance">
               <Unit>m</Unit>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
-            <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+            <QuantityProfile id="pointIndex" name="Point Index" cdm="Autonomy.Mission.Record.PointIndex"/>
+            <QuantityProfile id="totalPointCount" name="Total Point Count" cdm="Autonomy.Mission.Record.TotalPointCount"/>
           </ElementProfile>
         </CollectionProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+        <QuantityProfile id="lateralErrorTolerance" name="Lateral Error Tolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance">
           <Unit>m</Unit>
         </QuantityProfile>
-        <ValueSetProfile cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.RepeatNumber">
+        <ValueSetProfile id="endAction" name="End Action" cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
+        <QuantityProfile id="repeatNumber" name="Repeat Number" cdm="Autonomy.Mission.Record.RepeatNumber">
           <Range min="0" max="255"/>
         </QuantityProfile>
       </Parameters>
@@ -477,38 +477,38 @@
     <ControlSpec id="recordUnderwaterReconnaissanceMission" name="수중감시정찰 레코드 설정" cdm="Control.Autonomy.Mission.Record.UnderwaterReconnaissance">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <CollectionProfile cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
-          <ElementProfile cdm="Autonomy.Mission.Record.CommonMissionData">
-            <QuantityProfile cdm="Autonomy.Mission.Record.MissionID"/>
-            <QuantityProfile cdm="Autonomy.Mission.Record.Latitude">
+        <CollectionProfile id="commonMissionDataSequence" name="Common Mission Data Sequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
+          <ElementProfile id="commonMissionData" name="Common Mission Data" cdm="Autonomy.Mission.Record.CommonMissionData">
+            <QuantityProfile id="missionId" name="Mission ID" cdm="Autonomy.Mission.Record.MissionID"/>
+            <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Mission.Record.Latitude">
               <Unit>deg</Unit>
               <Range min="-90" max="90"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.Longitude">
+            <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Mission.Record.Longitude">
               <Unit>deg</Unit>
               <Range min="-180" max="180"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.DesiredVelocity">
+            <QuantityProfile id="desiredVelocity" name="Desired Velocity" cdm="Autonomy.Mission.Record.DesiredVelocity">
               <Unit>m/s</Unit>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.GoalErrorTolerance">
+            <QuantityProfile id="goalErrorTolerance" name="Goal Error Tolerance" cdm="Autonomy.Mission.Record.GoalErrorTolerance">
               <Unit>m</Unit>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Mission.Record.PointIndex"/>
-            <QuantityProfile cdm="Autonomy.Mission.Record.TotalPointCount"/>
+            <QuantityProfile id="pointIndex" name="Point Index" cdm="Autonomy.Mission.Record.PointIndex"/>
+            <QuantityProfile id="totalPointCount" name="Total Point Count" cdm="Autonomy.Mission.Record.TotalPointCount"/>
           </ElementProfile>
         </CollectionProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.LateralErrorTolerance">
+        <QuantityProfile id="lateralErrorTolerance" name="Lateral Error Tolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance">
           <Unit>m</Unit>
           <Range min="0" max="255"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.SearchingRange">
+        <QuantityProfile id="searchingRange" name="Searching Range" cdm="Autonomy.Mission.Record.SearchingRange">
           <Unit>m</Unit>
           <Range min="37.5" max="150"/>
           <Resolution>0.01</Resolution>
         </QuantityProfile>
-        <ValueSetProfile cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
-        <QuantityProfile cdm="Autonomy.Mission.Record.TimeLimit">
+        <ValueSetProfile id="endAction" name="End Action" cdm="Autonomy.Mission.Record.EndAction"><Values><Value name="Drift" cdm="Autonomy.Mission.Record.EndAction.Drift"/><Value name="WeatherVaning" cdm="Autonomy.Mission.Record.EndAction.WeatherVaning"/></Values></ValueSetProfile>
+        <QuantityProfile id="timeLimit" name="Time Limit" cdm="Autonomy.Mission.Record.TimeLimit">
           <Range min="0" max="14400"/>
           <Resolution>1</Resolution>
         </QuantityProfile>
@@ -521,29 +521,29 @@
     <ControlSpec id="setEmergencyReturnRoute" name="비상복귀점 및 경로 설정" cdm="Control.Autonomy.Return.EmergencyRoute">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Autonomy.Return.DesiredVelocity">
+        <QuantityProfile id="desiredVelocity" name="Desired Velocity" cdm="Autonomy.Return.DesiredVelocity">
           <Unit>m/s</Unit>
         </QuantityProfile>
-        <CollectionProfile cdm="Autonomy.Return.RoutePoints" minOccurs="0" maxOccurs="256">
-          <ElementProfile cdm="Autonomy.Return.RoutePoint">
-            <QuantityProfile cdm="Autonomy.Return.RoutePoint.Latitude">
+        <CollectionProfile id="routePoints" name="Route Points" cdm="Autonomy.Return.RoutePoints" minOccurs="0" maxOccurs="256">
+          <ElementProfile id="routePoint" name="Route Point" cdm="Autonomy.Return.RoutePoint">
+            <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Return.RoutePoint.Latitude">
               <Unit>deg</Unit>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Return.RoutePoint.Longitude">
+            <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Return.RoutePoint.Longitude">
               <Unit>deg</Unit>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.Return.RoutePoint.Index"/>
+            <QuantityProfile id="index" name="Index" cdm="Autonomy.Return.RoutePoint.Index"/>
           </ElementProfile>
         </CollectionProfile>
-        <QuantityProfile cdm="Autonomy.Return.LateralErrorTolerance">
+        <QuantityProfile id="lateralErrorTolerance" name="Lateral Error Tolerance" cdm="Autonomy.Return.LateralErrorTolerance">
           <Unit>m</Unit>
           <Range min="0" max="255"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Return.GoalError">
+        <QuantityProfile id="goalError" name="Goal Error" cdm="Autonomy.Return.GoalError">
           <Unit>m</Unit>
           <Range min="0" max="255"/>
         </QuantityProfile>
-        <ValueSetProfile cdm="Autonomy.Return.EndAction"><Values><Value name="Drift" cdm="Autonomy.Return.EndAction.Drift"/><Value name="HoldPosition" cdm="Autonomy.Return.EndAction.HoldPosition"/><Value name="Signal" cdm="Autonomy.Return.EndAction.Signal"/></Values></ValueSetProfile>
+        <ValueSetProfile id="endAction" name="End Action" cdm="Autonomy.Return.EndAction"><Values><Value name="Drift" cdm="Autonomy.Return.EndAction.Drift"/><Value name="HoldPosition" cdm="Autonomy.Return.EndAction.HoldPosition"/><Value name="Signal" cdm="Autonomy.Return.EndAction.Signal"/></Values></ValueSetProfile>
       </Parameters>
       <!--action 원문 Range는 0~0x03이나 의미가 정의된 값은 0=정지(표류), 1=함위 유지(default), 2=주기적 경적/등화 신호뿐이다. Semantic 입력 범위는 0~2로 제한한다.-->
       <Reply bindRef="setEmergencyReturnRouteAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
@@ -551,11 +551,11 @@
     <ControlSpec id="setReturnToBasePoint" name="기지복귀점 설정" cdm="Control.Autonomy.Return.BasePoint">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Autonomy.Return.BasePoint.Latitude">
+        <QuantityProfile id="latitude" name="Latitude" cdm="Autonomy.Return.BasePoint.Latitude">
           <Unit>deg</Unit>
           <Range min="-90" max="90"/>
         </QuantityProfile>
-        <QuantityProfile cdm="Autonomy.Return.BasePoint.Longitude">
+        <QuantityProfile id="longitude" name="Longitude" cdm="Autonomy.Return.BasePoint.Longitude">
           <Unit>deg</Unit>
           <Range min="-180" max="180"/>
         </QuantityProfile>
@@ -565,7 +565,7 @@
     <ControlSpec id="startMission" name="임무 시작" cdm="Control.Autonomy.Mission.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Autonomy.Mission.StartPointIndex">
+        <QuantityProfile id="startPointIndex" name="Start Point Index" cdm="Autonomy.Mission.StartPointIndex">
           <Range min="0" max="255"/>
         </QuantityProfile>
       </Parameters>
@@ -575,7 +575,7 @@
     <ControlSpec id="resumeMission" name="임무 재개" cdm="Control.Autonomy.Mission.Resume">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <QuantityProfile cdm="Autonomy.Mission.StartPointIndex">
+        <QuantityProfile id="startPointIndex" name="Start Point Index" cdm="Autonomy.Mission.StartPointIndex">
           <Range min="0" max="255"/>
         </QuantityProfile>
       </Parameters>
@@ -592,22 +592,22 @@
     <ControlSpec id="setRestrictedAreas" name="접근금지구역 설정" cdm="Control.Autonomy.RestrictedArea.Set">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <CollectionProfile cdm="Autonomy.RestrictedArea.List" minOccurs="0" maxOccurs="256">
-          <ElementProfile cdm="Autonomy.RestrictedArea.Item">
-            <QuantityProfile cdm="Autonomy.RestrictedArea.ID"/>
-            <QuantityProfile cdm="Autonomy.RestrictedArea.Point0.Latitude">
+        <CollectionProfile id="list" name="List" cdm="Autonomy.RestrictedArea.List" minOccurs="0" maxOccurs="256">
+          <ElementProfile id="restrictedArea" name="접근금지구역" cdm="Autonomy.RestrictedArea.Item">
+            <QuantityProfile id="restrictedAreaId" name="Restricted Area ID" cdm="Autonomy.RestrictedArea.ID"/>
+            <QuantityProfile id="point0Latitude" name="Point 0 Latitude" cdm="Autonomy.RestrictedArea.Point0.Latitude">
               <Unit>deg</Unit>
               <Range min="-90" max="90"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.RestrictedArea.Point0.Longitude">
+            <QuantityProfile id="point0Longitude" name="Point 0 Longitude" cdm="Autonomy.RestrictedArea.Point0.Longitude">
               <Unit>deg</Unit>
               <Range min="-180" max="180"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.RestrictedArea.Point1.Latitude">
+            <QuantityProfile id="point1Latitude" name="Point 1 Latitude" cdm="Autonomy.RestrictedArea.Point1.Latitude">
               <Unit>deg</Unit>
               <Range min="-90" max="90"/>
             </QuantityProfile>
-            <QuantityProfile cdm="Autonomy.RestrictedArea.Point1.Longitude">
+            <QuantityProfile id="point1Longitude" name="Point 1 Longitude" cdm="Autonomy.RestrictedArea.Point1.Longitude">
               <Unit>deg</Unit>
               <Range min="-180" max="180"/>
             </QuantityProfile>

@@ -98,9 +98,9 @@
     <ControlSpec id="configureDisplayMode" name="운항용카메라 영상 전시 송출 설정" cdm="Control.NavigationCamera.DisplayMode.Configure">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Parameters>
-        <ValueSetProfile cdm="Control.NavigationCamera.Display.EO.Mode"><Values><Value name="Off" cdm="Control.NavigationCamera.Display.EO.Off"/><Value name="On" cdm="Control.NavigationCamera.Display.EO.On"/></Values></ValueSetProfile>
-        <ValueSetProfile cdm="Control.NavigationCamera.Display.IR.Mode"><Values><Value name="Off" cdm="Control.NavigationCamera.Display.IR.Off"/><Value name="On" cdm="Control.NavigationCamera.Display.IR.On"/></Values></ValueSetProfile>
-        <ValueSetProfile cdm="Control.NavigationCamera.Display.Quality.Mode"><Values><Value name="Normal" cdm="Control.NavigationCamera.Display.Quality.Normal"/><Value name="Low" cdm="Control.NavigationCamera.Display.Quality.Low"/></Values></ValueSetProfile>
+        <ValueSetProfile id="eoMode" name="EO Mode" cdm="Control.NavigationCamera.Display.EO.Mode"><Values><Value name="Off" cdm="Control.NavigationCamera.Display.EO.Off"/><Value name="On" cdm="Control.NavigationCamera.Display.EO.On"/></Values></ValueSetProfile>
+        <ValueSetProfile id="irMode" name="IR Mode" cdm="Control.NavigationCamera.Display.IR.Mode"><Values><Value name="Off" cdm="Control.NavigationCamera.Display.IR.Off"/><Value name="On" cdm="Control.NavigationCamera.Display.IR.On"/></Values></ValueSetProfile>
+        <ValueSetProfile id="qualityMode" name="Quality Mode" cdm="Control.NavigationCamera.Display.Quality.Mode"><Values><Value name="Normal" cdm="Control.NavigationCamera.Display.Quality.Normal"/><Value name="Low" cdm="Control.NavigationCamera.Display.Quality.Low"/></Values></ValueSetProfile>
       </Parameters>
       <!--원본 ACK=X. displayMode Bit0=EO, Bit1=IR, Bit2=화질이며 물리 packing은 Binding이 담당한다.-->
     </ControlSpec>

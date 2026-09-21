@@ -856,7 +856,7 @@
     <ControlSpec id="addCommsChannel" name="통신 링크 추가" cdm="Control.Communication.Channel.Add">
       <!--commsChannelID 원본 Range는 0~2이나 정의된 값은 0=무선, 1=위성뿐이다. 값 2는 미정의이므로 Semantic 유효값에 포함하지 않는다. 추가 명령에는 현재 사용하지 않는 ID를 지정한다.-->
       <Parameters>
-        <ValueSetProfile cdm="Communication.Channel.Identifier"><Values><Value name="Wireless" cdm="Communication.Channel.Wireless"/><Value name="Satellite" cdm="Communication.Channel.Satellite"/></Values></ValueSetProfile>
+        <ValueSetProfile id="channelIdentifier" name="Channel Identifier" cdm="Communication.Channel.Identifier"><Values><Value name="Wireless" cdm="Communication.Channel.Wireless"/><Value name="Satellite" cdm="Communication.Channel.Satellite"/></Values></ValueSetProfile>
       </Parameters>
       <Reply bindRef="addCommsChannelAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
@@ -865,7 +865,7 @@
     <ControlSpec id="deleteCommsChannel" name="통신 링크 삭제" cdm="Control.Communication.Channel.Delete">
       <!--commsChannelID는 0=무선, 1=위성만 정의하며 원본 Range의 2는 의미 미정의로 제외한다.-->
       <Parameters>
-        <ValueSetProfile cdm="Communication.Channel.Identifier"><Values><Value name="Wireless" cdm="Communication.Channel.Wireless"/><Value name="Satellite" cdm="Communication.Channel.Satellite"/></Values></ValueSetProfile>
+        <ValueSetProfile id="channelIdentifier" name="Channel Identifier" cdm="Communication.Channel.Identifier"><Values><Value name="Wireless" cdm="Communication.Channel.Wireless"/><Value name="Satellite" cdm="Communication.Channel.Satellite"/></Values></ValueSetProfile>
       </Parameters>
       <Reply bindRef="deleteCommsChannelAck" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
@@ -876,56 +876,56 @@
       <!--netSet/output/comFA/topology/resource/debug 및 단말/중계기 modem fa/topology/amc는 bit-packed octet 원문을 raw 값으로 유지한다.-->
       <!--Semantic에서는 Repeater로 표기하되 Binding 물리 필드명은 원본 오기인 reapeterCtrl1~5를 그대로 사용한다.-->
       <Parameters>
-        <Profile cdm="Communication.LBand.BaseStation.NetworkID"/>
-        <Profile cdm="Communication.LBand.BaseStation.NetworkSet.Raw"/>
-        <Profile cdm="Communication.LBand.BaseStation.HandoverMode.Raw"/>
-        <Profile cdm="Communication.LBand.BaseStation.Output.Raw"/>
-        <Profile cdm="Communication.LBand.BaseStation.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.BaseStation.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.BaseStation.Resource.Raw"/>
-        <Profile cdm="Communication.LBand.BaseStation.Debug.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal1.Modem1.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal1.Modem1.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal1.Modem1.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal1.Modem2.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal1.Modem2.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal1.Modem2.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal2.Modem1.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal2.Modem1.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal2.Modem1.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal2.Modem2.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal2.Modem2.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Terminal2.Modem2.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater1.Modem1.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater1.Modem1.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater1.Modem1.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater1.Modem2.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater1.Modem2.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater1.Modem2.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater2.Modem1.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater2.Modem1.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater2.Modem1.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater2.Modem2.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater2.Modem2.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater2.Modem2.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater3.Modem1.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater3.Modem1.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater3.Modem1.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater3.Modem2.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater3.Modem2.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater3.Modem2.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater4.Modem1.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater4.Modem1.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater4.Modem1.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater4.Modem2.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater4.Modem2.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater4.Modem2.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater5.Modem1.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater5.Modem1.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater5.Modem1.AMC.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater5.Modem2.Frequency.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater5.Modem2.Topology.Raw"/>
-        <Profile cdm="Communication.LBand.Repeater5.Modem2.AMC.Raw"/>
+        <Profile id="baseNetworkId" name="통제국 통신망 ID" cdm="Communication.LBand.BaseStation.NetworkID"/>
+        <Profile id="baseNetSetRaw" name="통제국 네트워크 구성 노드(raw)" cdm="Communication.LBand.BaseStation.NetworkSet.Raw"/>
+        <Profile id="baseHandoverModeRaw" name="통제국 Handover 모드(raw)" cdm="Communication.LBand.BaseStation.HandoverMode.Raw"/>
+        <Profile id="baseOutputRaw" name="통제국 출력 설정(raw)" cdm="Communication.LBand.BaseStation.Output.Raw"/>
+        <Profile id="baseComFaRaw" name="통제국 주파수 설정(raw)" cdm="Communication.LBand.BaseStation.Frequency.Raw"/>
+        <Profile id="baseTopologyRaw" name="통제국 토폴로지(raw)" cdm="Communication.LBand.BaseStation.Topology.Raw"/>
+        <Profile id="baseResourceRaw" name="통제국 자원할당(raw)" cdm="Communication.LBand.BaseStation.Resource.Raw"/>
+        <Profile id="debugRaw" name="Debug Raw" cdm="Communication.LBand.BaseStation.Debug.Raw"/>
+        <Profile id="terminal1Modem1FaRaw" name="단말기1 모뎀1 주파수(raw)" cdm="Communication.LBand.Terminal1.Modem1.Frequency.Raw"/>
+        <Profile id="terminal1Modem1TopologyRaw" name="단말기1 모뎀1 부모노드(raw)" cdm="Communication.LBand.Terminal1.Modem1.Topology.Raw"/>
+        <Profile id="terminal1Modem1AmcRaw" name="단말기1 모뎀1 AMC(raw)" cdm="Communication.LBand.Terminal1.Modem1.AMC.Raw"/>
+        <Profile id="terminal1Modem2FaRaw" name="단말기1 모뎀2 주파수(raw)" cdm="Communication.LBand.Terminal1.Modem2.Frequency.Raw"/>
+        <Profile id="terminal1Modem2TopologyRaw" name="단말기1 모뎀2 부모노드(raw)" cdm="Communication.LBand.Terminal1.Modem2.Topology.Raw"/>
+        <Profile id="terminal1Modem2AmcRaw" name="단말기1 모뎀2 AMC(raw)" cdm="Communication.LBand.Terminal1.Modem2.AMC.Raw"/>
+        <Profile id="terminal2Modem1FaRaw" name="단말기2 모뎀1 주파수(raw)" cdm="Communication.LBand.Terminal2.Modem1.Frequency.Raw"/>
+        <Profile id="terminal2Modem1TopologyRaw" name="단말기2 모뎀1 부모노드(raw)" cdm="Communication.LBand.Terminal2.Modem1.Topology.Raw"/>
+        <Profile id="terminal2Modem1AmcRaw" name="단말기2 모뎀1 AMC(raw)" cdm="Communication.LBand.Terminal2.Modem1.AMC.Raw"/>
+        <Profile id="terminal2Modem2FaRaw" name="단말기2 모뎀2 주파수(raw)" cdm="Communication.LBand.Terminal2.Modem2.Frequency.Raw"/>
+        <Profile id="terminal2Modem2TopologyRaw" name="단말기2 모뎀2 부모노드(raw)" cdm="Communication.LBand.Terminal2.Modem2.Topology.Raw"/>
+        <Profile id="terminal2Modem2AmcRaw" name="단말기2 모뎀2 AMC(raw)" cdm="Communication.LBand.Terminal2.Modem2.AMC.Raw"/>
+        <Profile id="repeater1Modem1FaRaw" name="중계기1 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater1.Modem1.Frequency.Raw"/>
+        <Profile id="repeater1Modem1TopologyRaw" name="중계기1 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater1.Modem1.Topology.Raw"/>
+        <Profile id="repeater1Modem1AmcRaw" name="중계기1 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater1.Modem1.AMC.Raw"/>
+        <Profile id="repeater1Modem2FaRaw" name="중계기1 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater1.Modem2.Frequency.Raw"/>
+        <Profile id="repeater1Modem2TopologyRaw" name="중계기1 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater1.Modem2.Topology.Raw"/>
+        <Profile id="repeater1Modem2AmcRaw" name="중계기1 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater1.Modem2.AMC.Raw"/>
+        <Profile id="repeater2Modem1FaRaw" name="중계기2 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater2.Modem1.Frequency.Raw"/>
+        <Profile id="repeater2Modem1TopologyRaw" name="중계기2 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater2.Modem1.Topology.Raw"/>
+        <Profile id="repeater2Modem1AmcRaw" name="중계기2 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater2.Modem1.AMC.Raw"/>
+        <Profile id="repeater2Modem2FaRaw" name="중계기2 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater2.Modem2.Frequency.Raw"/>
+        <Profile id="repeater2Modem2TopologyRaw" name="중계기2 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater2.Modem2.Topology.Raw"/>
+        <Profile id="repeater2Modem2AmcRaw" name="중계기2 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater2.Modem2.AMC.Raw"/>
+        <Profile id="repeater3Modem1FaRaw" name="중계기3 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater3.Modem1.Frequency.Raw"/>
+        <Profile id="repeater3Modem1TopologyRaw" name="중계기3 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater3.Modem1.Topology.Raw"/>
+        <Profile id="repeater3Modem1AmcRaw" name="중계기3 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater3.Modem1.AMC.Raw"/>
+        <Profile id="repeater3Modem2FaRaw" name="중계기3 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater3.Modem2.Frequency.Raw"/>
+        <Profile id="repeater3Modem2TopologyRaw" name="중계기3 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater3.Modem2.Topology.Raw"/>
+        <Profile id="repeater3Modem2AmcRaw" name="중계기3 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater3.Modem2.AMC.Raw"/>
+        <Profile id="repeater4Modem1FaRaw" name="중계기4 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater4.Modem1.Frequency.Raw"/>
+        <Profile id="repeater4Modem1TopologyRaw" name="중계기4 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater4.Modem1.Topology.Raw"/>
+        <Profile id="repeater4Modem1AmcRaw" name="중계기4 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater4.Modem1.AMC.Raw"/>
+        <Profile id="repeater4Modem2FaRaw" name="중계기4 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater4.Modem2.Frequency.Raw"/>
+        <Profile id="repeater4Modem2TopologyRaw" name="중계기4 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater4.Modem2.Topology.Raw"/>
+        <Profile id="repeater4Modem2AmcRaw" name="중계기4 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater4.Modem2.AMC.Raw"/>
+        <Profile id="repeater5Modem1FaRaw" name="중계기5 모뎀1 주파수(raw)" cdm="Communication.LBand.Repeater5.Modem1.Frequency.Raw"/>
+        <Profile id="repeater5Modem1TopologyRaw" name="중계기5 모뎀1 부모노드(raw)" cdm="Communication.LBand.Repeater5.Modem1.Topology.Raw"/>
+        <Profile id="repeater5Modem1AmcRaw" name="중계기5 모뎀1 AMC(raw)" cdm="Communication.LBand.Repeater5.Modem1.AMC.Raw"/>
+        <Profile id="repeater5Modem2FaRaw" name="중계기5 모뎀2 주파수(raw)" cdm="Communication.LBand.Repeater5.Modem2.Frequency.Raw"/>
+        <Profile id="repeater5Modem2TopologyRaw" name="중계기5 모뎀2 부모노드(raw)" cdm="Communication.LBand.Repeater5.Modem2.Topology.Raw"/>
+        <Profile id="repeater5Modem2AmcRaw" name="중계기5 모뎀2 AMC(raw)" cdm="Communication.LBand.Repeater5.Modem2.AMC.Raw"/>
       </Parameters>
     </ControlSpec>
     <ControlSpec id="requestNetworkIntegrationControlStationPbit" name="네트워크추상화장치 PBIT 요청(통제소)" cdm="Request.Health.PBIT">
