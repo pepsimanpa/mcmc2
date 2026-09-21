@@ -21,6 +21,16 @@
         <xs:attribute name="cdm" type="CdmRefType" use="optional" />
     </xs:attributeGroup>
 
+    <!--
+        Control Parameter의 API 식별자, 표시명, CDM 의미를 구분한다.
+        기존 Semantic XML의 단계적 이관을 위해 id/name은 현재 optional로 둔다.
+    -->
+    <xs:attributeGroup name="ProfileAttrs">
+        <xs:attribute name="id" type="xs:string" use="optional" />
+        <xs:attribute name="name" type="xs:string" use="optional" />
+        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+    </xs:attributeGroup>
+
     <!-- Core Type Below -->
     <!--
     ============================================================================================= -->
@@ -449,6 +459,10 @@
         <xs:attribute name="timeout" type="xs:decimal" />
     </xs:complexType>
 
+    <xs:complexType name="ProfileType">
+        <xs:attributeGroup ref="ProfileAttrs" />
+    </xs:complexType>
+
     <xs:complexType name="QuantityProfileType">
         <xs:sequence>
             <xs:element name="Unit" type="xs:string" minOccurs="0" />
@@ -460,7 +474,7 @@
             </xs:element>
             <xs:element name="Resolution" type="xs:decimal" minOccurs="0" />
         </xs:sequence>
-        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+        <xs:attributeGroup ref="ProfileAttrs" />
     </xs:complexType>
 
     <!--
@@ -478,7 +492,7 @@
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
-        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+        <xs:attributeGroup ref="ProfileAttrs" />
     </xs:complexType>
 
     <!--
@@ -486,7 +500,7 @@
         참/거짓 형식의 제어 파라미터 프로파일
     -->
     <xs:complexType name="BooleanProfileType">
-        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+        <xs:attributeGroup ref="ProfileAttrs" />
         <xs:attribute name="required" type="xs:boolean" use="optional" />
         <xs:attribute name="default" type="xs:boolean" use="optional" />
     </xs:complexType>
@@ -498,7 +512,7 @@
     <xs:complexType name="ElementProfileType">
         <xs:complexContent>
             <xs:extension base="ProfileCompositeType">
-                <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+                <xs:attributeGroup ref="ProfileAttrs" />
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -511,14 +525,14 @@
         <xs:sequence>
             <xs:element name="ElementProfile" type="ElementProfileType" />
         </xs:sequence>
-        <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+        <xs:attributeGroup ref="ProfileAttrs" />
         <xs:attribute name="minOccurs" type="xs:nonNegativeInteger" use="optional" />
         <xs:attribute name="maxOccurs" type="xs:positiveInteger" use="optional" />
     </xs:complexType>
 
     <xs:complexType name="ProfileCompositeType">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="Profile" type="CdmRefAttrType" />
+            <xs:element name="Profile" type="ProfileType" />
             <xs:element name="QuantityProfile" type="QuantityProfileType" />
             <xs:element name="ValueSetProfile" type="ValueSetProfileType" />
             <xs:element name="BooleanProfile" type="BooleanProfileType" />

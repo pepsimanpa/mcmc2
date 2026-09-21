@@ -236,7 +236,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         <ControlSpec id="stopMission" name="MDV 임무 정지" cdm="Control.Mission.Stop">
             <Target cdm="Platform.Identifier.Numeric" />
             <Parameters>
-                <QuantityProfile cdm="Mission.Identifier">
+                <QuantityProfile id="missionId" name="임무 식별자" cdm="Mission.Identifier">
                     <Range min="0" max="4294967295" />
                     <Resolution>1</Resolution>
                 </QuantityProfile>
@@ -267,7 +267,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         <ControlSpec id="startMission" name="MDV 임무 시작" cdm="Control.Mission.Start">
             <Target cdm="Platform.Identifier.Numeric" />
             <Parameters>
-                <QuantityProfile cdm="Mission.Identifier">
+                <QuantityProfile id="missionId" name="임무 식별자" cdm="Mission.Identifier">
                     <Range min="0" max="4294967295" />
                     <Resolution>1</Resolution>
                 </QuantityProfile>
@@ -298,7 +298,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         <ControlSpec id="pauseMission" name="MDV 임무 일시정지" cdm="Control.Mission.Pause">
             <Target cdm="Platform.Identifier.Numeric" />
             <Parameters>
-                <QuantityProfile cdm="Mission.Identifier">
+                <QuantityProfile id="missionId" name="임무 식별자" cdm="Mission.Identifier">
                     <Range min="0" max="4294967295" />
                     <Resolution>1</Resolution>
                 </QuantityProfile>
@@ -329,7 +329,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         <ControlSpec id="resumeMission" name="MDV 임무 재개" cdm="Control.Mission.Resume">
             <Target cdm="Platform.Identifier.Numeric" />
             <Parameters>
-                <QuantityProfile cdm="Mission.Identifier">
+                <QuantityProfile id="missionId" name="임무 식별자" cdm="Mission.Identifier">
                     <Range min="0" max="4294967295" />
                     <Resolution>1</Resolution>
                 </QuantityProfile>
@@ -410,32 +410,32 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         <ControlSpec id="transferMissionPlan" name="MDV 임무계획 전송" cdm="Request.MissionPlan.Transfer">
             <Target cdm="Platform.Identifier.Numeric" />
             <Parameters>
-                <QuantityProfile cdm="Mission.Identifier">
+                <QuantityProfile id="missionId" name="임무 식별자" cdm="Mission.Identifier">
                     <Range min="0" max="4294967295" />
                     <Resolution>1</Resolution>
                 </QuantityProfile>
-                <CollectionProfile cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="20">
-                    <ElementProfile cdm="MissionPlan.Waypoint">
-                        <QuantityProfile cdm="MissionPlan.Waypoint.Latitude">
+                <CollectionProfile id="waypoints" name="경유점 목록" cdm="MissionPlan.Waypoints" minOccurs="0" maxOccurs="20">
+                    <ElementProfile id="waypoint" name="경유점" cdm="MissionPlan.Waypoint">
+                        <QuantityProfile id="latitude" name="위도" cdm="MissionPlan.Waypoint.Latitude">
                             <Unit>deg</Unit>
                             <Range min="-90" max="90" />
                             <Resolution>0.0000001</Resolution>
                         </QuantityProfile>
-                        <QuantityProfile cdm="MissionPlan.Waypoint.Longitude">
+                        <QuantityProfile id="longitude" name="경도" cdm="MissionPlan.Waypoint.Longitude">
                             <Unit>deg</Unit>
                             <Range min="-180" max="180" />
                             <Resolution>0.0000001</Resolution>
                         </QuantityProfile>
-                        <QuantityProfile cdm="MissionPlan.Waypoint.Speed">
+                        <QuantityProfile id="speed" name="속도" cdm="MissionPlan.Waypoint.Speed">
                             <Unit>knot</Unit>
                             <Range min="0" max="100" />
                             <Resolution>0.1</Resolution>
                         </QuantityProfile>
-                        <QuantityProfile cdm="MissionPlan.Waypoint.Depth">
+                        <QuantityProfile id="depth" name="심도" cdm="MissionPlan.Waypoint.Depth">
                             <Unit>cm</Unit>
                             <Resolution>1</Resolution>
                         </QuantityProfile>
-                        <ValueSetProfile cdm="MissionPlan.Waypoint.Action">
+                        <ValueSetProfile id="action" name="경유점 동작" cdm="MissionPlan.Waypoint.Action">
                             <Values>
                                 <Value name="통과" cdm="MissionPlan.Waypoint.Action.PassThrough" />
                                 <Value name="대기" cdm="MissionPlan.Waypoint.Action.Wait" />
@@ -443,7 +443,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </ValueSetProfile>
                     </ElementProfile>
                 </CollectionProfile>
-                <ValueSetProfile cdm="Mission.Type">
+                <ValueSetProfile id="missionType" name="임무 유형" cdm="Mission.Type">
                     <Values>
                         <Value name="이동" cdm="Mission.Type.Move" />
                         <Value name="탐색" cdm="Mission.Type.Search" />
@@ -477,7 +477,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         <ControlSpec id="immediateEmergencyStop" name="MDV 즉시 비상정지" cdm="Control.Platform.EmergencyStop.Immediate">
             <Target cdm="Platform.Identifier.Numeric" />
             <Parameters>
-                <ValueSetProfile cdm="Platform.EmergencyStop.Reason">
+                <ValueSetProfile id="emergencyStopReason" name="비상정지 사유" cdm="Platform.EmergencyStop.Reason">
                     <Values>
                         <Value name="운용자 명령" cdm="Platform.EmergencyStop.Reason.OperatorCommand" />
                         <Value name="체계 판단" cdm="Platform.EmergencyStop.Reason.SystemDecision" />
@@ -513,7 +513,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         <ControlSpec id="emergencyStopAndStandby" name="MDV 임무중지 후 대기" cdm="Control.Platform.EmergencyStop.StopAndStandby">
             <Target cdm="Platform.Identifier.Numeric" />
             <Parameters>
-                <ValueSetProfile cdm="Platform.EmergencyStop.Reason">
+                <ValueSetProfile id="emergencyStopReason" name="비상정지 사유" cdm="Platform.EmergencyStop.Reason">
                     <Values>
                         <Value name="운용자 명령" cdm="Platform.EmergencyStop.Reason.OperatorCommand" />
                         <Value name="체계 판단" cdm="Platform.EmergencyStop.Reason.SystemDecision" />
@@ -548,36 +548,36 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         </ControlSpec>
         <ControlSpec id="setTargetInformation" name="MDV 표적정보 설정" cdm="Control.Mission.TargetInformation">
             <Parameters>
-                <QuantityProfile cdm="Navigation.OwnShip.Heading">
+                <QuantityProfile id="ownShipHeading" name="모선 침로" cdm="Navigation.OwnShip.Heading">
                     <Unit>deg</Unit>
                     <Range min="0" max="359.9" />
                     <Resolution>0.1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="Navigation.Relative.Platform.Bearing">
+                <QuantityProfile id="mdvBearing" name="MDV 상대 방위" cdm="Navigation.Relative.Platform.Bearing">
                     <Unit>deg</Unit>
                     <Range min="0" max="359.9" />
                     <Resolution>0.1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="Navigation.Relative.Platform.Range">
+                <QuantityProfile id="mdvRange" name="MDV 상대 거리" cdm="Navigation.Relative.Platform.Range">
                     <Unit>m</Unit>
                     <Range min="0" max="1999.9" />
                     <Resolution>0.1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="Navigation.Depth">
+                <QuantityProfile id="mdvDepth" name="MDV 심도" cdm="Navigation.Depth">
                     <Unit>cm</Unit>
                     <Resolution>1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="Mission.Target.Bearing">
+                <QuantityProfile id="targetBearing" name="표적 방위" cdm="Mission.Target.Bearing">
                     <Unit>deg</Unit>
                     <Range min="0" max="359.9" />
                     <Resolution>0.1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="Mission.Target.Range">
+                <QuantityProfile id="targetRange" name="표적 거리" cdm="Mission.Target.Range">
                     <Unit>m</Unit>
                     <Range min="0" max="1999.9" />
                     <Resolution>0.1</Resolution>
                 </QuantityProfile>
-                <QuantityProfile cdm="Mission.Target.Depth">
+                <QuantityProfile id="targetDepth" name="표적 심도" cdm="Mission.Target.Depth">
                     <Unit>cm</Unit>
                     <Resolution>1</Resolution>
                 </QuantityProfile>
