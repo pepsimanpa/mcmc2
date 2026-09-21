@@ -88,33 +88,14 @@
     </section>
 
     <section id="panel-hmi" class="tab-panel" role="tabpanel" aria-labelledby="tab-hmi" data-panel="hmi" hidden>
-      <div id="hmiEmptyState" class="empty-callout"><b>⌘</b><span><strong>XML 폴더 선택 필요</strong><small>Semantic Control · Binding 기반 데모</small></span></div>
+      <div id="hmiEmptyState" class="empty-callout"><b>⌘</b><span><strong>XML 폴더 선택 필요</strong><small>Semantic Control · Binding 기반 문서</small></span></div>
 
       <div id="hmiWorkspace" hidden>
-        <section class="flow-strip"><div class="flow-node"><b>01</b><span><strong>HMI CSC</strong><small>Draft 작성·DDS Requester</small></span></div><div class="flow-link"><strong>DDS Request / Reply</strong><small>OperationManagement.idl</small></div><div class="flow-node"><b>02</b><span><strong>OPERATION MANAGEMENT CSC</strong><small>XML 조회·검증·Binding 변환</small></span></div><div class="flow-link"><strong>DDS / TCP / UDP / RTP / RS422</strong><small>논리 장치 메시지</small></div><div class="flow-node"><b>03</b><span><strong>UMS</strong><small>AUV · USV · MDV · EMDW</small></span></div></section>
-
-        <section class="hmi-layout">
-          <article class="panel-card terminal-panel">
-            <header><div><p>HMI CSC</p><h2>Command Terminal</h2></div><div class="terminal-actions"><span id="hmiState" class="state-chip">SPEC NOT LOADED</span><button id="resetDemoButton" class="button ghost" type="button">데모 초기화</button></div></header>
-            <details id="presetPicker" class="draft-picker"><summary><span><small>예제 Draft 빠르게 채우기</small><strong id="presetSelection">Control 검색 또는 선택</strong></span><b>⌄</b></summary><div class="draft-picker-menu"><input id="presetSearch" type="search" placeholder="Control 이름 또는 Full ID 검색"><div id="presetList" class="preset-list"></div></div></details>
-            <div class="terminal"><div class="terminal-titlebar"><span>● ● ●</span><span>hmi-control-client</span><span>UTF-8</span></div><div id="terminalLog" class="terminal-log" role="log" aria-live="polite"></div><form id="terminalForm" class="terminal-form"><span>hmi@csc:~$</span><input id="terminalInput" placeholder="request -rcc" autocomplete="off"><button>실행</button></form></div>
-            <details class="command-guide compact-guide" open><summary><span><small>COMMAND CHEAT SHEET</small><strong>HMI 명령 형식</strong></span><b>⌄</b></summary><div class="command-list"><div><code>request -rcc</code><span>ControlSpec 카탈로그 요청</span></div><div><code>control -i &lt;id&gt;</code><span>Draft 시작</span></div><div><code>control -a &lt;key&gt;,&lt;value&gt;</code><span>입력값 추가</span></div><div><code>control -p</code><span>Draft 확인</span></div><div><code>control -r</code><span>검증 · 변환 · Mock 송신</span></div><div><code>control -c</code><span>Draft 초기화</span></div></div></details>
-            <div class="draft-card"><header><div><p>CURRENT DRAFT</p><h3 id="draftControlId">선택되지 않음</h3></div><button id="sendDraftButton" class="button primary">control -r 송신</button></header><div id="argumentChips" class="argument-chips"><span class="empty-text">입력된 key-value가 없습니다.</span></div></div>
-          </article>
-
-          <article class="panel-card om-workspace">
-            <header><div><p>OPERATION MANAGEMENT CSC</p><h2>XML Binding Processing</h2></div><span id="omState" class="state-chip">IDLE</span></header>
-            <div class="om-inner-grid"><section class="om-resolver"><div class="om-subhead"><p>BINDING RESOLVER</p><h3>Control 처리 파이프라인</h3></div><label class="route-select">Binding 선택<select id="routePolicy"><option value="AUTO">DEFAULT · 첫 번째 Binding</option></select><small>실제 링크 상태를 판단하지 않는 데모 기본 정책입니다.</small></label><ol id="pipeline" class="pipeline"><li data-step="lookup"><b>1</b><span><strong>Control 조회</strong><small>Semantic ID</small></span></li><li data-step="validate"><b>2</b><span><strong>입력 검증</strong><small>필수·형식·범위</small></span></li><li data-step="binding"><b>3</b><span><strong>Binding 선택</strong><small>Channel·Reply</small></span></li><li data-step="mapping"><b>4</b><span><strong>Field 구성</strong><small>Input·Fixed·Derived·TBD</small></span></li><li data-step="publish"><b>5</b><span><strong>Mock 송신</strong><small>미확정 값은 보류</small></span></li></ol><div id="bindingSummary" class="binding-summary"><p class="empty-text">송신 후 선택 Binding이 표시됩니다.</p></div><div id="resultBanner" class="result-banner"><strong>처리 대기</strong><small>실제 장비 상태가 아닙니다.</small></div></section>
-              <section class="payload-panel"><header><div><p>LOGICAL DEVICE MESSAGE · MOCK</p><h3>Field Mapping</h3></div><button id="copyPayloadButton" class="button ghost" disabled>복사</button></header><div class="table-scroll"><table class="payload-table"><thead><tr><th>Field / Mapping Rule</th><th>Physical Value</th><th>공급 주체</th></tr></thead><tbody id="payloadTableBody"><tr><td colspan="3" class="table-empty">아직 생성된 논리 메시지가 없습니다.</td></tr></tbody></table></div></section></div>
-          </article>
-        </section>
-
-        <section class="catalog-section"><header><div><p>GENERATED FROM SEMANTIC XML</p><h2>Control 카탈로그</h2></div><input id="hmiCatalogSearch" type="search" placeholder="Control ID 또는 CDM 검색"></header><div id="hmiCatalog" class="catalog-grid"></div></section>
       </div>
     </section>
   </main>
 
-  <footer><span>UMS Protocol Explorer · static offline documentation</span><span>XML 관계 분석 · 논리 메시지 Mock · 실제 장비 송수신 아님</span></footer>
+  <footer><span>UMS Protocol Explorer · static offline documentation</span><span>Semantic · Binding 기반 정적 문서</span></footer>
 </div>
 </body>
 </html>

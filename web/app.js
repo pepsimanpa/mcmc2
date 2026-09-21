@@ -554,6 +554,7 @@ function parseProfile(node) {
   const required = attr(node, 'required');
   return {
     kind: node.localName,
+    key: attr(node, 'id'),
     name: attr(node, 'name'),
     type: profileType(node.localName),
     cdm: attr(node, 'cdm'),
@@ -2411,7 +2412,7 @@ function setupHmiContractUi() {
   }
   const footerLabels = document.querySelectorAll('footer span');
   if (footerLabels[0]) footerLabels[0].textContent = 'UMS XML Reference · static offline documentation';
-  if (footerLabels[1]) footerLabels[1].textContent = 'Semantic · Binding 설명 · 논리 메시지 Mock · 실제 장비 송수신 아님';
+  if (footerLabels[1]) footerLabels[1].textContent = 'Semantic · Binding 기반 정적 문서';
   const emptyTitle = dom.hmiEmptyState?.querySelector('strong');
   const emptyNote = dom.hmiEmptyState?.querySelector('small');
   if (emptyTitle) emptyTitle.textContent = 'XML 설계 폴더를 선택하세요';
@@ -2490,61 +2491,6 @@ function setupHmiContractUi() {
   if (dom.diagnosticList) diagnostics.append(dom.diagnosticList);
   dom.hmiWorkspace.prepend(layout, diagnostics);
 
-  const legacyLayout = dom.hmiWorkspace.querySelector('.hmi-layout');
-  if (legacyLayout) {
-    const terminalForm = legacyLayout.querySelector('.terminal-form');
-    if (terminalForm) {
-      const initialCommand = 'request -rcc';
-      const frameworkPreview = el('div', 'framework-call-preview');
-      const previewText = el('span');
-      previewText.append(el('small', '', 'HMI SW 호출 코드'), el('code', '', operationFrameworkCall(initialCommand)));
-      const previewCopy = el('button', 'icon-copy', '코드 복사');
-      previewCopy.type = 'button';
-      previewCopy.dataset.copyText = operationFrameworkCall(initialCommand);
-      frameworkPreview.append(previewText, previewCopy);
-      terminalForm.insertAdjacentElement('afterend', frameworkPreview);
-      dom.frameworkCallPreview = previewText.querySelector('code');
-      dom.frameworkCallCopy = previewCopy;
-    }
-    const runGuide = [...legacyLayout.querySelectorAll('.command-list > div')]
-      .find((row) => row.querySelector('code')?.textContent.trim() === 'control -r');
-    const runGuideDescription = runGuide?.querySelector('span');
-    if (runGuideDescription) runGuideDescription.textContent = '요청 생성 · OperationManagement 전달';
-
-    const deliveryWorkspace = legacyLayout.querySelector('.om-workspace');
-    if (deliveryWorkspace) {
-      deliveryWorkspace.classList.add('delivery-workspace');
-      const deliveryHeader = el('header');
-      const deliveryTitle = el('div');
-      deliveryTitle.append(el('p', '', 'REQUEST DELIVERY'), el('h2', '', 'OperationManagement 전달'));
-      deliveryHeader.append(deliveryTitle);
-      if (dom.omState) deliveryHeader.append(dom.omState);
-
-      const deliveryBody = el('div', 'delivery-body');
-      const requestCard = el('section', 'delivery-card delivery-request');
-      const requestHead = el('header');
-      requestHead.append(el('p', '', 'CONTROL EXECUTION REQUEST'), el('h3', '', '요청 메시지'));
-      requestCard.append(requestHead);
-      if (dom.bindingSummary) requestCard.append(dom.bindingSummary);
-
-      const replyCard = el('section', 'delivery-card delivery-reply');
-      const replyHead = el('header');
-      replyHead.append(el('p', '', 'EXECUTION REPLY'), el('h3', '', 'Reply 수신'));
-      replyCard.append(replyHead);
-      if (dom.resultBanner) replyCard.append(dom.resultBanner);
-
-      deliveryBody.append(requestCard, replyCard);
-      deliveryWorkspace.replaceChildren(deliveryHeader, deliveryBody);
-    }
-    const demo = el('details', 'hmi-demo-drawer');
-    demo.id = 'hmiDemoDrawer';
-    const summary = el('summary');
-    summary.append(el('span', '', '터미널·Mock 실행 데모'), el('small', '', '필요할 때 펼치기'));
-    demo.append(summary, legacyLayout);
-    dom.hmiWorkspace.append(demo);
-    dom.hmiDemoDrawer = demo;
-  }
-
   dom.hmiContractLayout = layout;
   dom.hmiDeviceSelect = deviceSelect;
   dom.hmiKindTabs = kindTabs;
@@ -2592,7 +2538,7 @@ function hmiExampleValue(profile) {
   return typeof sample === 'string' ? sample : JSON.stringify(sample);
 }
 
-function hmiProfileTable(title, profiles, inputMode = false) {
+function hmiProfileTable(title, profiles, inputMode = false, showOutputName = false) {
   const section = el('section', 'hmi-contract-section');
   section.append(el('h3', '', title));
   if (!profiles.length) {
@@ -2600,19 +2546,21 @@ function hmiProfileTable(title, profiles, inputMode = false) {
     return section;
   }
   const wrap = el('div', 'hmi-contract-table-wrap');
-  const table = el('table', `hmi-contract-table ${inputMode ? 'is-input' : 'is-output'}`);
+  const tableClass = `hmi-contract-table ${inputMode ? 'is-input' : 'is-output'}${showOutputName ? ' has-display-name' : ''}`;
+  const table = el('table', tableClass);
   const head = el('thead');
   const headRow = el('tr');
   const headings = inputMode
     ? ['입력 Key', 'CDM 의미', '형식', '실제 입력/송신값 · 의미', '명령']
-    : ['출력 항목', 'CDM 의미', '형식', '범위·선택값'];
-  if (!inputMode) headings[3] = '\uC2E4\uC81C \uC218\uC2E0\uAC12 \u00B7 \uC758\uBBF8';
+    : showOutputName
+      ? ['출력 Key (Semantic id)', '표시명', 'CDM 의미', '형식', '실제 수신값 · 의미']
+      : ['출력 항목', 'CDM 의미', '형식', '실제 수신값 · 의미'];
   headings.forEach((heading) => headRow.append(el('th', '', heading)));
   head.append(headRow);
   const body = el('tbody');
   for (const profile of profiles) {
     const row = el('tr');
-    const key = inputMode ? profile.key : (profile.name || lowerFirst(profile.cdm.split('.').pop()));
+    const key = profile.key || profile.name || lowerFirst(profile.cdm.split('.').pop());
     const keyCell = el('td');
     keyCell.append(el('code', '', key || '미정'));
     if (inputMode && !profile.required) keyCell.append(el('small', 'optional-mark', '선택'));
@@ -2628,12 +2576,14 @@ function hmiProfileTable(title, profiles, inputMode = false) {
       ? '\uC815\uC758 \uC5C6\uC74C (XML\uC5D0 \uAC12 \uC758\uBBF8 \uB9E4\uD551 \uC5C6\uC74C)'
       : profileAllowedLabel(profile);
     const allowedCell = el('td', 'hmi-value-map-cell', allowedLabel);
-    row.append(
-      keyCell,
+    const cells = [keyCell];
+    if (showOutputName) cells.push(el('td', '', profile.name || '—'));
+    cells.push(
       el('td', '', profile.cdm || '미정'),
       el('td', '', profile.wireType || profileTypeLabel(profile.type)),
       allowedCell,
     );
+    row.append(...cells);
     if (inputMode) {
       const command = `control -a ${key},${hmiExampleValue(profile)}`;
       const commandCell = el('td', 'hmi-command-cell');
@@ -2971,13 +2921,31 @@ function renderHmiContract(action) {
       conditions.append(list);
       dom.hmiContractBody.append(conditions);
     }
-    const demoButton = el('button', 'button ghost hmi-open-demo docs-try-it', 'Try it · 터미널과 Mock 데모 열기');
-    demoButton.type = 'button';
-    demoButton.dataset.hmiOpenDemo = action.publicId;
-    dom.hmiContractBody.append(demoButton);
   } else if (action.kind === 'Monitor') {
-    dom.hmiContractBody.append(el('p', 'docs-info', 'Monitor는 control -i로 호출하지 않습니다. HMI가 수신하여 아래 의미 항목을 표시합니다.'));
-    dom.hmiContractBody.append(hmiProfileTable('HMI 표시 항목', flattenSemanticProfiles(action.outputs), false));
+    const monitorCode = operationFrameworkMonitorSubscription(action);
+    const subscribeSection = el('section', 'hmi-command-sequence hmi-monitor-subscribe docs-section');
+    const subscribeHead = el('header');
+    subscribeHead.append(el('div', 'hmi-command-step', '01'), el('h2', '', 'HMI Monitor 구독'));
+    const copyMonitor = el('button', 'button primary', 'HMI 코드 복사');
+    copyMonitor.type = 'button';
+    copyMonitor.dataset.copyText = monitorCode;
+    subscribeHead.append(copyMonitor);
+    const subscribeExamples = el('div', 'hmi-call-examples');
+    const subscribeBlock = el('section', 'hmi-call-example is-framework');
+    subscribeBlock.append(el('small', '', '실제 HMI SW 호출 코드'));
+    const subscribePre = el('pre');
+    subscribePre.append(el('code', '', monitorCode));
+    subscribeBlock.append(subscribePre);
+    subscribeExamples.append(subscribeBlock);
+    subscribeSection.append(
+      subscribeHead,
+      el('p', 'hmi-monitor-note', 'SubscribeMonitor가 구독을 등록하고, 수신할 때마다 callback으로 MonitorUpdate를 전달합니다. value.Key는 Semantic 출력 항목의 id입니다.'),
+      subscribeExamples,
+    );
+    dom.hmiContractBody.append(
+      subscribeSection,
+      hmiProfileTable('02 · HMI 표시 항목', flattenSemanticProfiles(action.outputs), false, true),
+    );
   } else {
     const product = el('section', 'docs-section');
     product.append(el('h2', '', 'Product 정의'));
@@ -3007,6 +2975,25 @@ function operationFrameworkReplySubscription(action) {
     .replace(/[^A-Za-z0-9_]/g, '');
   const handlerName = `Handle${identifier ? identifier[0].toUpperCase() + identifier.slice(1) : 'Control'}Reply`;
   return `OperationFramework.SubscribeReply(${quote}${literal}${quote}, ${handlerName});`;
+}
+
+function operationFrameworkMonitorSubscription(action) {
+  const quote = String.fromCharCode(34);
+  const literal = String(action.publicId || '').replace(/\\/g, '\\\\').split(quote).join(`\\${quote}`);
+  return [
+    'var monitorSubscription = OperationFramework.SubscribeMonitor(',
+    `    ${quote}${literal}${quote},`,
+    '    update =>',
+    '    {',
+    '        foreach (var value in update.Values)',
+    '        {',
+    '            // value.Key(Semantic id), value.Value, value.Unit을 사용해 화면을 갱신합니다.',
+    '        }',
+    '    });',
+    '',
+    '// 화면 종료 시 구독 해제',
+    'monitorSubscription.Dispose();',
+  ].join('\n');
 }
 
 function renderHmiWorkspace() {
@@ -3842,15 +3829,6 @@ document.addEventListener('click', (event) => {
     state.hmiSourceKey = hmiSource.dataset.hmiSource;
     const action = state.bundle?.actions.find((item) => item.publicId === state.hmiActionId) || null;
     renderHmiResponse(action);
-    return;
-  }
-
-  const openDemo = event.target.closest('[data-hmi-open-demo]');
-  if (openDemo) {
-    state.demo.specLoaded = true;
-    selectControl(openDemo.dataset.hmiOpenDemo, true);
-    if (dom.hmiDemoDrawer) dom.hmiDemoDrawer.open = true;
-    dom.hmiDemoDrawer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
 
