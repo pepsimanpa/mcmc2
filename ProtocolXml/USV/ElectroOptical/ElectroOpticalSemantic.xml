@@ -183,31 +183,31 @@
   <ControlSpecs id="control">
         <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startIntegrationAck" name="Start Integration Ack" bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="restartSystemAck" name="Restart System Ack" bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="requestIbitAck" name="Request Ibit Ack" bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
+      <Reply id="requestIbitResult" name="Request Ibit Result" bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
         <Results>
-          <GroupResult name="eoirIbit" cdm="Health.IBIT.EOIR">
-            <ValueSetResult name="statusEoir" cdm="Health.EOIR.IBIT.Overall">
+          <GroupResult id="eOIR" name="eoirIbit" cdm="Health.IBIT.EOIR">
+            <ValueSetResult id="overall" name="statusEoir" cdm="Health.EOIR.IBIT.Overall">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -215,7 +215,7 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="statusCameraAssembly" cdm="Health.EOIR.IBIT.CameraAssembly">
+            <ValueSetResult id="cameraAssembly" name="statusCameraAssembly" cdm="Health.EOIR.IBIT.CameraAssembly">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -223,29 +223,29 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <GroupResult name="statusInternalGimbal" cdm="Health.EOIR.IBIT.InternalGimbal">
-              <Result name="internalAzimuthMotorDrive" cdm="Health.EOIR.IBIT.InternalGimbal.InternalAzimuthMotorDrive.Raw"/>
-              <Result name="internalElevationMotorDrive" cdm="Health.EOIR.IBIT.InternalGimbal.InternalElevationMotorDrive.Raw"/>
-              <Result name="internalAzimuthEncoderCommunication" cdm="Health.EOIR.IBIT.InternalGimbal.InternalAzimuthEncoderCommunication.Raw"/>
-              <Result name="internalElevationEncoderCommunication" cdm="Health.EOIR.IBIT.InternalGimbal.InternalElevationEncoderCommunication.Raw"/>
+            <GroupResult id="internalGimbal" name="statusInternalGimbal" cdm="Health.EOIR.IBIT.InternalGimbal">
+              <Result id="raw" name="internalAzimuthMotorDrive" cdm="Health.EOIR.IBIT.InternalGimbal.InternalAzimuthMotorDrive.Raw"/>
+              <Result id="raw2" name="internalElevationMotorDrive" cdm="Health.EOIR.IBIT.InternalGimbal.InternalElevationMotorDrive.Raw"/>
+              <Result id="raw3" name="internalAzimuthEncoderCommunication" cdm="Health.EOIR.IBIT.InternalGimbal.InternalAzimuthEncoderCommunication.Raw"/>
+              <Result id="raw4" name="internalElevationEncoderCommunication" cdm="Health.EOIR.IBIT.InternalGimbal.InternalElevationEncoderCommunication.Raw"/>
             </GroupResult>
-            <GroupResult name="statusSensorAssembly1" cdm="Health.EOIR.IBIT.SensorAssembly1">
-              <Result name="eoCameraPower" cdm="Health.EOIR.IBIT.SensorAssembly1.EOCameraPower.Raw"/>
-              <Result name="eoCameraControl" cdm="Health.EOIR.IBIT.SensorAssembly1.EOCameraControl.Raw"/>
-              <Result name="mwirCameraPower" cdm="Health.EOIR.IBIT.SensorAssembly1.MWIRCameraPower.Raw"/>
-              <Result name="mwirCameraControl" cdm="Health.EOIR.IBIT.SensorAssembly1.MWIRCameraControl.Raw"/>
-              <Result name="illuminatorPower" cdm="Health.EOIR.IBIT.SensorAssembly1.IlluminatorPower.Raw"/>
-              <Result name="illuminatorControl" cdm="Health.EOIR.IBIT.SensorAssembly1.IlluminatorControl.Raw"/>
-              <Result name="lrfPower" cdm="Health.EOIR.IBIT.SensorAssembly1.LRFPower.Raw"/>
-              <Result name="lrfControl" cdm="Health.EOIR.IBIT.SensorAssembly1.LRFControl.Raw"/>
+            <GroupResult id="sensorAssembly1" name="statusSensorAssembly1" cdm="Health.EOIR.IBIT.SensorAssembly1">
+              <Result id="raw5" name="eoCameraPower" cdm="Health.EOIR.IBIT.SensorAssembly1.EOCameraPower.Raw"/>
+              <Result id="raw6" name="eoCameraControl" cdm="Health.EOIR.IBIT.SensorAssembly1.EOCameraControl.Raw"/>
+              <Result id="raw7" name="mwirCameraPower" cdm="Health.EOIR.IBIT.SensorAssembly1.MWIRCameraPower.Raw"/>
+              <Result id="raw8" name="mwirCameraControl" cdm="Health.EOIR.IBIT.SensorAssembly1.MWIRCameraControl.Raw"/>
+              <Result id="raw9" name="illuminatorPower" cdm="Health.EOIR.IBIT.SensorAssembly1.IlluminatorPower.Raw"/>
+              <Result id="raw10" name="illuminatorControl" cdm="Health.EOIR.IBIT.SensorAssembly1.IlluminatorControl.Raw"/>
+              <Result id="raw11" name="lrfPower" cdm="Health.EOIR.IBIT.SensorAssembly1.LRFPower.Raw"/>
+              <Result id="raw12" name="lrfControl" cdm="Health.EOIR.IBIT.SensorAssembly1.LRFControl.Raw"/>
             </GroupResult>
-            <GroupResult name="statusSensorAssembly2" cdm="Health.EOIR.IBIT.SensorAssembly2">
-              <Result name="imuCommunication" cdm="Health.EOIR.IBIT.SensorAssembly2.IMUCommunication.Raw"/>
-              <Result name="cameraControlBoardControl" cdm="Health.EOIR.IBIT.SensorAssembly2.CameraControlBoardControl.Raw"/>
-              <Result name="imageTrackingBoardControl" cdm="Health.EOIR.IBIT.SensorAssembly2.ImageTrackingBoardControl.Raw"/>
-              <Result name="wiperOperation" cdm="Health.EOIR.IBIT.SensorAssembly2.WiperOperation.Raw"/>
+            <GroupResult id="sensorAssembly2" name="statusSensorAssembly2" cdm="Health.EOIR.IBIT.SensorAssembly2">
+              <Result id="raw13" name="imuCommunication" cdm="Health.EOIR.IBIT.SensorAssembly2.IMUCommunication.Raw"/>
+              <Result id="raw14" name="cameraControlBoardControl" cdm="Health.EOIR.IBIT.SensorAssembly2.CameraControlBoardControl.Raw"/>
+              <Result id="raw15" name="imageTrackingBoardControl" cdm="Health.EOIR.IBIT.SensorAssembly2.ImageTrackingBoardControl.Raw"/>
+              <Result id="raw16" name="wiperOperation" cdm="Health.EOIR.IBIT.SensorAssembly2.WiperOperation.Raw"/>
             </GroupResult>
-            <ValueSetResult name="statusPowerSwir" cdm="Health.EOIR.IBIT.SWIR.Power">
+            <ValueSetResult id="power" name="statusPowerSwir" cdm="Health.EOIR.IBIT.SWIR.Power">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -253,7 +253,7 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="statusControlSwir" cdm="Health.EOIR.IBIT.SWIR.Control">
+            <ValueSetResult id="control" name="statusControlSwir" cdm="Health.EOIR.IBIT.SWIR.Control">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -261,7 +261,7 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="statusMainBodyAssembly" cdm="Health.EOIR.IBIT.MainBodyAssembly">
+            <ValueSetResult id="mainBodyAssembly" name="statusMainBodyAssembly" cdm="Health.EOIR.IBIT.MainBodyAssembly">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -269,14 +269,14 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <GroupResult name="statusExternalGimbal" cdm="Health.EOIR.IBIT.ExternalGimbal">
-              <Result name="externalAzimuthMotorDrive" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalAzimuthMotorDrive.Raw"/>
-              <Result name="externalElevationMotorDrive" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalElevationMotorDrive.Raw"/>
-              <Result name="externalAzimuthEncoderCommunication" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalAzimuthEncoderCommunication.Raw"/>
-              <Result name="externalElevationEncoderCommunication" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalElevationEncoderCommunication.Raw"/>
+            <GroupResult id="externalGimbal" name="statusExternalGimbal" cdm="Health.EOIR.IBIT.ExternalGimbal">
+              <Result id="raw17" name="externalAzimuthMotorDrive" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalAzimuthMotorDrive.Raw"/>
+              <Result id="raw18" name="externalElevationMotorDrive" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalElevationMotorDrive.Raw"/>
+              <Result id="raw19" name="externalAzimuthEncoderCommunication" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalAzimuthEncoderCommunication.Raw"/>
+              <Result id="raw20" name="externalElevationEncoderCommunication" cdm="Health.EOIR.IBIT.ExternalGimbal.ExternalElevationEncoderCommunication.Raw"/>
             </GroupResult>
-            <GroupResult name="statusStabilizationControlBoard" cdm="Health.EOIR.IBIT.StabilizationControlBoard">
-              <Result name="stabilizationControlBoardControl" cdm="Health.EOIR.IBIT.StabilizationControlBoard.Control.Raw"/>
+            <GroupResult id="stabilizationControlBoard" name="statusStabilizationControlBoard" cdm="Health.EOIR.IBIT.StabilizationControlBoard">
+              <Result id="raw21" name="stabilizationControlBoardControl" cdm="Health.EOIR.IBIT.StabilizationControlBoard.Control.Raw"/>
             </GroupResult>
           </GroupResult>
         </Results>
@@ -284,15 +284,15 @@
     </ControlSpec>
         <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="requestPbitAck" name="Request Pbit Ack" bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
+      <Reply id="requestPbitResult" name="Request Pbit Result" bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
         <Results>
-          <GroupResult name="eoirPbit" cdm="Health.PBIT.EOIR">
-            <ValueSetResult name="statusEoir" cdm="Health.EOIR.PBIT.Overall">
+          <GroupResult id="eOIR" name="eoirPbit" cdm="Health.PBIT.EOIR">
+            <ValueSetResult id="overall" name="statusEoir" cdm="Health.EOIR.PBIT.Overall">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -300,7 +300,7 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="statusCameraAssembly" cdm="Health.EOIR.PBIT.CameraAssembly">
+            <ValueSetResult id="cameraAssembly" name="statusCameraAssembly" cdm="Health.EOIR.PBIT.CameraAssembly">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -308,7 +308,7 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="statusMainBodyAssembly" cdm="Health.EOIR.PBIT.MainBodyAssembly">
+            <ValueSetResult id="mainBodyAssembly" name="statusMainBodyAssembly" cdm="Health.EOIR.PBIT.MainBodyAssembly">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -336,9 +336,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="setOperationModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setOperationModeAck" name="Set Operation Mode Ack" bindRef="setOperationModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -353,9 +353,9 @@
           <Range min="-100" max="100"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="controlByJoystickAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="controlByJoystickAck" name="Control By Joystick Ack" bindRef="controlByJoystickAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -373,9 +373,9 @@
           <Resolution>0.01</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="pointToPositionAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="pointToPositionAck" name="Point To Position Ack" bindRef="pointToPositionAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -434,9 +434,9 @@
           <Range min="0" max="1080"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="controlTrackingAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="controlTrackingAck" name="Control Tracking Ack" bindRef="controlTrackingAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -448,9 +448,9 @@
           <Range min="1" max="65534"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="pointToRadarTargetAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="pointToRadarTargetAck" name="Point To Radar Target Ack" bindRef="pointToRadarTargetAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -474,9 +474,9 @@
           <Resolution>0.01</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="configureSwingAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="configureSwingAck" name="Configure Swing Ack" bindRef="configureSwingAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -485,9 +485,9 @@
       <Parameters>
         <BooleanProfile id="useSwir" name="Use Swir" cdm="Control.EOIR.Video.IR.UseSWIR"/>
       </Parameters>
-      <Reply bindRef="switchIrVideoAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="switchIrVideoAck" name="Switch Ir Video Ack" bindRef="switchIrVideoAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -517,9 +517,9 @@
           <Resolution>0.5</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="controlZoomAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="controlZoomAck" name="Control Zoom Ack" bindRef="controlZoomAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -550,9 +550,9 @@
           <Resolution>0.5</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="controlFocusAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="controlFocusAck" name="Control Focus Ack" bindRef="controlFocusAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -583,9 +583,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="configureEoSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="configureEoSensorAck" name="Configure Eo Sensor Ack" bindRef="configureEoSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -649,9 +649,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="configureMwirSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="configureMwirSensorAck" name="Configure Mwir Sensor Ack" bindRef="configureMwirSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -673,9 +673,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="configureSwirSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="configureSwirSensorAck" name="Configure Swir Sensor Ack" bindRef="configureSwirSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -692,9 +692,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="controlLrfAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="controlLrfAck" name="Control Lrf Ack" bindRef="controlLrfAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -715,9 +715,9 @@
           <Range min="0" max="255"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="configureIlluminatorAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="configureIlluminatorAck" name="Configure Illuminator Ack" bindRef="configureIlluminatorAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -733,9 +733,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="controlWiperAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="controlWiperAck" name="Control Wiper Ack" bindRef="controlWiperAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -771,9 +771,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="controlPowerAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="controlPowerAck" name="Control Power Ack" bindRef="controlPowerAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>

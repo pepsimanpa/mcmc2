@@ -241,15 +241,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true">
+            <Reply id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -272,15 +272,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true">
+            <Reply id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -303,15 +303,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true">
+            <Reply id="pauseMissionReply" name="Pause Mission Reply" cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -334,15 +334,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true">
+            <Reply id="resumeMissionReply" name="Resume Mission Reply" cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -359,15 +359,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         </ControlSpec>
         <ControlSpec id="setLegacyMode" name="MDV 레거시모드 설정" cdm="Control.Platform.OperationMode.Legacy">
             <Target cdm="Platform.Identifier.Numeric" />
-            <Reply cdm="Control.Platform.OperationMode.Legacy.Response" bindRef="setLegacyModeReply" required="true">
+            <Reply id="setLegacyModeReply" name="Set Legacy Mode Reply" cdm="Control.Platform.OperationMode.Legacy.Response" bindRef="setLegacyModeReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -384,15 +384,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
         </ControlSpec>
         <ControlSpec id="setAutonomousMode" name="MDV 자율운항모드 설정" cdm="Control.Platform.OperationMode.Autonomous">
             <Target cdm="Platform.Identifier.Numeric" />
-            <Reply cdm="Control.Platform.OperationMode.Autonomous.Response" bindRef="setAutonomousModeReply" required="true">
+            <Reply id="setAutonomousModeReply" name="Set Autonomous Mode Reply" cdm="Control.Platform.OperationMode.Autonomous.Response" bindRef="setAutonomousModeReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -451,15 +451,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true">
+            <Reply id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -487,15 +487,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true">
+            <Reply id="immediateEmergencyStopReply" name="Immediate Emergency Stop Reply" cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -523,15 +523,15 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true">
+            <Reply id="emergencyStopAndStandbyReply" name="Emergency Stop And Standby Reply" cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />

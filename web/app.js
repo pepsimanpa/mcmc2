@@ -589,6 +589,8 @@ function parseControlGroup(ref, file) {
       const targetNode = first(node, 'Target');
       const parametersNode = first(node, 'Parameters');
       const replies = direct(node, 'Reply').map((reply) => ({
+        id: semanticRefId(attr(reply, 'id')) || semanticRefId(attr(reply, 'bindRef')),
+        name: attr(reply, 'name') || attr(reply, 'id') || attr(reply, 'bindRef'),
         cdm: attr(reply, 'cdm'),
         bindRef: semanticRefId(attr(reply, 'bindRef')),
         required: attr(reply, 'required') !== 'false',
@@ -1068,7 +1070,7 @@ function auditBundle(bundle) {
 
       if (action.kind === 'Control') {
         for (const reply of action.replies) {
-          if (reply.required && !binding.replies.some((item) => item.semanticId === reply.bindRef)) {
+          if (reply.required && !binding.replies.some((item) => item.semanticId === (reply.id || reply.bindRef))) {
             bundle.diagnostics.push({
               level: 'error',
               code: 'REPLY_LINK',
@@ -1898,12 +1900,12 @@ function renderReplyOverview(control) {
   for (const reply of control.replies) {
     const item = el('article', 'reply-item');
     item.append(
-      el('strong', '', reply.bindRef),
-      el('small', '', `${reply.cdm} · ${reply.required ? '필수' : '선택'}${reply.timeout ? ` · timeout ${reply.timeout}` : ''}`),
+      el('strong', '', reply.id || reply.bindRef),
+      el('small', '', `${reply.name || '표시명 미정'} · ${reply.cdm || 'CDM 미정'} · ${reply.required ? '필수' : '선택'}${reply.timeout ? ` · timeout ${reply.timeout}` : ''}`),
     );
     const variants = control.bindings.flatMap((binding) => (
       binding.replies
-        .filter((candidate) => candidate.semanticId === reply.bindRef)
+        .filter((candidate) => candidate.semanticId === (reply.id || reply.bindRef))
         .map((candidate) => ({ binding, candidate }))
     ));
     for (const entry of variants) {
@@ -1978,7 +1980,7 @@ function showFeature(id, options = {}) {
       ['CDM', primaryAction.cdm],
       ['Semantic', primaryAction.sourceFile],
       ['Local ID', primaryAction.semanticId],
-      ['Reply', primaryAction.kind === 'Control' ? primaryAction.replies.map((item) => item.bindRef).join(', ') || 'No Reply' : '해당 없음'],
+      ['Reply', primaryAction.kind === 'Control' ? primaryAction.replies.map((item) => item.id || item.bindRef).join(', ') || 'No Reply' : '해당 없음'],
       ['선택', `${state.selectedFeatures.size}개 항목`],
     ]),
   );
@@ -2426,11 +2428,14 @@ function setupHmiContractUi() {
   dom.docsDiagnosticCount = diagnosticsCount;
 }
 
-function flattenSemanticProfiles(profiles) {
+function flattenSemanticProfiles(profiles, parentKey = '') {
   const output = [];
   for (const profile of profiles || []) {
-    if (profile.cdm || profile.name) output.push(profile);
-    output.push(...flattenSemanticProfiles(profile.children));
+    const localKey = profile.id || profile.key || '';
+    const key = parentKey && localKey ? `${parentKey}.${localKey}` : (localKey || parentKey);
+    const isContainer = ['GroupResult', 'Results'].includes(profile.kind);
+    if (!isContainer && (profile.cdm || profile.name)) output.push({ ...profile, key });
+    output.push(...flattenSemanticProfiles(profile.children, isContainer ? key : parentKey));
   }
   return output;
 }
@@ -2478,7 +2483,7 @@ function hmiProfileTable(title, profiles, inputMode = false, showOutputName = fa
   const body = el('tbody');
   for (const profile of profiles) {
     const row = el('tr');
-    const key = profile.id || profile.key || profile.name || lowerFirst(profile.cdm.split('.').pop());
+    const key = profile.key || profile.id || profile.name || lowerFirst(profile.cdm.split('.').pop());
     const keyCell = el('td');
     keyCell.append(el('code', '', key || '미정'));
     if (inputMode && !profile.required) keyCell.append(el('small', 'optional-mark', '선택'));
@@ -2815,17 +2820,20 @@ function renderHmiContract(action) {
     dom.hmiContractBody.append(commandSection, hmiProfileTable('02 · HMI 입력', action.inputs, true));
 
     const replySection = el('section', 'docs-section docs-replies');
-    replySection.append(el('h2', '', `03 · Reply 출력 (${action.replies.length})`));
+    replySection.append(
+      el('h2', '', `03 · Reply 출력 (${action.replies.length})`),
+      el('p', 'hmi-monitor-note', 'SubscribeReply callback의 update.ReplyId로 Reply를 식별하고, update.Values의 Key(Semantic Result id, 중첩 결과는 group.child), Value, Unit으로 결과를 읽습니다.'),
+    );
     if (!action.replies.length) replySection.append(el('p', 'semantic-empty', 'Semantic에 Reply가 정의되어 있지 않습니다.'));
     for (const reply of action.replies) {
       const card = el('article', 'hmi-reply-card');
       const head = el('header');
-      head.append(el('code', '', reply.bindRef || 'bindRef 미정'));
+      head.append(el('code', '', reply.id || reply.bindRef || 'Reply id 미정'));
       if (!reply.required || reply.timeout) {
         head.append(el('small', '', `${reply.required ? '' : '선택 응답'}${reply.timeout ? ` timeout ${reply.timeout}` : ''}`.trim()));
       }
-      card.append(head, el('p', '', reply.cdm || 'CDM 미정'));
-      card.append(hmiProfileTable('HMI 출력 항목', flattenSemanticProfiles(reply.results), false));
+      card.append(head, el('p', '', `${reply.name || '표시명 미정'} · ${reply.cdm || 'CDM 미정'}`));
+      card.append(hmiProfileTable('HMI 출력 항목', flattenSemanticProfiles(reply.results), false, true));
       replySection.append(card);
     }
     dom.hmiContractBody.append(replySection);
@@ -2886,12 +2894,18 @@ function operationFrameworkCall(command) {
 function operationFrameworkReplySubscription(action) {
   const quote = String.fromCharCode(34);
   const literal = String(action.publicId || '').replace(/\\/g, '\\\\').split(quote).join(`\\${quote}`);
-  const localId = String(action.semanticId || action.publicId?.split('.').pop() || 'Control');
-  const identifier = localId
-    .replace(/[^A-Za-z0-9]+(.)/g, (_, character) => character.toUpperCase())
-    .replace(/[^A-Za-z0-9_]/g, '');
-  const handlerName = `Handle${identifier ? identifier[0].toUpperCase() + identifier.slice(1) : 'Control'}Reply`;
-  return `OperationFramework.SubscribeReply(${quote}${literal}${quote}, ${handlerName});`;
+  return [
+    'var replySubscription = OperationFramework.SubscribeReply(',
+    `    ${quote}${literal}${quote},`,
+    '    update =>',
+    '    {',
+    '        // update.RequestId, update.ReplyId, update.State로 응답을 식별합니다.',
+    '        foreach (var value in update.Values)',
+    '        {',
+    '            // value.Key(Semantic Result id, 중첩 결과는 group.child), value.Value, value.Unit을 사용해 화면을 갱신합니다.',
+    '        }',
+    '    });',
+  ].join('\n');
 }
 
 function operationFrameworkMonitorSubscription(action) {
@@ -3316,9 +3330,12 @@ function mockReplyOutput(profile) {
     || semanticValue?.cdm?.split('.').pop()
     || sampleValue(profile);
   return {
-    id: profile.id || profile.key || 'result',
+    id: profile.key || profile.id || 'result',
     name: profile.name || '결과',
+    cdm: profile.cdm || '',
+    dataType: profile.type || profile.kind || '',
     value: displayValue(value),
+    unit: profile.unit || '',
   };
 }
 
@@ -3340,7 +3357,7 @@ function renderReplyResult(control, reply) {
   );
   body.append(executionRow);
 
-  const semanticReply = control.replies.find((item) => item.bindRef === reply.semanticId);
+  const semanticReply = control.replies.find((item) => (item.id || item.bindRef) === reply.semanticId);
   const outputs = flattenSemanticProfiles(semanticReply?.results || []).map(mockReplyOutput);
   for (const output of outputs) {
     const row = el('tr');
@@ -3349,6 +3366,17 @@ function renderReplyResult(control, reply) {
   }
   table.append(head, body);
   dom.resultBanner.replaceChildren(title, description, table);
+  return {
+    replyId: semanticReply?.id || reply.semanticId || '',
+    replyCdm: semanticReply?.cdm || '',
+    results: outputs.map((output) => ({
+      fieldName: output.id,
+      cdm: output.cdm,
+      dataType: output.dataType,
+      fieldValue: String(output.value),
+      unit: output.unit,
+    })),
+  };
 }
 
 function setResult(type, title, detail) {
@@ -3356,13 +3384,21 @@ function setResult(type, title, detail) {
   dom.resultBanner.replaceChildren(el('strong', '', title), el('small', '', detail));
 }
 
-function publishExecutionState(executionReport, detail = '') {
+function publishExecutionState(executionReport, detail = '', replyPayload = null) {
   const context = state.demo.currentDds;
   if (!context) return;
   addBus(
     OM_DDS_TYPES.controlExecutionReply,
     'OPERATION MANAGEMENT CSC → HMI CSC',
-    { targetId: context.target.targetId, executionReport },
+    {
+      requestId: context.requestId,
+      targetId: context.target.targetId,
+      controlId: state.demo.controlId || '',
+      replyId: replyPayload?.replyId || '',
+      replyCdm: replyPayload?.replyCdm || '',
+      executionReport,
+      results: replyPayload?.results || [],
+    },
     executionReport === OPERATION_STATES.failed ? 'error dds' : 'dds',
     { transport: 'DDS', relatedSampleIdentity: context.sampleIdentity, meaning: detail },
   );
@@ -3464,15 +3500,16 @@ async function publishControl() {
   markStep('publish', 'done');
   state.demo.sequence += 1;
 
+  let replyPayload = null;
   if (!binding.replies.length) {
     setResult('success', '전달 완료 · Reply 없음', 'Reply가 정의되지 않은 단방향 요청입니다.');
     setState(dom.omState, '전달 완료');
   } else {
     const reply = binding.replies[0];
-    renderReplyResult(control, reply);
+    replyPayload = renderReplyResult(control, reply);
     setState(dom.omState, 'Reply 수신');
   }
-  publishExecutionState(OPERATION_STATES.finished, 'OperationManagement Mock 처리 완료');
+  publishExecutionState(OPERATION_STATES.finished, 'OperationManagement Mock 처리 완료', replyPayload);
   setState(dom.hmiState, 'MOCK COMPLETE');
   state.demo.processing = false;
 }

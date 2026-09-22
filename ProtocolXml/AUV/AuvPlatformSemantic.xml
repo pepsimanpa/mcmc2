@@ -41,87 +41,87 @@
         -->
         <ControlSpec id="requestAuvCheck" name="AUV 점검 요청" cdm="Request.Health.Check">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.Health.Check.Response" bindRef="requestAuvCheckReply" required="true">
+            <Reply id="requestAuvCheckReply" name="Request Auv Check Reply" cdm="Request.Health.Check.Response" bindRef="requestAuvCheckReply" required="true">
                 <Results>
                     <!-- 각 bit의 물리 0/1과 정확한 offset은 Binding에서 정의한다. -->
-                    <GroupResult name="상세 점검 결과" required="false">
-                        <GroupResult name="MSPD 점검 결과">
-                            <Result name="통신부 연동상태"/>
-                            <Result name="자율제어컴퓨터 연동상태"/>
-                            <Result name="측면주사소나 연동상태"/>
-                            <Result name="전방주사소나 연동상태"/>
-                            <Result name="측면주사소나 상태점검"/>
-                            <Result name="전방주사소나 상태점검"/>
-                            <Result name="임무센서처리장치 모듈 #1 저장매체 상태"/>
-                            <Result name="임무센서처리장치 모듈 #1 부팅상태"/>
-                            <Result name="수중광학카메라 연동상태"/>
-                            <Result name="수중초음파카메라 연동상태"/>
-                            <Result name="수중광학카메라 점검"/>
-                            <Result name="수중초음파카메라 점검"/>
+                    <GroupResult id="detailedCheckResults" name="상세 점검 결과" required="false">
+                        <GroupResult id="mSPD" name="MSPD 점검 결과">
+                            <Result id="communicationInterfaceStatus" name="통신부 연동상태"/>
+                            <Result id="autonomousControlComputerInterfaceStatus" name="자율제어컴퓨터 연동상태"/>
+                            <Result id="sideScanSonarInterfaceStatus" name="측면주사소나 연동상태"/>
+                            <Result id="forwardLookingSonarInterfaceStatus" name="전방주사소나 연동상태"/>
+                            <Result id="sideScanSonarStatusCheck" name="측면주사소나 상태점검"/>
+                            <Result id="forwardLookingSonarStatusCheck" name="전방주사소나 상태점검"/>
+                            <Result id="missionSensorProcessorModule1StorageStatus" name="임무센서처리장치 모듈 #1 저장매체 상태"/>
+                            <Result id="missionSensorProcessorModule1BootStatus" name="임무센서처리장치 모듈 #1 부팅상태"/>
+                            <Result id="underwaterOpticalCameraInterfaceStatus" name="수중광학카메라 연동상태"/>
+                            <Result id="underwaterAcousticCameraInterfaceStatus" name="수중초음파카메라 연동상태"/>
+                            <Result id="underwaterOpticalCameraCheck" name="수중광학카메라 점검"/>
+                            <Result id="underwaterAcousticCameraCheck" name="수중초음파카메라 점검"/>
                         </GroupResult>
-                        <GroupResult name="INB 점검 결과">
-                            <Result name="메모리 점검"/>
-                            <Result name="INB MSB IMU 통신연동"/>
-                            <Result name="INB MSB DVL 통신연동"/>
-                            <Result name="INB MSB 심도계 통신연동"/>
-                            <Result name="INB MSB GPS 통신연동"/>
-                            <Result name="INB MSB 지자기센서 통신연동"/>
-                            <Result name="INB MSB 자율제어컴퓨터 통신연동"/>
-                            <Result name="INB LSB IMU 통신연동"/>
-                            <Result name="INB LSB DVL 통신연동"/>
-                            <Result name="INB LSB 심도계 통신연동"/>
-                            <Result name="INB LSB GPS 통신연동"/>
-                            <Result name="INB LSB 지자기센서 통신연동"/>
-                            <Result name="INB LSB 자율제어컴퓨터 통신연동"/>
+                        <GroupResult id="iNB" name="INB 점검 결과">
+                            <Result id="memoryCheck" name="메모리 점검"/>
+                            <Result id="iNBMSBIMU" name="INB MSB IMU 통신연동"/>
+                            <Result id="iNBMSBDVL" name="INB MSB DVL 통신연동"/>
+                            <Result id="iNBMSB" name="INB MSB 심도계 통신연동"/>
+                            <Result id="iNBMSBGPS" name="INB MSB GPS 통신연동"/>
+                            <Result id="iNBMSB2" name="INB MSB 지자기센서 통신연동"/>
+                            <Result id="iNBMSB3" name="INB MSB 자율제어컴퓨터 통신연동"/>
+                            <Result id="iNBLSBIMU" name="INB LSB IMU 통신연동"/>
+                            <Result id="iNBLSBDVL" name="INB LSB DVL 통신연동"/>
+                            <Result id="iNBLSB" name="INB LSB 심도계 통신연동"/>
+                            <Result id="iNBLSBGPS" name="INB LSB GPS 통신연동"/>
+                            <Result id="iNBLSB2" name="INB LSB 지자기센서 통신연동"/>
+                            <Result id="iNBLSB3" name="INB LSB 자율제어컴퓨터 통신연동"/>
                         </GroupResult>
-                        <GroupResult name="ACC 점검 결과">
-                            <Result name="자율제어컴퓨터 BOOT 점검"/>
-                            <Result name="자율제어컴퓨터 메모리 점검"/>
-                            <Result name="자율제어컴퓨터 28VDC 점검"/>
-                            <Result name="자율제어컴퓨터 인터페이스 점검"/>
-                            <Result name="핑어 통신연동"/>
-                            <Result name="점멸등 통신연동"/>
-                            <Result name="누수센서 연동"/>
-                            <Result name="전원제어장치 통신연동"/>
-                            <Result name="임무센서처리장치 통신연동"/>
-                            <Result name="복합항법컴퓨터 통신연동"/>
-                            <Result name="RF 통신장치 통신연동"/>
-                            <Result name="수중통신장치 통신연동"/>
-                            <Result name="추진제어기 통신연동"/>
-                            <Result name="핑어 자체점검"/>
-                            <Result name="점멸등 자체점검"/>
+                        <GroupResult id="aCC" name="ACC 점검 결과">
+                            <Result id="autonomousControlComputerBootCheck" name="자율제어컴퓨터 BOOT 점검"/>
+                            <Result id="autonomousControlComputerMemoryCheck" name="자율제어컴퓨터 메모리 점검"/>
+                            <Result id="autonomousControlComputer28VdcCheck" name="자율제어컴퓨터 28VDC 점검"/>
+                            <Result id="autonomousControlComputerInterfaceCheck" name="자율제어컴퓨터 인터페이스 점검"/>
+                            <Result id="pingerCommunicationStatus" name="핑어 통신연동"/>
+                            <Result id="flasherCommunicationStatus" name="점멸등 통신연동"/>
+                            <Result id="leakSensorInterfaceStatus" name="누수센서 연동"/>
+                            <Result id="powerControllerCommunicationStatus" name="전원제어장치 통신연동"/>
+                            <Result id="missionSensorProcessorCommunicationStatus" name="임무센서처리장치 통신연동"/>
+                            <Result id="integratedNavigationComputerCommunicationStatus" name="복합항법컴퓨터 통신연동"/>
+                            <Result id="rF" name="RF 통신장치 통신연동"/>
+                            <Result id="underwaterCommunicationStatus" name="수중통신장치 통신연동"/>
+                            <Result id="propulsionControllerCommunicationStatus" name="추진제어기 통신연동"/>
+                            <Result id="pingerSelfCheck" name="핑어 자체점검"/>
+                            <Result id="flasherSelfCheck" name="점멸등 자체점검"/>
                         </GroupResult>
-                        <GroupResult name="PCD 점검 결과">
-                            <Result name="전지 BMS 상태 점검"/>
-                            <Result name="전지팩 전압, 온도, BMS 연동상태 점검"/>
-                            <Result name="전지팩 온도 점검"/>
-                            <Result name="전원제어장치 제어상태, BMS 연동상태 점검"/>
+                        <GroupResult id="pCD" name="PCD 점검 결과">
+                            <Result id="batteryBmsStatusCheck" name="전지 BMS 상태 점검"/>
+                            <Result id="batteryPackVoltageTemperatureBmsCheck" name="전지팩 전압, 온도, BMS 연동상태 점검"/>
+                            <Result id="batteryPackTemperatureCheck" name="전지팩 온도 점검"/>
+                            <Result id="powerControllerAndBmsStatusCheck" name="전원제어장치 제어상태, BMS 연동상태 점검"/>
                         </GroupResult>
-                        <GroupResult name="MC 점검 결과">
-                            <Result name="추진제어기 온도 점검"/>
-                            <Result name="추진제어기 입력 전원 점검"/>
-                            <Result name="추진제어기 전류 센서 점검"/>
-                            <Result name="상방향타 구동기 점검"/>
-                            <Result name="하방향타 구동기 점검"/>
-                            <Result name="좌승강타 구동기 점검"/>
-                            <Result name="우승강타 구동기 점검"/>
+                        <GroupResult id="mC" name="MC 점검 결과">
+                            <Result id="propulsionControllerTemperatureCheck" name="추진제어기 온도 점검"/>
+                            <Result id="propulsionControllerInputPowerCheck" name="추진제어기 입력 전원 점검"/>
+                            <Result id="propulsionControllerCurrentSensorCheck" name="추진제어기 전류 센서 점검"/>
+                            <Result id="upperRudderActuatorCheck" name="상방향타 구동기 점검"/>
+                            <Result id="lowerRudderActuatorCheck" name="하방향타 구동기 점검"/>
+                            <Result id="portElevatorActuatorCheck" name="좌승강타 구동기 점검"/>
+                            <Result id="starboardElevatorActuatorCheck" name="우승강타 구동기 점검"/>
                         </GroupResult>
-                        <GroupResult name="RCD 점검 결과">
-                            <Result name="MCU"/>
-                            <Result name="모뎀 및 제어반"/>
-                            <Result name="송수신반 UHF"/>
-                            <Result name="송수신반 L-Band"/>
-                            <Result name="전원반"/>
-                            <Result name="암호화반"/>
+                        <GroupResult id="rCD" name="RCD 점검 결과">
+                            <Result id="mCU" name="MCU"/>
+                            <Result id="modemControlUnit" name="모뎀 및 제어반"/>
+                            <Result id="uHF" name="송수신반 UHF"/>
+                            <Result id="lBand" name="송수신반 L-Band"/>
+                            <Result id="powerUnit" name="전원반"/>
+                            <Result id="encryptionUnit" name="암호화반"/>
                         </GroupResult>
                     </GroupResult>
-                    <GroupResult name="요약 점검 결과" required="false">
-                        <Result name="MSS_TEST"/>
-                        <Result name="CCS_TEST"/>
-                        <Result name="NS_TEST"/>
-                        <Result name="BS_TEST"/>
-                        <Result name="PRS_TEST"/>
-                        <Result name="MCS_TEST"/>
+                    <GroupResult id="summaryCheckResults" name="요약 점검 결과" required="false">
+                        <Result id="mSSTEST" name="MSS_TEST"/>
+                        <Result id="cCSTEST" name="CCS_TEST"/>
+                        <Result id="nSTEST" name="NS_TEST"/>
+                        <Result id="bSTEST" name="BS_TEST"/>
+                        <Result id="pRSTEST" name="PRS_TEST"/>
+                        <Result id="mCSTEST" name="MCS_TEST"/>
                     </GroupResult>
                 </Results>
             </Reply>
@@ -175,7 +175,7 @@
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true"/>
+            <Reply id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true"/>
         </ControlSpec>
 
         <!--
@@ -196,7 +196,7 @@
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Platform.Motion.Response" bindRef="controlAuvLocallyReply" required="true"/>
+            <Reply id="controlAuvLocallyReply" name="Control Auv Locally Reply" cdm="Control.Platform.Motion.Response" bindRef="controlAuvLocallyReply" required="true"/>
         </ControlSpec>
 
         <!--
@@ -206,35 +206,35 @@
         -->
         <ControlSpec id="requestAuvStatus" name="AUV 상태 요청" cdm="Request.Platform.Status">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.Platform.Status.Response" bindRef="requestAuvStatusReply" required="true">
+            <Reply id="requestAuvStatusReply" name="Request Auv Status Reply" cdm="Request.Platform.Status.Response" bindRef="requestAuvStatusReply" required="true">
                 <Results>
-                    <QuantityResult name="AUV ID" cdm="Platform.Identifier.Numeric"/>
-                    <QuantityResult name="배터리 용량" cdm="Platform.Energy.Battery.RemainingPercent">
+                    <QuantityResult id="numeric" name="AUV ID" cdm="Platform.Identifier.Numeric"/>
+                    <QuantityResult id="remainingPercent" name="배터리 용량" cdm="Platform.Energy.Battery.RemainingPercent">
                         <Unit>%</Unit>
                         <Range min="0" max="100"/>
                         <Resolution>1</Resolution>
                     </QuantityResult>
-                    <QuantityResult name="GPS 위도" cdm="Navigation.GNSS.Position.Latitude"><Unit>rad</Unit></QuantityResult>
-                    <QuantityResult name="GPS 경도" cdm="Navigation.GNSS.Position.Longitude"><Unit>rad</Unit></QuantityResult>
-                    <QuantityResult name="WayPoint 개수" cdm="MissionPlan.WaypointCount"><Range min="0" max="100"/><Resolution>1</Resolution></QuantityResult>
-                    <Result name="정렬확인" cdm="Navigation.Integrated.Alignment.Status"/>
-                    <QuantityResult name="복합항법 위도" cdm="Navigation.Integrated.Position.Latitude"><Unit>rad</Unit></QuantityResult>
-                    <QuantityResult name="복합항법 경도" cdm="Navigation.Integrated.Position.Longitude"><Unit>rad</Unit></QuantityResult>
-                    <QuantityResult name="AUV 데이터 파일 개수" cdm="RecordedData.Platform.FileCount"/>
-                    <QuantityResult name="측면주사소나 파일 개수" cdm="RecordedData.SideScanSonar.FileCount"/>
-                    <QuantityResult name="광학카메라 파일 개수" cdm="RecordedData.OpticalCamera.FileCount"/>
-                    <QuantityResult name="초음파카메라 파일 개수" cdm="RecordedData.AcousticCamera.FileCount"/>
-                    <QuantityResult name="전방주사소나 파일 개수" cdm="RecordedData.ForwardLookingSonar.FileCount"/>
-                    <GroupResult name="비상종료 항목(EOR)">
-                        <Result name="LEAK"/><Result name="ROLL"/><Result name="PITCH"/><Result name="VEL"/>
-                        <Result name="COM"/><Result name="PCD"/><Result name="GPS"/><Result name="RF/UCD"/>
-                        <Result name="Ceiling Depth"/><Result name="BT_SOC"/><Result name="BT_TEMP"/><Result name="BT_CO"/>
-                        <Result name="BT_V"/><Result name="MC"/><Result name="DIS"/><Result name="EOM"/>
+                    <QuantityResult id="latitude" name="GPS 위도" cdm="Navigation.GNSS.Position.Latitude"><Unit>rad</Unit></QuantityResult>
+                    <QuantityResult id="longitude" name="GPS 경도" cdm="Navigation.GNSS.Position.Longitude"><Unit>rad</Unit></QuantityResult>
+                    <QuantityResult id="waypointCount" name="WayPoint 개수" cdm="MissionPlan.WaypointCount"><Range min="0" max="100"/><Resolution>1</Resolution></QuantityResult>
+                    <Result id="status" name="정렬확인" cdm="Navigation.Integrated.Alignment.Status"/>
+                    <QuantityResult id="latitude2" name="복합항법 위도" cdm="Navigation.Integrated.Position.Latitude"><Unit>rad</Unit></QuantityResult>
+                    <QuantityResult id="longitude2" name="복합항법 경도" cdm="Navigation.Integrated.Position.Longitude"><Unit>rad</Unit></QuantityResult>
+                    <QuantityResult id="fileCount" name="AUV 데이터 파일 개수" cdm="RecordedData.Platform.FileCount"/>
+                    <QuantityResult id="fileCount2" name="측면주사소나 파일 개수" cdm="RecordedData.SideScanSonar.FileCount"/>
+                    <QuantityResult id="fileCount3" name="광학카메라 파일 개수" cdm="RecordedData.OpticalCamera.FileCount"/>
+                    <QuantityResult id="fileCount4" name="초음파카메라 파일 개수" cdm="RecordedData.AcousticCamera.FileCount"/>
+                    <QuantityResult id="fileCount5" name="전방주사소나 파일 개수" cdm="RecordedData.ForwardLookingSonar.FileCount"/>
+                    <GroupResult id="emergencyShutdownItems" name="비상종료 항목(EOR)">
+                        <Result id="lEAK" name="LEAK"/><Result id="rOLL" name="ROLL"/><Result id="pITCH" name="PITCH"/><Result id="vEL" name="VEL"/>
+                        <Result id="cOM" name="COM"/><Result id="pCD" name="PCD"/><Result id="gPS" name="GPS"/><Result id="rFUCD" name="RF/UCD"/>
+                        <Result id="ceilingDepth" name="Ceiling Depth"/><Result id="bTSOC" name="BT_SOC"/><Result id="bTTEMP" name="BT_TEMP"/><Result id="bTCO" name="BT_CO"/>
+                        <Result id="bTV" name="BT_V"/><Result id="mC" name="MC"/><Result id="dIS" name="DIS"/><Result id="eOM" name="EOM"/>
                     </GroupResult>
-                    <GroupResult name="MODE 항목">
-                        <Result name="PLC"/><Result name="MS"/><Result name="RC"/><Result name="ALIGN"/>
-                        <Result name="MS_ST"/><Result name="EMER"/><Result name="FILE"/><Result name="DATA"/>
-                        <Result name="MS_STOP"/><Result name="REC_DEL"/><Result name="RF_CONF"/><Result name="EOR"/>
+                    <GroupResult id="mODE" name="MODE 항목">
+                        <Result id="pLC" name="PLC"/><Result id="mS" name="MS"/><Result id="rC" name="RC"/><Result id="aLIGN" name="ALIGN"/>
+                        <Result id="mSST" name="MS_ST"/><Result id="eMER" name="EMER"/><Result id="fILE" name="FILE"/><Result id="dATA" name="DATA"/>
+                        <Result id="mSSTOP" name="MS_STOP"/><Result id="rECDEL" name="REC_DEL"/><Result id="rFCONF" name="RF_CONF"/><Result id="eOR" name="EOR"/>
                     </GroupResult>
                 </Results>
             </Reply>
@@ -247,7 +247,7 @@
         -->
         <ControlSpec id="startMission" name="AUV 임무 시작" cdm="Control.Mission.Start">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true"/>
+            <Reply id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true"/>
         </ControlSpec>
 
         <!--
@@ -262,7 +262,7 @@
                 <QuantityProfile id="emergencyLatitude" name="비상복귀 위도" cdm="Autonomy.EmergencyReturn.Position.Latitude"><Unit>rad</Unit></QuantityProfile>
                 <QuantityProfile id="emergencyLongitude" name="비상복귀 경도" cdm="Autonomy.EmergencyReturn.Position.Longitude"><Unit>rad</Unit></QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.EmergencyReturn.Response" bindRef="emergencyReturnReply" required="true"/>
+            <Reply id="emergencyReturnReply" name="Emergency Return Reply" cdm="Control.Mission.EmergencyReturn.Response" bindRef="emergencyReturnReply" required="true"/>
         </ControlSpec>
 
         <!--
@@ -273,13 +273,13 @@
         -->
         <ControlSpec id="requestFileList" name="AUV 파일 목록 요청" cdm="Request.RecordedData.FileList">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.RecordedData.FileList.Response" bindRef="requestFileListReply" required="true">
+            <Reply id="requestFileListReply" name="Request File List Reply" cdm="Request.RecordedData.FileList.Response" bindRef="requestFileListReply" required="true">
                 <Results>
-                    <QuantityResult name="AUV 데이터 파일 개수" cdm="RecordedData.Platform.FileCount"/>
-                    <QuantityResult name="측면주사소나 파일 개수" cdm="RecordedData.SideScanSonar.FileCount"/>
-                    <QuantityResult name="광학카메라 파일 개수" cdm="RecordedData.OpticalCamera.FileCount"/>
-                    <QuantityResult name="초음파카메라 파일 개수" cdm="RecordedData.AcousticCamera.FileCount"/>
-                    <QuantityResult name="전방주사소나 파일 개수" cdm="RecordedData.ForwardLookingSonar.FileCount"/>
+                    <QuantityResult id="fileCount" name="AUV 데이터 파일 개수" cdm="RecordedData.Platform.FileCount"/>
+                    <QuantityResult id="fileCount2" name="측면주사소나 파일 개수" cdm="RecordedData.SideScanSonar.FileCount"/>
+                    <QuantityResult id="fileCount3" name="광학카메라 파일 개수" cdm="RecordedData.OpticalCamera.FileCount"/>
+                    <QuantityResult id="fileCount4" name="초음파카메라 파일 개수" cdm="RecordedData.AcousticCamera.FileCount"/>
+                    <QuantityResult id="fileCount5" name="전방주사소나 파일 개수" cdm="RecordedData.ForwardLookingSonar.FileCount"/>
                 </Results>
             </Reply>
         </ControlSpec>
@@ -305,17 +305,17 @@
 
         <ControlSpec id="stopMission" name="AUV 임무 중지" cdm="Control.Mission.Stop">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true"/>
+            <Reply id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true"/>
         </ControlSpec>
 
         <ControlSpec id="deleteAllRecords" name="AUV 저장자료 전체 삭제" cdm="Request.RecordedData.DeleteAll">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Request.RecordedData.DeleteAll.Response" bindRef="deleteAllRecordsReply" required="true"/>
+            <Reply id="deleteAllRecordsReply" name="Delete All Records Reply" cdm="Request.RecordedData.DeleteAll.Response" bindRef="deleteAllRecordsReply" required="true"/>
         </ControlSpec>
 
         <ControlSpec id="enterMaintenanceMode" name="AUV 정비장비모드 진입" cdm="Control.Platform.MaintenanceMode.Enter">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Control.Platform.MaintenanceMode.Enter.Response" bindRef="enterMaintenanceModeReply" required="true"/>
+            <Reply id="enterMaintenanceModeReply" name="Enter Maintenance Mode Reply" cdm="Control.Platform.MaintenanceMode.Enter.Response" bindRef="enterMaintenanceModeReply" required="true"/>
         </ControlSpec>
 
         <ControlSpec id="setFlashBrightness" name="AUV 점멸등 밝기 설정" cdm="Control.Equipment.Light.Brightness">
@@ -323,7 +323,7 @@
             <Parameters>
                 <QuantityProfile id="brightness" name="Brightness" cdm="Equipment.Light.Brightness"><Range min="1" max="10"/><Resolution>1</Resolution></QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Equipment.Light.Brightness.Response" bindRef="setFlashBrightnessReply" required="true"/>
+            <Reply id="setFlashBrightnessReply" name="Set Flash Brightness Reply" cdm="Control.Equipment.Light.Brightness.Response" bindRef="setFlashBrightnessReply" required="true"/>
         </ControlSpec>
     </ControlSpecs>
 

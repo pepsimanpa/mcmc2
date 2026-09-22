@@ -192,31 +192,31 @@
   <ControlSpecs id="control">
         <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startIntegrationAck" name="Start Integration Ack" bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="restartSystemAck" name="Restart System Ack" bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="requestIbitAck" name="Request Ibit Ack" bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
+      <Reply id="requestIbitResult" name="Request Ibit Result" bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
         <Results>
-          <GroupResult name="cipeIbit" cdm="Health.IBIT.NavigationRadarProcessor">
-            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+          <GroupResult id="navigationRadarProcessor" name="cipeIbit" cdm="Health.IBIT.NavigationRadarProcessor">
+            <ValueSetResult id="equipmentLink" name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
               <Values>
                 <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/>
                 <Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
@@ -228,7 +228,7 @@
                 <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+            <ValueSetResult id="operationalStatus" name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -236,11 +236,11 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <QuantityResult name="cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature">
+            <QuantityResult id="cpuTemperature" name="cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature">
               <Unit>degC</Unit>
               <Range min="20" max="100"/>
             </QuantityResult>
-            <QuantityResult name="cpuLoad" cdm="Health.CIPE.Processor.CpuLoad">
+            <QuantityResult id="cpuLoad" name="cpuLoad" cdm="Health.CIPE.Processor.CpuLoad">
               <Unit>percent</Unit>
               <Range min="0" max="100"/>
             </QuantityResult>
@@ -250,15 +250,15 @@
     </ControlSpec>
         <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="requestPbitAck" name="Request Pbit Ack" bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
+      <Reply id="requestPbitResult" name="Request Pbit Result" bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
         <Results>
-          <GroupResult name="cipePbit" cdm="Health.PBIT.NavigationRadarProcessor">
-            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+          <GroupResult id="navigationRadarProcessor" name="cipePbit" cdm="Health.PBIT.NavigationRadarProcessor">
+            <ValueSetResult id="equipmentLink" name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
               <Values>
                 <Value name="RadarConnected" cdm="Health.CIPE.Radar.Connected"/>
                 <Value name="RadarDisconnected" cdm="Health.CIPE.Radar.Disconnected"/>
@@ -270,7 +270,7 @@
                 <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+            <ValueSetResult id="operationalStatus" name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -283,16 +283,16 @@
       </Reply>
     </ControlSpec>
         <ControlSpec id="setRadarStandby" name="항해레이더 송출 대기 명령" cdm="Control.Radar.Transmit.Standby">
-      <Reply bindRef="setRadarStandbyAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setRadarStandbyAck" name="Set Radar Standby Ack" bindRef="setRadarStandbyAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="startRadarTransmit" name="항해레이더 송출 명령" cdm="Control.Radar.Transmit.Start">
-      <Reply bindRef="startRadarTransmitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startRadarTransmitAck" name="Start Radar Transmit Ack" bindRef="startRadarTransmitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -301,37 +301,37 @@
       <Parameters>
         <Profile id="commandValue" name="Command Value" cdm="Control.Radar.Range.CommandValue"/>
       </Parameters>
-      <Reply bindRef="setRadarRangeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setRadarRangeAck" name="Set Radar Range Ack" bindRef="setRadarRangeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="startRadarVideoStreaming" name="항해레이더 영상 송출 시작" cdm="Control.Radar.Video.Start">
-      <Reply bindRef="startRadarVideoStreamingAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startRadarVideoStreamingAck" name="Start Radar Video Streaming Ack" bindRef="startRadarVideoStreamingAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="stopRadarVideoStreaming" name="항해레이더 영상 송출 중지" cdm="Control.Radar.Video.Stop">
-      <Reply bindRef="stopRadarVideoStreamingAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="stopRadarVideoStreamingAck" name="Stop Radar Video Streaming Ack" bindRef="stopRadarVideoStreamingAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="setAISMessageStandby" name="AIS 메시지 출력 대기" cdm="Control.AIS.MessageTransmit.Standby">
-      <Reply bindRef="setAISMessageStandbyAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setAISMessageStandbyAck" name="Set AIS Message Standby Ack" bindRef="setAISMessageStandbyAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
         <ControlSpec id="startAISMessageTransmit" name="AIS 메시지 출력 시작" cdm="Control.AIS.MessageTransmit.Start">
-      <Reply bindRef="startAISMessageTransmitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startAISMessageTransmitAck" name="Start AIS Message Transmit Ack" bindRef="startAISMessageTransmitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -340,9 +340,9 @@
       <Parameters>
         <Profile id="commandValue" name="Command Value" cdm="Control.AIS.Range.CommandValue"/>
       </Parameters>
-      <Reply bindRef="setAISRangeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setAISRangeAck" name="Set AIS Range Ack" bindRef="setAISRangeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>

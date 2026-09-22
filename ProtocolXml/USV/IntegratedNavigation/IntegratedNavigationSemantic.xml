@@ -156,121 +156,121 @@
   </MonitorSpecs>
 
   <ControlSpecs id="control">
-    <ControlSpec id="startIntegration" name="복합항법장치 연동 개시" cdm="Control.Integration.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
-    <ControlSpec id="restartSystem" name="복합항법장치 시스템 재시작" cdm="Control.System.Restart"><Target cdm="Platform.Identifier.Numeric"/><Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
+    <ControlSpec id="startIntegration" name="복합항법장치 연동 개시" cdm="Control.Integration.Start"><Target cdm="Platform.Identifier.Numeric"/><Reply id="startIntegrationAck" name="Start Integration Ack" bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
+    <ControlSpec id="restartSystem" name="복합항법장치 시스템 재시작" cdm="Control.System.Restart"><Target cdm="Platform.Identifier.Numeric"/><Reply id="restartSystemAck" name="Restart System Ack" bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply></ControlSpec>
     <ControlSpec id="requestPbit" name="복합항법장치 PBIT 요청" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true"><Results><GroupResult name="cnePbit" cdm="Health.CNE.PBIT">
-          <ValueSetResult name="sys.systemError" cdm="Health.CNE.PBIT.sys.systemError">
+      <Reply id="requestPbitAck" name="Request Pbit Ack" bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply id="requestPbitResult" name="Request Pbit Result" bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true"><Results><GroupResult id="pBIT" name="cnePbit" cdm="Health.CNE.PBIT">
+          <ValueSetResult id="systemError" name="sys.systemError" cdm="Health.CNE.PBIT.sys.systemError">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.communication" cdm="Health.CNE.PBIT.imu.communication">
+          <ValueSetResult id="communication" name="imu.communication" cdm="Health.CNE.PBIT.imu.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.dataIntegrity" cdm="Health.CNE.PBIT.imu.dataIntegrity">
+          <ValueSetResult id="dataIntegrity" name="imu.dataIntegrity" cdm="Health.CNE.PBIT.imu.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.bitStatus" cdm="Health.CNE.PBIT.imu.bitStatus">
+          <ValueSetResult id="bitStatus" name="imu.bitStatus" cdm="Health.CNE.PBIT.imu.bitStatus">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="gnss.communication" cdm="Health.CNE.PBIT.gnss.communication">
+          <ValueSetResult id="communication2" name="gnss.communication" cdm="Health.CNE.PBIT.gnss.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="gnss.dataIntegrity" cdm="Health.CNE.PBIT.gnss.dataIntegrity">
+          <ValueSetResult id="dataIntegrity2" name="gnss.dataIntegrity" cdm="Health.CNE.PBIT.gnss.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="antiJam.communication" cdm="Health.CNE.PBIT.antiJam.communication">
+          <ValueSetResult id="communication3" name="antiJam.communication" cdm="Health.CNE.PBIT.antiJam.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="antiJam.dataIntegrity" cdm="Health.CNE.PBIT.antiJam.dataIntegrity">
+          <ValueSetResult id="dataIntegrity3" name="antiJam.dataIntegrity" cdm="Health.CNE.PBIT.antiJam.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="antiSpoofGNSS.communication" cdm="Health.CNE.PBIT.antiSpoofGNSS.communication">
+          <ValueSetResult id="communication4" name="antiSpoofGNSS.communication" cdm="Health.CNE.PBIT.antiSpoofGNSS.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="antiSpoofGNSS.dataIntegrity" cdm="Health.CNE.PBIT.antiSpoofGNSS.dataIntegrity">
+          <ValueSetResult id="dataIntegrity4" name="antiSpoofGNSS.dataIntegrity" cdm="Health.CNE.PBIT.antiSpoofGNSS.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="eLoran.communication" cdm="Health.CNE.PBIT.eLoran.communication">
+          <ValueSetResult id="communication5" name="eLoran.communication" cdm="Health.CNE.PBIT.eLoran.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="eLoran.dataIntegrity" cdm="Health.CNE.PBIT.eLoran.dataIntegrity">
+          <ValueSetResult id="dataIntegrity5" name="eLoran.dataIntegrity" cdm="Health.CNE.PBIT.eLoran.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.communication" cdm="Health.CNE.PBIT.dvl.communication">
+          <ValueSetResult id="communication6" name="dvl.communication" cdm="Health.CNE.PBIT.dvl.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.dataIntegrity" cdm="Health.CNE.PBIT.dvl.dataIntegrity">
+          <ValueSetResult id="dataIntegrity6" name="dvl.dataIntegrity" cdm="Health.CNE.PBIT.dvl.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.bitStatus" cdm="Health.CNE.PBIT.dvl.bitStatus">
+          <ValueSetResult id="bitStatus2" name="dvl.bitStatus" cdm="Health.CNE.PBIT.dvl.bitStatus">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="ais.communication" cdm="Health.CNE.PBIT.ais.communication">
+          <ValueSetResult id="communication7" name="ais.communication" cdm="Health.CNE.PBIT.ais.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="ais.dataIntegrity" cdm="Health.CNE.PBIT.ais.dataIntegrity">
+          <ValueSetResult id="dataIntegrity7" name="ais.dataIntegrity" cdm="Health.CNE.PBIT.ais.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="idc.communication" cdm="Health.CNE.PBIT.idc.communication">
+          <ValueSetResult id="communication8" name="idc.communication" cdm="Health.CNE.PBIT.idc.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="idc.dataIntegrity" cdm="Health.CNE.PBIT.idc.dataIntegrity">
+          <ValueSetResult id="dataIntegrity8" name="idc.dataIntegrity" cdm="Health.CNE.PBIT.idc.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
@@ -280,298 +280,298 @@
     </ControlSpec>
     <ControlSpec id="requestIbit" name="복합항법장치 IBIT 요청" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true"><Results><GroupResult name="cneIbit" cdm="Health.CNE.IBIT">
-        <ValueSetResult name="sys.systemError" cdm="Health.CNE.IBIT.sys.systemError"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
-        <ValueSetResult name="sys.clockConfig" cdm="Health.CNE.IBIT.sys.clockConfig"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
-        <ValueSetResult name="sys.powerConfig" cdm="Health.CNE.IBIT.sys.powerConfig"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
-        <ValueSetResult name="sys.memoryTest" cdm="Health.CNE.IBIT.sys.memoryTest"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
-          <ValueSetResult name="imu.communication" cdm="Health.CNE.IBIT.imu.communication">
+      <Reply id="requestIbitAck" name="Request Ibit Ack" bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true"><Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results></Reply>
+      <Reply id="requestIbitResult" name="Request Ibit Result" bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true"><Results><GroupResult id="iBIT" name="cneIbit" cdm="Health.CNE.IBIT">
+        <ValueSetResult id="systemError" name="sys.systemError" cdm="Health.CNE.IBIT.sys.systemError"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
+        <ValueSetResult id="clockConfig" name="sys.clockConfig" cdm="Health.CNE.IBIT.sys.clockConfig"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
+        <ValueSetResult id="powerConfig" name="sys.powerConfig" cdm="Health.CNE.IBIT.sys.powerConfig"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
+        <ValueSetResult id="memoryTest" name="sys.memoryTest" cdm="Health.CNE.IBIT.sys.memoryTest"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Unavailable" cdm="Health.Unavailable"/></Values></ValueSetResult>
+          <ValueSetResult id="communication" name="imu.communication" cdm="Health.CNE.IBIT.imu.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.dataIntegrity" cdm="Health.CNE.IBIT.imu.dataIntegrity">
+          <ValueSetResult id="dataIntegrity" name="imu.dataIntegrity" cdm="Health.CNE.IBIT.imu.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.bitStatus" cdm="Health.CNE.IBIT.imu.bitStatus">
+          <ValueSetResult id="bitStatus" name="imu.bitStatus" cdm="Health.CNE.IBIT.imu.bitStatus">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="gnss.communication" cdm="Health.CNE.IBIT.gnss.communication">
+          <ValueSetResult id="communication2" name="gnss.communication" cdm="Health.CNE.IBIT.gnss.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="gnss.dataIntegrity" cdm="Health.CNE.IBIT.gnss.dataIntegrity">
+          <ValueSetResult id="dataIntegrity2" name="gnss.dataIntegrity" cdm="Health.CNE.IBIT.gnss.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="antiJam.communication" cdm="Health.CNE.IBIT.antiJam.communication">
+          <ValueSetResult id="communication3" name="antiJam.communication" cdm="Health.CNE.IBIT.antiJam.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="antiJam.dataIntegrity" cdm="Health.CNE.IBIT.antiJam.dataIntegrity">
+          <ValueSetResult id="dataIntegrity3" name="antiJam.dataIntegrity" cdm="Health.CNE.IBIT.antiJam.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="antiSpoofGNSS.communication" cdm="Health.CNE.IBIT.antiSpoofGNSS.communication">
+          <ValueSetResult id="communication4" name="antiSpoofGNSS.communication" cdm="Health.CNE.IBIT.antiSpoofGNSS.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="antiSpoofGNSS.dataIntegrity" cdm="Health.CNE.IBIT.antiSpoofGNSS.dataIntegrity">
+          <ValueSetResult id="dataIntegrity4" name="antiSpoofGNSS.dataIntegrity" cdm="Health.CNE.IBIT.antiSpoofGNSS.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="eLoran.communication" cdm="Health.CNE.IBIT.eLoran.communication">
+          <ValueSetResult id="communication5" name="eLoran.communication" cdm="Health.CNE.IBIT.eLoran.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="eLoran.dataIntegrity" cdm="Health.CNE.IBIT.eLoran.dataIntegrity">
+          <ValueSetResult id="dataIntegrity5" name="eLoran.dataIntegrity" cdm="Health.CNE.IBIT.eLoran.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.communication" cdm="Health.CNE.IBIT.dvl.communication">
+          <ValueSetResult id="communication6" name="dvl.communication" cdm="Health.CNE.IBIT.dvl.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.dataIntegrity" cdm="Health.CNE.IBIT.dvl.dataIntegrity">
+          <ValueSetResult id="dataIntegrity6" name="dvl.dataIntegrity" cdm="Health.CNE.IBIT.dvl.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.bitStatus" cdm="Health.CNE.IBIT.dvl.bitStatus">
+          <ValueSetResult id="bitStatus2" name="dvl.bitStatus" cdm="Health.CNE.IBIT.dvl.bitStatus">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="ais.communication" cdm="Health.CNE.IBIT.ais.communication">
+          <ValueSetResult id="communication7" name="ais.communication" cdm="Health.CNE.IBIT.ais.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="ais.dataIntegrity" cdm="Health.CNE.IBIT.ais.dataIntegrity">
+          <ValueSetResult id="dataIntegrity7" name="ais.dataIntegrity" cdm="Health.CNE.IBIT.ais.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="idc.communication" cdm="Health.CNE.IBIT.idc.communication">
+          <ValueSetResult id="communication8" name="idc.communication" cdm="Health.CNE.IBIT.idc.communication">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="NoResponse" cdm="Health.NoResponse"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="idc.dataIntegrity" cdm="Health.CNE.IBIT.idc.dataIntegrity">
+          <ValueSetResult id="dataIntegrity8" name="idc.dataIntegrity" cdm="Health.CNE.IBIT.idc.dataIntegrity">
             <Values>
               <Value name="Normal" cdm="Health.Normal"/>
               <Value name="Unavailable" cdm="Health.Unavailable"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.gyroTest" cdm="Health.CNE.IBIT.IMU.GyroTest">
+          <ValueSetResult id="gyroTest" name="imu.gyroTest" cdm="Health.CNE.IBIT.IMU.GyroTest">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.accelTest" cdm="Health.CNE.IBIT.IMU.AccelTest">
+          <ValueSetResult id="accelTest" name="imu.accelTest" cdm="Health.CNE.IBIT.IMU.AccelTest">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.otherTest" cdm="Health.CNE.IBIT.IMU.OtherTest">
+          <ValueSetResult id="otherTest" name="imu.otherTest" cdm="Health.CNE.IBIT.IMU.OtherTest">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.memoryTest" cdm="Health.CNE.IBIT.IMU.MemoryTest">
+          <ValueSetResult id="memoryTest2" name="imu.memoryTest" cdm="Health.CNE.IBIT.IMU.MemoryTest">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.processorTest" cdm="Health.CNE.IBIT.IMU.ProcessorTest">
+          <ValueSetResult id="processorTest" name="imu.processorTest" cdm="Health.CNE.IBIT.IMU.ProcessorTest">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <QuantityResult name="imu.counter" cdm="Health.CNE.IBIT.IMU.Counter"><Range min="0" max="15"/><Resolution>1</Resolution></QuantityResult>
-          <ValueSetResult name="imu.failed" cdm="Health.CNE.IBIT.IMU.Failed">
+          <QuantityResult id="counter" name="imu.counter" cdm="Health.CNE.IBIT.IMU.Counter"><Range min="0" max="15"/><Resolution>1</Resolution></QuantityResult>
+          <ValueSetResult id="failed" name="imu.failed" cdm="Health.CNE.IBIT.IMU.Failed">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.cAxisRlgReset" cdm="Health.CNE.IBIT.IMU.CAxisRLGReset">
+          <ValueSetResult id="cAxisRLGReset" name="imu.cAxisRlgReset" cdm="Health.CNE.IBIT.IMU.CAxisRLGReset">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.bAxisRlgReset" cdm="Health.CNE.IBIT.IMU.BAxisRLGReset">
+          <ValueSetResult id="bAxisRLGReset" name="imu.bAxisRlgReset" cdm="Health.CNE.IBIT.IMU.BAxisRLGReset">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="imu.aAxisRlgReset" cdm="Health.CNE.IBIT.IMU.AAxisRLGReset">
+          <ValueSetResult id="aAxisRLGReset" name="imu.aAxisRlgReset" cdm="Health.CNE.IBIT.IMU.AAxisRLGReset">
             <Values>
               <Value name="OK" cdm="Health.Test.OK"/>
               <Value name="Error" cdm="Health.Test.Error"/>
             </Values>
           </ValueSetResult>
-          <QuantityResult name="imu.accelerometerTemperature" cdm="Health.CNE.IBIT.IMU.AccelerometerTemperature"><Unit>degC</Unit><Resolution>1</Resolution></QuantityResult>
-          <ValueSetResult name="dvl.BeamVelocity.Beam1" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam1">
+          <QuantityResult id="accelerometerTemperature" name="imu.accelerometerTemperature" cdm="Health.CNE.IBIT.IMU.AccelerometerTemperature"><Unit>degC</Unit><Resolution>1</Resolution></QuantityResult>
+          <ValueSetResult id="beam1" name="dvl.BeamVelocity.Beam1" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam1">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamVelocity.Beam2" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam2">
+          <ValueSetResult id="beam2" name="dvl.BeamVelocity.Beam2" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam2">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamVelocity.Beam3" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam3">
+          <ValueSetResult id="beam3" name="dvl.BeamVelocity.Beam3" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam3">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamVelocity.Beam4" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam4">
+          <ValueSetResult id="beam4" name="dvl.BeamVelocity.Beam4" cdm="Health.CNE.IBIT.DVL.BeamVelocity.Beam4">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamDistance.Beam1" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam1">
+          <ValueSetResult id="beam12" name="dvl.BeamDistance.Beam1" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam1">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamDistance.Beam2" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam2">
+          <ValueSetResult id="beam22" name="dvl.BeamDistance.Beam2" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam2">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamDistance.Beam3" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam3">
+          <ValueSetResult id="beam32" name="dvl.BeamDistance.Beam3" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam3">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamDistance.Beam4" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam4">
+          <ValueSetResult id="beam42" name="dvl.BeamDistance.Beam4" cdm="Health.CNE.IBIT.DVL.BeamDistance.Beam4">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamFOM.Beam1" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam1">
+          <ValueSetResult id="beam13" name="dvl.BeamFOM.Beam1" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam1">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamFOM.Beam2" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam2">
+          <ValueSetResult id="beam23" name="dvl.BeamFOM.Beam2" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam2">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamFOM.Beam3" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam3">
+          <ValueSetResult id="beam33" name="dvl.BeamFOM.Beam3" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam3">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.BeamFOM.Beam4" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam4">
+          <ValueSetResult id="beam43" name="dvl.BeamFOM.Beam4" cdm="Health.CNE.IBIT.DVL.BeamFOM.Beam4">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.XVelocity" cdm="Health.CNE.IBIT.DVL.XVelocity">
+          <ValueSetResult id="xVelocity" name="dvl.XVelocity" cdm="Health.CNE.IBIT.DVL.XVelocity">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.YVelocity" cdm="Health.CNE.IBIT.DVL.YVelocity">
+          <ValueSetResult id="yVelocity" name="dvl.YVelocity" cdm="Health.CNE.IBIT.DVL.YVelocity">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.Z1Velocity" cdm="Health.CNE.IBIT.DVL.Z1Velocity">
+          <ValueSetResult id="z1Velocity" name="dvl.Z1Velocity" cdm="Health.CNE.IBIT.DVL.Z1Velocity">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.Z2Velocity" cdm="Health.CNE.IBIT.DVL.Z2Velocity">
+          <ValueSetResult id="z2Velocity" name="dvl.Z2Velocity" cdm="Health.CNE.IBIT.DVL.Z2Velocity">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.XFOM" cdm="Health.CNE.IBIT.DVL.XFOM">
+          <ValueSetResult id="xFOM" name="dvl.XFOM" cdm="Health.CNE.IBIT.DVL.XFOM">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.YFOM" cdm="Health.CNE.IBIT.DVL.YFOM">
+          <ValueSetResult id="yFOM" name="dvl.YFOM" cdm="Health.CNE.IBIT.DVL.YFOM">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.Z1FOM" cdm="Health.CNE.IBIT.DVL.Z1FOM">
+          <ValueSetResult id="z1FOM" name="dvl.Z1FOM" cdm="Health.CNE.IBIT.DVL.Z1FOM">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <ValueSetResult name="dvl.Z2FOM" cdm="Health.CNE.IBIT.DVL.Z2FOM">
+          <ValueSetResult id="z2FOM" name="dvl.Z2FOM" cdm="Health.CNE.IBIT.DVL.Z2FOM">
             <Values>
               <Value name="Invalid" cdm="Data.Invalid"/>
               <Value name="Valid" cdm="Data.Valid"/>
             </Values>
           </ValueSetResult>
-          <QuantityResult name="idcTemperature" cdm="Health.CNE.IBIT.IDC.Temperature"><Unit>degC</Unit></QuantityResult>
-          <QuantityResult name="idcCpuLoad" cdm="Health.CNE.IBIT.IDC.CpuLoad"><Unit>%</Unit></QuantityResult>
+          <QuantityResult id="temperature" name="idcTemperature" cdm="Health.CNE.IBIT.IDC.Temperature"><Unit>degC</Unit></QuantityResult>
+          <QuantityResult id="cpuLoad" name="idcCpuLoad" cdm="Health.CNE.IBIT.IDC.CpuLoad"><Unit>%</Unit></QuantityResult>
       </GroupResult></Results></Reply>
     </ControlSpec>
     <ControlSpec id="updateRtcmData" name="위성항법 RTCM 보정정보 입력" cdm="Control.Navigation.GNSS.RTCM.Update">

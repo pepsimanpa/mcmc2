@@ -208,15 +208,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true">
+            <Reply id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -240,15 +240,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true">
+            <Reply id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -272,15 +272,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true">
+            <Reply id="pauseMissionReply" name="Pause Mission Reply" cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -304,15 +304,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true">
+            <Reply id="resumeMissionReply" name="Resume Mission Reply" cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -330,15 +330,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
         </ControlSpec>
         <ControlSpec id="setTerminalControlMode" name="EMDW 관제터미널모드 설정" cdm="Control.Platform.OperationMode.TerminalControl">
             <Target cdm="Platform.Identifier.Numeric" />
-            <Reply cdm="Control.Platform.OperationMode.TerminalControl.Response" bindRef="setTerminalControlModeReply" required="true">
+            <Reply id="setTerminalControlModeReply" name="Set Terminal Control Mode Reply" cdm="Control.Platform.OperationMode.TerminalControl.Response" bindRef="setTerminalControlModeReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -356,15 +356,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
         </ControlSpec>
         <ControlSpec id="setIntegratedControlMode" name="EMDW 통합통제모드 설정" cdm="Control.Platform.OperationMode.IntegratedControl">
             <Target cdm="Platform.Identifier.Numeric" />
-            <Reply cdm="Control.Platform.OperationMode.IntegratedControl.Response" bindRef="setIntegratedControlModeReply" required="true">
+            <Reply id="setIntegratedControlModeReply" name="Set Integrated Control Mode Reply" cdm="Control.Platform.OperationMode.IntegratedControl.Response" bindRef="setIntegratedControlModeReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -424,15 +424,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true">
+            <Reply id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -461,15 +461,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true">
+            <Reply id="immediateEmergencyStopReply" name="Immediate Emergency Stop Reply" cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -498,15 +498,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true">
+            <Reply id="emergencyStopAndStandbyReply" name="Emergency Stop And Standby Reply" cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -566,15 +566,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Disposal.Cancel.Response" bindRef="cancelDisposalReply" required="true">
+            <Reply id="cancelDisposalReply" name="Cancel Disposal Reply" cdm="Control.Mission.Disposal.Cancel.Response" bindRef="cancelDisposalReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -602,15 +602,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Disposal.Prepare.Response" bindRef="prepareDisposalReply" required="true">
+            <Reply id="prepareDisposalReply" name="Prepare Disposal Reply" cdm="Control.Mission.Disposal.Prepare.Response" bindRef="prepareDisposalReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />
@@ -638,15 +638,15 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Control.Mission.Disposal.Execute.Response" bindRef="executeDisposalReply" required="true">
+            <Reply id="executeDisposalReply" name="Execute Disposal Reply" cdm="Control.Mission.Disposal.Execute.Response" bindRef="executeDisposalReply" required="true">
                 <Results>
-                    <ValueSetResult name="처리 결과" cdm="Command.Result">
+                    <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
                             <Value name="성공" cdm="Command.Result.Success" />
                             <Value name="실패" cdm="Command.Result.Failure" />
                         </Values>
                     </ValueSetResult>
-                    <ValueSetResult name="사유 코드" cdm="Command.Result.ReasonCode">
+                    <ValueSetResult id="reasonCode" name="사유 코드" cdm="Command.Result.ReasonCode">
                         <Values>
                             <Value name="없음" cdm="Command.Result.Reason.None" />
                             <Value name="요청값 오류" cdm="Command.Result.Reason.InvalidRequest" />

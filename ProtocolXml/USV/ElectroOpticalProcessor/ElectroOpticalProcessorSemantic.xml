@@ -114,37 +114,37 @@
   <ControlSpecs id="control">
     <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startIntegrationAck" name="Start Integration Ack" bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="restartSystemAck" name="Restart System Ack" bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="requestIbitAck" name="Request Ibit Ack" bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
+      <Reply id="requestIbitResult" name="Request Ibit Result" bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
         <Results>
-          <GroupResult name="cipeIbit" cdm="Health.IBIT.ElectroOpticalProcessor">
-            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+          <GroupResult id="electroOpticalProcessor" name="cipeIbit" cdm="Health.IBIT.ElectroOpticalProcessor">
+            <ValueSetResult id="equipmentLink" name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
               <Values>
                 <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
                 <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+            <ValueSetResult id="operationalStatus" name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -152,11 +152,11 @@
                 <Value name="NoResponse" cdm="Health.NoResponse"/>
               </Values>
             </ValueSetResult>
-            <QuantityResult name="cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature">
+            <QuantityResult id="cpuTemperature" name="cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature">
               <Unit>degC</Unit>
               <Range min="20" max="100"/>
             </QuantityResult>
-            <QuantityResult name="cpuLoad" cdm="Health.CIPE.Processor.CpuLoad">
+            <QuantityResult id="cpuLoad" name="cpuLoad" cdm="Health.CIPE.Processor.CpuLoad">
               <Unit>percent</Unit>
               <Range min="0" max="100"/>
             </QuantityResult>
@@ -166,21 +166,21 @@
     </ControlSpec>
     <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="requestPbitAck" name="Request Pbit Ack" bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
+      <Reply id="requestPbitResult" name="Request Pbit Result" bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
         <Results>
-          <GroupResult name="cipePbit" cdm="Health.PBIT.ElectroOpticalProcessor">
-            <ValueSetResult name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
+          <GroupResult id="electroOpticalProcessor" name="cipePbit" cdm="Health.PBIT.ElectroOpticalProcessor">
+            <ValueSetResult id="equipmentLink" name="cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink">
               <Values>
                 <Value name="EOIRConnected" cdm="Health.CIPE.EOIR.Connected"/>
                 <Value name="EOIRDisconnected" cdm="Health.CIPE.EOIR.Disconnected"/>
               </Values>
             </ValueSetResult>
-            <ValueSetResult name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
+            <ValueSetResult id="operationalStatus" name="operationalStatus" cdm="Health.CIPE.OperationalStatus">
               <Values>
                 <Value name="Normal" cdm="Health.Normal"/>
                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -194,9 +194,9 @@
     </ControlSpec>
     <!-- controlImageSave의 0은 no change이고 1만 실제 저장 동작이므로 Semantic에서는 저장 동작 하나로 노출한다. -->
     <ControlSpec id="saveImage" name="전자광학장치 이미지 저장" cdm="Control.EOIR.Image.Save">
-      <Reply bindRef="saveImageAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="saveImageAck" name="Save Image Ack" bindRef="saveImageAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-          <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+          <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>

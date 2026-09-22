@@ -305,31 +305,31 @@
   <ControlSpecs id="control">
     <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startIntegrationAck" name="Start Integration Ack" bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="restartSystemAck" name="Restart System Ack" bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="requestIbitAck" name="Request Ibit Ack" bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response">
+      <Reply id="requestIbitResult" name="Request Ibit Result" bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response">
         <Results>
-            <GroupResult name="IBIT 점검 결과">
-              <ValueSetResult name="towedSonarAssemblyTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarAssemblyTotalIBIT">
+            <GroupResult id="iBIT" name="IBIT 점검 결과">
+              <ValueSetResult id="towedSonarAssemblyTotalIBIT" name="towedSonarAssemblyTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarAssemblyTotalIBIT">
                 <Values>
                   <Value name="Normal" cdm="Health.Normal"/>
                   <Value name="Degraded" cdm="Health.Degraded"/>
@@ -337,36 +337,36 @@
                   <Value name="NoResponse" cdm="Health.NoResponse"/>
                 </Values>
               </ValueSetResult>
-              <Result name="launchAndRecoveryTotalIBIT" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryTotalIBIT"/>
-              <GroupResult name="launchAndRecoveryPowerDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail">
-                <BooleanResult name="input220VacError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.input220VacError"/>
-                <BooleanResult name="output220VacError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.output220VacError"/>
-                <BooleanResult name="output320VdcError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.output320VdcError"/>
+              <Result id="launchAndRecoveryTotalIBIT" name="launchAndRecoveryTotalIBIT" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryTotalIBIT"/>
+              <GroupResult id="launchAndRecoveryPowerDetail" name="launchAndRecoveryPowerDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail">
+                <BooleanResult id="input220VacError" name="input220VacError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.input220VacError"/>
+                <BooleanResult id="output220VacError" name="output220VacError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.output220VacError"/>
+                <BooleanResult id="output320VdcError" name="output320VdcError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryPowerDetail.output320VdcError"/>
               </GroupResult>
-              <GroupResult name="launchAndRecoveryLinkDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail">
-                <BooleanResult name="winchMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.winchMotorDriverLinkError"/>
-                <BooleanResult name="recoveryLeftMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryLeftMotorDriverLinkError"/>
-                <BooleanResult name="recoveryRightMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryRightMotorDriverLinkError"/>
-                <BooleanResult name="usblVerticalActuatorLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.usblVerticalActuatorLinkError"/>
-                <BooleanResult name="winchEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.winchEncoderLinkError"/>
-                <BooleanResult name="loadCellLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.loadCellLinkError"/>
-                <BooleanResult name="recoveryLeftEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryLeftEncoderLinkError"/>
-                <BooleanResult name="recoveryRightEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryRightEncoderLinkError"/>
+              <GroupResult id="launchAndRecoveryLinkDetail" name="launchAndRecoveryLinkDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail">
+                <BooleanResult id="winchMotorDriverLinkError" name="winchMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.winchMotorDriverLinkError"/>
+                <BooleanResult id="recoveryLeftMotorDriverLinkError" name="recoveryLeftMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryLeftMotorDriverLinkError"/>
+                <BooleanResult id="recoveryRightMotorDriverLinkError" name="recoveryRightMotorDriverLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryRightMotorDriverLinkError"/>
+                <BooleanResult id="usblVerticalActuatorLinkError" name="usblVerticalActuatorLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.usblVerticalActuatorLinkError"/>
+                <BooleanResult id="winchEncoderLinkError" name="winchEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.winchEncoderLinkError"/>
+                <BooleanResult id="loadCellLinkError" name="loadCellLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.loadCellLinkError"/>
+                <BooleanResult id="recoveryLeftEncoderLinkError" name="recoveryLeftEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryLeftEncoderLinkError"/>
+                <BooleanResult id="recoveryRightEncoderLinkError" name="recoveryRightEncoderLinkError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryLinkDetail.recoveryRightEncoderLinkError"/>
               </GroupResult>
-              <GroupResult name="launchAndRecoveryOverCurrentDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail">
-                <BooleanResult name="winchMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.winchMotorDriverOverCurrent"/>
-                <BooleanResult name="recoveryLeftMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.recoveryLeftMotorDriverOverCurrent"/>
-                <BooleanResult name="recoveryRightMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.recoveryRightMotorDriverOverCurrent"/>
-                <BooleanResult name="usblVerticalActuatorOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.usblVerticalActuatorOverCurrent"/>
+              <GroupResult id="launchAndRecoveryOverCurrentDetail" name="launchAndRecoveryOverCurrentDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail">
+                <BooleanResult id="winchMotorDriverOverCurrent" name="winchMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.winchMotorDriverOverCurrent"/>
+                <BooleanResult id="recoveryLeftMotorDriverOverCurrent" name="recoveryLeftMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.recoveryLeftMotorDriverOverCurrent"/>
+                <BooleanResult id="recoveryRightMotorDriverOverCurrent" name="recoveryRightMotorDriverOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.recoveryRightMotorDriverOverCurrent"/>
+                <BooleanResult id="usblVerticalActuatorOverCurrent" name="usblVerticalActuatorOverCurrent" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryOverCurrentDetail.usblVerticalActuatorOverCurrent"/>
               </GroupResult>
-              <GroupResult name="launchAndRecoveryFunctionDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail">
-                <BooleanResult name="referenceTensionExceeded" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.referenceTensionExceeded"/>
-                <BooleanResult name="controlCardUartError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardUartError"/>
-                <BooleanResult name="controlCardEthernetError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardEthernetError"/>
-                <BooleanResult name="controlCardMemoryError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardMemoryError"/>
-                <BooleanResult name="positionInformationLost" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.positionInformationLost"/>
+              <GroupResult id="launchAndRecoveryFunctionDetail" name="launchAndRecoveryFunctionDetail" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail">
+                <BooleanResult id="referenceTensionExceeded" name="referenceTensionExceeded" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.referenceTensionExceeded"/>
+                <BooleanResult id="controlCardUartError" name="controlCardUartError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardUartError"/>
+                <BooleanResult id="controlCardEthernetError" name="controlCardEthernetError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardEthernetError"/>
+                <BooleanResult id="controlCardMemoryError" name="controlCardMemoryError" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.controlCardMemoryError"/>
+                <BooleanResult id="positionInformationLost" name="positionInformationLost" cdm="Health.IBIT.SideScanSonar.launchAndRecoveryFunctionDetail.positionInformationLost"/>
               </GroupResult>
-              <ValueSetResult name="towedSonarArrayTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarArrayTotalIBIT">
+              <ValueSetResult id="towedSonarArrayTotalIBIT" name="towedSonarArrayTotalIBIT" cdm="Health.IBIT.SideScanSonar.towedSonarArrayTotalIBIT">
                 <Values>
                   <Value name="Normal" cdm="Health.Normal"/>
                   <Value name="Degraded" cdm="Health.Degraded"/>
@@ -374,24 +374,24 @@
                   <Value name="NoResponse" cdm="Health.NoResponse"/>
                 </Values>
               </ValueSetResult>
-              <GroupResult name="towedSonarArrayDetail" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail">
-                <BooleanResult name="muxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail.muxCardVoltageAbnormal"/>
-                <BooleanResult name="sssTxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail.sssTxCardVoltageAbnormal"/>
+              <GroupResult id="towedSonarArrayDetail" name="towedSonarArrayDetail" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail">
+                <BooleanResult id="muxCardVoltageAbnormal" name="muxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail.muxCardVoltageAbnormal"/>
+                <BooleanResult id="sssTxCardVoltageAbnormal" name="sssTxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.towedSonarArrayDetail.sssTxCardVoltageAbnormal"/>
               </GroupResult>
-              <Result name="tsadMux12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux12vVoltage"/>
-              <Result name="tsadMux5vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux5vVoltage"/>
-              <Result name="tsadMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tsadMux3v3Voltage"/>
-              <Result name="tsadMuxPcmTemp" cdm="Health.IBIT.SideScanSonar.tsadMuxPcmTemp"/>
-              <Result name="tsadMuxOcxTemp" cdm="Health.IBIT.SideScanSonar.tsadMuxOcxTemp"/>
-              <Result name="tsadTxSupplyVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxSupplyVoltage"/>
-              <Result name="tsadTxPortCapVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxPortCapVoltage"/>
-              <Result name="tsadTxStbdCapVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxStbdCapVoltage"/>
-              <Result name="tsadTx12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadTx12vVoltage"/>
-              <Result name="tsadTxHfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfPortRms"/>
-              <Result name="tsadTxHfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfStbdRms"/>
-              <Result name="tsadTxLfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfPortRms"/>
-              <Result name="tsadTxLfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfStbdRms"/>
-              <ValueSetResult name="sonarSignalProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalIBIT">
+              <Result id="tsadMux12VVoltage" name="tsadMux12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux12vVoltage"/>
+              <Result id="tsadMux5VVoltage" name="tsadMux5vVoltage" cdm="Health.IBIT.SideScanSonar.tsadMux5vVoltage"/>
+              <Result id="tsadMux3V3Voltage" name="tsadMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tsadMux3v3Voltage"/>
+              <Result id="tsadMuxPcmTemp" name="tsadMuxPcmTemp" cdm="Health.IBIT.SideScanSonar.tsadMuxPcmTemp"/>
+              <Result id="tsadMuxOcxTemp" name="tsadMuxOcxTemp" cdm="Health.IBIT.SideScanSonar.tsadMuxOcxTemp"/>
+              <Result id="tsadTxSupplyVoltage" name="tsadTxSupplyVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxSupplyVoltage"/>
+              <Result id="tsadTxPortCapVoltage" name="tsadTxPortCapVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxPortCapVoltage"/>
+              <Result id="tsadTxStbdCapVoltage" name="tsadTxStbdCapVoltage" cdm="Health.IBIT.SideScanSonar.tsadTxStbdCapVoltage"/>
+              <Result id="tsadTx12VVoltage" name="tsadTx12vVoltage" cdm="Health.IBIT.SideScanSonar.tsadTx12vVoltage"/>
+              <Result id="tsadTxHfPortRms" name="tsadTxHfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfPortRms"/>
+              <Result id="tsadTxHfStbdRms" name="tsadTxHfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxHfStbdRms"/>
+              <Result id="tsadTxLfPortRms" name="tsadTxLfPortRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfPortRms"/>
+              <Result id="tsadTxLfStbdRms" name="tsadTxLfStbdRms" cdm="Health.IBIT.SideScanSonar.tsadTxLfStbdRms"/>
+              <ValueSetResult id="sonarSignalProcessingEquipmentTotalIBIT" name="sonarSignalProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalIBIT">
                 <Values>
                   <Value name="Normal" cdm="Health.Normal"/>
                   <Value name="Degraded" cdm="Health.Degraded"/>
@@ -399,37 +399,37 @@
                   <Value name="NoResponse" cdm="Health.NoResponse"/>
                 </Values>
               </ValueSetResult>
-              <GroupResult name="sonarSignalProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail">
-                <BooleanResult name="towedDemuxInterfaceCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedDemuxInterfaceCardVoltageAbnormal"/>
-                <BooleanResult name="towedSonarPowerSupplyCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedSonarPowerSupplyCardVoltageAbnormal"/>
-                <BooleanResult name="towedPowerSupplyCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedPowerSupplyCardVoltageAbnormal"/>
-                <BooleanResult name="towedPowerLineCommunicationCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedPowerLineCommunicationCardVoltageAbnormal"/>
+              <GroupResult id="sonarSignalProcessingEquipmentDetail" name="sonarSignalProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail">
+                <BooleanResult id="towedDemuxInterfaceCardVoltageAbnormal" name="towedDemuxInterfaceCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedDemuxInterfaceCardVoltageAbnormal"/>
+                <BooleanResult id="towedSonarPowerSupplyCardVoltageAbnormal" name="towedSonarPowerSupplyCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedSonarPowerSupplyCardVoltageAbnormal"/>
+                <BooleanResult id="towedPowerSupplyCardVoltageAbnormal" name="towedPowerSupplyCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedPowerSupplyCardVoltageAbnormal"/>
+                <BooleanResult id="towedPowerLineCommunicationCardVoltageAbnormal" name="towedPowerLineCommunicationCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.sonarSignalProcessingEquipmentDetail.towedPowerLineCommunicationCardVoltageAbnormal"/>
               </GroupResult>
-              <Result name="tdcDemux5vVoltage" cdm="Health.IBIT.SideScanSonar.tdcDemux5vVoltage"/>
-              <Result name="tdcDemux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tdcDemux3v3Voltage"/>
-              <Result name="tdcDemuxTemp1" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp1"/>
-              <Result name="tdcDemuxTemp2" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp2"/>
-              <Result name="spcPower5vVoltage" cdm="Health.IBIT.SideScanSonar.spcPower5vVoltage"/>
-              <Result name="spcPowerTwfCurrentVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerTwfCurrentVoltage"/>
-              <Result name="spcPowerSysCurrentVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerSysCurrentVoltage"/>
-              <Result name="spcPowerTwfCurrentFault" cdm="Health.IBIT.SideScanSonar.spcPowerTwfCurrentFault"/>
-              <Result name="spcPowerTwfVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerTwfVoltage"/>
-              <Result name="spcPowerSysVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerSysVoltage"/>
-              <Result name="spcPowerTemp1" cdm="Health.IBIT.SideScanSonar.spcPowerTemp1"/>
-              <Result name="spcPowerTemp2" cdm="Health.IBIT.SideScanSonar.spcPowerTemp2"/>
-              <Result name="tpcPowerTpuVoltage" cdm="Health.IBIT.SideScanSonar.tpcPowerTpuVoltage"/>
-              <Result name="tpcPower12vVoltage" cdm="Health.IBIT.SideScanSonar.tpcPower12vVoltage"/>
-              <Result name="tpcPowerTpuCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tpcPowerTpuCurrentVoltage"/>
-              <Result name="tpcPower12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tpcPower12vCurrentVoltage"/>
-              <Result name="tlc5vVoltage" cdm="Health.IBIT.SideScanSonar.tlc5vVoltage"/>
-              <Result name="tlcN5vVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vVoltage"/>
-              <Result name="tlc12vVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vVoltage"/>
-              <Result name="tlcN12vVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vVoltage"/>
-              <Result name="tlc5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc5vCurrentVoltage"/>
-              <Result name="tlc12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vCurrentVoltage"/>
-              <Result name="tlcN5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vCurrentVoltage"/>
-              <Result name="tlcN12vCurrentRefVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vCurrentRefVoltage"/>
-              <ValueSetResult name="sonarImagingProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalIBIT">
+              <Result id="tdcDemux5VVoltage" name="tdcDemux5vVoltage" cdm="Health.IBIT.SideScanSonar.tdcDemux5vVoltage"/>
+              <Result id="tdcDemux3V3Voltage" name="tdcDemux3v3Voltage" cdm="Health.IBIT.SideScanSonar.tdcDemux3v3Voltage"/>
+              <Result id="tdcDemuxTemp1" name="tdcDemuxTemp1" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp1"/>
+              <Result id="tdcDemuxTemp2" name="tdcDemuxTemp2" cdm="Health.IBIT.SideScanSonar.tdcDemuxTemp2"/>
+              <Result id="spcPower5VVoltage" name="spcPower5vVoltage" cdm="Health.IBIT.SideScanSonar.spcPower5vVoltage"/>
+              <Result id="spcPowerTwfCurrentVoltage" name="spcPowerTwfCurrentVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerTwfCurrentVoltage"/>
+              <Result id="spcPowerSysCurrentVoltage" name="spcPowerSysCurrentVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerSysCurrentVoltage"/>
+              <Result id="spcPowerTwfCurrentFault" name="spcPowerTwfCurrentFault" cdm="Health.IBIT.SideScanSonar.spcPowerTwfCurrentFault"/>
+              <Result id="spcPowerTwfVoltage" name="spcPowerTwfVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerTwfVoltage"/>
+              <Result id="spcPowerSysVoltage" name="spcPowerSysVoltage" cdm="Health.IBIT.SideScanSonar.spcPowerSysVoltage"/>
+              <Result id="spcPowerTemp1" name="spcPowerTemp1" cdm="Health.IBIT.SideScanSonar.spcPowerTemp1"/>
+              <Result id="spcPowerTemp2" name="spcPowerTemp2" cdm="Health.IBIT.SideScanSonar.spcPowerTemp2"/>
+              <Result id="tpcPowerTpuVoltage" name="tpcPowerTpuVoltage" cdm="Health.IBIT.SideScanSonar.tpcPowerTpuVoltage"/>
+              <Result id="tpcPower12VVoltage" name="tpcPower12vVoltage" cdm="Health.IBIT.SideScanSonar.tpcPower12vVoltage"/>
+              <Result id="tpcPowerTpuCurrentVoltage" name="tpcPowerTpuCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tpcPowerTpuCurrentVoltage"/>
+              <Result id="tpcPower12VCurrentVoltage" name="tpcPower12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tpcPower12vCurrentVoltage"/>
+              <Result id="tlc5VVoltage" name="tlc5vVoltage" cdm="Health.IBIT.SideScanSonar.tlc5vVoltage"/>
+              <Result id="tlcN5VVoltage" name="tlcN5vVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vVoltage"/>
+              <Result id="tlc12VVoltage" name="tlc12vVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vVoltage"/>
+              <Result id="tlcN12VVoltage" name="tlcN12vVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vVoltage"/>
+              <Result id="tlc5VCurrentVoltage" name="tlc5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc5vCurrentVoltage"/>
+              <Result id="tlc12VCurrentVoltage" name="tlc12vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlc12vCurrentVoltage"/>
+              <Result id="tlcN5VCurrentVoltage" name="tlcN5vCurrentVoltage" cdm="Health.IBIT.SideScanSonar.tlcN5vCurrentVoltage"/>
+              <Result id="tlcN12VCurrentRefVoltage" name="tlcN12vCurrentRefVoltage" cdm="Health.IBIT.SideScanSonar.tlcN12vCurrentRefVoltage"/>
+              <ValueSetResult id="sonarImagingProcessingEquipmentTotalIBIT" name="sonarImagingProcessingEquipmentTotalIBIT" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalIBIT">
                 <Values>
                   <Value name="Normal" cdm="Health.Normal"/>
                   <Value name="Degraded" cdm="Health.Degraded"/>
@@ -437,16 +437,16 @@
                   <Value name="NoResponse" cdm="Health.NoResponse"/>
                 </Values>
               </ValueSetResult>
-              <Result name="sonarImagingProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentDetail"/>
-              <GroupResult name="sonarImagingHealthDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail">
-                <BooleanResult name="powerSupplyCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.powerSupplyCardPowerAbnormal"/>
-                <BooleanResult name="networkSwitchCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.networkSwitchCardPowerAbnormal"/>
-                <BooleanResult name="sonarComputeProcessingCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.sonarComputeProcessingCardPowerAbnormal"/>
-                <BooleanResult name="coolingFanAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.coolingFanAbnormal"/>
+              <Result id="sonarImagingProcessingEquipmentDetail" name="sonarImagingProcessingEquipmentDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingProcessingEquipmentDetail"/>
+              <GroupResult id="sonarImagingHealthDetail" name="sonarImagingHealthDetail" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail">
+                <BooleanResult id="powerSupplyCardPowerAbnormal" name="powerSupplyCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.powerSupplyCardPowerAbnormal"/>
+                <BooleanResult id="networkSwitchCardPowerAbnormal" name="networkSwitchCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.networkSwitchCardPowerAbnormal"/>
+                <BooleanResult id="sonarComputeProcessingCardPowerAbnormal" name="sonarComputeProcessingCardPowerAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.sonarComputeProcessingCardPowerAbnormal"/>
+                <BooleanResult id="coolingFanAbnormal" name="coolingFanAbnormal" cdm="Health.IBIT.SideScanSonar.sonarImagingHealthDetail.coolingFanAbnormal"/>
               </GroupResult>
-              <Result name="powerCardTemp" cdm="Health.IBIT.SideScanSonar.powerCardTemp"/>
-              <Result name="sbcBoardTemp" cdm="Health.IBIT.SideScanSonar.sbcBoardTemp"/>
-              <ValueSetResult name="hullMountedSonarTotalIBIT" cdm="Health.IBIT.SideScanSonar.hullMountedSonarTotalIBIT">
+              <Result id="powerCardTemp" name="powerCardTemp" cdm="Health.IBIT.SideScanSonar.powerCardTemp"/>
+              <Result id="sbcBoardTemp" name="sbcBoardTemp" cdm="Health.IBIT.SideScanSonar.sbcBoardTemp"/>
+              <ValueSetResult id="hullMountedSonarTotalIBIT" name="hullMountedSonarTotalIBIT" cdm="Health.IBIT.SideScanSonar.hullMountedSonarTotalIBIT">
                 <Values>
                   <Value name="Normal" cdm="Health.Normal"/>
                   <Value name="Degraded" cdm="Health.Degraded"/>
@@ -454,33 +454,33 @@
                   <Value name="NoResponse" cdm="Health.NoResponse"/>
                 </Values>
               </ValueSetResult>
-              <GroupResult name="hullMountedSonarDetail" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail">
-                <BooleanResult name="hullMuxInterfaceCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail.hullMuxInterfaceCardVoltageAbnormal"/>
-                <BooleanResult name="hullTxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail.hullTxCardVoltageAbnormal"/>
+              <GroupResult id="hullMountedSonarDetail" name="hullMountedSonarDetail" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail">
+                <BooleanResult id="hullMuxInterfaceCardVoltageAbnormal" name="hullMuxInterfaceCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail.hullMuxInterfaceCardVoltageAbnormal"/>
+                <BooleanResult id="hullTxCardVoltageAbnormal" name="hullTxCardVoltageAbnormal" cdm="Health.IBIT.SideScanSonar.hullMountedSonarDetail.hullTxCardVoltageAbnormal"/>
               </GroupResult>
-              <Result name="hmMux5vVoltage" cdm="Health.IBIT.SideScanSonar.hmMux5vVoltage"/>
-              <Result name="hmMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.hmMux3v3Voltage"/>
-              <Result name="hmMuxAdcIn1Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn1Temp"/>
-              <Result name="hmMuxAdcIn2Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn2Temp"/>
-              <Result name="hmTx5vVoltage" cdm="Health.IBIT.SideScanSonar.hmTx5vVoltage"/>
-              <Result name="hmTx12vVoltage" cdm="Health.IBIT.SideScanSonar.hmTx12vVoltage"/>
-              <Result name="hmTxSupplyVoltage" cdm="Health.IBIT.SideScanSonar.hmTxSupplyVoltage"/>
-              <Result name="hmTxCapVoltage" cdm="Health.IBIT.SideScanSonar.hmTxCapVoltage"/>
+              <Result id="hmMux5VVoltage" name="hmMux5vVoltage" cdm="Health.IBIT.SideScanSonar.hmMux5vVoltage"/>
+              <Result id="hmMux3V3Voltage" name="hmMux3v3Voltage" cdm="Health.IBIT.SideScanSonar.hmMux3v3Voltage"/>
+              <Result id="hmMuxAdcIn1Temp" name="hmMuxAdcIn1Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn1Temp"/>
+              <Result id="hmMuxAdcIn2Temp" name="hmMuxAdcIn2Temp" cdm="Health.IBIT.SideScanSonar.hmMuxAdcIn2Temp"/>
+              <Result id="hmTx5VVoltage" name="hmTx5vVoltage" cdm="Health.IBIT.SideScanSonar.hmTx5vVoltage"/>
+              <Result id="hmTx12VVoltage" name="hmTx12vVoltage" cdm="Health.IBIT.SideScanSonar.hmTx12vVoltage"/>
+              <Result id="hmTxSupplyVoltage" name="hmTxSupplyVoltage" cdm="Health.IBIT.SideScanSonar.hmTxSupplyVoltage"/>
+              <Result id="hmTxCapVoltage" name="hmTxCapVoltage" cdm="Health.IBIT.SideScanSonar.hmTxCapVoltage"/>
             </GroupResult>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="requestPbitAck" name="Request Pbit Ack" bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response">
+      <Reply id="requestPbitResult" name="Request Pbit Result" bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response">
         <Results>
-            <GroupResult name="PBIT 점검 결과">
-              <ValueSetResult name="towedSonarAssemblyTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarAssemblyTotalPBIT">
+            <GroupResult id="pBIT" name="PBIT 점검 결과">
+              <ValueSetResult id="towedSonarAssemblyTotalPBIT" name="towedSonarAssemblyTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarAssemblyTotalPBIT">
                 <Values>
                   <Value name="Normal" cdm="Health.Normal"/>
                   <Value name="Degraded" cdm="Health.Degraded"/>
@@ -488,25 +488,25 @@
                   <Value name="NoResponse" cdm="Health.NoResponse"/>
                 </Values>
               </ValueSetResult>
-              <Result name="launchAndRecoveryTotalPBIT" cdm="Health.PBIT.SideScanSonar.launchAndRecoveryTotalPBIT"/>
-              <Result name="towedSonarArrayTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarArrayTotalPBIT"/>
-              <Result name="sonarSignalProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalPBIT"/>
-              <Result name="sonarImagingProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalPBIT"/>
-              <Result name="hullMountedSonarTotalPBIT" cdm="Health.PBIT.SideScanSonar.hullMountedSonarTotalPBIT"/>
+              <Result id="launchAndRecoveryTotalPBIT" name="launchAndRecoveryTotalPBIT" cdm="Health.PBIT.SideScanSonar.launchAndRecoveryTotalPBIT"/>
+              <Result id="towedSonarArrayTotalPBIT" name="towedSonarArrayTotalPBIT" cdm="Health.PBIT.SideScanSonar.towedSonarArrayTotalPBIT"/>
+              <Result id="sonarSignalProcessingEquipmentTotalPBIT" name="sonarSignalProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarSignalProcessingEquipmentTotalPBIT"/>
+              <Result id="sonarImagingProcessingEquipmentTotalPBIT" name="sonarImagingProcessingEquipmentTotalPBIT" cdm="Health.PBIT.SideScanSonar.sonarImagingProcessingEquipmentTotalPBIT"/>
+              <Result id="hullMountedSonarTotalPBIT" name="hullMountedSonarTotalPBIT" cdm="Health.PBIT.SideScanSonar.hullMountedSonarTotalPBIT"/>
             </GroupResult>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="stopSlideBackStop" name="슬라이드 후퇴고정 정지 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="stopSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="stopSlideBackStopAck" name="Stop Slide Back Stop Ack" bindRef="stopSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="stopSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
+      <Reply id="stopSlideBackStopResult" name="Stop Slide Back Stop Result" bindRef="stopSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
         <Results>
-            <ValueSetResult name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
+            <ValueSetResult id="slideBackStop" name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
               <Values>
                 <Value name="Stopped" cdm="LaunchRecovery.Slide.BackStop.State.Stopped"/>
                 <Value name="Engaged" cdm="LaunchRecovery.Slide.BackStop.State.Engaged"/>
@@ -518,14 +518,14 @@
     </ControlSpec>
     <ControlSpec id="engageSlideBackStop" name="슬라이드 후퇴고정 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Engage">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="engageSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="engageSlideBackStopAck" name="Engage Slide Back Stop Ack" bindRef="engageSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="engageSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
+      <Reply id="engageSlideBackStopResult" name="Engage Slide Back Stop Result" bindRef="engageSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
         <Results>
-            <ValueSetResult name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
+            <ValueSetResult id="slideBackStop" name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
               <Values>
                 <Value name="Stopped" cdm="LaunchRecovery.Slide.BackStop.State.Stopped"/>
                 <Value name="Engaged" cdm="LaunchRecovery.Slide.BackStop.State.Engaged"/>
@@ -537,14 +537,14 @@
     </ControlSpec>
     <ControlSpec id="returnSlideBackStop" name="슬라이드 후퇴고정 복귀 명령" cdm="Control.LaunchRecovery.Slide.BackStop.Return">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="returnSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="returnSlideBackStopAck" name="Return Slide Back Stop Ack" bindRef="returnSlideBackStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="returnSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
+      <Reply id="returnSlideBackStopResult" name="Return Slide Back Stop Result" bindRef="returnSlideBackStopResult" cdm="Control.LaunchRecovery.Slide.BackStop.Response">
         <Results>
-            <ValueSetResult name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
+            <ValueSetResult id="slideBackStop" name="slideBackStop" cdm="LaunchRecovery.Slide.BackStop.Response.slideBackStop">
               <Values>
                 <Value name="Stopped" cdm="LaunchRecovery.Slide.BackStop.State.Stopped"/>
                 <Value name="Engaged" cdm="LaunchRecovery.Slide.BackStop.State.Engaged"/>
@@ -570,14 +570,14 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="setCommunicationLevelAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setCommunicationLevelAck" name="Set Communication Level Ack" bindRef="setCommunicationLevelAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="setCommunicationLevelResult" cdm="Control.Communication.Level.Response">
+      <Reply id="setCommunicationLevelResult" name="Set Communication Level Result" bindRef="setCommunicationLevelResult" cdm="Control.Communication.Level.Response">
         <Results>
-            <ValueSetResult name="videoQualityType" cdm="Communication.Level.Response.videoQualityType">
+            <ValueSetResult id="videoQualityType" name="videoQualityType" cdm="Communication.Level.Response.videoQualityType">
               <Values>
                 <Value name="Level1" cdm="Communication.MCS.Level.Level1"/>
                 <Value name="Level2" cdm="Communication.MCS.Level.Level2"/>
@@ -677,9 +677,9 @@
           <Resolution>1</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="configureOperatingParametersAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="configureOperatingParametersAck" name="Configure Operating Parameters Ack" bindRef="configureOperatingParametersAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -693,9 +693,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="startAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startAck" name="Start Ack" bindRef="startAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -709,9 +709,9 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="stopAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="stopAck" name="Stop Ack" bindRef="stopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -734,39 +734,39 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply bindRef="powerOnOffAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="powerOnOffAck" name="Power On Off Ack" bindRef="powerOnOffAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="setAutoMode" name="자동 모드 변경 명령" cdm="Control.ModeChange">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="setAutoModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setAutoModeAck" name="Set Auto Mode Ack" bindRef="setAutoModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="setManualMode" name="수동 모드 변경 명령" cdm="Control.ModeChange">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="setManualModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setManualModeAck" name="Set Manual Mode Ack" bindRef="setManualModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="stopTowfish" name="자동모드 진수/회수 정지 명령" cdm="Control.LaunchRecovery.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Auto"/>
-      <Reply bindRef="stopTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="stopTowfishAck" name="Stop Towfish Ack" bindRef="stopTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="stopTowfishResult" cdm="Control.LaunchRecovery.Response">
+      <Reply id="stopTowfishResult" name="Stop Towfish Result" bindRef="stopTowfishResult" cdm="Control.LaunchRecovery.Response">
         <Results>
-            <ValueSetResult name="launch" cdm="LaunchRecovery.Response.launch">
+            <ValueSetResult id="launch" name="launch" cdm="LaunchRecovery.Response.launch">
               <Values>
                 <Value name="StopState" cdm="LaunchRecovery.Response.StopState"/>
                 <Value name="LaunchCompleted" cdm="LaunchRecovery.Response.LaunchCompleted"/>
@@ -779,14 +779,14 @@
     <ControlSpec id="launchTowfish" name="자동모드 진수 명령" cdm="Control.Launch">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Auto"/>
-      <Reply bindRef="launchTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="launchTowfishAck" name="Launch Towfish Ack" bindRef="launchTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="launchTowfishResult" cdm="Control.LaunchRecovery.Response">
+      <Reply id="launchTowfishResult" name="Launch Towfish Result" bindRef="launchTowfishResult" cdm="Control.LaunchRecovery.Response">
         <Results>
-            <ValueSetResult name="launch" cdm="LaunchRecovery.Response.launch">
+            <ValueSetResult id="launch" name="launch" cdm="LaunchRecovery.Response.launch">
               <Values>
                 <Value name="StopState" cdm="LaunchRecovery.Response.StopState"/>
                 <Value name="LaunchCompleted" cdm="LaunchRecovery.Response.LaunchCompleted"/>
@@ -799,14 +799,14 @@
     <ControlSpec id="recoveryTowfish" name="자동모드 회수 명령" cdm="Control.Recovery">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Auto"/>
-      <Reply bindRef="recoveryTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="recoveryTowfishAck" name="Recovery Towfish Ack" bindRef="recoveryTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
-      <Reply bindRef="recoveryTowfishResult" cdm="Control.LaunchRecovery.Response">
+      <Reply id="recoveryTowfishResult" name="Recovery Towfish Result" bindRef="recoveryTowfishResult" cdm="Control.LaunchRecovery.Response">
         <Results>
-            <ValueSetResult name="launch" cdm="LaunchRecovery.Response.launch">
+            <ValueSetResult id="launch" name="launch" cdm="LaunchRecovery.Response.launch">
               <Values>
                 <Value name="StopState" cdm="LaunchRecovery.Response.StopState"/>
                 <Value name="LaunchCompleted" cdm="LaunchRecovery.Response.LaunchCompleted"/>
@@ -818,17 +818,17 @@
     </ControlSpec>
     <ControlSpec id="emergencyStop" name="비상 정지 명령" cdm="Control.EmergencyStop">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="emergencyStopAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="emergencyStopAck" name="Emergency Stop Ack" bindRef="emergencyStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="cancelEmergencyStop" name="비상 정지 해제 명령" cdm="Control.EmergencyStop.Cancel">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="cancelEmergencyStopAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="cancelEmergencyStopAck" name="Cancel Emergency Stop Ack" bindRef="cancelEmergencyStopAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -840,9 +840,9 @@
           <Range min="0" max="100"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="setTowingCableLengthAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setTowingCableLengthAck" name="Set Towing Cable Length Ack" bindRef="setTowingCableLengthAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </SetPointSpec>
@@ -854,25 +854,25 @@
           <Range min="0" max="80"/>
         </QuantityProfile>
       </Parameters>
-      <Reply bindRef="setTowfishDepthAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="setTowfishDepthAck" name="Set Towfish Depth Ack" bindRef="setTowfishDepthAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </SetPointSpec>
     <ControlSpec id="changeScreenRealTimeMode" name="실시간 화면 모드 변경 명령" cdm="Control.Display.RealTime">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="changeScreenRealTimeModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="changeScreenRealTimeModeAck" name="Change Screen Real Time Mode Ack" bindRef="changeScreenRealTimeModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="changeScreenMergeMode" name="병합 화면 모드 변경 명령" cdm="Control.Display.Merge">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="changeScreenMergeModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="changeScreenMergeModeAck" name="Change Screen Merge Mode Ack" bindRef="changeScreenMergeModeAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -885,9 +885,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="stopUsblMotionAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="stopUsblMotionAck" name="Stop Usbl Motion Ack" bindRef="stopUsblMotionAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -900,9 +900,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="launchUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="launchUsblAck" name="Launch Usbl Ack" bindRef="launchUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -915,9 +915,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="recoveryUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="recoveryUsblAck" name="Recovery Usbl Ack" bindRef="recoveryUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -930,27 +930,27 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="returnUsblOriginAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="returnUsblOriginAck" name="Return Usbl Origin Ack" bindRef="returnUsblOriginAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="startUsbl" name="수동 모드 USBL 작동 명령" cdm="Control.ExecutionControl.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="startUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="startUsblAck" name="Start Usbl Ack" bindRef="startUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="stopUsbl" name="수동 모드 USBL 정지 명령" cdm="Control.ExecutionControl.Stop">
       <Target cdm="Platform.Identifier.Numeric"/>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="stopUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="stopUsblAck" name="Stop Usbl Ack" bindRef="stopUsblAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -963,9 +963,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="stopSlideAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="stopSlideAck" name="Stop Slide Ack" bindRef="stopSlideAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -978,9 +978,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="moveSlideAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="moveSlideAck" name="Move Slide Ack" bindRef="moveSlideAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -993,9 +993,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="returnSlideWithTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="returnSlideWithTowfishAck" name="Return Slide With Towfish Ack" bindRef="returnSlideWithTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -1008,9 +1008,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="returnSlideWithoutTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="returnSlideWithoutTowfishAck" name="Return Slide Without Towfish Ack" bindRef="returnSlideWithoutTowfishAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -1023,9 +1023,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="stopWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="stopWinchAck" name="Stop Winch Ack" bindRef="stopWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -1038,9 +1038,9 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="deployWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="deployWinchAck" name="Deploy Winch Ack" bindRef="deployWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
@@ -1053,25 +1053,25 @@
         </QuantityProfile>
       </Parameters>
       <Precondition cdm="SideScanSonar.State.Manual"/>
-      <Reply bindRef="recoveryWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="recoveryWinchAck" name="Recovery Winch Ack" bindRef="recoveryWinchAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="separateCable" name="케이블 분리 명령" cdm="Control.Cable.Separate">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="separateCableAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="separateCableAck" name="Separate Cable Ack" bindRef="separateCableAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>
     <ControlSpec id="cancelCableSeparation" name="케이블 분리 해제 명령" cdm="Control.Cable.SeparationCancel">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply bindRef="cancelCableSeparationAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <Reply id="cancelCableSeparationAck" name="Cancel Cable Separation Ack" bindRef="cancelCableSeparationAck" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
-            <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+            <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
       </Reply>
     </ControlSpec>

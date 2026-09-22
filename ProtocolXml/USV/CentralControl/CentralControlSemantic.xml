@@ -142,18 +142,18 @@
     <ControlSpecs id="control">
         <ControlSpec id="startIntegration" name="연동 개시" cdm="Control.Integration.Start">
           <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="startIntegrationCommandStatusReply" required="true">
+            <Reply id="startIntegrationCommandStatusReply" name="Start Integration Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="startIntegrationCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
 
         <ControlSpec id="restartSystem" name="중앙통제장치 재시작" cdm="Control.System.Restart">
           <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="restartSystemCommandStatusReply" required="true">
+            <Reply id="restartSystemCommandStatusReply" name="Restart System Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="restartSystemCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
@@ -161,14 +161,14 @@
         <!-- PBIT 요청은 원통의 비주기 RCUPBITControlType에 의해 수행된다. 중앙통제 CSCI의 MCEPBITReportType 주기가 1 Hz로 적혀 있으나, 타 장비 PBIT 패턴과 상충하므로 Request/Reply로 해석한다. -->
         <ControlSpec id="requestPbit" name="중앙통제장치 PBIT 요청" cdm="Request.Health.PBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="requestPbitCommandStatusReply" required="true">
+            <Reply id="requestPbitCommandStatusReply" name="Request Pbit Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="requestPbitCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
-            <Reply cdm="Request.Health.PBIT.Response" bindRef="requestPbitResultReply" required="true">
+            <Reply id="requestPbitResultReply" name="Request Pbit Result Reply" cdm="Request.Health.PBIT.Response" bindRef="requestPbitResultReply" required="true">
                 <Results>
-                    <ValueSetResult name="operationalStatus" cdm="Health.OperationalStatus">
+                    <ValueSetResult id="operationalStatus" name="operationalStatus" cdm="Health.OperationalStatus">
                         <Values>
                             <Value name="Normal" cdm="Health.Normal"/>
                             <Value name="Degraded" cdm="Health.Degraded"/>
@@ -182,15 +182,15 @@
 
         <ControlSpec id="requestIbit" name="중앙통제장치 IBIT 요청" cdm="Request.Health.IBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="requestIbitCommandStatusReply" required="true">
+            <Reply id="requestIbitCommandStatusReply" name="Request Ibit Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="requestIbitCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
-            <Reply cdm="Request.Health.IBIT.Response" bindRef="requestIbitResultReply" required="true">
+            <Reply id="requestIbitResultReply" name="Request Ibit Result Reply" cdm="Request.Health.IBIT.Response" bindRef="requestIbitResultReply" required="true">
                 <Results>
-                    <GroupResult name="mceIbit" cdm="Health.IBIT.CentralControl">
-                        <ValueSetResult name="operationalStatus" cdm="Health.OperationalStatus">
+                    <GroupResult id="centralControl" name="mceIbit" cdm="Health.IBIT.CentralControl">
+                        <ValueSetResult id="operationalStatus" name="operationalStatus" cdm="Health.OperationalStatus">
                             <Values>
                                 <Value name="Normal" cdm="Health.Normal"/>
                                 <Value name="Degraded" cdm="Health.Degraded"/>
@@ -198,11 +198,11 @@
                                 <Value name="NoResponse" cdm="Health.NoResponse"/>
                             </Values>
                         </ValueSetResult>
-                        <QuantityResult name="cpuTemperature" cdm="Health.Processor.CPU.Temperature">
+                        <QuantityResult id="temperature" name="cpuTemperature" cdm="Health.Processor.CPU.Temperature">
                             <Unit>degC</Unit>
                             <Range min="20" max="100"/>
                         </QuantityResult>
-                        <QuantityResult name="cpuLoad" cdm="Health.Processor.CPU.Load">
+                        <QuantityResult id="load" name="cpuLoad" cdm="Health.Processor.CPU.Load">
                             <Unit>percent</Unit>
                             <Range min="0" max="100"/>
                         </QuantityResult>
@@ -233,67 +233,67 @@
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="configureWirelessPresetCommandStatusReply" required="true">
+            <Reply id="configureWirelessPresetCommandStatusReply" name="Configure Wireless Preset Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="configureWirelessPresetCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
 
         <!-- OperationModeControl.operationMode 0~7을 서로 다른 운용자 동작으로 분리한다. -->
         <ControlSpec id="emergencyStop" name="무인수상정 비상정지" cdm="Control.Platform.EmergencyStop">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="emergencyStopCommandStatusReply" required="true">
+            <Reply id="emergencyStopCommandStatusReply" name="Emergency Stop Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="emergencyStopCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="emergencyReturn" name="무인수상정 비상복귀" cdm="Control.Platform.EmergencyReturn">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="emergencyReturnCommandStatusReply" required="true">
+            <Reply id="emergencyReturnCommandStatusReply" name="Emergency Return Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="emergencyReturnCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="enterRemoteManualMode" name="원격수동조작 모드 진입" cdm="Control.Platform.OperationMode.RemoteManual">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterRemoteManualModeCommandStatusReply" required="true">
+            <Reply id="enterRemoteManualModeCommandStatusReply" name="Enter Remote Manual Mode Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="enterRemoteManualModeCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="enterLocalManualMode" name="근거리수동조작 모드 진입" cdm="Control.Platform.OperationMode.LocalManual">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterLocalManualModeCommandStatusReply" required="true">
+            <Reply id="enterLocalManualModeCommandStatusReply" name="Enter Local Manual Mode Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="enterLocalManualModeCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="enterAutonomousMode" name="자율운항 모드 진입" cdm="Control.Platform.OperationMode.Autonomous">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterAutonomousModeCommandStatusReply" required="true">
+            <Reply id="enterAutonomousModeCommandStatusReply" name="Enter Autonomous Mode Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="enterAutonomousModeCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="enterCommandStandby" name="명령대기 모드 진입" cdm="Control.Platform.OperationMode.CommandStandby">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterCommandStandbyCommandStatusReply" required="true">
+            <Reply id="enterCommandStandbyCommandStatusReply" name="Enter Command Standby Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="enterCommandStandbyCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="enterMaintenanceMode" name="정비 모드 진입" cdm="Control.Platform.OperationMode.Maintenance">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="enterMaintenanceModeCommandStatusReply" required="true">
+            <Reply id="enterMaintenanceModeCommandStatusReply" name="Enter Maintenance Mode Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="enterMaintenanceModeCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="executeEmergencyAction" name="비상조치 수행" cdm="Control.Platform.EmergencyAction">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="executeEmergencyActionCommandStatusReply" required="true">
+            <Reply id="executeEmergencyActionCommandStatusReply" name="Execute Emergency Action Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="executeEmergencyActionCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
@@ -313,37 +313,37 @@
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="prepareAuthorityTransferCommandStatusReply" required="true">
+            <Reply id="prepareAuthorityTransferCommandStatusReply" name="Prepare Authority Transfer Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="prepareAuthorityTransferCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="requestControlAuthority" name="통제권 요청" cdm="Request.Control.Authority">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="requestControlAuthorityCommandStatusReply" required="true">
+            <Reply id="requestControlAuthorityCommandStatusReply" name="Request Control Authority Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="requestControlAuthorityCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="approveControlAuthorityRequest" name="통제권 요청 승인" cdm="Control.Authority.Request.Approve">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="approveControlAuthorityRequestCommandStatusReply" required="true">
+            <Reply id="approveControlAuthorityRequestCommandStatusReply" name="Approve Control Authority Request Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="approveControlAuthorityRequestCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="rejectControlAuthorityRequest" name="통제권 요청 거절" cdm="Control.Authority.Request.Reject">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="rejectControlAuthorityRequestCommandStatusReply" required="true">
+            <Reply id="rejectControlAuthorityRequestCommandStatusReply" name="Reject Control Authority Request Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="rejectControlAuthorityRequestCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
         <ControlSpec id="reclaimControlAuthority" name="통제권 회수" cdm="Control.Authority.Reclaim">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="reclaimControlAuthorityCommandStatusReply" required="true">
+            <Reply id="reclaimControlAuthorityCommandStatusReply" name="Reclaim Control Authority Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="reclaimControlAuthorityCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
@@ -361,9 +361,9 @@
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="controlVhfCommandStatusReply" required="true">
+            <Reply id="controlVhfCommandStatusReply" name="Control Vhf Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="controlVhfCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
@@ -376,9 +376,9 @@
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="setVoiceVolumeCommandStatusReply" required="true">
+            <Reply id="setVoiceVolumeCommandStatusReply" name="Set Voice Volume Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="setVoiceVolumeCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
@@ -391,9 +391,9 @@
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="setVhfSquelchCommandStatusReply" required="true">
+            <Reply id="setVhfSquelchCommandStatusReply" name="Set Vhf Squelch Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="setVhfSquelchCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
@@ -415,18 +415,18 @@
                 </ValueSetProfile>
                 <Profile id="receive" name="Receive" cdm="Communication.Voice.Receive"/>
             </Parameters>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="configureVoiceCommunicationCommandStatusReply" required="true">
+            <Reply id="configureVoiceCommunicationCommandStatusReply" name="Configure Voice Communication Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="configureVoiceCommunicationCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
 
         <!-- videoTransmitType: 0=중지, 1~4=감시#1~#4. 중지는 선택 제어와 분리한다. -->
         <ControlSpec id="stopVideoDistribution" name="영상분배 중지" cdm="Control.Video.Distribution.Stop">
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="stopVideoDistributionCommandStatusReply" required="true">
+            <Reply id="stopVideoDistributionCommandStatusReply" name="Stop Video Distribution Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="stopVideoDistributionCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
@@ -442,9 +442,9 @@
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply cdm="Command.ProcessingStatus.Response" bindRef="selectVideoDistributionCommandStatusReply" required="true">
+            <Reply id="selectVideoDistributionCommandStatusReply" name="Select Video Distribution Command Status Reply" cdm="Command.ProcessingStatus.Response" bindRef="selectVideoDistributionCommandStatusReply" required="true">
                 <Results>
-                    <Result name="commandStatusReport.status" cdm="Control.Response.Status"/>
+                    <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
                 </Results>
             </Reply>
         </ControlSpec>
