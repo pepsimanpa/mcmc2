@@ -723,7 +723,7 @@ input[type=search]{width:min(270px,100%)}
 }
 
 .hmi-call-example > small,
-.hmi-command-example > small,
+.hmi-command-example-head > small,
 .framework-call-preview small {
   display: block;
   margin-bottom: 5px;
@@ -754,6 +754,23 @@ input[type=search]{width:min(270px,100%)}
 
 .hmi-command-example {
   min-width: 0;
+}
+
+.hmi-command-example-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.hmi-command-example-head > small {
+  margin-bottom: 0;
+}
+
+.hmi-command-example-head .icon-copy {
+  flex: 0 0 auto;
+  margin-top: 0;
 }
 
 .hmi-command-example + .hmi-command-example {

@@ -2509,18 +2509,20 @@ function hmiProfileTable(title, profiles, inputMode = false, showOutputName = fa
       const command = `control -a ${key},${hmiExampleValue(profile)}`;
       const commandCell = el('td', 'hmi-command-cell');
       const commandExample = el('div', 'hmi-command-example');
-      commandExample.append(el('small', '', '명령 인터페이스'), el('code', '', command));
+      const commandHead = el('div', 'hmi-command-example-head');
       const commandCopy = el('button', 'icon-copy', '명령 복사');
       commandCopy.type = 'button';
       commandCopy.dataset.copyText = command;
-      commandExample.append(commandCopy);
+      commandHead.append(el('small', '', '명령 인터페이스'), commandCopy);
+      commandExample.append(commandHead, el('code', '', command));
       const frameworkExample = el('div', 'hmi-command-example is-framework');
+      const frameworkHead = el('div', 'hmi-command-example-head');
       const frameworkCode = operationFrameworkCall(command);
-      frameworkExample.append(el('small', '', 'HMI SW 호출 코드'), el('code', '', frameworkCode));
       const frameworkCopy = el('button', 'icon-copy', '코드 복사');
       frameworkCopy.type = 'button';
       frameworkCopy.dataset.copyText = frameworkCode;
-      frameworkExample.append(frameworkCopy);
+      frameworkHead.append(el('small', '', 'HMI SW 호출 코드'), frameworkCopy);
+      frameworkExample.append(frameworkHead, el('code', '', frameworkCode));
       commandCell.append(commandExample, frameworkExample);
       row.append(commandCell);
     }
