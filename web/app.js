@@ -2793,7 +2793,7 @@ function renderHmiContract(action) {
     ].join('\n');
     const commandSection = el('section', 'hmi-command-sequence docs-section');
     const commandHead = el('header');
-    commandHead.append(el('div', 'hmi-command-step', '01'), el('h2', '', 'HMI 호출 순서'));
+    commandHead.append(el('div', 'hmi-command-step', '02'), el('h2', '', 'HMI 제어 실행 방법'));
     const copyActions = el('div', 'hmi-command-copy-actions');
     const copyCommands = el('button', 'button ghost', '명령 복사');
     copyCommands.type = 'button';
@@ -2816,7 +2816,7 @@ function renderHmiContract(action) {
     frameworkBlock.append(frameworkPre);
     examples.append(commandBlock, frameworkBlock);
     commandSection.append(commandHead, examples);
-    dom.hmiContractBody.append(commandSection, hmiProfileTable('02 · HMI 입력', action.inputs, true));
+    dom.hmiContractBody.append(hmiProfileTable('01 · HMI 입력', action.inputs, true), commandSection);
 
     const replySection = el('section', 'docs-section docs-replies');
     replySection.append(
@@ -2849,7 +2849,7 @@ function renderHmiContract(action) {
     const monitorCode = operationFrameworkMonitorSubscription(action);
     const subscribeSection = el('section', 'hmi-command-sequence hmi-monitor-subscribe docs-section');
     const subscribeHead = el('header');
-    subscribeHead.append(el('div', 'hmi-command-step', '01'), el('h2', '', 'HMI Monitor 구독'));
+    subscribeHead.append(el('div', 'hmi-command-step', '02'), el('h2', '', 'HMI 모니터 구독 방법'));
     const copyMonitor = el('button', 'button primary', 'HMI 코드 복사');
     copyMonitor.type = 'button';
     copyMonitor.dataset.copyText = monitorCode;
@@ -2867,8 +2867,8 @@ function renderHmiContract(action) {
       subscribeExamples,
     );
     dom.hmiContractBody.append(
+      hmiProfileTable('01 · HMI 표시 항목', flattenSemanticProfiles(action.outputs), false, true),
       subscribeSection,
-      hmiProfileTable('02 · HMI 표시 항목', flattenSemanticProfiles(action.outputs), false, true),
     );
   } else {
     const product = el('section', 'docs-section');
