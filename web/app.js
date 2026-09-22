@@ -327,13 +327,13 @@ function renderPrinciples() {
         'Control · 원격 제어와 요청 기능',
         'Monitor · 지속적으로 감시하는 정보',
         'Parameters · 전송방식과 독립된 입력 의미',
-        'Reply · 요청 검증 및 명령 수락 결과',
+        'ReplySpec · 응답 식별자와 결과 의미',
       ],
     },
     {
       title: 'Binding',
       rules: [
-        'ControlBinding / MonitorBinding · 기능과 메시지 연결',
+        'ControlBinding / MonitorBinding / ReplyBinding · 기능과 메시지 연결',
         'TCP / UDP / RS422 · infoCode와 messageType',
         'DDS · topicName과 typeName',
         'Header·ACK·checksum·reserved · Binding 전용',
@@ -1073,7 +1073,7 @@ function auditBundle(bundle) {
             bundle.diagnostics.push({
               level: 'error',
               code: 'REPLY_LINK',
-              message: `${action.publicId} / ${binding.sourceFile} Reply 연결 실패`,
+              message: `${action.publicId} / ${binding.sourceFile} ReplySpec ↔ ReplyBinding 연결 실패`,
             });
           }
         }
@@ -1824,7 +1824,7 @@ function appendFieldRows(container, fields, depth = 0) {
 }
 
 function messageSectionLegacy(kind, id, channel, fields, reply) {
-  const section = el('section', `message-section ${kind.toLowerCase()}`);
+  const section = el('section', `message-section ${reply ? 'reply' : kind.toLowerCase()}`);
   section.append(
     el('h3', 'message-section-title', `${kind}${id ? ` · ${id}` : ''}`),
     makeDl([
@@ -1834,7 +1834,7 @@ function messageSectionLegacy(kind, id, channel, fields, reply) {
     ]),
   );
   section.append(el('h4', 'message-field-title', `${kind} Field`));
-  const list = el('div', `field-list-large ${kind === 'Reply' ? 'reply-fields' : ''}`);
+  const list = el('div', `field-list-large ${reply ? 'reply-fields' : ''}`);
   const columns = el('div', 'field-row-header');
   columns.append(el('span', '', 'Field'), el('span', '', 'Kind'), el('span', '', 'Value / CDM / Converter'));
   list.append(columns);
@@ -1845,7 +1845,7 @@ function messageSectionLegacy(kind, id, channel, fields, reply) {
 }
 
 function messageSection(kind, id, channel, fields, reply) {
-  const section = el('section', 'message-section ' + kind.toLowerCase());
+  const section = el('section', 'message-section ' + (reply ? 'reply' : kind.toLowerCase()));
   section.append(
     el('h3', 'message-section-title', kind + (id ? ' · ' + id : '')),
     makeDl([
@@ -1862,7 +1862,7 @@ function messageSection(kind, id, channel, fields, reply) {
     el('small', '', '펼치기'),
   );
   details.append(summary);
-  const list = el('div', 'field-list-large ' + (kind === 'Reply' ? 'reply-fields' : ''));
+  const list = el('div', 'field-list-large ' + (reply ? 'reply-fields' : ''));
   const columns = el('div', 'field-row-header');
   columns.append(el('span', '', 'FIELD'), el('span', '', 'KIND'), el('span', '', 'VALUE / CDM / CONVERTER'));
   list.append(columns);
@@ -1883,15 +1883,15 @@ function bindingDetail(action, binding) {
       `${match.name}${match.mask ? ` & ${match.mask}` : ''} = ${match.value}`
     ))));
   }
-  for (const reply of binding.replies) block.append(messageSection('Reply', reply.semanticId, reply.channel, reply.fields, reply));
+  for (const reply of binding.replies) block.append(messageSection('ReplyBinding', reply.semanticId, reply.channel, reply.fields, reply));
   return block;
 }
 
 function renderReplyOverview(control) {
   const block = el('section', 'detail-block reply-overview');
-  block.append(el('h3', '', 'Reply 항목'));
+  block.append(el('h3', '', 'ReplySpec 항목'));
   if (!control.replies.length) {
-    block.append(el('p', 'empty-text', 'Reply 없음'));
+    block.append(el('p', 'empty-text', 'ReplySpec 없음'));
     return block;
   }
 
@@ -1979,7 +1979,7 @@ function showFeature(id, options = {}) {
       ['CDM', primaryAction.cdm],
       ['Semantic', primaryAction.sourceFile],
       ['Local ID', primaryAction.semanticId],
-      ['Reply', primaryAction.kind === 'Control' ? primaryAction.replies.map((item) => item.id).join(', ') || 'No Reply' : '해당 없음'],
+      ['ReplySpec', primaryAction.kind === 'Control' ? primaryAction.replies.map((item) => item.id).join(', ') || 'No ReplySpec' : '해당 없음'],
       ['선택', `${state.selectedFeatures.size}개 항목`],
     ]),
   );
@@ -2282,7 +2282,7 @@ function renderCatalog(filter = '') {
     const card = el('article', 'catalog-card');
     card.append(el('h3', '', control.name), el('code', '', control.publicId), el('p', '', control.cdm));
     const protocols = [...new Set(control.bindings.map((binding) => binding.transport))].join('/') || 'No Binding';
-    card.append(el('p', '', `${control.inputs.length} input · ${control.bindings.length} variant · ${protocols} · ${control.replies.length ? 'Reply' : 'No Reply'}`));
+    card.append(el('p', '', `${control.inputs.length} input · ${control.bindings.length} variant · ${protocols} · ${control.replies.length ? 'ReplySpec' : 'No ReplySpec'}`));
     const button = el('button', 'button ghost', 'Draft로 선택');
     button.dataset.selectControl = control.publicId;
     card.append(button);
@@ -2717,7 +2717,7 @@ function renderHmiResponse(action) {
     const requestName = action.kind === 'Control' ? 'Request' : action.kind;
     overview.append(docsChannelCard(requestName, binding.channel, binding.fields));
     for (const reply of binding.replies) {
-      overview.append(docsChannelCard(`Reply · ${reply.semanticId}`, reply.channel, reply.fields, reply));
+      overview.append(docsChannelCard(`ReplyBinding · ${reply.semanticId}`, reply.channel, reply.fields, reply));
     }
   }
   dom.hmiResponseBody.append(overview, docsXmlSource(action, binding));
@@ -2820,10 +2820,10 @@ function renderHmiContract(action) {
 
     const replySection = el('section', 'docs-section docs-replies');
     replySection.append(
-      el('h2', '', `03 · Reply 출력 (${action.replies.length})`),
-      el('p', 'hmi-monitor-note', 'SubscribeReply callback의 update.ReplyId로 Reply를 식별하고, update.Values의 Key(Semantic Result id, 중첩 결과는 group.child), Value, Unit으로 결과를 읽습니다.'),
+      el('h2', '', `03 · ReplySpec 출력 (${action.replies.length})`),
+      el('p', 'hmi-monitor-note', 'SubscribeReply callback의 update.ReplyId로 ReplySpec을 식별하고, update.Values의 Key(Semantic Result id, 중첩 결과는 group.child), Value, Unit으로 결과를 읽습니다.'),
     );
-    if (!action.replies.length) replySection.append(el('p', 'semantic-empty', 'Semantic에 Reply가 정의되어 있지 않습니다.'));
+    if (!action.replies.length) replySection.append(el('p', 'semantic-empty', 'Semantic에 ReplySpec이 정의되어 있지 않습니다.'));
     for (const reply of action.replies) {
       const card = el('article', 'hmi-reply-card');
       const head = el('header');
@@ -2965,7 +2965,7 @@ function renderHmiWorkspace() {
   clear(dom.hmiFunctionList);
   for (const action of actions) {
     const summary = action.kind === 'Control'
-      ? `${action.cdm || 'CDM 미정'} · 입력 ${action.inputs.length} · Reply ${action.replies.length}`
+      ? `${action.cdm || 'CDM 미정'} · 입력 ${action.inputs.length} · ReplySpec ${action.replies.length}`
       : action.kind === 'Monitor'
         ? `${action.cdm || 'CDM 미정'} · 출력 ${flattenSemanticProfiles(action.outputs).length} · Binding ${action.bindings.length}`
         : `${action.cdm || 'CDM 미정'} · Product · Binding ${action.bindings.length}`;
