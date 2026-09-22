@@ -844,28 +844,6 @@ function inputIdFor(input, used) {
   if (id) used.add(id);
   return id;
 }
-function attachReplyFieldMetadata(profile, bindingReplies) {
-  const matchingFields = bindingReplies
-    .flatMap((reply) => flattenFields(reply.fields))
-    .filter((field) => (
-      (profile.cdm && field.cdm === profile.cdm)
-      || (profile.name && field.name === profile.name)
-    ));
-  const wireValues = matchingFields
-    .flatMap((field) => (field.maps || [])
-      .filter((item) => item.kind === 'ValueMap')
-      .map((item) => ({ ...item, fieldName: field.name })))
-    .filter((item, index, list) => list.findIndex((candidate) => (
-      candidate.cdm === item.cdm && candidate.value === item.value
-    )) === index);
-  const wireTypes = [...new Set(matchingFields.map((field) => field.dataType).filter(Boolean))];
-  return {
-    ...profile,
-    wireValues,
-    wireType: wireTypes.join(' / '),
-    children: (profile.children || []).map((child) => attachReplyFieldMetadata(child, bindingReplies)),
-  };
-}
 
 function attachBindings(ref, diagnostics) {
   const variants = ref.bindingFiles.flatMap((file) => [
@@ -902,33 +880,10 @@ function attachBindings(ref, diagnostics) {
         };
         used.add(action.target.key);
       }
-      action.inputs = action.parameters.map((input) => {
-        const exactField = fields.find((field) => field.cdm === input.cdm && ['Field', 'ArrayField'].includes(field.kind));
-        const wireValues = action.bindings.flatMap((binding) => flattenFields(binding.fields)
-          .filter((field) => field.cdm === input.cdm)
-          .flatMap((field) => (field.maps || [])
-            .filter((item) => item.kind === 'ValueMap')
-            .map((item) => ({ ...item, sourceFile: binding.sourceFile, transport: binding.transport }))));
-        const uniqueWireValues = wireValues.filter((item, index, list) => list.findIndex((candidate) => (
-          candidate.cdm === item.cdm && candidate.value === item.value
-        )) === index);
-        let type = input.type;
-        if (type === 'unknown') {
-          if (/Communication\.RF\.Configuration\.(?:OperationMode|.*\.Power)$/.test(input.cdm)) type = 'text';
-          else if (/Identifier\.Numeric|Latitude|Longitude|Depth|Speed|Bearing|Range|Heading|Pitch|Command|Reason|Type|Brightness|Interval|Channel|TimeSlot/i.test(input.cdm)) type = 'number';
-          else if (exactField && /UInt|Int|Float|Scale|Bit/i.test(exactField.converter)) type = 'number';
-        }
-        return { ...input, type, key: inputIdFor(input, used), wireValues: uniqueWireValues };
-      });
-      action.replies = action.replies.map((reply) => {
-        const bindingReplies = action.bindings.flatMap((binding) => (
-          binding.replies || []
-        ).filter((candidate) => candidate.semanticId === reply.bindRef));
-        return {
-          ...reply,
-          results: reply.results.map((result) => attachReplyFieldMetadata(result, bindingReplies)),
-        };
-      });
+      action.inputs = action.parameters.map((input) => ({
+        ...input,
+        key: inputIdFor(input, used),
+      }));
     }
 
     if (!action.bindings.length) diagnostics.push({
@@ -2231,24 +2186,19 @@ function sampleObjectFromCollection(input) {
   const element = (input.children || []).find((child) => child.kind === 'ElementProfile');
   const children = element?.children?.length ? element.children : (input.children || []);
   for (const child of children) {
-    const key = lowerFirst(child.cdm.split('.').pop());
+    const key = child.id || child.key || lowerFirst(child.cdm.split('.').pop());
     sample[key] = sampleValue(child);
   }
   return sample;
 }
 
 function sampleValue(input) {
-  if (input.wireValues?.length) return input.wireValues[0].value;
   if (input.values?.length) {
     const firstValue = input.values[0];
-    return firstValue.value || firstValue.cdm || firstValue.name || 'VALUE';
+    return firstValue.name || firstValue.value || firstValue.cdm?.split('.').pop() || firstValue.cdm || 'VALUE';
   }
   if (input.type === 'boolean') return true;
   if (input.type === 'collection') return [sampleObjectFromCollection(input)];
-  if (/Communication\.RF\.Configuration\.OperationMode/.test(input.cdm)) return '1:1';
-  if (/Communication\.RF\.Configuration\.TimeSlot/.test(input.cdm)) return 2;
-  if (/Communication\.RF\.Configuration\..*\.Channel/.test(input.cdm)) return 1;
-  if (/Communication\.RF\.Configuration\..*\.Power/.test(input.cdm)) return 'LOW';
   if (input.type === 'number') {
     if (Number.isFinite(input.min) && Number.isFinite(input.max)) {
       if (input.min <= 1 && input.max >= 1) return 1;
@@ -2257,11 +2207,9 @@ function sampleValue(input) {
     }
     if (Number.isFinite(input.min)) return input.min;
     if (Number.isFinite(input.max)) return input.max;
-    if (/Latitude/.test(input.cdm)) return 37.1234567;
-    if (/Longitude/.test(input.cdm)) return 127.1234567;
     return 1;
   }
-  return 'DEMO';
+  return 'VALUE';
 }
 
 function selectControl(id, withSample = false, preserveArgs = false) {
@@ -2489,14 +2437,9 @@ function flattenSemanticProfiles(profiles) {
 
 function profileAllowedLabel(profile) {
   if (profile.values?.length) {
-    return profile.values.map((item) => {
-      const wire = profile.wireValues?.find((candidate) => candidate.cdm === item.cdm);
-      const logical = item.name || item.value || item.cdm?.split('.').pop() || item.cdm;
-      return wire?.value !== undefined && wire.value !== '' ? `${wire.value} = ${logical}` : logical;
-    }).filter(Boolean).join('\n');
-  }
-  if (profile.wireValues?.length) {
-    return profile.wireValues.map((item) => `${item.value} = ${item.cdm?.split('.').pop() || item.cdm}`).join('\n');
+    return profile.values.map((item) => (
+      item.name || item.value || item.cdm?.split('.').pop() || item.cdm
+    )).filter(Boolean).join('\n');
   }
   const range = profileRangeLabel(profile);
   if (range !== '—') return range;
@@ -2505,10 +2448,9 @@ function profileAllowedLabel(profile) {
 }
 
 function hmiExampleValue(profile) {
-  if (profile.wireValues?.length) return profile.wireValues[0].value;
   if (profile.values?.length) {
     const firstValue = profile.values[0];
-    return firstValue.value || firstValue.cdm || firstValue.name || 'VALUE';
+    return firstValue.name || firstValue.value || firstValue.cdm?.split('.').pop() || firstValue.cdm || 'VALUE';
   }
   const sample = sampleValue(profile);
   return typeof sample === 'string' ? sample : JSON.stringify(sample);
@@ -2527,10 +2469,10 @@ function hmiProfileTable(title, profiles, inputMode = false, showOutputName = fa
   const head = el('thead');
   const headRow = el('tr');
   const headings = inputMode
-    ? ['입력 ID (Semantic id)', '표시명', 'CDM 의미', '형식', '실제 입력/송신값 · 의미', '명령']
+    ? ['입력 ID (Semantic id)', '표시명', 'CDM 의미', '형식', '허용 입력값 · 의미', '명령']
     : showOutputName
-      ? ['출력 ID (Semantic id)', '표시명', 'CDM 의미', '형식', '실제 수신값 · 의미']
-      : ['출력 항목', 'CDM 의미', '형식', '실제 수신값 · 의미'];
+      ? ['출력 ID (Semantic id)', '표시명', 'CDM 의미', '형식', 'Semantic 값 · 의미']
+      : ['출력 항목', 'CDM 의미', '형식', 'Semantic 값 · 의미'];
   headings.forEach((heading) => headRow.append(el('th', '', heading)));
   head.append(headRow);
   const body = el('tbody');
@@ -2542,7 +2484,6 @@ function hmiProfileTable(title, profiles, inputMode = false, showOutputName = fa
     if (inputMode && !profile.required) keyCell.append(el('small', 'optional-mark', '선택'));
     const hasDeclaredMeaning = Boolean(
       profile.values?.length
-      || profile.wireValues?.length
       || profile.min !== null
       || profile.max !== null
       || profile.unit
@@ -2556,7 +2497,7 @@ function hmiProfileTable(title, profiles, inputMode = false, showOutputName = fa
     if (inputMode || showOutputName) cells.push(el('td', '', profile.name || '—'));
     cells.push(
       el('td', '', profile.cdm || '미정'),
-      el('td', '', profile.wireType || profileTypeLabel(profile.type)),
+      el('td', '', profileTypeLabel(profile.type)),
       allowedCell,
     );
     row.append(...cells);
@@ -3110,8 +3051,6 @@ function parseArgument(input, raw) {
   if (input.type === 'valueSet' && input.values?.length) {
     const text = String(raw).trim();
     const normalized = text.toLowerCase();
-    const wireValue = input.wireValues?.find((item) => String(item.value).toLowerCase() === normalized);
-    if (wireValue) return { ok: true, value: wireValue.value };
     const selected = input.values.find((item) => [
       item.value,
       item.name,
@@ -3121,7 +3060,7 @@ function parseArgument(input, raw) {
     if (!selected) {
       return { ok: false, message: `${input.key} 허용값: ${profileAllowedLabel(input)}` };
     }
-    return { ok: true, value: selected.value || selected.cdm || selected.name };
+    return { ok: true, value: selected.name || selected.value || selected.cdm };
   }
   return { ok: true, value: raw };
 }
@@ -3153,11 +3092,23 @@ function resolveBinding(control) {
     : control.bindings.find((item) => item.key === dom.routePolicy.value);
 }
 
+function semanticBindingValue(input, raw) {
+  if (!input?.values?.length) return raw;
+  const normalized = String(raw).trim().toLowerCase();
+  const selected = input.values.find((item) => [
+    item.name,
+    item.value,
+    item.cdm,
+    item.cdm?.split('.').pop(),
+  ].filter(Boolean).some((candidate) => String(candidate).toLowerCase() === normalized));
+  return selected?.cdm || raw;
+}
+
 function sourceValue(source, control, values, physical) {
   if (control.target && (source === control.target.cdm || source === control.target.key || source === 'System.Target.DeviceId')) return targetDeviceValue(control);
   if (source.startsWith('System.Target.')) return targetDeviceValue(control);
   const input = control.inputs.find((item) => item.cdm === source || item.key === source);
-  if (input && Object.hasOwn(values, input.key)) return values[input.key];
+  if (input && Object.hasOwn(values, input.key)) return semanticBindingValue(input, values[input.key]);
   if (Object.hasOwn(physical, source)) return physical[source];
   if (source === 'System.Time.Now') return state.demo.now;
   if (source === 'System.Generated.HeartbeatSequence') return state.demo.sequence;
@@ -3255,7 +3206,9 @@ function fieldInput(field, control, values) {
   if (control.target && field.cdm && field.cdm === control.target.cdm) return { input: control.target, value: targetDeviceValue(control), automaticTarget: true };
   let input = field.cdm && control.inputs.find((item) => item.cdm === field.cdm);
   if (!input) input = control.inputs.find((item) => item.key === field.name);
-  return input && Object.hasOwn(values, input.key) ? { input, value: values[input.key], automaticTarget: false } : null;
+  return input && Object.hasOwn(values, input.key)
+    ? { input, value: semanticBindingValue(input, values[input.key]), automaticTarget: false }
+    : null;
 }
 
 function mapBinding(control, binding, values) {
@@ -3357,23 +3310,15 @@ function renderPayload(binding, mapped, requestId) {
 }
 
 function mockReplyOutput(profile) {
-  const wire = profile.wireValues?.[0] || null;
-  const semanticValue = wire
-    ? profile.values?.find((item) => item.cdm === wire.cdm)
-    : profile.values?.[0];
-  const numericWireType = /^(?:U?Int|Float)/.test(profile.wireType || '');
-  const rawValue = wire?.value
-    ?? semanticValue?.value
-    ?? (numericWireType ? 0 : sampleValue(profile));
-  const meaning = semanticValue?.name
+  const semanticValue = profile.values?.[0] || null;
+  const value = semanticValue?.name
     || semanticValue?.value
     || semanticValue?.cdm?.split('.').pop()
-    || wire?.cdm?.split('.').pop()
-    || `${profile.cdm || profile.name || '결과'} · 값 의미 매핑 없음`;
+    || sampleValue(profile);
   return {
-    name: profile.name || lowerFirst(profile.cdm?.split('.').pop() || 'result'),
-    value: displayValue(rawValue),
-    meaning,
+    id: profile.id || profile.key || 'result',
+    name: profile.name || '결과',
+    value: displayValue(value),
   };
 }
 
@@ -3384,7 +3329,7 @@ function renderReplyResult(control, reply) {
   const table = el('table', 'delivery-reply-table');
   const head = el('thead');
   const headRow = el('tr');
-  ['출력 항목', 'Mock 수신값', '의미'].forEach((label) => headRow.append(el('th', '', label)));
+  ['출력 ID', '표시명', 'Semantic Mock 값'].forEach((label) => headRow.append(el('th', '', label)));
   head.append(headRow);
   const body = el('tbody');
   const executionRow = el('tr');
@@ -3399,7 +3344,7 @@ function renderReplyResult(control, reply) {
   const outputs = flattenSemanticProfiles(semanticReply?.results || []).map(mockReplyOutput);
   for (const output of outputs) {
     const row = el('tr');
-    row.append(el('td', '', output.name), el('td', '', output.value), el('td', '', output.meaning));
+    row.append(el('td', '', output.id), el('td', '', output.name), el('td', '', output.value));
     body.append(row);
   }
   table.append(head, body);
