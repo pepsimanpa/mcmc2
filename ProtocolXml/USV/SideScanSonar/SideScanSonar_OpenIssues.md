@@ -49,10 +49,10 @@
 - 현재 Binding은 `commandStatusReport.dstEquipmentType`처럼 dotted path를 사용한다.
 - 공통 Adapter가 dotted path를 정식 구조체 접근 규칙으로 사용할지 최종 확정은 TBD이다.
 
-### 6. 로컬 XSD 복사본 정리
+### 6. [RESOLVED] 로컬 XSD 복사본 정리
 
-- `SideScanSonar/CommonSpecSchema.xsd`, `SideScanSonar/CommonBindingSchema.xsd`는 현재 `ProtocolXml/XSD`의 공통 XSD보다 오래된 snapshot이다.
-- SSS XML의 `schemaLocation`과 USV 전체 migration은 공통 XSD 기준으로 완료하였다. 다만 외부 도구가 로컬 snapshot을 직접 참조할 가능성이 남아 있어 파일 자체는 삭제하지 않는다. 외부 의존성 확인 후 삭제 여부만 별도로 결정한다.
+- SSS Semantic/Binding은 각각 `../../XSD/CommonSpecSchema.xsd`, `../../XSD/CommonBindingSchema.xsd`를 직접 참조한다.
+- 저장소 내부 참조가 없는 오래된 로컬 XSD 복사본 두 개는 2026-09-22에 삭제하고 `ProtocolXml/XSD`를 단일 기준으로 확정하였다.
 
 ### 7. [RESOLVED] 최종 CDM 감사
 

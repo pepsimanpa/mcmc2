@@ -130,13 +130,13 @@ Canonical:
     ProtocolXml/XSD/CommonSpecSchema.xsd
     ProtocolXml/XSD/CommonBindingSchema.xsd
 
-호환을 위해 유지하는 로컬/샘플 복사본도 함께 수정했다.
+SSS Semantic/Binding은 위 canonical XSD를 직접 참조한다. 미참조 상태였던 SSS 폴더의 로컬 XSD 복사본 두 개는 삭제했다.
 
-    ProtocolXml/USV/SideScanSonar/CommonSpecSchema.xsd
-    ProtocolXml/USV/SideScanSonar/CommonBindingSchema.xsd
+Sample 호환 복사본은 별도로 유지한다.
+
     Sample/OperationManagement/OperationManagement/spec/CommonSpecSchema.xsd
 
-스키마를 추가 변경할 때 canonical과 필요한 복사본을 함께 확인한다.
+스키마를 추가 변경할 때 canonical과 필요한 Sample 복사본을 함께 확인한다.
 
 ## 5. Reply IDL 및 callback 계약
 
