@@ -2816,7 +2816,7 @@ function renderHmiContract(action) {
     frameworkBlock.append(frameworkPre);
     examples.append(commandBlock, frameworkBlock);
     commandSection.append(commandHead, examples);
-    dom.hmiContractBody.append(hmiProfileTable('01 · HMI 입력', action.inputs, true), commandSection);
+    dom.hmiContractBody.append(hmiProfileTable('01 · HMI 입력 항목', action.inputs, true), commandSection);
 
     const replySection = el('section', 'docs-section docs-replies');
     replySection.append(
@@ -2867,7 +2867,7 @@ function renderHmiContract(action) {
       subscribeExamples,
     );
     dom.hmiContractBody.append(
-      hmiProfileTable('01 · HMI 표시 항목', flattenSemanticProfiles(action.outputs), false, true),
+      hmiProfileTable('01 · HMI 표출 항목', flattenSemanticProfiles(action.outputs), false, true),
       subscribeSection,
     );
   } else {
