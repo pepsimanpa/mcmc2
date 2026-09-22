@@ -71,33 +71,33 @@
   <ControlSpecs id="control">
     <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="startIntegrationAck" name="Start Integration Ack" bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="startIntegrationAck" name="Start Integration Ack" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-    </Reply>
+    </ReplySpec>
     </ControlSpec>
     <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="restartSystemAck" name="Restart System Ack" bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="restartSystemAck" name="Restart System Ack" cdm="Command.ProcessingStatus.Response" required="true">
       <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-    </Reply>
+    </ReplySpec>
     </ControlSpec>
     <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="requestIbitAck" name="Request Ibit Ack" bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="requestIbitAck" name="Request Ibit Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
-      <Reply id="requestIbitResult" name="Request Ibit Result" bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
+      </ReplySpec>
+      <ReplySpec id="requestIbitResult" name="Request Ibit Result" cdm="Request.Health.IBIT.Response" required="true">
       <Results><ValueSetResult id="equipmentLink" name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"><Values><Value name="Connected" cdm="Health.CIPE.Lidar.Connected"/><Value name="Disconnected" cdm="Health.CIPE.Lidar.Disconnected"/></Values></ValueSetResult><ValueSetResult id="operationalStatus" name="cipeIBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult><QuantityResult id="cpuTemperature" name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature"><Unit>degC</Unit><Range min="20" max="100"/></QuantityResult><QuantityResult id="cpuLoad" name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.CIPE.Processor.CpuLoad"><Unit>percent</Unit><Range min="0" max="100"/></QuantityResult></Results>
-    </Reply>
+    </ReplySpec>
     </ControlSpec>
     <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
       <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="requestPbitAck" name="Request Pbit Ack" bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="requestPbitAck" name="Request Pbit Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
-      <Reply id="requestPbitResult" name="Request Pbit Result" bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
+      </ReplySpec>
+      <ReplySpec id="requestPbitResult" name="Request Pbit Result" cdm="Request.Health.PBIT.Response" required="true">
       <Results><ValueSetResult id="equipmentLink" name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink"><Values><Value name="Connected" cdm="Health.CIPE.Lidar.Connected"/><Value name="Disconnected" cdm="Health.CIPE.Lidar.Disconnected"/></Values></ValueSetResult><ValueSetResult id="operationalStatus" name="cipePBITStatus.operationalStatus" cdm="Health.CIPE.OperationalStatus"><Values><Value name="Normal" cdm="Health.Normal"/><Value name="Degraded" cdm="Health.Degraded"/><Value name="Unavailable" cdm="Health.Unavailable"/><Value name="NoResponse" cdm="Health.NoResponse"/></Values></ValueSetResult></Results>
-    </Reply>
+    </ReplySpec>
     </ControlSpec>
   </ControlSpecs>
 </SensorSpec>

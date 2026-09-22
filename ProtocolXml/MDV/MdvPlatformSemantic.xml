@@ -241,7 +241,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true">
+            <ReplySpec id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -262,7 +262,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="startMission" name="MDV 임무 시작" cdm="Control.Mission.Start">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -272,7 +272,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true">
+            <ReplySpec id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -293,7 +293,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="pauseMission" name="MDV 임무 일시정지" cdm="Control.Mission.Pause">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -303,7 +303,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="pauseMissionReply" name="Pause Mission Reply" cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true">
+            <ReplySpec id="pauseMissionReply" name="Pause Mission Reply" cdm="Control.Mission.Pause.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -324,7 +324,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="resumeMission" name="MDV 임무 재개" cdm="Control.Mission.Resume">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -334,7 +334,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="resumeMissionReply" name="Resume Mission Reply" cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true">
+            <ReplySpec id="resumeMissionReply" name="Resume Mission Reply" cdm="Control.Mission.Resume.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -355,11 +355,11 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="setLegacyMode" name="MDV 레거시모드 설정" cdm="Control.Platform.OperationMode.Legacy">
             <Target cdm="Platform.Identifier.Numeric" />
-            <Reply id="setLegacyModeReply" name="Set Legacy Mode Reply" cdm="Control.Platform.OperationMode.Legacy.Response" bindRef="setLegacyModeReply" required="true">
+            <ReplySpec id="setLegacyModeReply" name="Set Legacy Mode Reply" cdm="Control.Platform.OperationMode.Legacy.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -380,11 +380,11 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="setAutonomousMode" name="MDV 자율운항모드 설정" cdm="Control.Platform.OperationMode.Autonomous">
             <Target cdm="Platform.Identifier.Numeric" />
-            <Reply id="setAutonomousModeReply" name="Set Autonomous Mode Reply" cdm="Control.Platform.OperationMode.Autonomous.Response" bindRef="setAutonomousModeReply" required="true">
+            <ReplySpec id="setAutonomousModeReply" name="Set Autonomous Mode Reply" cdm="Control.Platform.OperationMode.Autonomous.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -405,7 +405,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="transferMissionPlan" name="MDV 임무계획 전송" cdm="Request.MissionPlan.Transfer">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -451,7 +451,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true">
+            <ReplySpec id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -472,7 +472,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="immediateEmergencyStop" name="MDV 즉시 비상정지" cdm="Control.Platform.EmergencyStop.Immediate">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -487,7 +487,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply id="immediateEmergencyStopReply" name="Immediate Emergency Stop Reply" cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true">
+            <ReplySpec id="immediateEmergencyStopReply" name="Immediate Emergency Stop Reply" cdm="Control.Platform.EmergencyStop.Immediate.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -508,7 +508,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="emergencyStopAndStandby" name="MDV 임무중지 후 대기" cdm="Control.Platform.EmergencyStop.StopAndStandby">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -523,7 +523,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply id="emergencyStopAndStandbyReply" name="Emergency Stop And Standby Reply" cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true">
+            <ReplySpec id="emergencyStopAndStandbyReply" name="Emergency Stop And Standby Reply" cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -544,7 +544,7 @@ MDV 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="setTargetInformation" name="MDV 표적정보 설정" cdm="Control.Mission.TargetInformation">
             <Parameters>

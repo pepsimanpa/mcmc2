@@ -445,7 +445,7 @@ Resolved common master issue는 다음 2개다.
 |---|---|
 | 28개 Semantic / Binding XML XSD 검증 | PASS |
 | Control ↔ ControlBinding ID | PASS |
-| Reply bindRef ↔ Binding Reply | PASS |
+| ReplySpec.id ↔ ReplyBinding.semantic_id | PASS |
 | Monitor ↔ MonitorBinding ID | PASS |
 | Product ↔ ProductBinding ID | PASS |
 | converter 잔존 | 0 |

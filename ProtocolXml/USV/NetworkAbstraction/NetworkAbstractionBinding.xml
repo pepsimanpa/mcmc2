@@ -419,14 +419,14 @@
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <!--DestinationType: Communication(0x08) / NetworkAbstractionUnit(0x01) / 통제소 NAE(0x01).-->
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.ControlStation"/>
-      <Reply semantic_id="startControlStationIntegrationAck" required="true">
+      <ReplyBinding semantic_id="startControlStationIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="startUsvIntegration">
       <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
@@ -434,14 +434,14 @@
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <!--DestinationType: Communication(0x08) / NetworkAbstractionUnit(0x01) / USV NAE(0x02).-->
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.USV"/>
-      <Reply semantic_id="startUsvIntegrationAck" required="true">
+      <ReplyBinding semantic_id="startUsvIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="addCommsChannel">
       <DDSChannel topicName="RUSV::C2::RCU::CommsChannelAddMessageConfigCommandType" typeName="CommsChannelAddMessageConfigCommandType"/>
@@ -450,14 +450,14 @@
       <Field name="commsChannelID" cdm="Communication.Channel.Identifier" dataType="UInt8">
         <ValueMap><Map cdm="Communication.Channel.Wireless" value="0"/><Map cdm="Communication.Channel.Satellite" value="1"/></ValueMap>
       </Field>
-      <Reply semantic_id="addCommsChannelAck" required="true">
+      <ReplyBinding semantic_id="addCommsChannelAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="deleteCommsChannel">
       <DDSChannel topicName="RUSV::C2::RCU::CommsChannelDeleteMessageConfigCommandType" typeName="CommsChannelDeleteMessageConfigCommandType"/>
@@ -466,14 +466,14 @@
       <Field name="commsChannelID" cdm="Communication.Channel.Identifier" dataType="UInt8">
         <ValueMap><Map cdm="Communication.Channel.Wireless" value="0"/><Map cdm="Communication.Channel.Satellite" value="1"/></ValueMap>
       </Field>
-      <Reply semantic_id="deleteCommsChannelAck" required="true">
+      <ReplyBinding semantic_id="deleteCommsChannelAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="configureLBandComms">
       <DDSChannel topicName="RUSV::C2::RCU::LBandCommsControlType" typeName="LBandCommsControlType"/>
@@ -537,15 +537,15 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.ControlStation"/>
-      <Reply semantic_id="requestNetworkIntegrationControlStationPbitAck" required="true">
+      <ReplyBinding semantic_id="requestNetworkIntegrationControlStationPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestNetworkIntegrationControlStationPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestNetworkIntegrationControlStationPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDevicePBITReportType" typeName="NetworkIntegrationDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
@@ -561,22 +561,22 @@
           <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x01)/USV(0x02) 대상 식별 방법은 TBD.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestNetworkIntegrationUsvPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.USV"/>
-      <Reply semantic_id="requestNetworkIntegrationUsvPbitAck" required="true">
+      <ReplyBinding semantic_id="requestNetworkIntegrationUsvPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestNetworkIntegrationUsvPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestNetworkIntegrationUsvPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDevicePBITReportType" typeName="NetworkIntegrationDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDevicePBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
@@ -592,22 +592,22 @@
           <ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap>
         </Field>
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x01)/USV(0x02) 대상 식별 방법은 TBD.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestNetworkIntegrationControlStationIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.ControlStation"/>
-      <Reply semantic_id="requestNetworkIntegrationControlStationIbitAck" required="true">
+      <ReplyBinding semantic_id="requestNetworkIntegrationControlStationIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestNetworkIntegrationControlStationIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestNetworkIntegrationControlStationIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDeviceIBITReportType" typeName="NetworkIntegrationDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
@@ -628,22 +628,22 @@
         <Field name="networkIntegrationDeviceIBIT.nmcDetail" cdm="Health.NetworkAbstraction.NMC.Detail.Raw" dataType="UInt8"/>
         <!--NetworkIntegrationDeviceIBIT raw bit 정의: mccDetail1 Bit3=Flash, Bit2=메모리, Bit1=보안칩, Bit0=전원; mccDetail2 Bit6=저궤도위성 포트(J1), Bit5=출입항보조 송수신기 포트(J3), Bit4=고궤도위성 트래픽(J8), Bit3=무선통신 트래픽(J2), Bit2=암호장비 수신(J6), Bit1=암호장비 송신(J6), Bit0=내부 포트; ddcDetail Bit6=메모리, Bit5=Flash, Bit4=고궤도위성 제어/상태(J8), Bit3=무선통신 제어/상태(J2), Bit2=USV 비상망(J4), Bit1=RCS/USV 주망(J4), Bit0=내부 포트; nmcDetail Bit0=MCU. 세부 bit는 정상/Success/Alive/On=0, 비가용/Failure/Down/Off=1의 원문 의미를 유지한다.-->
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x01)/USV(0x02) 대상 식별 방법은 TBD.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestNetworkIntegrationUsvIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.USV"/>
-      <Reply semantic_id="requestNetworkIntegrationUsvIbitAck" required="true">
+      <ReplyBinding semantic_id="requestNetworkIntegrationUsvIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestNetworkIntegrationUsvIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestNetworkIntegrationUsvIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::NetworkIntegrationDeviceIBITReportType" typeName="NetworkIntegrationDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="networkIntegrationDeviceIBIT.overallStatus" cdm="Health.NetworkAbstraction.Overall.Status" dataType="UInt8">
@@ -664,22 +664,22 @@
         <Field name="networkIntegrationDeviceIBIT.nmcDetail" cdm="Health.NetworkAbstraction.NMC.Detail.Raw" dataType="UInt8"/>
         <!--NetworkIntegrationDeviceIBIT raw bit 정의: mccDetail1 Bit3=Flash, Bit2=메모리, Bit1=보안칩, Bit0=전원; mccDetail2 Bit6=저궤도위성 포트(J1), Bit5=출입항보조 송수신기 포트(J3), Bit4=고궤도위성 트래픽(J8), Bit3=무선통신 트래픽(J2), Bit2=암호장비 수신(J6), Bit1=암호장비 송신(J6), Bit0=내부 포트; ddcDetail Bit6=메모리, Bit5=Flash, Bit4=고궤도위성 제어/상태(J8), Bit3=무선통신 제어/상태(J2), Bit2=USV 비상망(J4), Bit1=RCS/USV 주망(J4), Bit0=내부 포트; nmcDetail Bit0=MCU. 세부 bit는 정상/Success/Alive/On=0, 비가용/Failure/Down/Off=1의 원문 의미를 유지한다.-->
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x01)/USV(0x02) 대상 식별 방법은 TBD.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestLBandControlStationGroupPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.LBandControlStationGroup"/>
-      <Reply semantic_id="requestLBandControlStationGroupPbitAck" required="true">
+      <ReplyBinding semantic_id="requestLBandControlStationGroupPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestLBandControlStationGroupPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestLBandControlStationGroupPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::LBandControlStationDevicePBITReportType" typeName="LBandControlStationDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <PackedField name="lBandControlStationDevicePBIT.operation" width="8" defaultValue="0">
@@ -838,22 +838,22 @@
         <Field name="lBandRepeaterDevice5PBIT.powerStatus" cdm="Health.LBand.Repeater5.Power.Status" dataType="UInt8">
         <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.Disconnected" value="3"/></ValueMap>
       </Field>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestLBandTerminalPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.LBandTerminal"/>
-      <Reply semantic_id="requestLBandTerminalPbitAck" required="true">
+      <ReplyBinding semantic_id="requestLBandTerminalPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestLBandTerminalPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestLBandTerminalPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::LBandTerminalDevicePBITReportType" typeName="LBandTerminalDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <PackedField name="lBandTerminalDevicePBIT.operation" width="8" defaultValue="0">
@@ -882,22 +882,22 @@
         <Field name="lBandTerminalDevicePBIT.powerStatus" cdm="Health.LBand.Terminal.Power.Status" dataType="UInt8">
         <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Degraded" value="1"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.Disconnected" value="3"/></ValueMap>
       </Field>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestLBandControlStationGroupIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.LBandControlStationGroup"/>
-      <Reply semantic_id="requestLBandControlStationGroupIbitAck" required="true">
+      <ReplyBinding semantic_id="requestLBandControlStationGroupIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestLBandControlStationGroupIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestLBandControlStationGroupIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::LBandControlStationDeviceIBITReportType" typeName="LBandControlStationDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="lBandControlStationDeviceIBIT.operation" cdm="Health.LBand.ControlStation.OperationalStatus" dataType="UInt8">
@@ -1082,22 +1082,22 @@
         <Field name="lBandRepeaterDevice5IBIT.powerDetail" cdm="Health.LBand.Repeater5.Power.Detail.Raw" dataType="UInt8"/>
         <!--IBIT operation은 원문에서 octet 값 0/1/2로 직접 정의되어 있어 PBIT/CBIT의 Bit7~6 추출 converter를 적용하지 않는다. 세부 Detail 필드는 raw octet으로 유지한다.-->
         <!--LBandDeviceIBIT Detail bit 정의: referenceControlDetail Bit2=기준신호, Bit1=SOC Core, Bit0=NAE 통신수신; modem1/2Detail Bit2=기준신호 동기화, Bit1=SoC/FPGA Core, Bit0=연동; rfmodule1/2Detail Bit2=출력, Bit1=장착, Bit0=연동; powerDetail Bit0=입출력 전압. 각 bit는 정상=0/비가용=1.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestLBandTerminalIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.LBandTerminal"/>
-      <Reply semantic_id="requestLBandTerminalIbitAck" required="true">
+      <ReplyBinding semantic_id="requestLBandTerminalIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestLBandTerminalIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestLBandTerminalIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::LBandTerminalDeviceIBITReportType" typeName="LBandTerminalDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="lBandTerminalDeviceIBIT.operation" cdm="Health.LBand.Terminal.OperationalStatus" dataType="UInt8">
@@ -1132,43 +1132,43 @@
         <Field name="lBandTerminalDeviceIBIT.powerDetail" cdm="Health.LBand.Terminal.Power.Detail.Raw" dataType="UInt8"/>
         <!--IBIT operation은 원문 octet 0/1/2 직접값이며 세부 Detail은 raw octet으로 유지한다.-->
         <!--LBandDeviceIBIT Detail bit 정의: referenceControlDetail Bit2=기준신호, Bit1=SOC Core, Bit0=NAE 통신수신; modem1/2Detail Bit2=기준신호 동기화, Bit1=SoC/FPGA Core, Bit0=연동; rfmodule1/2Detail Bit2=출력, Bit1=장착, Bit0=연동; powerDetail Bit0=입출력 전압. 각 bit는 정상=0/비가용=1.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestAuxControlPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.AuxControl"/>
-      <Reply semantic_id="requestAuxControlPbitAck" required="true">
+      <ReplyBinding semantic_id="requestAuxControlPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestAuxControlPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestAuxControlPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::AuxControlDevicePBITReportType" typeName="AuxControlDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="auxControlDevicePBIT" cdm="Health.AuxControl.Transceiver.Status" dataType="UInt8">
         <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.Disconnected" value="3"/></ValueMap>
       </Field>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestAuxControlIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.AuxControl"/>
-      <Reply semantic_id="requestAuxControlIbitAck" required="true">
+      <ReplyBinding semantic_id="requestAuxControlIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestAuxControlIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestAuxControlIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::AuxControlDeviceIBITReportType" typeName="AuxControlDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="auxControlDeviceStatus" cdm="Health.AuxControl.Transceiver.Status" dataType="UInt8">
@@ -1176,66 +1176,66 @@
         </Field>
         <Field name="auxControlDeviceIBIT" cdm="Health.AuxControl.Transceiver.IBIT.Detail.Raw" dataType="UInt16"/>
         <!--auxControlDeviceIBIT는 unsigned short(2B) bit-packed 세부 상태이며 raw로 유지한다. Bit15=데이터링크 Lock, Bit13=버퍼 오버플로우, Bit7=통신포트 연결, Bit5=모뎀부 데이터#1 포트, Bit4=모뎀부 제어 포트, Bit3=RF부 포트, Bit2=온도 Alarm, Bit1=송신출력 Alarm, Bit0=전압 Alarm; 각 bit 정상=0/비정상=1, 나머지는 Reserved.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestGeoSatControlStationPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.GeoSatControlStation"/>
-      <Reply semantic_id="requestGeoSatControlStationPbitAck" required="true">
+      <ReplyBinding semantic_id="requestGeoSatControlStationPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestGeoSatControlStationPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestGeoSatControlStationPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::GeoSatDevicePBITReportType" typeName="GeoSatDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="geoSatDevicePBIT" cdm="Health.GeoSat.Device.Status" dataType="UInt8">
           <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.Disconnected" value="3"/></ValueMap>
         </Field>
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x21)/USV(0x22) 대상 식별 방법은 TBD.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestGeoSatUsvPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.GeoSatUSV"/>
-      <Reply semantic_id="requestGeoSatUsvPbitAck" required="true">
+      <ReplyBinding semantic_id="requestGeoSatUsvPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestGeoSatUsvPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestGeoSatUsvPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::GeoSatDevicePBITReportType" typeName="GeoSatDevicePBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="geoSatDevicePBIT" cdm="Health.GeoSat.Device.Status" dataType="UInt8">
           <ValueMap><Map cdm="Health.Status.Normal" value="0"/><Map cdm="Health.Status.Unavailable" value="2"/><Map cdm="Health.Status.Disconnected" value="3"/></ValueMap>
         </Field>
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x21)/USV(0x22) 대상 식별 방법은 TBD.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestGeoSatControlStationIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.GeoSatControlStation"/>
-      <Reply semantic_id="requestGeoSatControlStationIbitAck" required="true">
+      <ReplyBinding semantic_id="requestGeoSatControlStationIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestGeoSatControlStationIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestGeoSatControlStationIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::GeoSatDeviceIBITReportType" typeName="GeoSatDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="geoSatDeviceStatus" cdm="Health.GeoSat.Device.Status" dataType="UInt8">
@@ -1244,22 +1244,22 @@
         <Field name="geoSatDeviceIBIT" cdm="Health.GeoSat.Device.IBIT.Detail.Raw" dataType="UInt8"/>
         <!--geoSatDeviceIBIT는 bit-packed octet 세부 상태이며 raw로 유지한다. Bit0=제어 NIC eth0 carrier/link, Bit1=data NIC eth1 carrier/link, Bit2=RF 기준주파수(10MHz) 입력, Bit3=변조 chipset 설정, Bit4=복조 chipset 설정, Bit5=TDMA 송신 설정, Bit6=Reserved, Bit7=total 상태; 정상=0/비정상=1.-->
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x21)/USV(0x22) 대상 식별 방법은 TBD.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestGeoSatUsvIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.NetworkAbstraction.GeoSatUSV"/>
-      <Reply semantic_id="requestGeoSatUsvIbitAck" required="true">
+      <ReplyBinding semantic_id="requestGeoSatUsvIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::NAE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestGeoSatUsvIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestGeoSatUsvIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::NAE::GeoSatDeviceIBITReportType" typeName="GeoSatDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="geoSatDeviceStatus" cdm="Health.GeoSat.Device.Status" dataType="UInt8">
@@ -1268,7 +1268,7 @@
         <Field name="geoSatDeviceIBIT" cdm="Health.GeoSat.Device.IBIT.Detail.Raw" dataType="UInt8"/>
         <!--geoSatDeviceIBIT는 bit-packed octet 세부 상태이며 raw로 유지한다. Bit0=제어 NIC eth0 carrier/link, Bit1=data NIC eth1 carrier/link, Bit2=RF 기준주파수(10MHz) 입력, Bit3=변조 chipset 설정, Bit4=복조 chipset 설정, Bit5=TDMA 송신 설정, Bit6=Reserved, Bit7=total 상태; 정상=0/비정상=1.-->
         <!--Result에 subEquipmentID/commandID가 없어 통제소(0x21)/USV(0x22) 대상 식별 방법은 TBD.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
   </Controls>
 </CommBinding>

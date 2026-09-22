@@ -592,7 +592,7 @@ parser = ET.XMLParser(
 1. XML well-formed
 2. XSD 검증
 3. Semantic Control ID ↔ Binding `semantic_id`
-4. Semantic Reply `bindRef` ↔ Binding Reply `semantic_id`
+4. Semantic `ReplySpec.id` ↔ Binding `ReplyBinding.semantic_id`
 5. Parameter CDM ↔ Binding CDM/sourceField
 6. Result CDM ↔ Binding Field/BitMember CDM
 7. Semantic ValueSet에 raw 숫자 code가 남아 있지 않은지
@@ -880,7 +880,7 @@ AUV RF Binding의 다음 계산성 converter를 선언형/책임분리 구조로
 - Platform Semantic Control 12개와 Platform RF ControlBinding 12개의 `id/semantic_id`가 1:1 일치한다.
 - UCD는 원 ICD에서 정의된 `requestAuvCheck`, `emergencyReturn`, `deleteAllRecords` 3개 ControlBinding만 동일 Platform Semantic을 재사용한다.
 - RF 통신장치 Semantic Control 6개와 RF Comm ControlBinding 6개가 1:1 일치한다.
-- Semantic `Reply.bindRef`는 실제 Binding `Reply.semantic_id`로 모두 해소된다. `requestData`와 `toggleRfGain`은 합의대로 Reply가 없다.
+- Semantic `ReplySpec.id`는 실제 Binding `ReplyBinding.semantic_id`로 모두 해소된다. `requestData`와 `toggleRfGain`은 합의대로 Reply가 없다.
 - RF-1 COMMAND의 주 기능 bit와 `RF_SEND(bit30)` / `RF_EXEC(bit31)`, expectedValue, RF-2 ACK expectedValue가 현재 확정표와 일치한다.
 - INFO_NUM은 Platform.Identifier.Numeric=1/2 기준 INFO1=`1/4`, INFO2=`2/5`, INFO3=`3/6`으로 일치한다.
 - `MISSION_START`는 origin CSV의 INFO2 표기와 달리 프로젝트 확정값 INFO3를 유지한다.

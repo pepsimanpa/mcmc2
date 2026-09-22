@@ -86,7 +86,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="configureRfReply" required="true">
+            <ReplyBinding semantic_id="configureRfReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER: START(4), COUNT(4), COMMAND(2), ACK(4). -->
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
@@ -161,7 +161,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!--
@@ -198,7 +198,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="scanRfChannelsReply" required="true">
+            <ReplyBinding semantic_id="scanRfChannelsReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
@@ -251,7 +251,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!--
@@ -288,7 +288,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="requestRfStatusReply" required="true">
+            <ReplyBinding semantic_id="requestRfStatusReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
@@ -376,7 +376,7 @@
                                 </PackedField>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!--
@@ -413,7 +413,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="requestPreLaunchCheckReply" required="true">
+            <ReplyBinding semantic_id="requestPreLaunchCheckReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
@@ -487,7 +487,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!--
@@ -564,7 +564,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="applyRfEncryptionKeyReply" required="true">
+            <ReplyBinding semantic_id="applyRfEncryptionKeyReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
@@ -616,7 +616,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
     </Controls>
 </CommBinding>

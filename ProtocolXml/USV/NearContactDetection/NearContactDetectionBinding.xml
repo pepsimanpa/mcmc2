@@ -23,53 +23,53 @@
       <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><Reply semantic_id="startIntegrationAck" required="true">
+      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><ReplyBinding semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::SCDE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="restartSystem">
       <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><Reply semantic_id="restartSystemAck" required="true">
+      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><ReplyBinding semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::SCDE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="requestPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><Reply semantic_id="requestPbitAck" required="true">
+      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><ReplyBinding semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::SCDE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestPbitScdeResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitScdeResult" required="true">
         <DDSChannel topicName="RUSV::SO::SCDE::SCDEPBITReportType" typeName="SCDEPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
         <!--PBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하며, SCDE/Lidar PBIT Report는 실제 점검 결과 Reply로 처리한다.-->
-      </Reply>
-      <Reply semantic_id="requestPbitLidarResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitLidarResult" required="true">
         <DDSChannel topicName="RUSV::SO::SCDE::LidarPBITReportType" typeName="LidarPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="lidarStatus" cdm="Health.NearContactDetection.Lidar.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
-      </Reply>
+      </ReplyBinding>
       <!--PBIT 결과 Report에는 commandID가 없으므로 CommandStatusReport 외의 명시적 요청 상관관계를 임의로 추가하지 않는다.-->
     </ControlBinding>
 
@@ -77,15 +77,15 @@
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><Reply semantic_id="requestIbitAck" required="true">
+      <DerivedField name="destination" sourceField="System.Target.NearContactDetection"/><ReplyBinding semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::SCDE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestIbitScdeResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitScdeResult" required="true">
         <DDSChannel topicName="RUSV::SO::SCDE::SCDEIBITReportType" typeName="SCDEIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="scdeStatus" cdm="Health.NearContactDetection.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
@@ -124,8 +124,8 @@
         <!--powerManagingModuleStatus: Bit0=전원 상태, Bit1~7 reserved. ECU1~3/T1 Converter1~2/Ethernet Hub: Bit0=전원, Bit1=동작, Bit2~7 reserved.-->
         <!--반복 센서군은 첫 비고의 `4D 이미지 레이더#`, `RGB 카메라(접촉물)#`, `RGB 카메라(서라운드뷰)#` 표기가 특정 1번이 아닌 공통 placeholder이며 이후 행 공란은 병합셀 CSV export 패턴이다. 따라서 Radar1~9, Contact1~9, SVM1~6 전체에 Bit0=전원, Bit1=동작 규칙을 적용한다.-->
         <!--IBIT 명령 처리 ACK은 공용 CommandStatusReportType으로 수신하며, SCDE/Lidar IBIT Report는 실제 점검 결과 Reply로 처리한다.-->
-      </Reply>
-      <Reply semantic_id="requestIbitLidarResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitLidarResult" required="true">
         <DDSChannel topicName="RUSV::SO::SCDE::LidarIBITReportType" typeName="LidarIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="lidar1Status" cdm="Health.NearContactDetection.Lidar1.Overall" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
@@ -141,7 +141,7 @@
         <!--라이다 IBIT의 category/level/sensorAction은 원문 bit 위치를 PackedField로 분해한다. 각 bit의 동시 설정 가능 여부/우선순위는 원문에 없으므로 별도 운용 규칙을 만들지 않는다.-->
         <!--lidar#Category: Bit14 IO_CONNECTION, 13 CONFIG, 12 MOTOR_CONTROL, 11 WARMUP_ISSUE, 10 INTERNAL_FAULT, 9 UDP_CONNECT, 8 INPUT_VOLTAGE, 7 STARTUP, 6 UDP_TRANSMISSION, 5 ETHERNET_LINK_BAD, 4 INTERNAL_FW, 3 SHOT_LIMITING, 2 INTERNAL_COMM, 1 UNDERTEMP, 0 OVERTEMP; Bit15 reserved.-->
         <!--lidar#Level: Bit3 Error, Bit2 Warning, Bit1 Notice, Bit0 Normal; Bit4~7 reserved. lidar#SensorAction: Bit2 RESTART, Bit1 SHUTDOWN, Bit0 No Action; Bit3~7 reserved.-->
-      </Reply>
+      </ReplyBinding>
       <!--IBIT 결과 Report에는 commandID가 없으므로 CommandStatusReport 외의 명시적 요청 상관관계를 임의로 추가하지 않는다.-->
     </ControlBinding>
   </Controls>

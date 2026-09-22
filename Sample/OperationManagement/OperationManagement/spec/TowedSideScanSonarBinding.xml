@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <SensorBinding xmlns="http://lignex1.com/mcmc2/umsSchema">
 	<Monitors semantic_id="monitor">
 		<MonitorBindingDDS semantic_id="ping.pulseType">
@@ -24,12 +24,12 @@
 			<Field name="timeStamp" cdm="Global.TimeStamp"/>
 			<FixedField name="start" cdm="" value="1"/>
 			<Field name="commandID" cdm="Message.ID"/>
-			<Reply semantic_id="" >
+			<ReplyBinding semantic_id="" >
 				<Channel topicName="XxxType" typeName="XxxType"/>
 				<Field name="platformIDKey" cdm="Platform.NumericID"/>
 				<Field name="equipmentIDKey" cdm="Sensor.NumericID"/>
 				<Field name="timeStamp" cdm="Global.TimeStamp"/>
-			</Reply>
+			</ReplyBinding>
 		</ControlBindingDDS>
 		
 		<ControlBindingDDS semantic_id="stop">

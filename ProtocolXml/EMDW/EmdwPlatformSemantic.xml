@@ -208,7 +208,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true">
+            <ReplySpec id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -230,7 +230,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="startMission" name="EMDW 임무 시작" cdm="Control.Mission.Start">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -240,7 +240,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true">
+            <ReplySpec id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -262,7 +262,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="pauseMission" name="EMDW 임무 일시정지" cdm="Control.Mission.Pause">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -272,7 +272,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="pauseMissionReply" name="Pause Mission Reply" cdm="Control.Mission.Pause.Response" bindRef="pauseMissionReply" required="true">
+            <ReplySpec id="pauseMissionReply" name="Pause Mission Reply" cdm="Control.Mission.Pause.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -294,7 +294,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="resumeMission" name="EMDW 임무 재개" cdm="Control.Mission.Resume">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -304,7 +304,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="resumeMissionReply" name="Resume Mission Reply" cdm="Control.Mission.Resume.Response" bindRef="resumeMissionReply" required="true">
+            <ReplySpec id="resumeMissionReply" name="Resume Mission Reply" cdm="Control.Mission.Resume.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -326,11 +326,11 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="setTerminalControlMode" name="EMDW 관제터미널모드 설정" cdm="Control.Platform.OperationMode.TerminalControl">
             <Target cdm="Platform.Identifier.Numeric" />
-            <Reply id="setTerminalControlModeReply" name="Set Terminal Control Mode Reply" cdm="Control.Platform.OperationMode.TerminalControl.Response" bindRef="setTerminalControlModeReply" required="true">
+            <ReplySpec id="setTerminalControlModeReply" name="Set Terminal Control Mode Reply" cdm="Control.Platform.OperationMode.TerminalControl.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -352,11 +352,11 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="setIntegratedControlMode" name="EMDW 통합통제모드 설정" cdm="Control.Platform.OperationMode.IntegratedControl">
             <Target cdm="Platform.Identifier.Numeric" />
-            <Reply id="setIntegratedControlModeReply" name="Set Integrated Control Mode Reply" cdm="Control.Platform.OperationMode.IntegratedControl.Response" bindRef="setIntegratedControlModeReply" required="true">
+            <ReplySpec id="setIntegratedControlModeReply" name="Set Integrated Control Mode Reply" cdm="Control.Platform.OperationMode.IntegratedControl.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -378,7 +378,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="transferMissionPlan" name="EMDW 임무계획 전송" cdm="Request.MissionPlan.Transfer">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -424,7 +424,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true">
+            <ReplySpec id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -446,7 +446,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="immediateEmergencyStop" name="EMDW 즉시 비상정지" cdm="Control.Platform.EmergencyStop.Immediate">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -461,7 +461,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply id="immediateEmergencyStopReply" name="Immediate Emergency Stop Reply" cdm="Control.Platform.EmergencyStop.Immediate.Response" bindRef="immediateEmergencyStopReply" required="true">
+            <ReplySpec id="immediateEmergencyStopReply" name="Immediate Emergency Stop Reply" cdm="Control.Platform.EmergencyStop.Immediate.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -483,7 +483,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="emergencyStopAndStandby" name="EMDW 임무중지 후 대기" cdm="Control.Platform.EmergencyStop.StopAndStandby">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -498,7 +498,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     </Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply id="emergencyStopAndStandbyReply" name="Emergency Stop And Standby Reply" cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" bindRef="emergencyStopAndStandbyReply" required="true">
+            <ReplySpec id="emergencyStopAndStandbyReply" name="Emergency Stop And Standby Reply" cdm="Control.Platform.EmergencyStop.StopAndStandby.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -520,7 +520,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="setTargetInformation" name="EMDW 표적정보 설정" cdm="Control.Mission.TargetInformation">
             <Parameters>
@@ -566,7 +566,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="cancelDisposalReply" name="Cancel Disposal Reply" cdm="Control.Mission.Disposal.Cancel.Response" bindRef="cancelDisposalReply" required="true">
+            <ReplySpec id="cancelDisposalReply" name="Cancel Disposal Reply" cdm="Control.Mission.Disposal.Cancel.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -588,7 +588,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="prepareDisposal" name="EMDW 처리 준비" cdm="Control.Mission.Disposal.Prepare">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -602,7 +602,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="prepareDisposalReply" name="Prepare Disposal Reply" cdm="Control.Mission.Disposal.Prepare.Response" bindRef="prepareDisposalReply" required="true">
+            <ReplySpec id="prepareDisposalReply" name="Prepare Disposal Reply" cdm="Control.Mission.Disposal.Prepare.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -624,7 +624,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
         <ControlSpec id="executeDisposal" name="EMDW 처리 실행" cdm="Control.Mission.Disposal.Execute">
             <Target cdm="Platform.Identifier.Numeric" />
@@ -638,7 +638,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="executeDisposalReply" name="Execute Disposal Reply" cdm="Control.Mission.Disposal.Execute.Response" bindRef="executeDisposalReply" required="true">
+            <ReplySpec id="executeDisposalReply" name="Execute Disposal Reply" cdm="Control.Mission.Disposal.Execute.Response" required="true">
                 <Results>
                     <ValueSetResult id="result" name="처리 결과" cdm="Command.Result">
                         <Values>
@@ -660,7 +660,7 @@ EMDW 플랫폼 기능 Semantic - 기능 중심 재정의본.
                         </Values>
                     </ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
     </ControlSpecs>
 </PlatformSpec>

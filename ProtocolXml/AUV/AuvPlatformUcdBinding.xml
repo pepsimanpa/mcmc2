@@ -47,7 +47,7 @@
             <!-- UCD-1 bytes 14..15: COMMAND와 INFORMATION에 대한 CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
 
-            <Reply semantic_id="requestAuvCheckReply" required="true">
+            <ReplyBinding semantic_id="requestAuvCheckReply" required="true">
                 <RS422Channel messageType="AuvUcd2Telegram"/>
                 <!-- UCD-2 bytes 0..3: START(2)=0x7E7E, ACK(2 LE)=요청 COMMAND. -->
                 <FixedField name="startByte" value="0x7E7E" dataType="UInt16"/>
@@ -81,7 +81,7 @@
                 </PackedField>
                 <!-- UCD-2 bytes 14..15: ACK와 INFORMATION에 대한 CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->
                 <Field name="checksum" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!--
@@ -104,7 +104,7 @@
             <!-- UCD-1 bytes 14..15: CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
 
-            <Reply semantic_id="emergencyReturnReply" required="true">
+            <ReplyBinding semantic_id="emergencyReturnReply" required="true">
                 <RS422Channel messageType="AuvUcd2Telegram"/>
                 <!-- UCD-2 bytes 0..3: START(2), ACK(2 LE)=0x0020. -->
                 <FixedField name="startByte" value="0x7E7E" dataType="UInt16"/>
@@ -138,7 +138,7 @@
                 </PackedField>
                 <!-- UCD-2 bytes 14..15: CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->
                 <Field name="checksum" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!--
@@ -161,7 +161,7 @@
             <!-- UCD-1 bytes 14..15: CHECKSUM. 값 생성은 OM/실행 계층 책임이다. -->
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
 
-            <Reply semantic_id="deleteAllRecordsReply" required="true">
+            <ReplyBinding semantic_id="deleteAllRecordsReply" required="true">
                 <RS422Channel messageType="AuvUcd2Telegram"/>
                 <!-- UCD-2 bytes 0..3: START(2), ACK(2 LE)=0x0200. -->
                 <FixedField name="startByte" value="0x7E7E" dataType="UInt16"/>
@@ -196,7 +196,7 @@
                 </PackedField>
                 <!-- UCD-2 bytes 14..15: CHECKSUM. 수신값 검증은 OM/실행 계층 책임이다. -->
                 <Field name="checksum" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
     </Controls>
 </PlatformBinding>

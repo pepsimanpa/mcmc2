@@ -63,7 +63,7 @@
                     <Values><Value name="OFF" cdm="Communication.RF.Configuration.LBand.Power.Off"/><Value name="LOW" cdm="Communication.RF.Configuration.LBand.Power.Low"/><Value name="HIGH" cdm="Communication.RF.Configuration.LBand.Power.High"/></Values>
                 </ValueSetProfile>
             </Parameters>
-            <Reply id="configureRfReply" name="Configure Rf Reply" cdm="Control.Communication.RF.Configuration.Response" bindRef="configureRfReply" required="true">
+            <ReplySpec id="configureRfReply" name="Configure Rf Reply" cdm="Control.Communication.RF.Configuration.Response" required="true">
                 <Results>
                     <ValueSetResult id="operationMode" name="RF 운용모드" cdm="Communication.RF.Configuration.OperationMode"><Values><Value name="1:1" cdm="Communication.RF.Configuration.OperationMode.OneToOne"/><Value name="1:2" cdm="Communication.RF.Configuration.OperationMode.OneToTwo"/></Values></ValueSetResult>
                     <ValueSetResult id="timeSlot" name="RF Time Slot" cdm="Communication.RF.Configuration.TimeSlot"><Values><Value name="Time Slot 2" cdm="Communication.RF.Configuration.TimeSlot.Two"/><Value name="Time Slot 4" cdm="Communication.RF.Configuration.TimeSlot.Four"/></Values></ValueSetResult>
@@ -72,7 +72,7 @@
                     <ValueSetResult id="power" name="UHF 출력" cdm="Communication.RF.Configuration.UHF.Power"><Values><Value name="OFF" cdm="Communication.RF.Configuration.UHF.Power.Off"/><Value name="LOW" cdm="Communication.RF.Configuration.UHF.Power.Low"/><Value name="HIGH" cdm="Communication.RF.Configuration.UHF.Power.High"/></Values></ValueSetResult>
                     <ValueSetResult id="power2" name="L-Band 출력" cdm="Communication.RF.Configuration.LBand.Power"><Values><Value name="OFF" cdm="Communication.RF.Configuration.LBand.Power.Off"/><Value name="LOW" cdm="Communication.RF.Configuration.LBand.Power.Low"/><Value name="HIGH" cdm="Communication.RF.Configuration.LBand.Power.High"/></Values></ValueSetResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
 
         <!--
@@ -81,7 +81,7 @@
         -->
         <ControlSpec id="scanRfChannels" name="RF 채널 스캔" cdm="Request.Communication.RF.ChannelScan">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="scanRfChannelsReply" name="Scan Rf Channels Reply" cdm="Request.Communication.RF.ChannelScan.Response" bindRef="scanRfChannelsReply" required="true">
+            <ReplySpec id="scanRfChannelsReply" name="Scan Rf Channels Reply" cdm="Request.Communication.RF.ChannelScan.Response" required="true">
                 <Results>
                     <QuantityResult id="receivedSignalLevel" name="UHF ch.1 수신감도" cdm="Communication.RF.ChannelScan.UHF.Channel1.ReceivedSignalLevel">
                         <Unit>dB</Unit>
@@ -124,7 +124,7 @@
                         <Resolution>1</Resolution>
                     </QuantityResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
 
         <!--
@@ -133,7 +133,7 @@
         -->
         <ControlSpec id="requestRfStatus" name="RF 상태 요청" cdm="Request.Communication.RF.Status">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="requestRfStatusReply" name="Request Rf Status Reply" cdm="Request.Communication.RF.Status.Response" bindRef="requestRfStatusReply" required="true">
+            <ReplySpec id="requestRfStatusReply" name="Request Rf Status Reply" cdm="Request.Communication.RF.Status.Response" required="true">
                 <Results>
                     <ValueSetResult id="operationMode" name="RF 운용모드" cdm="Communication.RF.Configuration.OperationMode"><Values><Value name="1:1" cdm="Communication.RF.Configuration.OperationMode.OneToOne"/><Value name="1:2" cdm="Communication.RF.Configuration.OperationMode.OneToTwo"/></Values></ValueSetResult>
                     <ValueSetResult id="timeSlot" name="RF Time Slot" cdm="Communication.RF.Configuration.TimeSlot"><Values><Value name="Time Slot 2" cdm="Communication.RF.Configuration.TimeSlot.Two"/><Value name="Time Slot 4" cdm="Communication.RF.Configuration.TimeSlot.Four"/></Values></ValueSetResult>
@@ -196,7 +196,7 @@
                         <Result id="sYNCLOCK" name="SYNC_LOCK"/>
                     </GroupResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
 
         <!--
@@ -206,7 +206,7 @@
         -->
         <ControlSpec id="requestPreLaunchCheck" name="RF 출항 전 점검 요청" cdm="Request.Health.Check">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="requestPreLaunchCheckReply" name="Request Pre Launch Check Reply" cdm="Request.Health.Check.Response" bindRef="requestPreLaunchCheckReply" required="true">
+            <ReplySpec id="requestPreLaunchCheckReply" name="Request Pre Launch Check Reply" cdm="Request.Health.Check.Response" required="true">
                 <Results>
                     <GroupResult id="preLaunchCheck" name="Pre_Launch-Check">
                         <Result id="encryptionUnit" name="암호화반"/>
@@ -217,7 +217,7 @@
                         <Result id="mCU" name="MCU"/>
                     </GroupResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
 
         <!--
@@ -242,7 +242,7 @@
         <ControlSpec id="applyRfEncryptionKey" name="사전 주입 RF 암호 키 적용" cdm="Control.Security.PreloadedKey.Apply">
             <Target cdm="Platform.Identifier.Numeric"/>
             <Precondition cdm="Security.PreloadedKey.Available"/>
-            <Reply id="applyRfEncryptionKeyReply" name="Apply Rf Encryption Key Reply" cdm="Control.Security.PreloadedKey.Apply.Response" bindRef="applyRfEncryptionKeyReply" required="true"/>
+            <ReplySpec id="applyRfEncryptionKeyReply" name="Apply Rf Encryption Key Reply" cdm="Control.Security.PreloadedKey.Apply.Response" required="true"/>
         </ControlSpec>
     </ControlSpecs>
 </CommSpec>

@@ -47,24 +47,14 @@
         </xs:simpleContent>
     </xs:complexType>
 
-    <!-- 
-    Summary:
-        Binding 키 정보를 담는 Element 타입 선언    
-    -->
-    <xs:simpleType name="BindRefType">
-        <xs:restriction base="xs:string">
-            <!-- <xs:pattern value="" /> Binding 키 정규식 들어갈 자리 -->
-        </xs:restriction>
-    </xs:simpleType>
 
     <!-- 
     Summary:
-        Binding 키 정보를 담는 Attribute를 갖는 Element 타입 선언    
+        텍스트 콘텐츠를 담는 기본 타입 선언
     -->
-    <xs:complexType name="BindRefAttrType">
+    <xs:complexType name="StringContentType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="bindRef" type="BindRefType" use="optional" />
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -74,7 +64,6 @@
         SemanticSpec이 가질 수 있는 기본 항목들을 선언
     Elements:
         CdmRef: CDM 매핑 키
-        BindRef: BindindSpec 매핑 키
     Attributes:
         SpecAttrs: 
     -->
@@ -349,8 +338,10 @@
 
     <xs:complexType name="ReplySpecType">
         <xs:complexContent>
-            <xs:extension base="BindRefAttrType">
-                <xs:attribute name="cdm" type="CdmRefType" use="optional" />
+            <xs:extension base="StringContentType">
+                <xs:attribute name="id" type="xs:string" use="required" />
+                <xs:attribute name="name" type="xs:string" use="required" />
+                <xs:attribute name="cdm" type="CdmRefType" use="required" />
                 <xs:attribute name="required" type="xs:boolean" />
                 <xs:attribute name="timeout" type="xs:decimal" />
             </xs:extension>
@@ -422,7 +413,7 @@
                     <xs:element name="Target" type="CdmRefAttrType" minOccurs="0" />
                     <xs:element name="Parameters" type="ProfileCompositeType" minOccurs="0" />
                     <xs:element name="Precondition" type="CdmRefAttrType" minOccurs="0" />
-                    <xs:element name="Reply" type="ReplySpecType" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="ReplySpec" type="ReplySpecType" minOccurs="0" maxOccurs="unbounded" />
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

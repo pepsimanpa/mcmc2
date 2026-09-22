@@ -588,11 +588,10 @@ function parseControlGroup(ref, file) {
   return direct(group).filter((node) => ['ControlSpec', 'SetPointSpec'].includes(node.localName)).map((node) => {
       const targetNode = first(node, 'Target');
       const parametersNode = first(node, 'Parameters');
-      const replies = direct(node, 'Reply').map((reply) => ({
-        id: semanticRefId(attr(reply, 'id')) || semanticRefId(attr(reply, 'bindRef')),
-        name: attr(reply, 'name') || attr(reply, 'id') || attr(reply, 'bindRef'),
+      const replies = direct(node, 'ReplySpec').map((reply) => ({
+        id: semanticRefId(attr(reply, 'id')),
+        name: attr(reply, 'name') || attr(reply, 'id'),
         cdm: attr(reply, 'cdm'),
-        bindRef: semanticRefId(attr(reply, 'bindRef')),
         required: attr(reply, 'required') !== 'false',
         timeout: attr(reply, 'timeout'),
         results: direct(first(reply, 'Results')).map(parseProfile),
@@ -791,7 +790,7 @@ function parseBindingGroup(ref, file, kind) {
     .map((node) => {
       const base = parseMessage(node, file.name);
       const replies = kind === 'Control'
-        ? direct(node, 'Reply').map((reply) => ({
+        ? direct(node, 'ReplyBinding').map((reply) => ({
           ...parseMessage(reply, file.name),
           semanticId: semanticRefId(attr(reply, 'semantic_id')),
           required: attr(reply, 'required') !== 'false',
@@ -1070,7 +1069,7 @@ function auditBundle(bundle) {
 
       if (action.kind === 'Control') {
         for (const reply of action.replies) {
-          if (reply.required && !binding.replies.some((item) => item.semanticId === (reply.id || reply.bindRef))) {
+          if (reply.required && !binding.replies.some((item) => item.semanticId === reply.id)) {
             bundle.diagnostics.push({
               level: 'error',
               code: 'REPLY_LINK',
@@ -1900,12 +1899,12 @@ function renderReplyOverview(control) {
   for (const reply of control.replies) {
     const item = el('article', 'reply-item');
     item.append(
-      el('strong', '', reply.id || reply.bindRef),
+      el('strong', '', reply.id),
       el('small', '', `${reply.name || '표시명 미정'} · ${reply.cdm || 'CDM 미정'} · ${reply.required ? '필수' : '선택'}${reply.timeout ? ` · timeout ${reply.timeout}` : ''}`),
     );
     const variants = control.bindings.flatMap((binding) => (
       binding.replies
-        .filter((candidate) => candidate.semanticId === (reply.id || reply.bindRef))
+        .filter((candidate) => candidate.semanticId === reply.id)
         .map((candidate) => ({ binding, candidate }))
     ));
     for (const entry of variants) {
@@ -1980,7 +1979,7 @@ function showFeature(id, options = {}) {
       ['CDM', primaryAction.cdm],
       ['Semantic', primaryAction.sourceFile],
       ['Local ID', primaryAction.semanticId],
-      ['Reply', primaryAction.kind === 'Control' ? primaryAction.replies.map((item) => item.id || item.bindRef).join(', ') || 'No Reply' : '해당 없음'],
+      ['Reply', primaryAction.kind === 'Control' ? primaryAction.replies.map((item) => item.id).join(', ') || 'No Reply' : '해당 없음'],
       ['선택', `${state.selectedFeatures.size}개 항목`],
     ]),
   );
@@ -2828,7 +2827,7 @@ function renderHmiContract(action) {
     for (const reply of action.replies) {
       const card = el('article', 'hmi-reply-card');
       const head = el('header');
-      head.append(el('code', '', reply.id || reply.bindRef || 'Reply id 미정'));
+      head.append(el('code', '', reply.id || 'ReplySpec id 미정'));
       if (!reply.required || reply.timeout) {
         head.append(el('small', '', `${reply.required ? '' : '선택 응답'}${reply.timeout ? ` timeout ${reply.timeout}` : ''}`.trim()));
       }
@@ -3357,7 +3356,7 @@ function renderReplyResult(control, reply) {
   );
   body.append(executionRow);
 
-  const semanticReply = control.replies.find((item) => (item.id || item.bindRef) === reply.semanticId);
+  const semanticReply = control.replies.find((item) => item.id === reply.semanticId);
   const outputs = flattenSemanticProfiles(semanticReply?.results || []).map(mockReplyOutput);
   for (const output of outputs) {
     const row = el('tr');

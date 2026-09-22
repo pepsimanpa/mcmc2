@@ -396,7 +396,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="stopMissionReply" required="true">
+            <ReplyBinding semantic_id="stopMissionReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -439,7 +439,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="startMission">
             <TCPChannel infoCode="3001" messageType="T_MDV_MISSION_CTRL_CMD" />
@@ -464,7 +464,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="startMissionReply" required="true">
+            <ReplyBinding semantic_id="startMissionReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -507,7 +507,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="pauseMission">
             <TCPChannel infoCode="3001" messageType="T_MDV_MISSION_CTRL_CMD" />
@@ -532,7 +532,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="pauseMissionReply" required="true">
+            <ReplyBinding semantic_id="pauseMissionReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -575,7 +575,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="resumeMission">
             <TCPChannel infoCode="3001" messageType="T_MDV_MISSION_CTRL_CMD" />
@@ -600,7 +600,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
             <Field name="missionId" cdm="Mission.Identifier" dataType="UInt32" />
             <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="resumeMissionReply" required="true">
+            <ReplyBinding semantic_id="resumeMissionReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -643,7 +643,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="setLegacyMode">
             <TCPChannel infoCode="3002" messageType="T_MDV_MODE_SET_CMD" />
@@ -667,7 +667,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
             <FixedField name="operationMode" value="0" dataType="UInt8" />
             <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="setLegacyModeReply" required="true">
+            <ReplyBinding semantic_id="setLegacyModeReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -710,7 +710,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="setAutonomousMode">
             <TCPChannel infoCode="3002" messageType="T_MDV_MODE_SET_CMD" />
@@ -734,7 +734,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
             <FixedField name="operationMode" value="1" dataType="UInt8" />
             <FixedField name="reserved" value="0" dataType="UInt8" length="5" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="setAutonomousModeReply" required="true">
+            <ReplyBinding semantic_id="setAutonomousModeReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -777,7 +777,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="transferMissionPlan">
             <TCPChannel infoCode="3003" messageType="T_MDV_MISSION_PLAN_INFO" />
@@ -824,7 +824,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
             </Field>
             <FixedField name="reserved" value="0" dataType="UInt8" length="3" />
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="transferMissionPlanReply" required="true">
+            <ReplyBinding semantic_id="transferMissionPlanReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -867,7 +867,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="immediateEmergencyStop">
             <TCPChannel infoCode="3004" messageType="T_MDV_EMERGENCY_STOP_CMD" />
@@ -899,7 +899,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 </ValueMap>
             </Field>
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="immediateEmergencyStopReply" required="true">
+            <ReplyBinding semantic_id="immediateEmergencyStopReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -942,7 +942,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="emergencyStopAndStandby">
             <TCPChannel infoCode="3004" messageType="T_MDV_EMERGENCY_STOP_CMD" />
@@ -974,7 +974,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 </ValueMap>
             </Field>
             <FixedField name="tail" value="0x55555555" dataType="UInt32" />
-            <Reply semantic_id="emergencyStopAndStandbyReply" required="true">
+            <ReplyBinding semantic_id="emergencyStopAndStandbyReply" required="true">
                 <TCPChannel infoCode="3301" messageType="T_MDV_CTRL_RESP" />
                 <!-- 수신 T_TCP_HEADER(24 bytes). infoCode=3301, packetLength=56 여부는 Adapter 검증 조건이다. -->
                 <Field name="preamble" dataType="UInt32" />
@@ -1017,7 +1017,7 @@ T_HEARTBEAT의 물리 양방향 송수신은 유지하며 Semantic Monitor 방�
                 <Field name="reserved" dataType="UInt8" length="5" />
                 <!-- 수신 T_TCP_TAIL(4 bytes), 기대값 0x55555555. -->
                 <Field name="tail" dataType="UInt32" />
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
         <ControlBinding semantic_id="setTargetInformation">
             <TCPChannel infoCode="3005" messageType="T_MDV_TARGET_INFO_CMD" />

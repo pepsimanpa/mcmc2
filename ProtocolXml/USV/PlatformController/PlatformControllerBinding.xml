@@ -420,28 +420,28 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.PlatformController"/>
-      <Reply semantic_id="startIntegrationAck" required="true">
+      <ReplyBinding semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="restartSystem">
       <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.PlatformController"/>
-      <Reply semantic_id="restartSystemAck" required="true">
+      <ReplyBinding semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="requestIbit">
       <!--DestinationType는 선체제어장치 CSCI를 가리킨다. 내부 Engine/WaterJet 등의 별도 subEquipment 식별값은 근거가 없어 사용하지 않는다.-->
@@ -449,16 +449,16 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.PlatformController"/>
-      <Reply semantic_id="requestIbitAck" required="true">
+      <ReplyBinding semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
       <!--상세 IBIT는 서로 다른 물리 메시지 타입별 Reply를 유지한다. 장치별 세부 primitive type은 원 선체제어 CSCI/IDL 재확인 전 임의 선언하지 않는다.-->
-      <Reply semantic_id="requestIbitEngineResult">
+      <ReplyBinding semantic_id="requestIbitEngineResult">
         <DDSChannel topicName="RUSV::SO::SPCE::EngineIBITReportType" typeName="EngineIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="engineStatus" dataType="UInt8"/>
@@ -492,8 +492,8 @@
         <Field name="starboardTransGear" dataType="UInt8"/>
         <Field name="starboardTransOilPressure" dataType="UInt16"/>
         <Field name="starboardTransOilTemperature" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestIbitWaterJetResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitWaterJetResult">
         <DDSChannel topicName="RUSV::SO::SPCE::WaterJetIBITReportType" typeName="WaterJetIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="portWaterjetStatus" dataType="UInt8"/>
@@ -522,8 +522,8 @@
         <Field name="starboardBucketFeedbackOutOfSpan" dataType="UInt8"/>
         <Field name="starboardNozzleNotInSetPoint" dataType="UInt8"/>
         <Field name="starboardNozzleFeedbackSensorError" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitBowThrusterResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitBowThrusterResult">
         <DDSChannel topicName="RUSV::SO::SPCE::BowThrusterIBITReportType" typeName="BowThrusterIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="bowThrusterStatus" dataType="UInt8"/>
@@ -532,8 +532,8 @@
         <Field name="bowThrusterTemperature" dataType="UInt16"/>
         <Field name="bowThrusterMotorCurrent" dataType="UInt8"/>
         <Field name="bowThrusterMotorOperationTime" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestIbitPowerResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitPowerResult">
         <DDSChannel topicName="RUSV::SO::SPCE::PowerIBITReportType" typeName="PowerIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="pduStatus" dataType="UInt8"/>
@@ -640,8 +640,8 @@
         <Field name="commonDeviceCS" dataType="UInt16"/>
         <Field name="commonContVS" dataType="UInt16"/>
         <Field name="commonContCS" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestIbitBatteryResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitBatteryResult">
         <DDSChannel topicName="RUSV::SO::SPCE::BatteryIBITReportType" typeName="BatteryIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="batteryOperationMode" dataType="UInt8"/>
@@ -654,8 +654,8 @@
         <Field name="moduleStatus1" dataType="UInt8"/>
         <Field name="moduleStatus2" dataType="UInt8"/>
         <Field name="moduleStatus3" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitGeneratorResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitGeneratorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::GeneratorIBITReportType" typeName="GeneratorIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="portGeneratorStatus" dataType="UInt8"/>
@@ -690,36 +690,36 @@
         <Field name="starboardTemperatureWinding" dataType="UInt8"/>
         <Field name="starboardTemperatureExhaust" dataType="UInt8"/>
         <Field name="starboardTemperatureMCU" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitEnvironmentResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitEnvironmentResult">
         <DDSChannel topicName="RUSV::SO::SPCE::EnvironmentIBITReportType" typeName="EnvironmentIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="environmentSensorDeviceStatus" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitWindSensorResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitWindSensorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::WindSensorIBITReportType" typeName="WindSensorIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="windSensorStatus" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitFireDetectorResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitFireDetectorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::FireDetectorIBITReportType" typeName="FireDetectorIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="fireDetectorStatus" dataType="UInt8"/>
         <Field name="fireDetected" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitLeakDetectorResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitLeakDetectorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::LeakDetectorIBITReportType" typeName="LeakDetectorIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="leakDetectorStatus" dataType="UInt8"/>
         <Field name="leakDetected" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitFlowMeterResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitFlowMeterResult">
         <DDSChannel topicName="RUSV::SO::SPCE::FlowMeterIBITReportType" typeName="FlowMeterIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="flowMeterStatus" dataType="UInt8"/>
         <Field name="flowAnomalyDetected" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitStabilizerResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitStabilizerResult">
         <DDSChannel topicName="RUSV::SO::SPCE::StabilizerIBITReportType" typeName="StabilizerIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="stabilizerStatus" dataType="UInt8"/>
@@ -733,8 +733,8 @@
         <Field name="batteryLevel" dataType="UInt8"/>
         <Field name="batteryVoltage" dataType="UInt8"/>
         <Field name="driveTemp" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitInterceptorResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitInterceptorResult">
         <DDSChannel topicName="RUSV::SO::SPCE::InterceptorIBITReportType" typeName="InterceptorIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="interceptorStatus" dataType="UInt8"/>
@@ -751,15 +751,15 @@
         <Field name="starboardDemandPosition" dataType="UInt8"/>
         <Field name="portAutoDemandPosition" dataType="UInt8"/>
         <Field name="starboardAutoDemandPosition" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitSeaWaterConditionerResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitSeaWaterConditionerResult">
         <DDSChannel topicName="RUSV::SO::SPCE::SeaWaterConditionerIBITReportType" typeName="SeaWaterConditionerIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="seaWaterAirConditionerStatus" dataType="UInt8"/>
         <Field name="seawaterFlowSensorStatus" dataType="UInt8"/>
         <Field name="strainerBlockageDetectStatus" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitTowingDeviceResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitTowingDeviceResult">
         <DDSChannel topicName="RUSV::SO::SPCE::TowingDeviceIBITReportType" typeName="TowingDeviceIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="towingDeviceStatus" dataType="UInt8"/>
@@ -768,8 +768,8 @@
         <Field name="towingDeviceOverCurrentStatus" dataType="UInt8"/>
         <Field name="towingDeviceCardErrorStatus" dataType="UInt8"/>
         <Field name="towingDeviceActuatorErrorStatus" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestIbitSPCEResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitSPCEResult">
         <DDSChannel topicName="RUSV::SO::SPCE::SPCEIBITReportType" typeName="SPCEIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="spceStatus" dataType="UInt8"/>
@@ -777,22 +777,22 @@
         <Field name="vcuProcessorIBIT"/>
         <Field name="vcuTmpStatus" dataType="UInt8"/>
         <Field name="vcuTmpProcessorIBIT"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="requestPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <DerivedField name="destination" sourceField="System.Target.PlatformController"/>
-      <Reply semantic_id="requestPbitAck" required="true">
+      <ReplyBinding semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestPbitPropulsionResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitPropulsionResult">
         <DDSChannel topicName="RUSV::SO::SPCE::PropulsionPBITReportType" typeName="PropulsionPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="portEngineStatus" dataType="UInt8"/>
@@ -800,8 +800,8 @@
         <Field name="portWaterjetStatus" dataType="UInt8"/>
         <Field name="starboardWaterjetStatus" dataType="UInt8"/>
         <Field name="bowThrustertStatus" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestPbitElectricalResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitElectricalResult">
         <DDSChannel topicName="RUSV::SO::SPCE::ElectricalPBITReportType" typeName="ElectricalPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="pduStatus" dataType="UInt8"/>
@@ -809,8 +809,8 @@
         <Field name="portGeneratorStatus" dataType="UInt8"/>
         <Field name="starboardGeneratorStatus" dataType="UInt8"/>
         <Field name="powerStatus" dataType="UInt64"/>
-      </Reply>
-      <Reply semantic_id="requestPbitAccessoriesResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitAccessoriesResult">
         <DDSChannel topicName="RUSV::SO::SPCE::AccessoriesPBITReportType" typeName="AccessoriesPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="environmentSensorDeviceStatus" dataType="UInt8"/>
@@ -823,132 +823,132 @@
         <Field name="flowAnomalyDetected" dataType="UInt8"/>
         <Field name="stabilizerStatus" dataType="UInt8"/>
         <Field name="interceptorStatus" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestPbitSubsystemResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitSubsystemResult">
         <DDSChannel topicName="RUSV::SO::SPCE::SubsystemPBITReportType" typeName="SubsystemPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="seaWaterAirConditionerStatus" dataType="UInt8"/>
         <Field name="towingDeviceStatus" dataType="UInt8"/>
-      </Reply>
-      <Reply semantic_id="requestPbitSPCEResult">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitSPCEResult">
         <DDSChannel topicName="RUSV::SO::SPCE::SPCEPBITReportType" typeName="SPCEPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="spceStatus" dataType="UInt8"/>
         <Field name="vcuStatus" dataType="UInt8"/>
         <Field name="vcuTmpStatus" dataType="UInt8"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="setEmergencyStopMode">
       <DDSChannel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <FixedField name="operationModeControlStatus.operationMode" value="0" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setEmergencyStopModeAck" required="true">
+      <ReplyBinding semantic_id="setEmergencyStopModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="setEmergencyReturnMode">
       <DDSChannel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <FixedField name="operationModeControlStatus.operationMode" value="1" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setEmergencyReturnModeAck" required="true">
+      <ReplyBinding semantic_id="setEmergencyReturnModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="setRemoteManualMode">
       <DDSChannel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <FixedField name="operationModeControlStatus.operationMode" value="2" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setRemoteManualModeAck" required="true">
+      <ReplyBinding semantic_id="setRemoteManualModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="setLocalManualMode">
       <DDSChannel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <FixedField name="operationModeControlStatus.operationMode" value="3" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setLocalManualModeAck" required="true">
+      <ReplyBinding semantic_id="setLocalManualModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="setAutonomousMode">
       <DDSChannel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <FixedField name="operationModeControlStatus.operationMode" value="4" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setAutonomousModeAck" required="true">
+      <ReplyBinding semantic_id="setAutonomousModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="setStandbyMode">
       <DDSChannel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <FixedField name="operationModeControlStatus.operationMode" value="5" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setStandbyModeAck" required="true">
+      <ReplyBinding semantic_id="setStandbyModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="setMaintenanceMode">
       <DDSChannel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <FixedField name="operationModeControlStatus.operationMode" value="6" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setMaintenanceModeAck" required="true">
+      <ReplyBinding semantic_id="setMaintenanceModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="setEmergencyActionMode">
       <DDSChannel topicName="RUSV::C2::RCU::OperationModeControlType" typeName="OperationModeControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <FixedField name="operationModeControlStatus.operationMode" value="7" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setEmergencyActionModeAck" required="true">
+      <ReplyBinding semantic_id="setEmergencyActionModeAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <!--장비별 PowerControl mask 조립은 bit mapping 확정 전 OM/Adapter 책임으로 둔다. Binding에는 완성된 UInt64 wire 값만 연결한다.-->
         <ControlBinding semantic_id="powerOnEquipment">
@@ -958,14 +958,14 @@
       <DerivedField name="stateControl" sourceField="System.Prepared.PlatformPowerStateMask" dataType="UInt64"/>
       <FixedField name="reset" value="0" dataType="UInt64"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="powerOnEquipmentAck" required="true">
+      <ReplyBinding semantic_id="powerOnEquipmentAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="powerOffEquipment">
       <DDSChannel topicName="RUSV::C2::RCU::PowerControlType" typeName="PowerControlType"/>
@@ -974,14 +974,14 @@
       <FixedField name="stateControl" value="0" dataType="UInt64"/>
       <FixedField name="reset" value="0" dataType="UInt64"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="powerOffEquipmentAck" required="true">
+      <ReplyBinding semantic_id="powerOffEquipmentAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="resetEquipmentPower">
       <!--reset 동작 시 stateControl의 동시 적용 의미는 CSCI에서 불명확하여 값을 고정하지 않는다.-->
@@ -991,28 +991,28 @@
       <DerivedField name="stateControl" sourceField="System.Prepared.PlatformPowerStateMask" dataType="UInt64"/>
       <DerivedField name="reset" sourceField="System.Prepared.PlatformPowerResetMask" dataType="UInt64"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="resetEquipmentPowerAck" required="true">
+      <ReplyBinding semantic_id="resetEquipmentPowerAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
         <ControlBinding semantic_id="configureSurveillanceCameraPower">
       <DDSChannel topicName="RUSV::SO::RCU::CamPowerControlType" typeName="CamPowerControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="cctvMask" sourceField="System.Prepared.CameraPowerMask" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="configureSurveillanceCameraPowerAck" required="true">
+      <ReplyBinding semantic_id="configureSurveillanceCameraPowerAck" required="true">
         <DDSChannel topicName="RUSV::C2::SPCE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <!--ENVCommandType은 ACK=O이나 commandID가 없어 CommandStatusReport Reply를 강제로 연결하지 않는다.-->
         <ControlBinding semantic_id="configureEnvironmentSystem">

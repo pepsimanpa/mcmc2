@@ -101,14 +101,14 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.SensorFusion"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="startIntegrationAck" required="true">
+      <ReplyBinding semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="restartSystem">
@@ -116,14 +116,14 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.SensorFusion"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="restartSystemAck" required="true">
+      <ReplyBinding semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="requestIbit">
@@ -131,15 +131,15 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.SensorFusion"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="requestIbitAck" required="true">
+      <ReplyBinding semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::CIPE::CIPEIBITReportType" typeName="CIPEIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8">
@@ -165,7 +165,7 @@
         <!--DDS에는 CPU 상태 enum이 별도로 존재하지 않으며 실제 cpuTemperature/cpuLoad 값만 전달된다.-->
         <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature" dataType="Float64"/>
         <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.CIPE.Processor.CpuLoad" dataType="Float64"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="requestPbit">
@@ -173,15 +173,15 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.SensorFusion"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="requestPbitAck" required="true">
+      <ReplyBinding semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::CIPE::CIPEPBITReportType" typeName="CIPEPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8">
@@ -204,7 +204,7 @@
             <Map cdm="Health.NoResponse" value="3"/>
           </ValueMap>
         </Field>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
   </Controls>
 </SensorBinding>

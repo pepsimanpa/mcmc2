@@ -41,7 +41,7 @@
         -->
         <ControlSpec id="requestAuvCheck" name="AUV 점검 요청" cdm="Request.Health.Check">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="requestAuvCheckReply" name="Request Auv Check Reply" cdm="Request.Health.Check.Response" bindRef="requestAuvCheckReply" required="true">
+            <ReplySpec id="requestAuvCheckReply" name="Request Auv Check Reply" cdm="Request.Health.Check.Response" required="true">
                 <Results>
                     <!-- 각 bit의 물리 0/1과 정확한 offset은 Binding에서 정의한다. -->
                     <GroupResult id="detailedCheckResults" name="상세 점검 결과" required="false">
@@ -124,7 +124,7 @@
                         <Result id="mCSTEST" name="MCS_TEST"/>
                     </GroupResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
 
         <!--
@@ -175,7 +175,7 @@
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" bindRef="transferMissionPlanReply" required="true"/>
+            <ReplySpec id="transferMissionPlanReply" name="Transfer Mission Plan Reply" cdm="Request.MissionPlan.Transfer.Response" required="true"/>
         </ControlSpec>
 
         <!--
@@ -196,7 +196,7 @@
                     <Resolution>1</Resolution>
                 </QuantityProfile>
             </Parameters>
-            <Reply id="controlAuvLocallyReply" name="Control Auv Locally Reply" cdm="Control.Platform.Motion.Response" bindRef="controlAuvLocallyReply" required="true"/>
+            <ReplySpec id="controlAuvLocallyReply" name="Control Auv Locally Reply" cdm="Control.Platform.Motion.Response" required="true"/>
         </ControlSpec>
 
         <!--
@@ -206,7 +206,7 @@
         -->
         <ControlSpec id="requestAuvStatus" name="AUV 상태 요청" cdm="Request.Platform.Status">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="requestAuvStatusReply" name="Request Auv Status Reply" cdm="Request.Platform.Status.Response" bindRef="requestAuvStatusReply" required="true">
+            <ReplySpec id="requestAuvStatusReply" name="Request Auv Status Reply" cdm="Request.Platform.Status.Response" required="true">
                 <Results>
                     <QuantityResult id="numeric" name="AUV ID" cdm="Platform.Identifier.Numeric"/>
                     <QuantityResult id="remainingPercent" name="배터리 용량" cdm="Platform.Energy.Battery.RemainingPercent">
@@ -237,7 +237,7 @@
                         <Result id="mSSTOP" name="MS_STOP"/><Result id="rECDEL" name="REC_DEL"/><Result id="rFCONF" name="RF_CONF"/><Result id="eOR" name="EOR"/>
                     </GroupResult>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
 
         <!--
@@ -247,7 +247,7 @@
         -->
         <ControlSpec id="startMission" name="AUV 임무 시작" cdm="Control.Mission.Start">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" bindRef="startMissionReply" required="true"/>
+            <ReplySpec id="startMissionReply" name="Start Mission Reply" cdm="Control.Mission.Start.Response" required="true"/>
         </ControlSpec>
 
         <!--
@@ -262,7 +262,7 @@
                 <QuantityProfile id="emergencyLatitude" name="비상복귀 위도" cdm="Autonomy.EmergencyReturn.Position.Latitude"><Unit>rad</Unit></QuantityProfile>
                 <QuantityProfile id="emergencyLongitude" name="비상복귀 경도" cdm="Autonomy.EmergencyReturn.Position.Longitude"><Unit>rad</Unit></QuantityProfile>
             </Parameters>
-            <Reply id="emergencyReturnReply" name="Emergency Return Reply" cdm="Control.Mission.EmergencyReturn.Response" bindRef="emergencyReturnReply" required="true"/>
+            <ReplySpec id="emergencyReturnReply" name="Emergency Return Reply" cdm="Control.Mission.EmergencyReturn.Response" required="true"/>
         </ControlSpec>
 
         <!--
@@ -273,7 +273,7 @@
         -->
         <ControlSpec id="requestFileList" name="AUV 파일 목록 요청" cdm="Request.RecordedData.FileList">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="requestFileListReply" name="Request File List Reply" cdm="Request.RecordedData.FileList.Response" bindRef="requestFileListReply" required="true">
+            <ReplySpec id="requestFileListReply" name="Request File List Reply" cdm="Request.RecordedData.FileList.Response" required="true">
                 <Results>
                     <QuantityResult id="fileCount" name="AUV 데이터 파일 개수" cdm="RecordedData.Platform.FileCount"/>
                     <QuantityResult id="fileCount2" name="측면주사소나 파일 개수" cdm="RecordedData.SideScanSonar.FileCount"/>
@@ -281,7 +281,7 @@
                     <QuantityResult id="fileCount4" name="초음파카메라 파일 개수" cdm="RecordedData.AcousticCamera.FileCount"/>
                     <QuantityResult id="fileCount5" name="전방주사소나 파일 개수" cdm="RecordedData.ForwardLookingSonar.FileCount"/>
                 </Results>
-            </Reply>
+            </ReplySpec>
         </ControlSpec>
 
         <!--
@@ -305,17 +305,17 @@
 
         <ControlSpec id="stopMission" name="AUV 임무 중지" cdm="Control.Mission.Stop">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" bindRef="stopMissionReply" required="true"/>
+            <ReplySpec id="stopMissionReply" name="Stop Mission Reply" cdm="Control.Mission.Stop.Response" required="true"/>
         </ControlSpec>
 
         <ControlSpec id="deleteAllRecords" name="AUV 저장자료 전체 삭제" cdm="Request.RecordedData.DeleteAll">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="deleteAllRecordsReply" name="Delete All Records Reply" cdm="Request.RecordedData.DeleteAll.Response" bindRef="deleteAllRecordsReply" required="true"/>
+            <ReplySpec id="deleteAllRecordsReply" name="Delete All Records Reply" cdm="Request.RecordedData.DeleteAll.Response" required="true"/>
         </ControlSpec>
 
         <ControlSpec id="enterMaintenanceMode" name="AUV 정비장비모드 진입" cdm="Control.Platform.MaintenanceMode.Enter">
             <Target cdm="Platform.Identifier.Numeric"/>
-            <Reply id="enterMaintenanceModeReply" name="Enter Maintenance Mode Reply" cdm="Control.Platform.MaintenanceMode.Enter.Response" bindRef="enterMaintenanceModeReply" required="true"/>
+            <ReplySpec id="enterMaintenanceModeReply" name="Enter Maintenance Mode Reply" cdm="Control.Platform.MaintenanceMode.Enter.Response" required="true"/>
         </ControlSpec>
 
         <ControlSpec id="setFlashBrightness" name="AUV 점멸등 밝기 설정" cdm="Control.Equipment.Light.Brightness">
@@ -323,7 +323,7 @@
             <Parameters>
                 <QuantityProfile id="brightness" name="Brightness" cdm="Equipment.Light.Brightness"><Range min="1" max="10"/><Resolution>1</Resolution></QuantityProfile>
             </Parameters>
-            <Reply id="setFlashBrightnessReply" name="Set Flash Brightness Reply" cdm="Control.Equipment.Light.Brightness.Response" bindRef="setFlashBrightnessReply" required="true"/>
+            <ReplySpec id="setFlashBrightnessReply" name="Set Flash Brightness Reply" cdm="Control.Equipment.Light.Brightness.Response" required="true"/>
         </ControlSpec>
     </ControlSpecs>
 

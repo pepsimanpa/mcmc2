@@ -72,7 +72,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="requestAuvCheckReply" required="true">
+            <ReplyBinding semantic_id="requestAuvCheckReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER: START(4), COUNT(4), COMMAND(2), ACK(4). -->
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
@@ -231,7 +231,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!--
@@ -291,7 +291,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="transferMissionPlanReply" required="true">
+            <ReplyBinding semantic_id="transferMissionPlanReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <!-- RF-2 bytes 0..13 HEADER. -->
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
@@ -343,7 +343,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!--
@@ -381,7 +381,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="controlAuvLocallyReply" required="true">
+            <ReplyBinding semantic_id="controlAuvLocallyReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -430,7 +430,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!-- Binding: requestAuvStatus / Status_Chk(bit3)|RF_SEND=0x40000008, INFORMATION3. -->
@@ -462,7 +462,7 @@
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
 
-            <Reply semantic_id="requestAuvStatusReply" required="true">
+            <ReplyBinding semantic_id="requestAuvStatusReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -547,7 +547,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!-- Binding: startMission / MISSION_START(bit4)|RF_SEND=0x40000010. -->
@@ -578,7 +578,7 @@
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            <Reply semantic_id="startMissionReply" required="true">
+            <ReplyBinding semantic_id="startMissionReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -627,7 +627,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!-- Binding: emergencyReturn / EMER_RETURN(bit5)|RF_SEND=0x40000020. -->
@@ -658,7 +658,7 @@
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            <Reply semantic_id="emergencyReturnReply" required="true">
+            <ReplyBinding semantic_id="emergencyReturnReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -707,7 +707,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!-- Binding: requestFileList / File_List_Req(bit6)|RF_SEND=0x40000040. -->
@@ -738,7 +738,7 @@
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            <Reply semantic_id="requestFileListReply" required="true">
+            <ReplyBinding semantic_id="requestFileListReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -787,7 +787,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!-- Binding: requestData / Data_Req(bit7)|RF_SEND=0x40000080. RF-3 데이터 스트림 시작 요청. -->
@@ -854,7 +854,7 @@
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            <Reply semantic_id="stopMissionReply" required="true">
+            <ReplyBinding semantic_id="stopMissionReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -903,7 +903,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!-- Binding: deleteAllRecords / Record_Del(bit9)|RF_SEND=0x40000200. -->
@@ -934,7 +934,7 @@
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            <Reply semantic_id="deleteAllRecordsReply" required="true">
+            <ReplyBinding semantic_id="deleteAllRecordsReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -983,7 +983,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!-- Binding: enterMaintenanceMode / MTE_MODE(bit10)|RF_SEND=0x40000400. -->
@@ -1014,7 +1014,7 @@
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            <Reply semantic_id="enterMaintenanceModeReply" required="true">
+            <ReplyBinding semantic_id="enterMaintenanceModeReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -1063,7 +1063,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
 
         <!-- Binding: setFlashBrightness / FLASH(bit15)|RF_SEND=0x40008000. -->
@@ -1094,7 +1094,7 @@
             <FixedField name="reserveInformation3" value="0" dataType="UInt8" length="8"/>
             <DerivedField name="checksum" sourceField="System.Frame.Checksum" dataType="UInt16"/>
             <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            <Reply semantic_id="setFlashBrightnessReply" required="true">
+            <ReplyBinding semantic_id="setFlashBrightnessReply" required="true">
                 <TCPChannel messageType="AuvRf2Telegram"/>
                 <FixedField name="startByte" value="0x7E7E7E7E" dataType="UInt32"/>
                 <Field name="count" dataType="UInt32"/>
@@ -1143,7 +1143,7 @@
                 <Field name="statusCode" dataType="UInt8"/>
                 <Field name="checksum" dataType="UInt16"/>
                 <FixedField name="stopByte" value="0x8181" dataType="UInt16"/>
-            </Reply>
+            </ReplyBinding>
         </ControlBinding>
     </Controls>
     <SensorProducts semantic_id="sensorProduct">

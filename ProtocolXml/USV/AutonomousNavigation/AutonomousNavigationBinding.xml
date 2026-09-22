@@ -114,67 +114,67 @@
       <DDSChannel topicName="RUSV::C2::RCU::IntegrationControlType" typeName="IntegrationControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <DerivedField name="destination" sourceField="System.Target.AutonomousNavigation"/><Reply semantic_id="startIntegrationAck" required="true">
+      <DerivedField name="destination" sourceField="System.Target.AutonomousNavigation"/><ReplyBinding semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="restartSystem">
       <DDSChannel topicName="RUSV::C2::RCU::SystemRebootControlType" typeName="SystemRebootControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <DerivedField name="destination" sourceField="System.Target.AutonomousNavigation"/><Reply semantic_id="restartSystemAck" required="true">
+      <DerivedField name="destination" sourceField="System.Target.AutonomousNavigation"/><ReplyBinding semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestPbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUPBITControlType" typeName="RCUPBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <DerivedField name="destination" sourceField="System.Target.AutonomousNavigation"/><Reply semantic_id="requestPbitAck" required="true">
+      <DerivedField name="destination" sourceField="System.Target.AutonomousNavigation"/><ReplyBinding semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::ANU::ANUPBITReportType" typeName="ANUPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="operationalStatus" cdm="Health.PBIT.AutonomousNavigation.Status" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
         <!--ANUPBITReportType Range 0~1은 비고의 0~3 및 CBIT/IBIT와 충돌하므로 0~3 상태 체계를 적용한다.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="requestIbit">
       <DDSChannel topicName="RUSV::SO::RCU::RCUIBITControlType" typeName="RCUIBITControlType"/>
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <DerivedField name="destination" sourceField="System.Target.AutonomousNavigation"/><Reply semantic_id="requestIbitAck" required="true">
+      <DerivedField name="destination" sourceField="System.Target.AutonomousNavigation"/><ReplyBinding semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::ANU::ANUIBITReportType" typeName="ANUIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="operationalIBITStatus" cdm="Health.IBIT.AutonomousNavigation.Status" dataType="UInt8"><ValueMap><Map cdm="Health.Normal" value="0"/><Map cdm="Health.Degraded" value="1"/><Map cdm="Health.Unavailable" value="2"/><Map cdm="Health.NoResponse" value="3"/></ValueMap></Field>
         <Field name="anuProcessorIBIT.cpuTemperature" cdm="Health.IBIT.CPU.Temperature" dataType="Float64"/>
         <Field name="anuProcessorIBIT.cpuLoad" cdm="Health.IBIT.CPU.Load" dataType="Float64"/>
         <!--ProcessorIBIT의 cpuTemperature/cpuLoad만 의미 필드로 노출하며 임계값은 원문 참고 주석 수준으로 유지한다.-->
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="recordWaypointMission">
       <DDSChannel topicName="RUSV::C2::RCU::WaypointRecordCommandType" typeName="WaypointRecordCommandType"/>
@@ -194,15 +194,15 @@
       <Field name="waypointRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
       <Field name="waypointRecordCommandStatus.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance" dataType="UInt32"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="recordWaypointMissionAck" required="true">
+      <ReplyBinding semantic_id="recordWaypointMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="recordWaypointMissionRecordAck" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="recordWaypointMissionRecordAck" required="true">
         <DDSChannel topicName="RUSV::MM::ANU::WaypointRecordCommandAckReportType" typeName="WaypointRecordCommandAckReportType"/>
         <Field name="usvHeader"/>
         <ArrayField name="responseWaypointRecordCommand.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
@@ -219,7 +219,7 @@
         </ArrayField>
         <Field name="responseWaypointRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
         <Field name="responseWaypointRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance" dataType="UInt32"/>
-      </Reply>
+      </ReplyBinding>
       <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
     </ControlBinding>
     <ControlBinding semantic_id="recordGlobalHoverMission">
@@ -238,15 +238,15 @@
       <Field name="globalHoverRecordCommandStatus.enableModeRadius" cdm="Autonomy.Mission.Record.EnableModeRadius" dataType="Float64"/>
       <Field name="globalHoverRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="recordGlobalHoverMissionAck" required="true">
+      <ReplyBinding semantic_id="recordGlobalHoverMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="recordGlobalHoverMissionRecordAck" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="recordGlobalHoverMissionRecordAck" required="true">
         <DDSChannel topicName="RUSV::MM::ANU::GlobalHoverRecordCommandAckReportType" typeName="GlobalHoverRecordCommandAckReportType"/>
         <Field name="usvHeader"/>
         <Field name="responseGlobalHoverCommand.commonMissionData.missionType" cdm="Autonomy.Mission.Type" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Type.Waypoint" value="0"/><Map cdm="Autonomy.Mission.Type.GlobalHover" value="1"/><Map cdm="Autonomy.Mission.Type.TargetTracking" value="2"/><Map cdm="Autonomy.Mission.Type.PointAndGo" value="3"/><Map cdm="Autonomy.Mission.Type.AutonomousNavigation" value="4"/><Map cdm="Autonomy.Mission.Type.SurfaceReconnaissance" value="5"/><Map cdm="Autonomy.Mission.Type.UnderwaterReconnaissance" value="6"/><Map cdm="Autonomy.Mission.Type.AutonomousDocking" value="7"/></ValueMap></Field>
@@ -261,7 +261,7 @@
         <Field name="responseGlobalHoverCommand.heading" cdm="Autonomy.Mission.Record.Heading" dataType="Float64"/>
         <Field name="responseGlobalHoverCommand.enableModeRadius" cdm="Autonomy.Mission.Record.EnableModeRadius" dataType="Float64"/>
         <Field name="responseGlobalHoverCommand.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
-      </Reply>
+      </ReplyBinding>
       <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
     </ControlBinding>
     <ControlBinding semantic_id="recordTargetTrackingMission">
@@ -281,15 +281,15 @@
       <Field name="targetTrackingRecordCommandStatus.offsetFromTarget" cdm="Autonomy.Mission.Record.OffsetFromTarget" dataType="Int32"/>
       <!--rangeToTarget wire Range는 0~2000 m 그대로 유지. 0은 충돌회피만 수행, 50~2000은 이격거리 유지, 1~49 의미는 원문 미정의.-->
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="recordTargetTrackingMissionAck" required="true">
+      <ReplyBinding semantic_id="recordTargetTrackingMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="recordTargetTrackingMissionRecordAck" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="recordTargetTrackingMissionRecordAck" required="true">
         <DDSChannel topicName="RUSV::MM::ANU::TargetTrackingRecordCommandAckReportType" typeName="TargetTrackingRecordCommandAckReportType"/>
         <Field name="usvHeader"/>
         <Field name="responseTargetTrackingRecordCommand.commonMissionData.missionType" cdm="Autonomy.Mission.Type" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Type.Waypoint" value="0"/><Map cdm="Autonomy.Mission.Type.GlobalHover" value="1"/><Map cdm="Autonomy.Mission.Type.TargetTracking" value="2"/><Map cdm="Autonomy.Mission.Type.PointAndGo" value="3"/><Map cdm="Autonomy.Mission.Type.AutonomousNavigation" value="4"/><Map cdm="Autonomy.Mission.Type.SurfaceReconnaissance" value="5"/><Map cdm="Autonomy.Mission.Type.UnderwaterReconnaissance" value="6"/><Map cdm="Autonomy.Mission.Type.AutonomousDocking" value="7"/></ValueMap></Field>
@@ -304,7 +304,7 @@
         <Field name="responseTargetTrackingRecordCommand.rangeToTarget" cdm="Autonomy.Mission.Record.RangeToTarget" dataType="UInt32"/>
         <Field name="responseTargetTrackingRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
         <Field name="responseTargetTrackingRecordCommand.offsetFromTarget" cdm="Autonomy.Mission.Record.OffsetFromTarget" dataType="Int32"/>
-      </Reply>
+      </ReplyBinding>
       <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
     </ControlBinding>
     <ControlBinding semantic_id="recordPointAndGoMission">
@@ -321,15 +321,15 @@
       <Field name="pointAndGoRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
       <Field name="pointAndGoRecordCommandStatus.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance" dataType="Float64"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="recordPointAndGoMissionAck" required="true">
+      <ReplyBinding semantic_id="recordPointAndGoMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="recordPointAndGoMissionRecordAck" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="recordPointAndGoMissionRecordAck" required="true">
         <DDSChannel topicName="RUSV::MM::ANU::PointAndGoRecordCommandAckReportType" typeName="PointAndGoRecordCommandAckReportType"/>
         <Field name="usvHeader"/>
         <Field name="responsePointAndGoRecordCommand.commonMissionData.missionType" cdm="Autonomy.Mission.Type" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Type.Waypoint" value="0"/><Map cdm="Autonomy.Mission.Type.GlobalHover" value="1"/><Map cdm="Autonomy.Mission.Type.TargetTracking" value="2"/><Map cdm="Autonomy.Mission.Type.PointAndGo" value="3"/><Map cdm="Autonomy.Mission.Type.AutonomousNavigation" value="4"/><Map cdm="Autonomy.Mission.Type.SurfaceReconnaissance" value="5"/><Map cdm="Autonomy.Mission.Type.UnderwaterReconnaissance" value="6"/><Map cdm="Autonomy.Mission.Type.AutonomousDocking" value="7"/></ValueMap></Field>
@@ -342,7 +342,7 @@
         <Field name="responsePointAndGoRecordCommand.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount" dataType="UInt32"/>
         <Field name="responsePointAndGoRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
         <Field name="responsePointAndGoRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance" dataType="Float64"/>
-      </Reply>
+      </ReplyBinding>
       <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
     </ControlBinding>
     <ControlBinding semantic_id="recordAutonomousNavigationMission">
@@ -359,15 +359,15 @@
       <Field name="autonomousNavigationRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
       <Field name="autonomousNavigationRecordCommandStatus.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance" dataType="Float64"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="recordAutonomousNavigationMissionAck" required="true">
+      <ReplyBinding semantic_id="recordAutonomousNavigationMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="recordAutonomousNavigationMissionRecordAck" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="recordAutonomousNavigationMissionRecordAck" required="true">
         <DDSChannel topicName="RUSV::MM::ANU::AutonomousNavigationRecordCommandAckReportType" typeName="AutonomousNavigationRecordCommandAckReportType"/>
         <Field name="usvHeader"/>
         <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.missionType" cdm="Autonomy.Mission.Type" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Type.Waypoint" value="0"/><Map cdm="Autonomy.Mission.Type.GlobalHover" value="1"/><Map cdm="Autonomy.Mission.Type.TargetTracking" value="2"/><Map cdm="Autonomy.Mission.Type.PointAndGo" value="3"/><Map cdm="Autonomy.Mission.Type.AutonomousNavigation" value="4"/><Map cdm="Autonomy.Mission.Type.SurfaceReconnaissance" value="5"/><Map cdm="Autonomy.Mission.Type.UnderwaterReconnaissance" value="6"/><Map cdm="Autonomy.Mission.Type.AutonomousDocking" value="7"/></ValueMap></Field>
@@ -380,7 +380,7 @@
         <Field name="responseAutonomousNavigationRecordCommand.commonMissionData.totalPointNum" cdm="Autonomy.Mission.Record.TotalPointCount" dataType="UInt32"/>
         <Field name="responseAutonomousNavigationRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
         <Field name="responseAutonomousNavigationRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance" dataType="Float64"/>
-      </Reply>
+      </ReplyBinding>
       <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
     </ControlBinding>
     <ControlBinding semantic_id="recordSurfaceReconnaissanceMission">
@@ -402,15 +402,15 @@
       <Field name="surfaceReconnaissanceRecordCommandStatus.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
       <Field name="surfaceReconnaissanceRecordCommandStatus.repeatNumber" cdm="Autonomy.Mission.Record.RepeatNumber" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="recordSurfaceReconnaissanceMissionAck" required="true">
+      <ReplyBinding semantic_id="recordSurfaceReconnaissanceMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="recordSurfaceReconnaissanceMissionRecordAck" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="recordSurfaceReconnaissanceMissionRecordAck" required="true">
         <DDSChannel topicName="RUSV::MM::ANU::SurfaceReconnaissanceRecordCommandAckReportType" typeName="SurfaceReconnaissanceRecordCommandAckReportType"/>
         <Field name="usvHeader"/>
         <ArrayField name="responseSurfaceReconnaissanceRecordCommand.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
@@ -428,7 +428,7 @@
         <Field name="responseSurfaceReconnaissanceRecordCommand.lateralErrorTolerance" cdm="Autonomy.Mission.Record.LateralErrorTolerance" dataType="Float64"/>
         <Field name="responseSurfaceReconnaissanceRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
         <Field name="responseSurfaceReconnaissanceRecordCommand.repeatNumber" cdm="Autonomy.Mission.Record.RepeatNumber" dataType="UInt8"/>
-      </Reply>
+      </ReplyBinding>
       <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
     </ControlBinding>
     <ControlBinding semantic_id="recordUnderwaterReconnaissanceMission">
@@ -452,15 +452,15 @@
       <Field name="underwaterMissionPlanRecordCommandStatus.timeLimit" cdm="Autonomy.Mission.Record.TimeLimit" dataType="UInt32"/>
       <!--searchingRange는 Semantic[m] × 100을 UInt16 wire raw로 송신하고 수신 시 raw/100으로 해석한다. timeLimit의 단위는 원문 추가 확인 대상이다.-->
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="recordUnderwaterReconnaissanceMissionAck" required="true">
+      <ReplyBinding semantic_id="recordUnderwaterReconnaissanceMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="recordUnderwaterReconnaissanceMissionRecordAck" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="recordUnderwaterReconnaissanceMissionRecordAck" required="true">
         <DDSChannel topicName="RUSV::MM::ANU::UnderwaterMissionPlanRecordCommandAckReportType" typeName="UnderwaterMissionPlanRecordCommandAckReportType"/>
         <Field name="usvHeader"/>
         <ArrayField name="responseUnderwaterMissionPlanRecordCommand.commonMissionDataSequence" cdm="Autonomy.Mission.Record.CommonMissionDataSequence" minOccurs="0" maxOccurs="256">
@@ -479,7 +479,7 @@
         <Field name="responseUnderwaterMissionPlanRecordCommand.searchingRange" cdm="Autonomy.Mission.Record.SearchingRange" dataType="UInt16" scale="100"/>
         <Field name="responseUnderwaterMissionPlanRecordCommand.endAction" cdm="Autonomy.Mission.Record.EndAction" dataType="UInt8"><ValueMap><Map cdm="Autonomy.Mission.Record.EndAction.Drift" value="0"/><Map cdm="Autonomy.Mission.Record.EndAction.WeatherVaning" value="1"/></ValueMap></Field>
         <Field name="responseUnderwaterMissionPlanRecordCommand.timeLimit" cdm="Autonomy.Mission.Record.TimeLimit" dataType="UInt32"/>
-      </Reply>
+      </ReplyBinding>
       <!--RecordCommand 물리 Size 열은 공용 구조체 내용과 불일치하므로 공용 구조체 필드를 기준으로 Binding한다.-->
     </ControlBinding>
     <ControlBinding semantic_id="setEmergencyReturnRoute">
@@ -497,14 +497,14 @@
       <Field name="goalError" cdm="Autonomy.Return.GoalError" dataType="Float64"/>
       <Field name="action" cdm="Autonomy.Return.EndAction" dataType="UInt32"><ValueMap><Map cdm="Autonomy.Return.EndAction.Drift" value="0"/><Map cdm="Autonomy.Return.EndAction.HoldPosition" value="1"/><Map cdm="Autonomy.Return.EndAction.Signal" value="2"/></ValueMap></Field>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setEmergencyReturnRouteAck" required="true">
+      <ReplyBinding semantic_id="setEmergencyReturnRouteAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
       <!--action 값 3은 Range에는 포함되지만 의미가 미정의이므로 Semantic 입력에서는 사용하지 않는다.-->
     </ControlBinding>
     <ControlBinding semantic_id="setReturnToBasePoint">
@@ -513,14 +513,14 @@
       <Field name="latitude" cdm="Autonomy.Return.BasePoint.Latitude" dataType="Float64"/>
       <Field name="longitude" cdm="Autonomy.Return.BasePoint.Longitude" dataType="Float64"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setReturnToBasePointAck" required="true">
+      <ReplyBinding semantic_id="setReturnToBasePointAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="startMission">
       <DDSChannel topicName="RUSV::C2::RCU::StartMissionCommandType" typeName="StartMissionCommandType"/>
@@ -528,14 +528,14 @@
       <FixedField name="missionActionCommand" value="0" cdm="Autonomy.Mission.Action" dataType="UInt8"/>
       <Field name="pointIndex" cdm="Autonomy.Mission.StartPointIndex" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="startMissionAck" required="true">
+      <ReplyBinding semantic_id="startMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="resumeMission">
       <DDSChannel topicName="RUSV::C2::RCU::StartMissionCommandType" typeName="StartMissionCommandType"/>
@@ -543,14 +543,14 @@
       <FixedField name="missionActionCommand" value="1" cdm="Autonomy.Mission.Action" dataType="UInt8"/>
       <Field name="pointIndex" cdm="Autonomy.Mission.StartPointIndex" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="resumeMissionAck" required="true">
+      <ReplyBinding semantic_id="resumeMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="abortMission">
       <DDSChannel topicName="RUSV::C2::RCU::StartMissionCommandType" typeName="StartMissionCommandType"/>
@@ -558,14 +558,14 @@
       <FixedField name="missionActionCommand" value="2" cdm="Autonomy.Mission.Action" dataType="UInt8"/>
       <FixedField name="pointIndex" value="0" cdm="Autonomy.Mission.StartPointIndex" dataType="UInt8"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="abortMissionAck" required="true">
+      <ReplyBinding semantic_id="abortMissionAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
     <ControlBinding semantic_id="setRestrictedAreas">
       <DDSChannel topicName="RUSV::C2::RCU::RestrictAreaCommandType" typeName="RestrictAreaCommandType"/>
@@ -580,14 +580,14 @@
         </Element>
       </ArrayField>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="setRestrictedAreasAck" required="true">
+      <ReplyBinding semantic_id="setRestrictedAreasAck" required="true">
         <DDSChannel topicName="RUSV::C2::ANU::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
       <!--원문 RestrictArea는 두 좌표점만 제공하며 사각형/다각형 생성 규칙은 정의하지 않는다.-->
     </ControlBinding>
   </Controls>

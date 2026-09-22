@@ -183,28 +183,28 @@
   <ControlSpecs id="control">
         <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="startIntegrationAck" name="Start Integration Ack" bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="startIntegrationAck" name="Start Integration Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="restartSystemAck" name="Restart System Ack" bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="restartSystemAck" name="Restart System Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="requestIbitAck" name="Request Ibit Ack" bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="requestIbitAck" name="Request Ibit Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
-      <Reply id="requestIbitResult" name="Request Ibit Result" bindRef="requestIbitResult" cdm="Request.Health.IBIT.Response" required="true">
+      </ReplySpec>
+      <ReplySpec id="requestIbitResult" name="Request Ibit Result" cdm="Request.Health.IBIT.Response" required="true">
         <Results>
           <GroupResult id="eOIR" name="eoirIbit" cdm="Health.IBIT.EOIR">
             <ValueSetResult id="overall" name="statusEoir" cdm="Health.EOIR.IBIT.Overall">
@@ -280,16 +280,16 @@
             </GroupResult>
           </GroupResult>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="requestPbitAck" name="Request Pbit Ack" bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="requestPbitAck" name="Request Pbit Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
-      <Reply id="requestPbitResult" name="Request Pbit Result" bindRef="requestPbitResult" cdm="Request.Health.PBIT.Response" required="true">
+      </ReplySpec>
+      <ReplySpec id="requestPbitResult" name="Request Pbit Result" cdm="Request.Health.PBIT.Response" required="true">
         <Results>
           <GroupResult id="eOIR" name="eoirPbit" cdm="Health.PBIT.EOIR">
             <ValueSetResult id="overall" name="statusEoir" cdm="Health.EOIR.PBIT.Overall">
@@ -318,7 +318,7 @@
             </ValueSetResult>
           </GroupResult>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="setOperationMode" name="EOIR 운용모드 설정" cdm="Control.EOIR.Mode.Set">
       <!--operationMode: 0=대기, 1=구동, 2=추적, 3=항해레이더 연동, 4=RCWS 연동, 5=선수지향, 6=SWING, 7=STOW-->
@@ -336,11 +336,11 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply id="setOperationModeAck" name="Set Operation Mode Ack" bindRef="setOperationModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setOperationModeAck" name="Set Operation Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="controlByJoystick" name="EOIR 조이스틱 구동 제어" cdm="Control.EOIR.Motion.Joystick">
       <Parameters>
@@ -353,11 +353,11 @@
           <Range min="-100" max="100"/>
         </QuantityProfile>
       </Parameters>
-      <Reply id="controlByJoystickAck" name="Control By Joystick Ack" bindRef="controlByJoystickAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="controlByJoystickAck" name="Control By Joystick Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="pointToPosition" name="EOIR 설정값 구동 제어" cdm="Control.EOIR.Motion.Position">
       <!--referenceModeResult: false(0)=헤딩 기준, true(1)=진북 기준. PAN 허용범위는 헤딩 기준 -180~180 deg, 진북 기준 0~360 deg로 조건부이므로 단일 Range는 지정하지 않는다.-->
@@ -373,11 +373,11 @@
           <Resolution>0.01</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply id="pointToPositionAck" name="Point To Position Ack" bindRef="pointToPositionAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="pointToPositionAck" name="Point To Position Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="controlTracking" name="EOIR 접촉물 추적 제어" cdm="Control.EOIR.Tracking">
       <!--targetSetting: 0=No change, 1=1차 설정, 2=2차 설정, 3=1차 취소, 4=2차 취소. sensorSelection: 0=직전 채널, 1=EO, 2=MWIR. SWIR 추적 값은 원본 CSCI에 없음(TBD).-->
@@ -434,11 +434,11 @@
           <Range min="0" max="1080"/>
         </QuantityProfile>
       </Parameters>
-      <Reply id="controlTrackingAck" name="Control Tracking Ack" bindRef="controlTrackingAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="controlTrackingAck" name="Control Tracking Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="pointToRadarTarget" name="항해레이더 지향 목표 표적 설정" cdm="Control.EOIR.Pointing.RadarTarget">
       <!--targetId: 1~65534는 탐지물 ID이며 0 및 65535(0xFFFF)는 Not available 특수값이다.-->
@@ -448,11 +448,11 @@
           <Range min="1" max="65534"/>
         </QuantityProfile>
       </Parameters>
-      <Reply id="pointToRadarTargetAck" name="Point To Radar Target Ack" bindRef="pointToRadarTargetAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="pointToRadarTargetAck" name="Point To Radar Target Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
     <!--swingSpeedResult은 원문 Unit이 deg로 표기되지만 필드 설명은 속도/각속도이므로 deg/s로 추정하지 않고 원문 Unit을 보존하며 OpenIssues에 남긴다.-->
         <ControlSpec id="configureSwing" name="EOIR 스윙 설정" cdm="Control.EOIR.Swing">
@@ -474,22 +474,22 @@
           <Resolution>0.01</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply id="configureSwingAck" name="Configure Swing Ack" bindRef="configureSwingAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="configureSwingAck" name="Configure Swing Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="switchIrVideo" name="IR 영상 전환" cdm="Control.EOIR.Video.IR.Switch">
       <!--irSwitching: false(0)=MWIR 송신(SWIR 포트 닫음), true(1)=SWIR 송신(MWIR 포트 닫음).-->
       <Parameters>
         <BooleanProfile id="useSwir" name="Use Swir" cdm="Control.EOIR.Video.IR.UseSWIR"/>
       </Parameters>
-      <Reply id="switchIrVideoAck" name="Switch Ir Video Ack" bindRef="switchIrVideoAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="switchIrVideoAck" name="Switch Ir Video Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="controlZoom" name="EOIR Zoom 설정" cdm="Control.EOIR.Zoom">
       <!--eoirFlagResult: false(0)=EO, true(1)=MWIR. zoomControl: 0=No action/No change, 1=연속제어, 2=위치제어. continuousZoomControl: 0=No action, 1=Zoom In, 2=Zoom Out, 3=Stop.-->
@@ -517,11 +517,11 @@
           <Resolution>0.5</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply id="controlZoomAck" name="Control Zoom Ack" bindRef="controlZoomAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="controlZoomAck" name="Control Zoom Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="controlFocus" name="EOIR Focus 설정" cdm="Control.EOIR.Focus">
       <!--eoirFlagResult: false(0)=EO, true(1)=MWIR. focusControl: 0=No action/No change, 1=연속제어, 2=위치제어. continuousFocusControl: 0=No change, 1=Near, 2=Far, 3=Auto Focus ON, 4=Stop.-->
@@ -550,11 +550,11 @@
           <Resolution>0.5</Resolution>
         </QuantityProfile>
       </Parameters>
-      <Reply id="controlFocusAck" name="Control Focus Ack" bindRef="controlFocusAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="controlFocusAck" name="Control Focus Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="configureEoSensor" name="EO 카메라 세부 설정" cdm="Control.EOIR.EO.Configure">
       <!--eoSensorControl: 0=No change, 1=Day, 2=Night, 3=연무제거 On, 4=연무제거 Off. eoBLCControl/eoWDRControl: 0=No change, 1=On, 2=Off.-->
@@ -583,11 +583,11 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply id="configureEoSensorAck" name="Configure Eo Sensor Ack" bindRef="configureEoSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="configureEoSensorAck" name="Configure Eo Sensor Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="configureMwirSensor" name="MWIR 카메라 세부 설정" cdm="Control.EOIR.MWIR.Configure">
       <!--NUC/AutoGain: 0=No change, 1=On, 2=Off. Palette: 0=No change, 1=Hot/White, 2=Cold/White. AGC Limit: 0=No change, 1~9=Level(default 4). MIDE: 0=No change, 1~15=Level, 16=Off(default).-->
@@ -649,11 +649,11 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply id="configureMwirSensorAck" name="Configure Mwir Sensor Ack" bindRef="configureMwirSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="configureMwirSensorAck" name="Configure Mwir Sensor Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="configureSwirSensor" name="SWIR 카메라 세부 설정" cdm="Control.EOIR.SWIR.Configure">
       <!--AutoGain: 0=No change, 1=On, 2=Off. Palette: 0=No change, 1=Hot/White, 2=Cold/White.-->
@@ -673,11 +673,11 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply id="configureSwirSensorAck" name="Configure Swir Sensor Ack" bindRef="configureSwirSensorAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="configureSwirSensorAck" name="Configure Swir Sensor Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="controlLrf" name="LRF 측정 설정" cdm="Control.EOIR.LRF.Measurement">
       <!--controlLRFCount: 0=No change, 1=단발 1회, 2=1Hz 연속, 3=4Hz 연속, 4=연속 정지. 측정 결과는 LRFReportType을 lrfMeasurement Monitor로 수신한다.-->
@@ -692,11 +692,11 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply id="controlLrfAck" name="Control Lrf Ack" bindRef="controlLrfAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="controlLrfAck" name="Control Lrf Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="configureIlluminator" name="탐조등 설정" cdm="Control.EOIR.Illuminator">
       <!--laserIlluminatorSetting: false(0)=탐조등 사용, true(1)=탐조등 미사용. beamAngleTele/Wide 값은 한 번 확대/축소되는 변화 크기이며 0~255 raw 단계값이다.-->
@@ -715,11 +715,11 @@
           <Range min="0" max="255"/>
         </QuantityProfile>
       </Parameters>
-      <Reply id="configureIlluminatorAck" name="Configure Illuminator Ack" bindRef="configureIlluminatorAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="configureIlluminatorAck" name="Configure Illuminator Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="controlWiper" name="Wiper 설정" cdm="Control.EOIR.Wiper">
       <!--원본 CSCI의 wiperSetting 범위는 0~9이나 실제 유효 동작으로 0=No change, 1=1회 동작, 2=연속 동작, 3=Stop만 사용한다. 4/5는 원본에 삭제 요청으로 표기되고 6~9는 정의가 없어 Semantic에서 제외한다.-->
@@ -733,11 +733,11 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply id="controlWiperAck" name="Control Wiper Ack" bindRef="controlWiperAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="controlWiperAck" name="Control Wiper Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="controlPower" name="EOIR 전원 설정" cdm="Control.EOIR.Power">
       <!--각 전원 필드: 0=No change, 1=On, 2=Off. SWIR는 설정/영상전환/IBIT 상태는 존재하지만 EOIRPowerControlType에 swirPower가 정의되어 있지 않아 임의로 추가하지 않는다(TBD).-->
@@ -771,11 +771,11 @@
           </Values>
         </ValueSetProfile>
       </Parameters>
-      <Reply id="controlPowerAck" name="Control Power Ack" bindRef="controlPowerAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="controlPowerAck" name="Control Power Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results>
           <Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/>
         </Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
   </ControlSpecs>
   <SensorProductSpecs id="sensorProduct"><ProductStreamSpec id="eoVideo" name="EO 영상 스트림" cdm="ProductStream.Video.EO">

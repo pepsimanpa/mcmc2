@@ -67,14 +67,14 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.ElectroOpticalProcessor"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="startIntegrationAck" required="true">
+      <ReplyBinding semantic_id="startIntegrationAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="restartSystem">
@@ -82,14 +82,14 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.ElectroOpticalProcessor"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="restartSystemAck" required="true">
+      <ReplyBinding semantic_id="restartSystemAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="requestIbit">
@@ -97,15 +97,15 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.ElectroOpticalProcessor"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="requestIbitAck" required="true">
+      <ReplyBinding semantic_id="requestIbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestIbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestIbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::CIPE::CIPEIBITReportType" typeName="CIPEIBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="cipeIBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8">
@@ -125,7 +125,7 @@
         <!-- ProcessorIBIT 원문: cpuTemperature double/℃/20~100, cpuLoad double/%/0~100. -->
         <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuTemperature" cdm="Health.CIPE.Processor.CpuTemperature" dataType="Float64"/>
         <Field name="cipeIBITStatus.cipeProcessorIBIT.cpuLoad" cdm="Health.CIPE.Processor.CpuLoad" dataType="Float64"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="requestPbit">
@@ -133,15 +133,15 @@
       <DerivedField name="usvHeader" sourceField="System.Generated.USVMessageBase"/>
       <DerivedField name="destination" sourceField="System.Target.ElectroOpticalProcessor"/>
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
-      <Reply semantic_id="requestPbitAck" required="true">
+      <ReplyBinding semantic_id="requestPbitAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
-      <Reply semantic_id="requestPbitResult" required="true">
+      </ReplyBinding>
+      <ReplyBinding semantic_id="requestPbitResult" required="true">
         <DDSChannel topicName="RUSV::SO::CIPE::CIPEPBITReportType" typeName="CIPEPBITReportType"/>
         <Field name="usvHeader"/>
         <Field name="cipePBITStatus.cipeOperationalStatus" cdm="Health.CIPE.EquipmentLink" dataType="UInt8">
@@ -158,7 +158,7 @@
             <Map cdm="Health.NoResponse" value="3"/>
           </ValueMap>
         </Field>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
 
     <ControlBinding semantic_id="saveImage">
@@ -167,14 +167,14 @@
       <DerivedField name="commandID" sourceField="System.Generated.CommandSequence" dataType="UInt16"/>
       <!-- 0=no change, 1=전자광학장치 이미지 저장. source IDL type은 boolean이며 공통 WireDataType Boolean으로 직접 선언한다. -->
       <FixedField name="controlImageSave" value="1" dataType="Boolean"/>
-      <Reply semantic_id="saveImageAck" required="true">
+      <ReplyBinding semantic_id="saveImageAck" required="true">
         <DDSChannel topicName="RUSV::C2::CIPE::CommandStatusReportType" typeName="CommandStatusReportType"/>
         <Field name="usvHeader"/>
         <Field name="commandStatusReport.dstEquipmentType" cdm="Control.Response.Destination.EquipmentType" dataType="UInt8"/>
         <Field name="commandStatusReport.dstEquipmentID" cdm="Control.Response.Destination.EquipmentID" dataType="UInt8"/>
         <Field name="commandStatusReport.status" cdm="Control.Response.Status" dataType="UInt8"/>
         <Field name="commandID" cdm="Message.Correlation.NumericID" dataType="UInt16"/>
-      </Reply>
+      </ReplyBinding>
     </ControlBinding>
   </Controls>
 </SensorBinding>

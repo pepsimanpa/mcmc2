@@ -542,82 +542,82 @@
   <ControlSpecs id="control">
         <ControlSpec id="startIntegration" name="연동 개시 명령" cdm="Control.Integration.Start">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="startIntegrationAck" name="Start Integration Ack" bindRef="startIntegrationAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="startIntegrationAck" name="Start Integration Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="restartSystem" name="시스템 재시작 명령" cdm="Control.System.Restart">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="restartSystemAck" name="Restart System Ack" bindRef="restartSystemAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="restartSystemAck" name="Restart System Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
     <!--선체제어 PBIT/IBIT은 원 CSCI에서 여러 개의 서로 다른 물리 결과 메시지 타입으로 정의되어 있으므로 각 물리 결과 메시지당 하나의 Reply를 유지한다.-->
         <ControlSpec id="requestIbit" name="IBIT 명령" cdm="Request.Health.IBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="requestIbitAck" name="Request Ibit Ack" bindRef="requestIbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="requestIbitAck" name="Request Ibit Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
-      <Reply id="requestIbitEngineResult" name="Request Ibit Engine Result" bindRef="requestIbitEngineResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitWaterJetResult" name="Request Ibit Water Jet Result" bindRef="requestIbitWaterJetResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitBowThrusterResult" name="Request Ibit Bow Thruster Result" bindRef="requestIbitBowThrusterResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitPowerResult" name="Request Ibit Power Result" bindRef="requestIbitPowerResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitBatteryResult" name="Request Ibit Battery Result" bindRef="requestIbitBatteryResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitGeneratorResult" name="Request Ibit Generator Result" bindRef="requestIbitGeneratorResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitEnvironmentResult" name="Request Ibit Environment Result" bindRef="requestIbitEnvironmentResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitWindSensorResult" name="Request Ibit Wind Sensor Result" bindRef="requestIbitWindSensorResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitFireDetectorResult" name="Request Ibit Fire Detector Result" bindRef="requestIbitFireDetectorResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitLeakDetectorResult" name="Request Ibit Leak Detector Result" bindRef="requestIbitLeakDetectorResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitFlowMeterResult" name="Request Ibit Flow Meter Result" bindRef="requestIbitFlowMeterResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitStabilizerResult" name="Request Ibit Stabilizer Result" bindRef="requestIbitStabilizerResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitInterceptorResult" name="Request Ibit Interceptor Result" bindRef="requestIbitInterceptorResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitSeaWaterConditionerResult" name="Request Ibit Sea Water Conditioner Result" bindRef="requestIbitSeaWaterConditionerResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitTowingDeviceResult" name="Request Ibit Towing Device Result" bindRef="requestIbitTowingDeviceResult" cdm="Request.Health.IBIT.Response"/>
-      <Reply id="requestIbitSPCEResult" name="Request Ibit SPCE Result" bindRef="requestIbitSPCEResult" cdm="Request.Health.IBIT.Response"/>
+      </ReplySpec>
+      <ReplySpec id="requestIbitEngineResult" name="Request Ibit Engine Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitWaterJetResult" name="Request Ibit Water Jet Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitBowThrusterResult" name="Request Ibit Bow Thruster Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitPowerResult" name="Request Ibit Power Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitBatteryResult" name="Request Ibit Battery Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitGeneratorResult" name="Request Ibit Generator Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitEnvironmentResult" name="Request Ibit Environment Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitWindSensorResult" name="Request Ibit Wind Sensor Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitFireDetectorResult" name="Request Ibit Fire Detector Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitLeakDetectorResult" name="Request Ibit Leak Detector Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitFlowMeterResult" name="Request Ibit Flow Meter Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitStabilizerResult" name="Request Ibit Stabilizer Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitInterceptorResult" name="Request Ibit Interceptor Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitSeaWaterConditionerResult" name="Request Ibit Sea Water Conditioner Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitTowingDeviceResult" name="Request Ibit Towing Device Result" cdm="Request.Health.IBIT.Response"/>
+      <ReplySpec id="requestIbitSPCEResult" name="Request Ibit SPCE Result" cdm="Request.Health.IBIT.Response"/>
     </ControlSpec>
         <ControlSpec id="requestPbit" name="PBIT 명령" cdm="Request.Health.PBIT">
           <Target cdm="Platform.Identifier.Numeric"/>
-      <Reply id="requestPbitAck" name="Request Pbit Ack" bindRef="requestPbitAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="requestPbitAck" name="Request Pbit Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
-      <Reply id="requestPbitPropulsionResult" name="Request Pbit Propulsion Result" bindRef="requestPbitPropulsionResult" cdm="Request.Health.PBIT.Response"/>
-      <Reply id="requestPbitElectricalResult" name="Request Pbit Electrical Result" bindRef="requestPbitElectricalResult" cdm="Request.Health.PBIT.Response"/>
-      <Reply id="requestPbitAccessoriesResult" name="Request Pbit Accessories Result" bindRef="requestPbitAccessoriesResult" cdm="Request.Health.PBIT.Response"/>
-      <Reply id="requestPbitSubsystemResult" name="Request Pbit Subsystem Result" bindRef="requestPbitSubsystemResult" cdm="Request.Health.PBIT.Response"/>
-      <Reply id="requestPbitSPCEResult" name="Request Pbit SPCE Result" bindRef="requestPbitSPCEResult" cdm="Request.Health.PBIT.Response"/>
+      </ReplySpec>
+      <ReplySpec id="requestPbitPropulsionResult" name="Request Pbit Propulsion Result" cdm="Request.Health.PBIT.Response"/>
+      <ReplySpec id="requestPbitElectricalResult" name="Request Pbit Electrical Result" cdm="Request.Health.PBIT.Response"/>
+      <ReplySpec id="requestPbitAccessoriesResult" name="Request Pbit Accessories Result" cdm="Request.Health.PBIT.Response"/>
+      <ReplySpec id="requestPbitSubsystemResult" name="Request Pbit Subsystem Result" cdm="Request.Health.PBIT.Response"/>
+      <ReplySpec id="requestPbitSPCEResult" name="Request Pbit SPCE Result" cdm="Request.Health.PBIT.Response"/>
     </ControlSpec>
         <ControlSpec id="setEmergencyStopMode" name="비상정지 모드 설정" cdm="Control.Platform.OperationMode.EmergencyStop">
-      <Reply id="setEmergencyStopModeAck" name="Set Emergency Stop Mode Ack" bindRef="setEmergencyStopModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setEmergencyStopModeAck" name="Set Emergency Stop Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>    <ControlSpec id="setEmergencyReturnMode" name="비상복귀 모드 설정" cdm="Control.Platform.OperationMode.EmergencyReturn">
-      <Reply id="setEmergencyReturnModeAck" name="Set Emergency Return Mode Ack" bindRef="setEmergencyReturnModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setEmergencyReturnModeAck" name="Set Emergency Return Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>    <ControlSpec id="setRemoteManualMode" name="원격수동조작 모드 설정" cdm="Control.Platform.OperationMode.RemoteManual">
-      <Reply id="setRemoteManualModeAck" name="Set Remote Manual Mode Ack" bindRef="setRemoteManualModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setRemoteManualModeAck" name="Set Remote Manual Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>    <ControlSpec id="setLocalManualMode" name="근거리수동조작 모드 설정" cdm="Control.Platform.OperationMode.LocalManual">
-      <Reply id="setLocalManualModeAck" name="Set Local Manual Mode Ack" bindRef="setLocalManualModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setLocalManualModeAck" name="Set Local Manual Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>    <ControlSpec id="setAutonomousMode" name="자율운항 모드 설정" cdm="Control.Platform.OperationMode.Autonomous">
-      <Reply id="setAutonomousModeAck" name="Set Autonomous Mode Ack" bindRef="setAutonomousModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setAutonomousModeAck" name="Set Autonomous Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>    <ControlSpec id="setStandbyMode" name="명령대기 모드 설정" cdm="Control.Platform.OperationMode.Standby">
-      <Reply id="setStandbyModeAck" name="Set Standby Mode Ack" bindRef="setStandbyModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setStandbyModeAck" name="Set Standby Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>    <ControlSpec id="setMaintenanceMode" name="정비 모드 설정" cdm="Control.Platform.OperationMode.Maintenance">
-      <Reply id="setMaintenanceModeAck" name="Set Maintenance Mode Ack" bindRef="setMaintenanceModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setMaintenanceModeAck" name="Set Maintenance Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>    <ControlSpec id="setEmergencyActionMode" name="비상조치 모드 설정" cdm="Control.Platform.OperationMode.EmergencyAction">
-      <Reply id="setEmergencyActionModeAck" name="Set Emergency Action Mode Ack" bindRef="setEmergencyActionModeAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="setEmergencyActionModeAck" name="Set Emergency Action Mode Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="powerOnEquipment" name="장비 전원 ON" cdm="Control.Power.On">
       <Parameters>
@@ -627,9 +627,9 @@
           </ElementProfile>
         </CollectionProfile>
       </Parameters>
-      <Reply id="powerOnEquipmentAck" name="Power On Equipment Ack" bindRef="powerOnEquipmentAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="powerOnEquipmentAck" name="Power On Equipment Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="powerOffEquipment" name="장비 전원 OFF" cdm="Control.Power.Off">
       <Parameters>
@@ -639,9 +639,9 @@
           </ElementProfile>
         </CollectionProfile>
       </Parameters>
-      <Reply id="powerOffEquipmentAck" name="Power Off Equipment Ack" bindRef="powerOffEquipmentAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="powerOffEquipmentAck" name="Power Off Equipment Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="resetEquipmentPower" name="장비 전원 Reset" cdm="Control.Power.Reset">
       <Parameters>
@@ -651,17 +651,17 @@
           </ElementProfile>
         </CollectionProfile>
       </Parameters>
-      <Reply id="resetEquipmentPowerAck" name="Reset Equipment Power Ack" bindRef="resetEquipmentPowerAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="resetEquipmentPowerAck" name="Reset Equipment Power Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
         <ControlSpec id="configureSurveillanceCameraPower" name="감시카메라 전원 설정" cdm="Control.Camera.Power.Configuration">
       <Parameters>
         <Profile id="powerStateSet" name="Power State Set" cdm="Equipment.Camera.Power.StateSet"/>
       </Parameters>
-      <Reply id="configureSurveillanceCameraPowerAck" name="Configure Surveillance Camera Power Ack" bindRef="configureSurveillanceCameraPowerAck" cdm="Command.ProcessingStatus.Response" required="true">
+      <ReplySpec id="configureSurveillanceCameraPowerAck" name="Configure Surveillance Camera Power Ack" cdm="Command.ProcessingStatus.Response" required="true">
         <Results><Result id="status" name="commandStatusReport.status" cdm="Control.Response.Status"/></Results>
-      </Reply>
+      </ReplySpec>
     </ControlSpec>
     <!--ENVCommandType과 TowingDeviceControlType은 ACK=O이나 commandID가 없어 현재 CommandStatusReport Reply를 강제로 연결하지 않는다.-->
         <ControlSpec id="configureEnvironmentSystem" name="환경센서 계통 제어" cdm="Control.Environment.Configuration">
