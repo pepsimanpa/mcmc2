@@ -2867,7 +2867,7 @@ function renderHmiContract(action) {
       subscribeExamples,
     );
     dom.hmiContractBody.append(
-      hmiProfileTable('01 · HMI 표출 항목', flattenSemanticProfiles(action.outputs), false, true),
+      hmiProfileTable('01 · HMI 전시 항목', flattenSemanticProfiles(action.outputs), false, true),
       subscribeSection,
     );
   } else {
