@@ -2464,7 +2464,7 @@ function hmiProfileTable(title, profiles, inputMode = false, showOutputName = fa
   const section = el('section', 'hmi-contract-section');
   section.append(el('h3', '', title));
   if (!profiles.length) {
-    section.append(el('p', 'semantic-empty', inputMode ? 'HMI 입력 없음' : '표시할 의미 항목 없음'));
+    section.append(el('p', 'semantic-empty', inputMode ? 'HMI 입력 항목 없음' : '표시할 의미 항목 없음'));
     return section;
   }
   const wrap = el('div', 'hmi-contract-table-wrap');
